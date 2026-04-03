@@ -1,26 +1,18 @@
 {
-  "name": "warrioraashuu-codemaster",
+  "name": "agclaw-source-explorer",
   "version": "1.1.0",
-  "mcpName": "io.github.warrioraashuu/warrioraashuu-codemaster",
-  "description": "MCP server for exploring the Claude Code source code — rebranded and published by warrioraashuu. STDIO, HTTP, and SSE transports.",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/codeaashu/claude-code.git"
-  },
+  "mcpName": "io.github.williamkasasa/agclaw-source-explorer",
+  "description": "AG-Claw source explorer MCP server for local research workspaces.",
   "author": "warrioraashuu <npmjs.com/~warrioraashuu>",
-  "homepage": "https://github.com/codeaashu/claude-code#readme",
-  "bugs": {
-    "url": "https://github.com/codeaashu/claude-code/issues"
-  },
   "type": "module",
-  "main": "dist/index.js",
+  "main": "dist/src/index.js",
   "bin": {
-    "warrioraashuu-codemaster": "dist/index.js"
+    "agclaw-source-explorer": "dist/src/index.js"
   },
   "scripts": {
     "build": "tsc",
-    "start": "node dist/index.js",
-    "start:http": "node dist/http.js",
+    "start": "node dist/src/index.js",
+    "start:http": "node dist/src/http.js",
     "dev": "npx tsx src/index.ts"
   },
   "dependencies": {
@@ -32,7 +24,6 @@
     "@types/node": "^22.0.0",
     "tsx": "^4.19.0",
     "typescript": "^5.7.0"
-  }
+  },
+  "private": true
 }
-
-

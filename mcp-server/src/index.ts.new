@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 /**
- * STDIO entrypoint — for local use with Claude Desktop, Claude Code, etc.
+ * STDIO entrypoint for local MCP clients.
  *
  * Usage:
- *   node dist/index.js
- *   CLAUDE_CODE_SRC_ROOT=/path/to/src node dist/index.js
+ *   node dist/src/index.js
+ *   AGCLAW_REFERENCE_SRC_ROOT=/path/to/src node dist/src/index.js
  */
 
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
@@ -15,7 +15,7 @@ async function main() {
   const server = createServer();
   const transport = new StdioServerTransport();
   await server.connect(transport);
-  console.error(`Claude Code Explorer MCP (stdio) started — src: ${SRC_ROOT}`);
+  console.error(`AG-Claw Source Explorer MCP (stdio) started — src: ${SRC_ROOT}`);
 }
 
 main().catch((err) => {
