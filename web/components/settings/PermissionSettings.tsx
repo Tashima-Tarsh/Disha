@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import { Plus, X } from "lucide-react";
@@ -64,7 +64,7 @@ export function PermissionSettings() {
       <SectionHeader title="Permissions & Safety" onReset={() => resetSettings("permissions")} />
 
       <div className="mb-4 p-3 rounded-md bg-amber-500/10 border border-amber-500/20 text-xs text-amber-300">
-        Auto-approving tools means Claude can perform these actions without asking for confirmation.
+        Auto-approving tools means AG-Claw can perform these actions without asking for confirmation.
         Use with caution.
       </div>
 
@@ -91,6 +91,9 @@ export function PermissionSettings() {
               <span className="text-xs font-mono text-surface-300 truncate">{dir}</span>
               <button
                 onClick={() => removeRestrictedDir(dir)}
+                type="button"
+                aria-label={`Remove restricted directory ${dir}`}
+                title="Remove restricted directory"
                 className="text-surface-500 hover:text-red-400 transition-colors flex-shrink-0"
               >
                 <X className="w-3.5 h-3.5" />
@@ -104,6 +107,7 @@ export function PermissionSettings() {
               onChange={(e) => setNewDir(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && addRestrictedDir()}
               placeholder="/path/to/directory"
+              aria-label="Restricted directory path"
               className={cn(
                 "flex-1 bg-surface-800 border border-surface-700 rounded-md px-3 py-1.5 text-xs",
                 "text-surface-200 placeholder-surface-600 focus:outline-none focus:ring-1 focus:ring-brand-500 font-mono"
@@ -111,6 +115,7 @@ export function PermissionSettings() {
             />
             <button
               onClick={addRestrictedDir}
+              type="button"
               className={cn(
                 "flex items-center gap-1 px-2.5 py-1.5 rounded-md text-xs",
                 "bg-surface-800 border border-surface-700 text-surface-300",
@@ -126,3 +131,4 @@ export function PermissionSettings() {
     </div>
   );
 }
+

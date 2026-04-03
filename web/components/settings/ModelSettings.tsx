@@ -3,15 +3,15 @@
 import { useState } from "react";
 import { ChevronDown } from "lucide-react";
 import { useChatStore } from "@/lib/store";
-import { MODELS } from "@/lib/constants";
+import { getModelOptions } from "@/lib/constants";
 import { SettingRow, SectionHeader, Slider } from "./SettingRow";
 import { cn } from "@/lib/utils";
 
 export function ModelSettings() {
   const { settings, updateSettings, resetSettings } = useChatStore();
   const [showAdvanced, setShowAdvanced] = useState(false);
-
-  const selectedModel = MODELS.find((m) => m.id === settings.model);
+  const modelOptions = getModelOptions(settings.provider);
+  const selectedModel = modelOptions.find((model) => model.id === settings.model);
 
   return (
     <div>
@@ -19,34 +19,36 @@ export function ModelSettings() {
 
       <SettingRow
         label="Default model"
-        description="The AI model used for new conversations."
+        description="The AI model used for new conversations. Options change with the selected provider."
       >
         <select
           value={settings.model}
-          onChange={(e) => updateSettings({ model: e.target.value })}
+          onChange={(event) => updateSettings({ model: event.target.value })}
+          aria-label="Default model"
           className={cn(
             "bg-surface-800 border border-surface-700 rounded-md px-3 py-1.5 text-sm",
             "text-surface-200 focus:outline-none focus:ring-1 focus:ring-brand-500"
           )}
         >
-          {MODELS.map((m) => (
-            <option key={m.id} value={m.id}>
-              {m.label} — {m.description}
+          {modelOptions.map((model) => (
+            <option key={model.id} value={model.id}>
+              {model.label} - {model.description}
             </option>
           ))}
         </select>
       </SettingRow>
 
       {selectedModel && (
-        <div className="mb-4 px-3 py-2 rounded-md bg-surface-800/50 border border-surface-800 text-xs text-surface-400">
+        <div className="mb-4 rounded-md border border-surface-800 bg-surface-800/50 px-3 py-2 text-xs text-surface-400">
           <span className="font-medium text-surface-300">{selectedModel.label}</span>
-          {" — "}{selectedModel.description}
+          {" - "}
+          {selectedModel.description}
         </div>
       )}
 
       <SettingRow
         label="Max tokens"
-        description="Maximum number of tokens in the model's response."
+        description="Maximum number of tokens in the model response."
         stack
       >
         <div className="flex items-center gap-3">
@@ -55,7 +57,7 @@ export function ModelSettings() {
             min={1000}
             max={200000}
             step={1000}
-            onChange={(v) => updateSettings({ maxTokens: v })}
+            onChange={(value) => updateSettings({ maxTokens: value })}
             showValue={false}
             className="flex-1"
           />
@@ -65,9 +67,10 @@ export function ModelSettings() {
             min={1000}
             max={200000}
             step={1000}
-            onChange={(e) => updateSettings({ maxTokens: Number(e.target.value) })}
+            onChange={(event) => updateSettings({ maxTokens: Number(event.target.value) })}
+            aria-label="Max tokens"
             className={cn(
-              "w-24 bg-surface-800 border border-surface-700 rounded-md px-2 py-1 text-sm text-right",
+              "w-24 bg-surface-800 border border-surface-700 rounded-md px-2 py-1 text-right text-sm",
               "text-surface-200 focus:outline-none focus:ring-1 focus:ring-brand-500 font-mono"
             )}
           />
@@ -81,24 +84,25 @@ export function ModelSettings() {
       >
         <textarea
           value={settings.systemPrompt}
-          onChange={(e) => updateSettings({ systemPrompt: e.target.value })}
+          onChange={(event) => updateSettings({ systemPrompt: event.target.value })}
           placeholder="You are a helpful assistant..."
           rows={4}
+          aria-label="System prompt"
           className={cn(
-            "w-full bg-surface-800 border border-surface-700 rounded-md px-3 py-2 text-sm",
+            "w-full resize-none rounded-md border border-surface-700 bg-surface-800 px-3 py-2 text-sm",
             "text-surface-200 placeholder-surface-600 focus:outline-none focus:ring-1 focus:ring-brand-500",
-            "resize-none font-mono"
+            "font-mono"
           )}
         />
       </SettingRow>
 
-      {/* Advanced toggle */}
       <button
-        onClick={() => setShowAdvanced((v) => !v)}
-        className="flex items-center gap-1.5 text-xs text-surface-400 hover:text-surface-200 transition-colors mt-2 mb-1"
+        onClick={() => setShowAdvanced((value) => !value)}
+        type="button"
+        className="mt-2 mb-1 flex items-center gap-1.5 text-xs text-surface-400 transition-colors hover:text-surface-200"
       >
         <ChevronDown
-          className={cn("w-3.5 h-3.5 transition-transform", showAdvanced && "rotate-180")}
+          className={cn("h-3.5 w-3.5 transition-transform", showAdvanced && "rotate-180")}
         />
         Advanced settings
       </button>
@@ -114,7 +118,7 @@ export function ModelSettings() {
             min={0}
             max={1}
             step={0.05}
-            onChange={(v) => updateSettings({ temperature: v })}
+            onChange={(value) => updateSettings({ temperature: value })}
           />
         </SettingRow>
       )}

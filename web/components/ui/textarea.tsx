@@ -13,7 +13,8 @@ export interface TextareaProps extends React.TextareaHTMLAttributes<HTMLTextArea
 
 const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
   ({ className, label, error, helper, maxCount, autoGrow = false, id, onChange, value, ...props }, ref) => {
-    const textareaId = id ?? React.useId()
+    const generatedId = React.useId()
+    const textareaId = id ?? generatedId
     const errorId = `${textareaId}-error`
     const helperId = `${textareaId}-helper`
     const internalRef = React.useRef<HTMLTextAreaElement>(null)
@@ -39,7 +40,7 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
       }
     }, [value, autoGrow, resolvedRef])
 
-    const describedBy = [error ? errorId : null, helper ? helperId : null]
+    const describedBy = [error ? errorId : null, helper && !error ? helperId : null]
       .filter(Boolean)
       .join(' ')
 
@@ -58,7 +59,6 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
           value={value}
           onChange={handleChange}
           aria-describedby={describedBy || undefined}
-          aria-invalid={error ? true : undefined}
           className={cn(
             'flex min-h-[80px] w-full rounded-md border bg-surface-900 px-3 py-2 text-sm text-surface-100',
             'border-surface-700 placeholder:text-surface-500',

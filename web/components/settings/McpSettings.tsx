@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import {
@@ -32,7 +32,7 @@ function ServerRow({
 
   async function testConnection() {
     setTestStatus("testing");
-    // Simulate connection test — in real impl this would call an API
+    // Simulate connection test â€” in real impl this would call an API
     await new Promise((r) => setTimeout(r, 800));
     setTestStatus(Math.random() > 0.3 ? "ok" : "error");
   }
@@ -61,12 +61,18 @@ function ServerRow({
           <button
             onClick={testConnection}
             disabled={testStatus === "testing"}
+            type="button"
+            aria-label={`Test ${server.name} connection`}
+            title="Test server connection"
             className="text-xs text-surface-400 hover:text-surface-200 transition-colors disabled:opacity-50"
           >
             Test
           </button>
           <button
             onClick={() => setExpanded((v) => !v)}
+            type="button"
+            aria-label={expanded ? `Collapse ${server.name} settings` : `Expand ${server.name} settings`}
+            title={expanded ? "Collapse server settings" : "Expand server settings"}
             className="text-surface-500 hover:text-surface-300 transition-colors"
           >
             <ChevronDown
@@ -75,6 +81,9 @@ function ServerRow({
           </button>
           <button
             onClick={onDelete}
+            type="button"
+            aria-label={`Delete ${server.name}`}
+            title="Delete server"
             className="text-surface-500 hover:text-red-400 transition-colors"
           >
             <Trash2 className="w-3.5 h-3.5" />
@@ -91,6 +100,7 @@ function ServerRow({
               <input
                 value={server.name}
                 onChange={(e) => onUpdate({ ...server, name: e.target.value })}
+                aria-label="Server name"
                 className="w-full bg-surface-800 border border-surface-700 rounded px-2 py-1 text-xs text-surface-200 focus:outline-none focus:ring-1 focus:ring-brand-500"
               />
             </div>
@@ -100,6 +110,7 @@ function ServerRow({
                 value={server.command}
                 onChange={(e) => onUpdate({ ...server, command: e.target.value })}
                 placeholder="npx, node, python..."
+                aria-label="Server command"
                 className="w-full bg-surface-800 border border-surface-700 rounded px-2 py-1 text-xs text-surface-200 font-mono focus:outline-none focus:ring-1 focus:ring-brand-500"
               />
             </div>
@@ -117,6 +128,7 @@ function ServerRow({
                 })
               }
               placeholder="-y @modelcontextprotocol/server-filesystem /path"
+              aria-label="Server arguments"
               className="w-full bg-surface-800 border border-surface-700 rounded px-2 py-1 text-xs text-surface-200 font-mono focus:outline-none focus:ring-1 focus:ring-brand-500"
             />
           </div>
@@ -163,7 +175,7 @@ export function McpSettings() {
       <SectionHeader title="MCP Servers" />
 
       <p className="text-xs text-surface-400 mb-4">
-        Model Context Protocol servers extend Claude with external tools and data sources.
+        Model Context Protocol servers extend AG-Claw with external tools and data sources.
       </p>
 
       <div className="space-y-2 mb-4">
@@ -193,6 +205,7 @@ export function McpSettings() {
                 value={newServer.name}
                 onChange={(e) => setNewServer((s) => ({ ...s, name: e.target.value }))}
                 placeholder="filesystem"
+                aria-label="New server name"
                 className="w-full bg-surface-800 border border-surface-700 rounded px-2 py-1 text-xs text-surface-200 focus:outline-none focus:ring-1 focus:ring-brand-500"
               />
             </div>
@@ -202,6 +215,7 @@ export function McpSettings() {
                 value={newServer.command}
                 onChange={(e) => setNewServer((s) => ({ ...s, command: e.target.value }))}
                 placeholder="npx"
+                aria-label="New server command"
                 className="w-full bg-surface-800 border border-surface-700 rounded px-2 py-1 text-xs text-surface-200 font-mono focus:outline-none focus:ring-1 focus:ring-brand-500"
               />
             </div>
@@ -219,12 +233,14 @@ export function McpSettings() {
                 }))
               }
               placeholder="-y @modelcontextprotocol/server-filesystem /path"
+              aria-label="New server arguments"
               className="w-full bg-surface-800 border border-surface-700 rounded px-2 py-1 text-xs text-surface-200 font-mono focus:outline-none focus:ring-1 focus:ring-brand-500"
             />
           </div>
           <div className="flex justify-end gap-2 pt-1">
             <button
               onClick={() => setShowAddForm(false)}
+              type="button"
               className="px-3 py-1.5 text-xs text-surface-400 hover:text-surface-200 transition-colors"
             >
               Cancel
@@ -232,6 +248,7 @@ export function McpSettings() {
             <button
               onClick={addServer}
               disabled={!newServer.name.trim() || !newServer.command.trim()}
+              type="button"
               className={cn(
                 "px-3 py-1.5 text-xs rounded-md bg-brand-600 text-white",
                 "hover:bg-brand-700 transition-colors",
@@ -245,6 +262,7 @@ export function McpSettings() {
       ) : (
         <button
           onClick={() => setShowAddForm(true)}
+          type="button"
           className="flex items-center gap-2 text-sm text-surface-400 hover:text-surface-200 transition-colors"
         >
           <Plus className="w-4 h-4" />
@@ -254,3 +272,4 @@ export function McpSettings() {
     </div>
   );
 }
+

@@ -1,6 +1,6 @@
-"use client";
+﻿"use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useChatStore } from "@/lib/store";
 import { MessageBubble } from "./MessageBubble";
 import { Bot } from "lucide-react";
@@ -13,7 +13,7 @@ export function ChatWindow({ conversationId }: ChatWindowProps) {
   const bottomRef = useRef<HTMLDivElement>(null);
   const { conversations } = useChatStore();
   const conversation = conversations.find((c) => c.id === conversationId);
-  const messages = conversation?.messages ?? [];
+  const messages = useMemo(() => conversation?.messages ?? [], [conversation]);
 
   const isStreaming = messages.some((m) => m.status === "streaming");
 
@@ -33,7 +33,7 @@ export function ChatWindow({ conversationId }: ChatWindowProps) {
       // Announce a short preview so screen reader users know a reply arrived
       const preview = lastMsg.content.slice(0, 100);
       setAnnouncement("");
-      setTimeout(() => setAnnouncement(`Claude replied: ${preview}`), 50);
+      setTimeout(() => setAnnouncement(`AG-Claw replied: ${preview}`), 50);
     }
     prevLengthRef.current = messages.length;
   }, [messages.length, messages]);
@@ -50,7 +50,7 @@ export function ChatWindow({ conversationId }: ChatWindowProps) {
         <div>
           <h2 className="text-lg font-semibold text-surface-100">How can I help?</h2>
           <p className="text-sm text-surface-400 mt-1">
-            Start a conversation with Claude Code
+            Start a conversation with AG-Claw
           </p>
         </div>
       </div>
@@ -60,25 +60,14 @@ export function ChatWindow({ conversationId }: ChatWindowProps) {
   return (
     <div
       className="flex-1 overflow-y-auto"
-      aria-busy={isStreaming}
       aria-label="Conversation"
     >
-      {/* Polite live region — announces when Claude finishes a reply */}
+      {/* Polite live region announces when AG-Claw finishes a reply. */}
       <div
         role="status"
         aria-live="polite"
         aria-atomic="true"
-        style={{
-          position: "absolute",
-          width: "1px",
-          height: "1px",
-          padding: 0,
-          margin: "-1px",
-          overflow: "hidden",
-          clip: "rect(0,0,0,0)",
-          whiteSpace: "nowrap",
-          borderWidth: 0,
-        }}
+        className="sr-only"
       >
         {announcement}
       </div>
@@ -92,3 +81,6 @@ export function ChatWindow({ conversationId }: ChatWindowProps) {
     </div>
   );
 }
+
+
+

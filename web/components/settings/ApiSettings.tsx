@@ -1,44 +1,85 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Eye, EyeOff, CheckCircle, XCircle, Loader2 } from "lucide-react";
 import { useChatStore } from "@/lib/store";
+import {
+  DEFAULT_PROVIDER_URLS,
+  PROVIDERS,
+  getDefaultModelForProvider,
+  isLocalProvider,
+} from "@/lib/constants";
+import type { ChatProvider } from "@/lib/types";
 import { SettingRow, SectionHeader, Toggle } from "./SettingRow";
 import { cn } from "@/lib/utils";
 
 type ConnectionStatus = "idle" | "checking" | "ok" | "error";
+
+function getKeyPlaceholder(provider: ChatProvider) {
+  switch (provider) {
+    case "anthropic":
+      return "sk-ant-...";
+    case "ollama":
+      return "Optional for proxied Ollama";
+    default:
+      return "Optional bearer token";
+  }
+}
 
 export function ApiSettings() {
   const { settings, updateSettings, resetSettings } = useChatStore();
   const [showKey, setShowKey] = useState(false);
   const [connectionStatus, setConnectionStatus] = useState<ConnectionStatus>("idle");
   const [latencyMs, setLatencyMs] = useState<number | null>(null);
+  const selectedProvider = useMemo(
+    () => PROVIDERS.find((provider) => provider.id === settings.provider),
+    [settings.provider]
+  );
 
   async function checkConnection() {
     setConnectionStatus("checking");
     setLatencyMs(null);
     const start = Date.now();
     try {
-      const res = await fetch(`${settings.apiUrl}/health`, { signal: AbortSignal.timeout(5000) });
-      const ms = Date.now() - start;
-      setLatencyMs(ms);
-      setConnectionStatus(res.ok ? "ok" : "error");
+      const params = new URLSearchParams({
+        provider: settings.provider,
+        apiUrl: settings.apiUrl,
+      });
+      if (settings.apiKey) {
+        params.set("apiKey", settings.apiKey);
+      }
+      const response = await fetch(`/api/provider-health?${params.toString()}`, {
+        signal: AbortSignal.timeout(5000),
+      });
+      setLatencyMs(Date.now() - start);
+      setConnectionStatus(response.ok ? "ok" : "error");
     } catch {
       setConnectionStatus("error");
     }
   }
 
+  function handleProviderChange(provider: ChatProvider) {
+    updateSettings({
+      provider,
+      localMode: isLocalProvider(provider),
+      apiUrl: DEFAULT_PROVIDER_URLS[provider],
+      model: getDefaultModelForProvider(provider),
+    });
+    setConnectionStatus("idle");
+    setLatencyMs(null);
+  }
+
   const statusIcon = {
     idle: null,
-    checking: <Loader2 className="w-4 h-4 animate-spin text-surface-400" />,
-    ok: <CheckCircle className="w-4 h-4 text-green-400" />,
-    error: <XCircle className="w-4 h-4 text-red-400" />,
+    checking: <Loader2 className="h-4 w-4 animate-spin text-surface-400" />,
+    ok: <CheckCircle className="h-4 w-4 text-green-400" />,
+    error: <XCircle className="h-4 w-4 text-red-400" />,
   }[connectionStatus];
 
   const statusText = {
     idle: "Not checked",
     checking: "Checking...",
-    ok: latencyMs !== null ? `Connected — ${latencyMs}ms` : "Connected",
+    ok: latencyMs !== null ? `Connected - ${latencyMs}ms` : "Connected",
     error: "Connection failed",
   }[connectionStatus];
 
@@ -47,8 +88,57 @@ export function ApiSettings() {
       <SectionHeader title="API & Authentication" onReset={() => resetSettings("api")} />
 
       <SettingRow
+        label="Local mode"
+        description="Route chat through a local provider by default. This keeps sensitive research traffic on the machine or LAN."
+      >
+        <Toggle
+          checked={settings.localMode}
+          onChange={(checked) => {
+            const provider = checked ? "ollama" : "anthropic";
+            updateSettings({
+              localMode: checked,
+              provider,
+              apiUrl: DEFAULT_PROVIDER_URLS[provider],
+              model: getDefaultModelForProvider(provider),
+            });
+            setConnectionStatus("idle");
+            setLatencyMs(null);
+          }}
+        />
+      </SettingRow>
+
+      <SettingRow
+        label="Provider"
+        description="Select the upstream model API. OpenAI-compatible covers local gateways, proxies, and vLLM-style servers."
+        stack
+      >
+        <select
+          value={settings.provider}
+          onChange={(event) => handleProviderChange(event.target.value as ChatProvider)}
+          aria-label="Provider"
+          className={cn(
+            "w-full rounded-md border border-surface-700 bg-surface-800 px-3 py-2 text-sm",
+            "text-surface-200 focus:outline-none focus:ring-1 focus:ring-brand-500"
+          )}
+        >
+          {PROVIDERS.map((provider) => (
+            <option key={provider.id} value={provider.id}>
+              {provider.label}
+            </option>
+          ))}
+        </select>
+        {selectedProvider && (
+          <p className="text-xs text-surface-500">{selectedProvider.description}</p>
+        )}
+      </SettingRow>
+
+      <SettingRow
         label="API key"
-        description="Your Anthropic API key. Stored locally and never sent to third parties."
+        description={
+          settings.provider === "anthropic"
+            ? "Required for direct Anthropic access. Stored locally in browser state only."
+            : "Optional for local providers unless your gateway requires a bearer token."
+        }
         stack
       >
         <div className="flex gap-2">
@@ -56,53 +146,45 @@ export function ApiSettings() {
             <input
               type={showKey ? "text" : "password"}
               value={settings.apiKey}
-              onChange={(e) => updateSettings({ apiKey: e.target.value })}
-              placeholder="sk-ant-..."
+              onChange={(event) => updateSettings({ apiKey: event.target.value })}
+              placeholder={getKeyPlaceholder(settings.provider)}
+              aria-label="API key"
               className={cn(
-                "w-full bg-surface-800 border border-surface-700 rounded-md px-3 py-1.5 pr-10 text-sm",
+                "w-full rounded-md border border-surface-700 bg-surface-800 px-3 py-1.5 pr-10 text-sm",
                 "text-surface-200 placeholder-surface-600 focus:outline-none focus:ring-1 focus:ring-brand-500 font-mono"
               )}
             />
             <button
-              onClick={() => setShowKey((v) => !v)}
-              className="absolute right-2 top-1/2 -translate-y-1/2 text-surface-500 hover:text-surface-300 transition-colors"
+              onClick={() => setShowKey((value) => !value)}
+              type="button"
+              className="absolute right-2 top-1/2 -translate-y-1/2 text-surface-500 transition-colors hover:text-surface-300"
               title={showKey ? "Hide key" : "Show key"}
             >
-              {showKey ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              {showKey ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
             </button>
           </div>
         </div>
-        {settings.apiKey && (
-          <p className="text-xs text-surface-500 mt-1">
-            Key ending in{" "}
-            <span className="font-mono text-surface-400">
-              ...{settings.apiKey.slice(-4)}
-            </span>
-          </p>
-        )}
       </SettingRow>
 
       <SettingRow
         label="API base URL"
-        description="Custom endpoint for enterprise or proxy setups. Leave as default for direct Anthropic access."
+        description="Provider endpoint. Anthropic uses the public API root. Local mode defaults to Ollama on 127.0.0.1:11434."
         stack
       >
         <input
           type="url"
           value={settings.apiUrl}
-          onChange={(e) => updateSettings({ apiUrl: e.target.value })}
-          placeholder="http://localhost:3001"
+          onChange={(event) => updateSettings({ apiUrl: event.target.value })}
+          placeholder={DEFAULT_PROVIDER_URLS[settings.provider]}
+          aria-label="API base URL"
           className={cn(
-            "w-full bg-surface-800 border border-surface-700 rounded-md px-3 py-1.5 text-sm",
+            "w-full rounded-md border border-surface-700 bg-surface-800 px-3 py-1.5 text-sm",
             "text-surface-200 placeholder-surface-600 focus:outline-none focus:ring-1 focus:ring-brand-500 font-mono"
           )}
         />
       </SettingRow>
 
-      <SettingRow
-        label="Connection status"
-        description="Verify that the API endpoint is reachable."
-      >
+      <SettingRow label="Connection status" description="Probe the selected provider without sending a chat request.">
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-1.5">
             {statusIcon}
@@ -121,10 +203,11 @@ export function ApiSettings() {
           <button
             onClick={checkConnection}
             disabled={connectionStatus === "checking"}
+            type="button"
             className={cn(
-              "px-3 py-1 text-xs rounded-md border border-surface-700 transition-colors",
-              "text-surface-300 hover:text-surface-100 hover:bg-surface-800",
-              "disabled:opacity-50 disabled:cursor-not-allowed"
+              "rounded-md border border-surface-700 px-3 py-1 text-xs transition-colors",
+              "text-surface-300 hover:bg-surface-800 hover:text-surface-100",
+              "disabled:cursor-not-allowed disabled:opacity-50"
             )}
           >
             Check
@@ -132,13 +215,10 @@ export function ApiSettings() {
         </div>
       </SettingRow>
 
-      <SettingRow
-        label="Streaming"
-        description="Stream responses token by token as they are generated."
-      >
+      <SettingRow label="Streaming" description="Stream responses token by token as they are generated.">
         <Toggle
           checked={settings.streamingEnabled}
-          onChange={(v) => updateSettings({ streamingEnabled: v })}
+          onChange={(value) => updateSettings({ streamingEnabled: value })}
         />
       </SettingRow>
     </div>

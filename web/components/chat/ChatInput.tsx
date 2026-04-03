@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useRef, useCallback } from "react";
 import { Send, Square, Paperclip } from "lucide-react";
@@ -55,7 +55,20 @@ export function ChatInput({ conversationId }: ChatInputProps) {
     let fullText = "";
 
     try {
-      for await (const chunk of streamChat(messages, settings.model, controller.signal)) {
+      for await (const chunk of streamChat(
+        messages,
+        settings.model,
+        {
+          provider: settings.provider,
+          apiUrl: settings.apiUrl,
+          apiKey: settings.apiKey,
+          streamingEnabled: settings.streamingEnabled,
+          systemPrompt: settings.systemPrompt,
+          temperature: settings.temperature,
+          maxTokens: settings.maxTokens,
+        },
+        controller.signal
+      )) {
         if (chunk.type === "text" && chunk.content) {
           fullText += chunk.content;
           updateMessage(conversationId, assistantId, {
@@ -87,7 +100,22 @@ export function ChatInput({ conversationId }: ChatInputProps) {
       setIsStreaming(false);
       abortRef.current = null;
     }
-  }, [input, isStreaming, conversationId, conversation, settings.model, addMessage, updateMessage]);
+  }, [
+    input,
+    isStreaming,
+    conversationId,
+    conversation,
+    settings.model,
+    settings.provider,
+    settings.apiUrl,
+    settings.apiKey,
+    settings.streamingEnabled,
+    settings.systemPrompt,
+    settings.temperature,
+    settings.maxTokens,
+    addMessage,
+    updateMessage,
+  ]);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
@@ -135,7 +163,7 @@ export function ChatInput({ conversationId }: ChatInputProps) {
               adjustHeight();
             }}
             onKeyDown={handleKeyDown}
-            placeholder="Message Claude Code..."
+            placeholder="Message AG-Claw..."
             rows={1}
             aria-label="Message"
             className={cn(
@@ -158,7 +186,6 @@ export function ChatInput({ conversationId }: ChatInputProps) {
               onClick={handleSubmit}
               disabled={!input.trim()}
               aria-label="Send message"
-              aria-disabled={!input.trim()}
               className={cn(
                 "p-1.5 rounded-lg transition-colors flex-shrink-0",
                 input.trim()
@@ -172,9 +199,11 @@ export function ChatInput({ conversationId }: ChatInputProps) {
         </div>
 
         <p className="text-xs text-surface-600 text-center mt-2">
-          Claude can make mistakes. Verify important information.
+          AG-Claw can make mistakes. Verify important information.
         </p>
       </div>
     </div>
   );
 }
+
+
