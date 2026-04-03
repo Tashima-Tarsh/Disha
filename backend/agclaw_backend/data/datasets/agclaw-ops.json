@@ -1,0 +1,32 @@
+[
+  {
+    "source": "AG-Claw",
+    "title": "Alarm handling and acknowledgement review",
+    "excerpt": "Assess alarm visibility, acknowledgement ownership, and escalation traceability before recommending any procedural follow-up.",
+    "tags": ["alarms", "operations", "safety", "traceability"]
+  },
+  {
+    "source": "AG-Claw",
+    "title": "Downtime normalization and reason coding",
+    "excerpt": "Normalize repetitive downtime events into canonical reason codes while retaining first occurrence, batch context, and operator notes.",
+    "tags": ["downtime", "reporting", "operations", "quality"]
+  },
+  {
+    "source": "AG-Claw",
+    "title": "Label issuance and serialization controls",
+    "excerpt": "Label generation should preserve serialized identifiers, issuance operator, line assignment, and rejection or reprint traceability.",
+    "tags": ["labels", "serialization", "quality", "packaging"]
+  },
+  {
+    "source": "AG-Claw",
+    "title": "Deviation and CAPA linkage",
+    "excerpt": "Tie batch deviations to CAPA records, hold dispositions, and reviewer decisions so post-event analysis remains auditable.",
+    "tags": ["deviation", "capa", "quality", "approvals"]
+  },
+  {
+    "source": "AG-Claw",
+    "title": "Legacy HMI review checklist",
+    "excerpt": "Capture visible mode indicators, alarm banners, release state, operator prompts, and active recipe or batch identifiers when reviewing screenshots.",
+    "tags": ["hmi", "screen-review", "operations", "legacy-ui"]
+  }
+]

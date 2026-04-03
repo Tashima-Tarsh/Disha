@@ -1,0 +1,10 @@
+{
+  "name": "agclaw-promptfoo",
+  "private": true,
+  "scripts": {
+    "gate": "promptfoo eval -c promptfooconfig.yaml --no-write"
+  },
+  "devDependencies": {
+    "promptfoo": "^0.110.0"
+  }
+}

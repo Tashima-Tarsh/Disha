@@ -1,0 +1,32 @@
+[
+  {
+    "source": "ISA-95",
+    "title": "Material genealogy and traceability",
+    "excerpt": "Track lot, batch, and material lineage across receiving, production, packaging, hold, release, and shipment events.",
+    "tags": ["isa-95", "genealogy", "traceability", "quality"]
+  },
+  {
+    "source": "ISA-95",
+    "title": "Production scheduling and dispatching",
+    "excerpt": "Dispatch rules should preserve equipment capability checks, production state transitions, and operator acknowledgements.",
+    "tags": ["isa-95", "scheduling", "dispatching", "operations"]
+  },
+  {
+    "source": "ISA-95",
+    "title": "Equipment capability and resource matching",
+    "excerpt": "Verify machine capability, personnel qualification, and material readiness before a work order changes state.",
+    "tags": ["isa-95", "equipment", "personnel", "resource-management"]
+  },
+  {
+    "source": "ISA-95",
+    "title": "Quality hold and release workflow",
+    "excerpt": "Quality holds, deviations, and release approvals must preserve reason codes, reviewer identity, and timestamped state changes.",
+    "tags": ["isa-95", "quality", "hold-release", "approvals"]
+  },
+  {
+    "source": "ISA-95",
+    "title": "Electronic batch record checkpoints",
+    "excerpt": "Record operator acknowledgement, critical parameter confirmation, and release signatures at controlled batch checkpoints.",
+    "tags": ["isa-95", "ebr", "batch", "traceability"]
+  }
+]

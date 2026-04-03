@@ -1,0 +1,18 @@
+[
+  {
+    "id": "isa95-core",
+    "name": "ISA-95 Core Workflow Set",
+    "version": "2026.04",
+    "description": "Core ISA-95 and MES workflow references for genealogy, quality, scheduling, and equipment context.",
+    "file": "datasets/isa95-core.json",
+    "tags": ["isa-95", "mes", "traceability", "scheduling"]
+  },
+  {
+    "id": "agclaw-ops",
+    "name": "AG-Claw Operations Review Set",
+    "version": "2026.04",
+    "description": "Operational review heuristics for alarms, electronic batch records, downtime, and labeling workflows.",
+    "file": "datasets/agclaw-ops.json",
+    "tags": ["operations", "quality", "alarms", "downtime"]
+  }
+]
