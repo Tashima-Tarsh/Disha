@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import fs from "fs";
+import { fileURLToPath } from "url";
 
 const AVERAGE_GLYPH_WIDTH = 7.2;
 
@@ -61,7 +62,7 @@ const results = samples.map((s) => {
 
 const report = { date: new Date().toISOString(), results };
 
-const outPath = new URL("../scripts/pretext-report.json", import.meta.url).pathname;
+const outPath = fileURLToPath(new URL("./pretext-report.json", import.meta.url));
 fs.writeFileSync(outPath, JSON.stringify(report, null, 2), "utf-8");
 console.log("Pretext evaluation complete. Report:", JSON.stringify(report, null, 2));
 console.log(`Wrote report to ${outPath}`);
