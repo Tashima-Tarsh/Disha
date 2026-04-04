@@ -1,15 +1,15 @@
-import { ApiError } from "./types";
+﻿import { ApiError } from "./types";
 import { extractTextContent } from "../utils";
 import type { Conversation } from "../types";
+import { useChatStore } from "../store";
 
 // Lazy import to avoid circular deps at module init time
 function getStore() {
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
-  return require("../store").useChatStore as import("../store").UseChatStore;
+  return useChatStore;
 }
 
 // ---------------------------------------------------------------------------
-// ConversationAPI — backed by the Zustand client-side store.
+// ConversationAPI â€” backed by the Zustand client-side store.
 // ---------------------------------------------------------------------------
 //
 // Conversations are not persisted on the backend; they live in localStorage
@@ -90,14 +90,14 @@ export const conversationAPI: ConversationAPI = {
     // Markdown export
     const lines: string[] = [`# ${conv.title}`, ""];
     const created = new Date(conv.createdAt).toISOString();
-    lines.push(`> Exported from Claude Code · ${created}`, "");
+    lines.push(`> Exported from AG-Claw · ${created}`, "");
 
     for (const msg of conv.messages) {
       const heading =
         msg.role === "user"
           ? "**You**"
           : msg.role === "assistant"
-            ? "**Claude**"
+            ? "**AG-Claw**"
             : `**${msg.role}**`;
       lines.push(heading, "");
       lines.push(extractTextContent(msg.content), "");
@@ -107,3 +107,4 @@ export const conversationAPI: ConversationAPI = {
     return new Blob([lines.join("\n")], { type: "text/markdown" });
   },
 };
+

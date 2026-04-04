@@ -222,7 +222,7 @@ export function inkBoxPropsToCSS(props: InkStyleProps): CSSProperties {
     const dimAll = props.borderDimColor
 
     if (showTop) {
-      css.borderTopStyle = cssBorderStyle
+      css.borderTopStyle = cssBorderStyle as CSSProperties['borderTopStyle']
       css.borderTopWidth = borderWidth
       css.borderTopColor = resolveColor(
         props.borderTopColor ?? props.borderColor,
@@ -231,7 +231,7 @@ export function inkBoxPropsToCSS(props: InkStyleProps): CSSProperties {
       )
     }
     if (showBottom) {
-      css.borderBottomStyle = cssBorderStyle
+      css.borderBottomStyle = cssBorderStyle as CSSProperties['borderBottomStyle']
       css.borderBottomWidth = borderWidth
       css.borderBottomColor = resolveColor(
         props.borderBottomColor ?? props.borderColor,
@@ -240,7 +240,7 @@ export function inkBoxPropsToCSS(props: InkStyleProps): CSSProperties {
       )
     }
     if (showLeft) {
-      css.borderLeftStyle = cssBorderStyle
+      css.borderLeftStyle = cssBorderStyle as CSSProperties['borderLeftStyle']
       css.borderLeftWidth = borderWidth
       css.borderLeftColor = resolveColor(
         props.borderLeftColor ?? props.borderColor,
@@ -249,7 +249,7 @@ export function inkBoxPropsToCSS(props: InkStyleProps): CSSProperties {
       )
     }
     if (showRight) {
-      css.borderRightStyle = cssBorderStyle
+      css.borderRightStyle = cssBorderStyle as CSSProperties['borderRightStyle']
       css.borderRightWidth = borderWidth
       css.borderRightColor = resolveColor(
         props.borderRightColor ?? props.borderColor,

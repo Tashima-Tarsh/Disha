@@ -199,9 +199,13 @@ export type CollabEvent =
   | ErrorEvent;
 
 // Outgoing-only events (client → server) that don't need timestamp/sessionId
-export type OutgoingEvent = Omit<CollabEvent, "timestamp">;
+type DistributiveOmit<T, K extends keyof T> = T extends unknown ? Omit<T, K> : never;
+export type OutgoingEvent = DistributiveOmit<CollabEvent, "timestamp">;
 
 type EventHandler<T extends CollabEvent = CollabEvent> = (event: T) => void;
+type CollabEventOfType<T extends CollabEventType> = Extract<CollabEvent, { type: T }>;
+type OutgoingEventType = OutgoingEvent["type"];
+type OutgoingEventOfType<T extends OutgoingEventType> = Extract<OutgoingEvent, { type: T }>;
 
 // ─── CollabSocket ─────────────────────────────────────────────────────────────
 
@@ -275,14 +279,14 @@ export class CollabSocket {
     this.ws = null;
   }
 
-  send(event: OutgoingEvent): void {
+  send<T extends OutgoingEventType>(event: OutgoingEventOfType<T>): void {
     if (this.ws?.readyState !== WebSocket.OPEN) return;
     this.ws.send(JSON.stringify({ ...event, timestamp: Date.now() }));
   }
 
-  on<T extends CollabEvent>(
-    type: T["type"],
-    handler: EventHandler<T>
+  on<T extends CollabEventType>(
+    type: T,
+    handler: EventHandler<CollabEventOfType<T>>
   ): () => void {
     if (!this.handlers.has(type)) {
       this.handlers.set(type, new Set());
@@ -291,7 +295,7 @@ export class CollabSocket {
     return () => this.off(type, handler);
   }
 
-  off<T extends CollabEvent>(type: T["type"], handler: EventHandler<T>): void {
+  off<T extends CollabEventType>(type: T, handler: EventHandler<CollabEventOfType<T>>): void {
     this.handlers.get(type)?.delete(handler as EventHandler);
   }
 

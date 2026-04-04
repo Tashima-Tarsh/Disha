@@ -1,9 +1,10 @@
-"use client";
+﻿"use client";
 
 import { User, Bot, AlertCircle } from "lucide-react";
 import { cn, extractTextContent } from "@/lib/utils";
 import type { Message } from "@/lib/types";
 import { MarkdownContent } from "./MarkdownContent";
+import { AnnotationBadge } from "@/components/collaboration/AnnotationBadge";
 
 interface MessageBubbleProps {
   message: Message;
@@ -20,9 +21,9 @@ export function MessageBubble({ message }: MessageBubbleProps) {
         "flex gap-3 animate-fade-in",
         isUser && "flex-row-reverse"
       )}
-      aria-label={isUser ? "You" : isError ? "Error from Claude" : "Claude"}
+      aria-label={isUser ? "You" : isError ? "Error from AG-Claw" : "AG-Claw"}
     >
-      {/* Avatar — purely decorative, role conveyed by article label */}
+      {/* Avatar â€” purely decorative, role conveyed by article label */}
       <div
         aria-hidden="true"
         className={cn(
@@ -72,7 +73,14 @@ export function MessageBubble({ message }: MessageBubbleProps) {
             />
           )}
         </div>
+        {!isUser && (
+          <div className="mt-2 flex justify-end">
+            <AnnotationBadge messageId={message.id} />
+          </div>
+        )}
       </div>
     </article>
   );
 }
+
+

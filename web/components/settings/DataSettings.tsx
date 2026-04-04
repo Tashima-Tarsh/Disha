@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import { Download, Trash2, AlertTriangle } from "lucide-react";
@@ -17,13 +17,13 @@ export function DataSettings() {
 
     if (format === "json") {
       content = JSON.stringify(conversations, null, 2);
-      filename = `claude-code-conversations-${ts}.json`;
+      filename = `agclaw-conversations-${ts}.json`;
     } else {
       content = conversations
         .map((conv) => {
           const messages = conv.messages
             .map((m) => {
-              const role = m.role === "user" ? "**You**" : "**Claude**";
+              const role = m.role === "user" ? "**You**" : "**AG-Claw**";
               const text = typeof m.content === "string"
                 ? m.content
                 : m.content
@@ -36,7 +36,7 @@ export function DataSettings() {
           return `# ${conv.title}\n\n${messages}`;
         })
         .join("\n\n====\n\n");
-      filename = `claude-code-conversations-${ts}.md`;
+      filename = `agclaw-conversations-${ts}.md`;
     }
 
     const blob = new Blob([content], { type: "text/plain" });
@@ -129,7 +129,7 @@ export function DataSettings() {
 
       <SettingRow
         label="Anonymous telemetry"
-        description="Help improve Claude Code by sharing anonymous usage data. No conversation content is ever sent."
+        description="Help improve AG-Claw by sharing anonymous usage data. No conversation content is ever sent."
       >
         <Toggle
           checked={settings.telemetryEnabled}
@@ -139,10 +139,14 @@ export function DataSettings() {
 
       <div className="mt-6 pt-4 border-t border-surface-800">
         <p className="text-xs text-surface-500">
-          All data is stored locally in your browser. Claude Code does not send conversation data
+          All data is stored locally in your browser. AG-Claw does not send conversation data
           to any server unless explicitly configured.
         </p>
       </div>
     </div>
   );
 }
+
+
+
+

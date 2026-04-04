@@ -1,8 +1,14 @@
-import { create } from "zustand";
+﻿import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { nanoid } from "nanoid";
 import type { Conversation, Message, AppSettings, ConversationTag } from "./types";
-import { DEFAULT_MODEL } from "./constants";
+import {
+  DEFAULT_MODEL,
+  DEFAULT_PROVIDER,
+  DEFAULT_PROVIDER_URLS,
+  getDefaultModelForProvider,
+  isLocalProvider,
+} from "./constants";
 
 const DEFAULT_SETTINGS: AppSettings = {
   // General
@@ -19,7 +25,9 @@ const DEFAULT_SETTINGS: AppSettings = {
   systemPrompt: "",
 
   // API
-  apiUrl: process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001",
+  localMode: false,
+  provider: DEFAULT_PROVIDER,
+  apiUrl: process.env.NEXT_PUBLIC_API_URL ?? DEFAULT_PROVIDER_URLS[DEFAULT_PROVIDER],
   apiKey: "",
   streamingEnabled: true,
 
@@ -56,6 +64,7 @@ interface ChatState {
   activeConversationId: string | null;
   settings: AppSettings;
   settingsOpen: boolean;
+  researchOpen: boolean;
 
   // Sidebar state
   sidebarOpen: boolean;
@@ -107,6 +116,8 @@ interface ChatState {
   resetSettings: (section?: string) => void;
   openSettings: () => void;
   closeSettings: () => void;
+  openResearch: () => void;
+  closeResearch: () => void;
 
   // Sidebar actions
   toggleSidebar: () => void;
@@ -123,6 +134,7 @@ export const useChatStore = create<ChatState>()(
       activeConversationId: null,
       settings: DEFAULT_SETTINGS,
       settingsOpen: false,
+      researchOpen: false,
 
       sidebarOpen: true,
       sidebarWidth: 280,
@@ -224,6 +236,20 @@ export const useChatStore = create<ChatState>()(
         }));
       },
 
+      truncateMessages: (conversationId, keepCount) => {
+        set((state) => ({
+          conversations: state.conversations.map((c) =>
+            c.id === conversationId
+              ? {
+                  ...c,
+                  messages: c.messages.slice(0, Math.max(0, keepCount)),
+                  updatedAt: Date.now(),
+                }
+              : c
+          ),
+        }));
+      },
+
       toggleSelectConversation: (id) => {
         set((state) => ({
           selectedConversationIds: state.selectedConversationIds.includes(id)
@@ -309,9 +335,37 @@ export const useChatStore = create<ChatState>()(
       clearRecentSearches: () => set({ recentSearches: [] }),
 
       updateSettings: (settings) => {
-        set((state) => ({
-          settings: { ...state.settings, ...settings },
-        }));
+        set((state) => {
+          const nextSettings = { ...state.settings, ...settings };
+          if (typeof settings.localMode === "boolean" && !settings.provider) {
+            const nextProvider = settings.localMode ? "ollama" : DEFAULT_PROVIDER;
+            nextSettings.provider = nextProvider;
+            if (!("apiUrl" in settings) || !settings.apiUrl) {
+              nextSettings.apiUrl = DEFAULT_PROVIDER_URLS[nextProvider];
+            }
+            if (!("model" in settings) || !settings.model) {
+              nextSettings.model = getDefaultModelForProvider(nextProvider);
+            }
+          }
+          if (
+            settings.provider &&
+            settings.provider !== state.settings.provider &&
+            (!("apiUrl" in settings) || !settings.apiUrl)
+          ) {
+            nextSettings.apiUrl = DEFAULT_PROVIDER_URLS[settings.provider];
+          }
+          if (
+            settings.provider &&
+            settings.provider !== state.settings.provider &&
+            (!("model" in settings) || !settings.model)
+          ) {
+            nextSettings.model = getDefaultModelForProvider(settings.provider);
+          }
+          if (settings.provider && settings.provider !== state.settings.provider && !("localMode" in settings)) {
+            nextSettings.localMode = isLocalProvider(settings.provider);
+          }
+          return { settings: nextSettings };
+        });
       },
 
       resetSettings: (section) => {
@@ -334,7 +388,10 @@ export const useChatStore = create<ChatState>()(
             systemPrompt: DEFAULT_SETTINGS.systemPrompt,
           },
           api: {
+            localMode: DEFAULT_SETTINGS.localMode,
+            provider: DEFAULT_SETTINGS.provider,
             apiUrl: DEFAULT_SETTINGS.apiUrl,
+            apiKey: DEFAULT_SETTINGS.apiKey,
             streamingEnabled: DEFAULT_SETTINGS.streamingEnabled,
           },
           permissions: { permissions: DEFAULT_SETTINGS.permissions },
@@ -349,6 +406,8 @@ export const useChatStore = create<ChatState>()(
 
       openSettings: () => set({ settingsOpen: true }),
       closeSettings: () => set({ settingsOpen: false }),
+      openResearch: () => set({ researchOpen: true }),
+      closeResearch: () => set({ researchOpen: false }),
 
       toggleSidebar: () => set((state) => ({ sidebarOpen: !state.sidebarOpen })),
       setSidebarWidth: (w) => set({ sidebarWidth: w }),
@@ -370,7 +429,7 @@ export const useChatStore = create<ChatState>()(
       },
     }),
     {
-      name: "claude-code-chat",
+      name: "agclaw-chat",
       partialize: (state) => ({
         conversations: state.conversations,
         activeConversationId: state.activeConversationId,
@@ -388,6 +447,7 @@ export const useChatStore = create<ChatState>()(
         },
         // Never persist UI state
         settingsOpen: false,
+        researchOpen: false,
         isSearchOpen: false,
         sidebarTab: "chats",
         selectedConversationIds: [],
@@ -395,3 +455,4 @@ export const useChatStore = create<ChatState>()(
     }
   )
 );
+

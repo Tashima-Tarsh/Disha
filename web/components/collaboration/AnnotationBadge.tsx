@@ -18,7 +18,6 @@ export function AnnotationBadge({ messageId }: AnnotationBadgeProps) {
 
   const annotations = ctx.annotations[messageId] ?? [];
   const unresolved = annotations.filter((a) => !a.resolved);
-  if (annotations.length === 0) return null;
 
   return (
     <div className="relative inline-block">
@@ -31,10 +30,14 @@ export function AnnotationBadge({ messageId }: AnnotationBadgeProps) {
             ? "bg-amber-900/30 border-amber-700/50 text-amber-300 hover:bg-amber-900/50"
             : "bg-surface-800 border-surface-700 text-surface-400 hover:bg-surface-700"
         )}
-        title={`${annotations.length} comment${annotations.length !== 1 ? "s" : ""}`}
+        title={
+          annotations.length === 0
+            ? "Add comment"
+            : `${annotations.length} comment${annotations.length !== 1 ? "s" : ""}`
+        }
       >
         <MessageSquare className="w-3 h-3" />
-        {unresolved.length > 0 ? unresolved.length : annotations.length}
+        {annotations.length === 0 ? "Comment" : unresolved.length > 0 ? unresolved.length : annotations.length}
       </button>
 
       {open && (

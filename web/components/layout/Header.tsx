@@ -1,15 +1,19 @@
 "use client";
 
+import { useMemo, useState } from "react";
 import { Sun, Moon, Monitor } from "lucide-react";
 import { useTheme } from "./ThemeProvider";
 import { useChatStore } from "@/lib/store";
-import { MODELS } from "@/lib/constants";
+import { getModelOptions } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 import { NotificationCenter } from "@/components/notifications/NotificationCenter";
+import { ShareDialog } from "@/components/share/ShareDialog";
 
 export function Header() {
   const { theme, setTheme } = useTheme();
-  const { settings, updateSettings } = useChatStore();
+  const { settings, updateSettings, openSettings, getActiveConversation } = useChatStore();
+  const [shareOpen, setShareOpen] = useState(false);
+  const modelOptions = useMemo(() => getModelOptions(settings.provider), [settings.provider]);
 
   const themeIcons = {
     light: Sun,
@@ -21,44 +25,64 @@ export function Header() {
   const nextTheme = theme === "dark" ? "light" : theme === "light" ? "system" : "dark";
 
   return (
-    <header className="flex items-center justify-between px-4 py-2.5 border-b border-surface-800 bg-surface-900/50 backdrop-blur-sm">
-      <div className="flex items-center gap-3">
-        <h1 className="text-sm font-medium text-surface-100">Chat</h1>
-      </div>
+    <>
+      <header className="flex items-center justify-between border-b border-surface-800 bg-surface-900/50 px-4 py-2.5 backdrop-blur-sm">
+        <div className="min-w-0 flex items-center gap-3">
+          <h1 className="text-sm font-medium text-surface-100">Chat</h1>
+          <span className="truncate text-xs text-surface-500">
+            {getActiveConversation()?.title ?? "No active conversation"}
+          </span>
+        </div>
 
-      <div className="flex items-center gap-2">
-        {/* Model selector */}
-        <label htmlFor="model-select" className="sr-only">
-          Model
-        </label>
-        <select
-          id="model-select"
-          value={settings.model}
-          onChange={(e) => updateSettings({ model: e.target.value })}
-          className={cn(
-            "text-xs bg-surface-800 border border-surface-700 rounded-md px-2 py-1",
-            "text-surface-300 focus:outline-none focus:ring-1 focus:ring-brand-500"
-          )}
-        >
-          {MODELS.map((m) => (
-            <option key={m.id} value={m.id}>
-              {m.label}
-            </option>
-          ))}
-        </select>
+        <div className="flex items-center gap-2">
+          <span className="hidden rounded-md border border-surface-700 px-2 py-1 text-[11px] text-surface-400 md:inline-flex">
+            {settings.localMode ? "Local mode" : settings.provider}
+          </span>
 
-        {/* Notification center */}
-        <NotificationCenter />
+          <label htmlFor="model-select" className="sr-only">
+            Model
+          </label>
+          <select
+            id="model-select"
+            value={settings.model}
+            onChange={(event) => updateSettings({ model: event.target.value })}
+            className={cn(
+              "rounded-md border border-surface-700 bg-surface-800 px-2 py-1 text-xs",
+              "text-surface-300 focus:outline-none focus:ring-1 focus:ring-brand-500"
+            )}
+          >
+            {modelOptions.map((model) => (
+              <option key={model.id} value={model.id}>
+                {model.label}
+              </option>
+            ))}
+          </select>
 
-        {/* Theme toggle */}
-        <button
-          onClick={() => setTheme(nextTheme)}
-          aria-label={`Switch to ${nextTheme} theme`}
-          className="p-1.5 rounded-md text-surface-400 hover:text-surface-100 hover:bg-surface-800 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500"
-        >
-          <ThemeIcon className="w-4 h-4" aria-hidden="true" />
-        </button>
-      </div>
-    </header>
+          <button
+            onClick={() => setShareOpen(true)}
+            className="rounded-md border border-surface-700 px-2.5 py-1 text-xs text-surface-300 transition-colors hover:bg-surface-800 hover:text-surface-100"
+          >
+            Share
+          </button>
+          <button
+            onClick={openSettings}
+            className="rounded-md border border-surface-700 px-2.5 py-1 text-xs text-surface-300 transition-colors hover:bg-surface-800 hover:text-surface-100"
+          >
+            Settings
+          </button>
+
+          <NotificationCenter />
+
+          <button
+            onClick={() => setTheme(nextTheme)}
+            aria-label={`Switch to ${nextTheme} theme`}
+            className="rounded-md p-1.5 text-surface-400 transition-colors hover:bg-surface-800 hover:text-surface-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500"
+          >
+            <ThemeIcon className="h-4 w-4" aria-hidden="true" />
+          </button>
+        </div>
+      </header>
+      <ShareDialog open={shareOpen} onClose={() => setShareOpen(false)} />
+    </>
   );
 }

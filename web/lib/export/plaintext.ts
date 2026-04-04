@@ -1,4 +1,4 @@
-import type { Conversation, ExportOptions } from "../types";
+﻿import type { Conversation, ExportOptions } from "../types";
 import { extractTextContent } from "../utils";
 
 export function toPlainText(conv: Conversation, options: ExportOptions): string {
@@ -40,7 +40,7 @@ export function toPlainText(conv: Conversation, options: ExportOptions): string 
               : extractTextContent(block.content);
           const text =
             !options.includeFileContents && raw.length > 500
-              ? raw.slice(0, 500) + " …[truncated]"
+              ? raw.slice(0, 500) + " â€¦[truncated]"
               : raw;
           parts.push(`[Tool Result${block.is_error ? " (error)" : ""}]\n${text}`);
         }
@@ -52,7 +52,8 @@ export function toPlainText(conv: Conversation, options: ExportOptions): string 
   }
 
   lines.push("---");
-  lines.push("Exported from Claude Code");
+  lines.push("Exported from AG-Claw");
 
   return lines.join("\n");
 }
+

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useRef, useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -14,6 +14,9 @@ const MAX_WIDTH = 480;
 const COLLAPSED_WIDTH = 60;
 
 type SidebarTab = "chats" | "history" | "files" | "settings";
+interface SidebarProps {
+  onNavigate?: () => void;
+}
 
 const TABS: Array<{ id: SidebarTab; icon: React.ElementType; label: string }> = [
   { id: "chats", icon: MessageSquare, label: "Chats" },
@@ -21,7 +24,7 @@ const TABS: Array<{ id: SidebarTab; icon: React.ElementType; label: string }> = 
   { id: "settings", icon: Settings, label: "Settings" },
 ];
 
-export function Sidebar() {
+export function Sidebar({ onNavigate }: SidebarProps) {
   const {
     sidebarOpen,
     sidebarWidth,
@@ -76,10 +79,12 @@ export function Sidebar() {
   const handleTabClick = (id: SidebarTab) => {
     if (id === "settings") {
       openSettings();
+      onNavigate?.();
       return;
     }
     if (!sidebarOpen) toggleSidebar();
     setSidebarTab(id);
+    onNavigate?.();
   };
 
   return (
@@ -102,7 +107,7 @@ export function Sidebar() {
       >
         {sidebarOpen && (
           <span className="flex-1 text-sm font-semibold text-surface-100 px-4 py-3 truncate">
-            Claude Code
+            AG-Claw
           </span>
         )}
 
@@ -136,7 +141,7 @@ export function Sidebar() {
 
         <button
           onClick={toggleSidebar}
-          title={sidebarOpen ? "Collapse sidebar (⌘B)" : "Expand sidebar (⌘B)"}
+          title={sidebarOpen ? "Collapse sidebar (âŒ˜B)" : "Expand sidebar (âŒ˜B)"}
           aria-label={sidebarOpen ? "Collapse sidebar" : "Expand sidebar"}
           className={cn(
             "p-2 rounded-md text-surface-500 hover:text-surface-300 hover:bg-surface-800/60 transition-colors",
@@ -187,3 +192,4 @@ export function Sidebar() {
     </motion.aside>
   );
 }
+

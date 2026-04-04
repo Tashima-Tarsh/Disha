@@ -1,4 +1,4 @@
-import { nanoid } from "nanoid";
+﻿import { nanoid } from "nanoid";
 import { ApiError } from "./types";
 import type {
   FileEntry,
@@ -55,7 +55,7 @@ class McpClient {
         params: {
           protocolVersion: "2024-11-05",
           capabilities: {},
-          clientInfo: { name: "claude-code-web", version: "1.0.0" },
+          clientInfo: { name: "agclaw-web", version: "1.0.0" },
         },
       } satisfies McpRequest),
     });
@@ -140,7 +140,7 @@ class McpClient {
       } satisfies McpRequest),
     });
 
-    // Session expired — reinitialize once and retry
+    // Session expired â€” reinitialize once and retry
     if (res.status === 400 || res.status === 404) {
       this.sessionId = null;
       this.initPromise = null;
@@ -247,3 +247,4 @@ export const fileAPI: FileAPI = {
     throw new ApiError(501, "File upload is not supported", "server");
   },
 };
+

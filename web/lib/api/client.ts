@@ -161,7 +161,8 @@ class ApiClient {
     const url = `${this.baseUrl}${path}`;
     const headers = this.buildHeaders(extraHeaders);
 
-    const timeoutSignals: (AbortSignal | undefined)[] = [userSignal];
+    const normalizedUserSignal = userSignal ?? undefined;
+    const timeoutSignals: (AbortSignal | undefined)[] = [normalizedUserSignal];
     let timeoutController: AbortController | undefined;
     let timeoutId: ReturnType<typeof setTimeout> | undefined;
 
@@ -209,7 +210,7 @@ class ApiClient {
       return res.clone().json() as Promise<T>;
     }
 
-    const promise = this.request(path, { method: "GET", signal: opts?.signal });
+    const promise = this.request(path, { method: "GET", signal: opts?.signal ?? undefined });
     this.inflight.set(key, promise);
     promise.finally(() => this.inflight.delete(key));
 

@@ -1,4 +1,4 @@
-import { create } from "zustand";
+﻿import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { nanoid } from "nanoid";
 
@@ -138,7 +138,7 @@ export const useNotificationStore = create<NotificationStore>()(
       },
     }),
     {
-      name: "claude-code-notifications",
+      name: "agclaw-notifications",
       partialize: (state) => ({
         notifications: state.notifications,
         browserNotificationsEnabled: state.browserNotificationsEnabled,
@@ -147,3 +147,4 @@ export const useNotificationStore = create<NotificationStore>()(
     }
   )
 );
+

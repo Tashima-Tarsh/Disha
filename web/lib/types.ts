@@ -108,6 +108,12 @@ export interface MCPServerConfig {
   enabled: boolean;
 }
 
+export type ChatProvider =
+  | "anthropic"
+  | "openai-compatible"
+  | "ollama"
+  | "vllm";
+
 export interface AppSettings {
   // General
   theme: "light" | "dark" | "system";
@@ -123,6 +129,8 @@ export interface AppSettings {
   systemPrompt: string;
 
   // API
+  localMode: boolean;
+  provider: ChatProvider;
   apiUrl: string;
   apiKey: string;
   streamingEnabled: boolean;

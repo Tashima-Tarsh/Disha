@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import {
   createContext,
@@ -11,12 +11,12 @@ import {
 import type { Command } from "@/lib/shortcuts";
 
 const RECENT_MAX = 5;
-const RECENT_KEY = "claude-code-recent-commands";
+const RECENT_KEY = "agclaw-recent-commands";
 
 interface CommandRegistryContextValue {
   /** Live list of all registered commands for UI rendering */
   commands: Command[];
-  /** Ref always pointing to the latest commands list — use in event handlers */
+  /** Ref always pointing to the latest commands list â€” use in event handlers */
   commandsRef: React.MutableRefObject<Command[]>;
   registerCommand: (cmd: Command) => () => void;
   /** Run a command by id and record it as recently used */
@@ -135,3 +135,4 @@ export function CommandRegistryProvider({
 export function useCommandRegistry() {
   return useContext(CommandRegistryContext);
 }
+

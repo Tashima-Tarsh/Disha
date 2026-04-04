@@ -1,4 +1,4 @@
-import type { Conversation, Message, ExportOptions } from "../types";
+﻿import type { Conversation, Message, ExportOptions } from "../types";
 import { extractTextContent } from "../utils";
 
 function escapeHtml(str: string): string {
@@ -40,7 +40,7 @@ function renderMessageHtml(msg: Message, options: ExportOptions): string {
             : extractTextContent(block.content);
         const text =
           !options.includeFileContents && raw.length > 500
-            ? raw.slice(0, 500) + "\n…[truncated]"
+            ? raw.slice(0, 500) + "\nâ€¦[truncated]"
             : raw;
         parts.push(`
           <details class="tool-block${block.is_error ? " tool-error" : ""}">
@@ -139,7 +139,7 @@ export function toHTML(conv: Conversation, options: ExportOptions): string {
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>${escapeHtml(conv.title)} — Claude Code</title>
+  <title>${escapeHtml(conv.title)} — AG-Claw</title>
   <style>${CSS}</style>
 </head>
 <body>
@@ -147,8 +147,9 @@ export function toHTML(conv: Conversation, options: ExportOptions): string {
   <div class="meta">${metaParts.join("")}</div>
   <div class="messages">${messagesHtml}</div>
   <div class="footer">
-    <a href="https://claude.ai/code">Powered by Claude Code</a>
+    <span>Exported from AG-Claw</span>
   </div>
 </body>
 </html>`;
 }
+

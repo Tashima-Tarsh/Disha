@@ -11,6 +11,22 @@ const IMAGE_MIME: Record<string, string> = {
   bmp: "image/bmp",
   ico: "image/x-icon",
 };
+const DEFAULT_ROOT = process.env.AGCLAW_WEB_ROOT
+  ? path.resolve(process.env.AGCLAW_WEB_ROOT)
+  : path.resolve(process.cwd(), "..");
+
+function resolveWithinRoot(relativePath: string) {
+  const absolutePath = path.resolve(DEFAULT_ROOT, relativePath);
+  const relativeToRoot = path.relative(DEFAULT_ROOT, absolutePath);
+  if (
+    relativeToRoot === ".." ||
+    relativeToRoot.startsWith(`..${path.sep}`) ||
+    path.isAbsolute(relativeToRoot)
+  ) {
+    return null;
+  }
+  return absolutePath;
+}
 
 export async function GET(request: NextRequest) {
   const filePath = request.nextUrl.searchParams.get("path");
@@ -18,7 +34,10 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "path parameter required" }, { status: 400 });
   }
 
-  const resolvedPath = path.resolve(filePath);
+  const resolvedPath = resolveWithinRoot(filePath);
+  if (!resolvedPath) {
+    return NextResponse.json({ error: "path is outside the workspace root" }, { status: 400 });
+  }
 
   try {
     const stats = await fs.stat(resolvedPath);

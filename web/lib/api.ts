@@ -1,4 +1,4 @@
-import type { Message } from "./types";
+import type { AppSettings, Message } from "./types";
 
 const getApiUrl = () =>
   process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001";
@@ -16,15 +16,33 @@ export interface StreamChunk {
   error?: string;
 }
 
+export interface ChatRequestSettings
+  extends Pick<
+    AppSettings,
+    | "provider"
+    | "apiUrl"
+    | "apiKey"
+    | "streamingEnabled"
+    | "systemPrompt"
+    | "temperature"
+    | "maxTokens"
+  > {}
+
 export async function* streamChat(
   messages: Pick<Message, "role" | "content">[],
   model: string,
+  settings: ChatRequestSettings,
   signal?: AbortSignal
 ): AsyncGenerator<StreamChunk> {
   const response = await fetch("/api/chat", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ messages, model, stream: true }),
+    body: JSON.stringify({
+      messages,
+      model,
+      stream: settings.streamingEnabled,
+      settings,
+    }),
     signal,
   });
 

@@ -1,4 +1,4 @@
-import type { Conversation, Message, ExportOptions } from "../types";
+﻿import type { Conversation, Message, ExportOptions } from "../types";
 import { extractTextContent } from "../utils";
 
 function renderMessage(msg: Message, options: ExportOptions): string {
@@ -34,7 +34,7 @@ function renderMessage(msg: Message, options: ExportOptions): string {
             : extractTextContent(block.content);
         const truncated =
           !options.includeFileContents && raw.length > 500
-            ? raw.slice(0, 500) + "\n…[truncated]"
+            ? raw.slice(0, 500) + "\nâ€¦[truncated]"
             : raw;
         parts.push(
           `\`\`\`tool-result${block.is_error ? " error" : ""}\n${truncated}\n\`\`\``
@@ -72,7 +72,8 @@ export function toMarkdown(conv: Conversation, options: ExportOptions): string {
   }
 
   lines.push("---");
-  lines.push("*Exported from Claude Code*");
+  lines.push("*Exported from AG-Claw*");
 
   return lines.join("\n");
 }
+
