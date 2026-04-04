@@ -11,6 +11,62 @@ def _enabled() -> bool:
 
 @unittest.skipUnless(_enabled(), "Set AGCLAW_LIVE_PROVIDER_TESTS=1 to run live provider checks.")
 class LiveProviderTests(unittest.TestCase):
+    def test_live_github_models_provider(self) -> None:
+        api_key = os.getenv("GITHUB_TOKEN") or os.getenv("AGCLAW_LIVE_GITHUB_MODELS_API_KEY")
+        if not api_key:
+            self.skipTest("GITHUB_TOKEN or AGCLAW_LIVE_GITHUB_MODELS_API_KEY is not set")
+
+        config = ProviderConfig(
+            provider=ChatProvider.GITHUB_MODELS,
+            base_url=os.getenv("AGCLAW_LIVE_GITHUB_MODELS_BASE_URL", default_base_url(ChatProvider.GITHUB_MODELS)),
+            api_key=api_key,
+            local_mode=False,
+        )
+        probe = probe_provider(config, timeout=15.0)
+        self.assertTrue(probe.ok, msg=probe.error or f"Probe failed with status {probe.status}")
+
+        model = os.getenv("AGCLAW_LIVE_GITHUB_MODELS_MODEL")
+        if not model:
+            self.skipTest("AGCLAW_LIVE_GITHUB_MODELS_MODEL is not set")
+
+        chunks = chat_chunks(
+            config=config,
+            model=model,
+            messages=[{"role": "user", "content": "Reply with: GITHUB MODELS LIVE OK"}],
+            stream=False,
+            timeout=60.0,
+        )
+        combined = "".join(chunk.get("content", "") for chunk in chunks)
+        self.assertIn("GITHUB MODELS LIVE OK", combined)
+
+    def test_live_openai_provider(self) -> None:
+        api_key = os.getenv("OPENAI_API_KEY")
+        if not api_key:
+            self.skipTest("OPENAI_API_KEY is not set")
+
+        config = ProviderConfig(
+            provider=ChatProvider.OPENAI,
+            base_url=os.getenv("AGCLAW_LIVE_OPENAI_HOSTED_BASE_URL", default_base_url(ChatProvider.OPENAI)),
+            api_key=api_key,
+            local_mode=False,
+        )
+        probe = probe_provider(config, timeout=15.0)
+        self.assertTrue(probe.ok, msg=probe.error or f"Probe failed with status {probe.status}")
+
+        model = os.getenv("AGCLAW_LIVE_OPENAI_HOSTED_MODEL")
+        if not model:
+            self.skipTest("AGCLAW_LIVE_OPENAI_HOSTED_MODEL is not set")
+
+        chunks = chat_chunks(
+            config=config,
+            model=model,
+            messages=[{"role": "user", "content": "Reply with: OPENAI HOSTED LIVE OK"}],
+            stream=False,
+            timeout=60.0,
+        )
+        combined = "".join(chunk.get("content", "") for chunk in chunks)
+        self.assertIn("OPENAI HOSTED LIVE OK", combined)
+
     def test_live_openai_compatible_provider(self) -> None:
         base_url = os.getenv("AGCLAW_LIVE_OPENAI_BASE_URL")
         if not base_url:

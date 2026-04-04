@@ -1,4 +1,5 @@
 import json
+import os
 import threading
 import time
 import unittest
@@ -49,6 +50,22 @@ class BackendHttpApiTests(unittest.TestCase):
         self.assertTrue(payload["ok"])
         self.assertEqual(payload["provider"], "openai-compatible")
 
+    def test_provider_health_openai(self) -> None:
+        with urlopen(self._url(f"/api/provider-health?provider=openai&apiUrl={self._fixture_url()}&apiKey=test-token")) as response:
+            payload = json.loads(response.read().decode("utf-8"))
+        self.assertTrue(payload["ok"])
+        self.assertEqual(payload["provider"], "openai")
+
+    def test_provider_health_github_models(self) -> None:
+        with urlopen(
+            self._url(
+                f"/api/provider-health?provider=github-models&apiUrl={self._fixture_url()}&apiKey=test-token"
+            )
+        ) as response:
+            payload = json.loads(response.read().decode("utf-8"))
+        self.assertTrue(payload["ok"])
+        self.assertEqual(payload["provider"], "github-models")
+
     def test_chat_endpoint_returns_fixture_sse(self) -> None:
         request = Request(
             self._url("/api/chat"),
@@ -68,6 +85,28 @@ class BackendHttpApiTests(unittest.TestCase):
         with urlopen(request) as response:
             payload = response.read().decode("utf-8")
         self.assertIn("Fixture reply: review this batch log", payload)
+        self.assertIn("[DONE]", payload)
+
+    def test_chat_endpoint_returns_github_models_fixture_sse(self) -> None:
+        request = Request(
+            self._url("/api/chat"),
+            data=json.dumps(
+                {
+                    "model": "openai/gpt-4.1-mini",
+                    "messages": [{"role": "user", "content": "reply with github models ok"}],
+                    "settings": {
+                        "provider": "github-models",
+                        "apiUrl": self._fixture_url(),
+                        "apiKey": "test-token",
+                    },
+                }
+            ).encode("utf-8"),
+            headers={"Content-Type": "application/json"},
+            method="POST",
+        )
+        with urlopen(request) as response:
+            payload = response.read().decode("utf-8")
+        self.assertIn("Fixture reply: reply with github models ok", payload)
         self.assertIn("[DONE]", payload)
 
     def test_chat_endpoint_returns_json_error_for_missing_anthropic_key(self) -> None:
@@ -194,6 +233,45 @@ class BackendHttpApiTests(unittest.TestCase):
         self.assertTrue(any("manual" in risk.lower() for risk in payload["risks"]))
         self.assertTrue(any("batch id" in item.lower() for item in payload["recommended_follow_up"]))
         self.assertTrue(any("screenshot received" in observation.lower() for observation in payload["observations"]))
+
+    def test_mes_interpret_screen_endpoint_uses_configured_vision_adapter(self) -> None:
+        previous_env = {
+            "AGCLAW_SCREEN_VISION_PROVIDER": os.getenv("AGCLAW_SCREEN_VISION_PROVIDER"),
+            "AGCLAW_SCREEN_VISION_BASE_URL": os.getenv("AGCLAW_SCREEN_VISION_BASE_URL"),
+            "AGCLAW_SCREEN_VISION_API_KEY": os.getenv("AGCLAW_SCREEN_VISION_API_KEY"),
+            "AGCLAW_SCREEN_VISION_MODEL": os.getenv("AGCLAW_SCREEN_VISION_MODEL"),
+        }
+        os.environ["AGCLAW_SCREEN_VISION_PROVIDER"] = "openai-compatible"
+        os.environ["AGCLAW_SCREEN_VISION_BASE_URL"] = self._fixture_url()
+        os.environ["AGCLAW_SCREEN_VISION_API_KEY"] = "fixture-token"
+        os.environ["AGCLAW_SCREEN_VISION_MODEL"] = "Qwen/Qwen2.5-VL-7B-Instruct"
+
+        try:
+            request = Request(
+                self._url("/api/mes/interpret-screen"),
+                data=json.dumps(
+                    {
+                        "title": "Mixer release screen",
+                        "notes": "Alarm banner visible. Manual mode lit. Batch 42 recipe screen open with release hold indicator.",
+                        "visible_labels": ["ALARM 42", "MANUAL MODE", "Batch 42", "Release Hold"],
+                        "image_name": "mixer-release-screen.png",
+                        "image_data_url": "data:image/png;base64,ZmFrZQ==",
+                    }
+                ).encode("utf-8"),
+                headers={"Content-Type": "application/json"},
+                method="POST",
+            )
+            with urlopen(request) as response:
+                payload = json.loads(response.read().decode("utf-8"))
+        finally:
+            for key, value in previous_env.items():
+                if value is None:
+                    os.environ.pop(key, None)
+                else:
+                    os.environ[key] = value
+
+        self.assertEqual(payload["adapter"], "openai-compatible")
+        self.assertTrue(any("vision summary" in observation.lower() for observation in payload["observations"]))
 
 
 if __name__ == "__main__":

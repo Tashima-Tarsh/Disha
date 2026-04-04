@@ -109,7 +109,7 @@ def _vision_adapter() -> tuple[str, str, str, str]:
 
 def _run_openai_vision(prompt: str, image_data_url: str) -> tuple[str, str]:
     provider, base_url, api_key, model = _vision_adapter()
-    if provider not in {"openai-compatible", "ollama", "vllm"} or not base_url or not model or not image_data_url:
+    if provider not in {"github-models", "openai", "openai-compatible", "ollama", "vllm"} or not base_url or not model or not image_data_url:
         return "heuristic", ""
 
     payload = {
@@ -131,7 +131,12 @@ def _run_openai_vision(prompt: str, image_data_url: str) -> tuple[str, str]:
         "Content-Type": "application/json",
         **({"Authorization": f"Bearer {api_key}"} if api_key else {}),
     }
-    response = _request_json(f"{base_url.rstrip('/')}/v1/chat/completions", payload, headers)
+    if provider == "github-models":
+        headers["X-GitHub-Api-Version"] = "2022-11-28"
+        target = f"{base_url.rstrip('/')}/chat/completions"
+    else:
+        target = f"{base_url.rstrip('/')}/v1/chat/completions"
+    response = _request_json(target, payload, headers)
     return provider, _extract_vision_summary(response)
 
 

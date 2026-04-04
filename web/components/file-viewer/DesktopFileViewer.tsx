@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { X, Save } from "lucide-react";
 import { useFileViewerStore } from "@/lib/fileViewerStore";
+import { truncateMeasuredText } from "@/lib/pretextSpike";
 import { cn } from "@/lib/utils";
 import { FileBreadcrumb } from "./FileBreadcrumb";
 import { FileInfoBar } from "./FileInfoBar";
@@ -22,6 +23,10 @@ export function DesktopFileViewer() {
   const activeTab = useMemo(
     () => tabs.find((tab) => tab.id === activeTabId) ?? null,
     [tabs, activeTabId]
+  );
+  const measuredTitle = useMemo(
+    () => (activeTab ? truncateMeasuredText(activeTab.path, 360) : null),
+    [activeTab]
   );
 
   if (!isOpen || !activeTab) {
@@ -52,7 +57,9 @@ export function DesktopFileViewer() {
         <div className="flex items-center justify-between border-b border-surface-800 px-3 py-2">
           <div className="min-w-0">
             <div className="truncate text-sm font-medium text-surface-100">{activeTab.filename}</div>
-            <div className="text-xs text-surface-500">Workspace file viewer</div>
+            <div className="truncate text-xs text-surface-500" title={activeTab.path}>
+              {measuredTitle?.truncated ?? "Workspace file viewer"}
+            </div>
           </div>
           <div className="flex items-center gap-2">
             {!activeTab.isImage && activeTab.mode !== "diff" && (

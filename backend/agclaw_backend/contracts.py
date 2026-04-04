@@ -7,6 +7,8 @@ from typing import Any
 
 class ChatProvider(str, Enum):
     ANTHROPIC = "anthropic"
+    GITHUB_MODELS = "github-models"
+    OPENAI = "openai"
     OPENAI_COMPATIBLE = "openai-compatible"
     OLLAMA = "ollama"
     VLLM = "vllm"

@@ -49,7 +49,7 @@ to the clean backend service instead of using the in-process fallback logic.
   - `AGCLAW_ARTIFACT_DIR`
 - Optional vision adapter for `/api/mes/interpret-screen`:
   - `AGCLAW_SCREEN_VISION_PROVIDER`
-    - expected values: `openai-compatible`, `ollama`, `vllm`
+    - expected values: `github-models`, `openai`, `openai-compatible`, `ollama`, `vllm`
   - `AGCLAW_SCREEN_VISION_BASE_URL`
   - `AGCLAW_SCREEN_VISION_API_KEY`
   - `AGCLAW_SCREEN_VISION_MODEL`
@@ -116,6 +116,14 @@ These tests are opt-in only. They are skipped unless `AGCLAW_LIVE_PROVIDER_TESTS
 
 Required environment variables:
 
+- GitHub Models:
+  - `GITHUB_TOKEN` or `AGCLAW_LIVE_GITHUB_MODELS_API_KEY`
+  - `AGCLAW_LIVE_GITHUB_MODELS_MODEL`
+  - optional `AGCLAW_LIVE_GITHUB_MODELS_BASE_URL`
+- OpenAI:
+  - `OPENAI_API_KEY`
+  - `AGCLAW_LIVE_OPENAI_HOSTED_MODEL`
+  - optional `AGCLAW_LIVE_OPENAI_HOSTED_BASE_URL`
 - OpenAI-compatible:
   - `AGCLAW_LIVE_OPENAI_BASE_URL`
   - `AGCLAW_LIVE_OPENAI_MODEL`

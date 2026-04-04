@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import type { ChatProvider, Message } from "@/lib/types";
+import { DEFAULT_PROVIDER_URLS } from "@/lib/constants";
 
 interface RequestSettings {
   provider?: ChatProvider;
@@ -175,7 +176,7 @@ async function handleAnthropic(body: ChatRequestBody, settings: Required<Request
   }
 
   const { system, messages } = buildConversationPayload(body.messages ?? [], settings.systemPrompt);
-  const upstreamResponse = await fetch(`${normalizeBaseUrl(settings.apiUrl, "https://api.anthropic.com")}/v1/messages`, {
+  const upstreamResponse = await fetch(`${normalizeBaseUrl(settings.apiUrl, DEFAULT_PROVIDER_URLS.anthropic)}/v1/messages`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -250,19 +251,22 @@ async function handleAnthropic(body: ChatRequestBody, settings: Required<Request
 }
 
 async function handleOpenAiCompatible(body: ChatRequestBody, settings: Required<RequestSettings>) {
-  const baseUrl = normalizeBaseUrl(
-    settings.apiUrl,
-    settings.provider === "ollama" ? "http://127.0.0.1:11434" : "http://127.0.0.1:8000"
-  );
+  const baseUrl = normalizeBaseUrl(settings.apiUrl, DEFAULT_PROVIDER_URLS[settings.provider]);
   const { system, messages } = buildConversationPayload(body.messages ?? [], settings.systemPrompt);
   const upstreamMessages = system ? [{ role: "system", content: system }, ...messages] : messages;
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+    ...(settings.apiKey ? { Authorization: `Bearer ${settings.apiKey}` } : {}),
+  };
+  const endpoint = settings.provider === "github-models" ? `${baseUrl}/chat/completions` : `${baseUrl}/v1/chat/completions`;
 
-  const upstreamResponse = await fetch(`${baseUrl}/v1/chat/completions`, {
+  if (settings.provider === "github-models") {
+    headers["X-GitHub-Api-Version"] = "2022-11-28";
+  }
+
+  const upstreamResponse = await fetch(endpoint, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      ...(settings.apiKey ? { Authorization: `Bearer ${settings.apiKey}` } : {}),
-    },
+    headers,
     body: JSON.stringify({
       model: body.model,
       messages: upstreamMessages,

@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { Check, MessageSquareText, X } from "lucide-react";
 import { useCollaborationContext } from "./CollaborationProvider";
+import { measureCommentPreview } from "@/lib/pretextSpike";
 import { cn } from "@/lib/utils";
 
 interface AnnotationThreadProps {
@@ -63,12 +64,14 @@ export function AnnotationThread({ messageId, onClose }: AnnotationThreadProps) 
                 {annotation.resolved ? "Resolved" : "Resolve"}
               </button>
             </div>
-            <p className="mt-2 text-sm text-surface-200">{annotation.text}</p>
+            <p className="mt-2 text-sm text-surface-200" title={measureCommentPreview(annotation.text, 320).truncated}>
+              {annotation.text}
+            </p>
 
             {annotation.replies.length > 0 && (
               <div className="mt-3 space-y-2 border-l border-surface-700 pl-3">
                 {annotation.replies.map((reply) => (
-                  <div key={reply.id}>
+                  <div key={reply.id} title={measureCommentPreview(reply.text, 260).truncated}>
                     <div className="text-xs font-medium text-surface-300">{reply.author.name}</div>
                     <div className="text-xs text-surface-500">{formatTimestamp(reply.createdAt)}</div>
                     <p className="mt-1 text-sm text-surface-200">{reply.text}</p>

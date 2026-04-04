@@ -110,6 +110,8 @@ export interface MCPServerConfig {
 
 export type ChatProvider =
   | "anthropic"
+  | "github-models"
+  | "openai"
   | "openai-compatible"
   | "ollama"
   | "vllm";

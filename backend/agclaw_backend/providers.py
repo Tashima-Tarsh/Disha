@@ -22,7 +22,11 @@ class ProviderConfig:
         return self.base_url.rstrip("/")
 
     def requires_api_key(self) -> bool:
-        return self.provider == ChatProvider.ANTHROPIC
+        return self.provider in {
+            ChatProvider.ANTHROPIC,
+            ChatProvider.GITHUB_MODELS,
+            ChatProvider.OPENAI,
+        }
 
 
 @dataclass(slots=True)
@@ -46,6 +50,8 @@ class ProviderError(RuntimeError):
 def default_base_url(provider: ChatProvider) -> str:
     defaults = {
         ChatProvider.ANTHROPIC: "https://api.anthropic.com",
+        ChatProvider.GITHUB_MODELS: "https://models.github.ai/inference",
+        ChatProvider.OPENAI: "https://api.openai.com",
         ChatProvider.OPENAI_COMPATIBLE: "http://127.0.0.1:8000",
         ChatProvider.OLLAMA: "http://127.0.0.1:11434",
         ChatProvider.VLLM: "http://127.0.0.1:8000",
@@ -164,21 +170,25 @@ def probe_provider(config: ProviderConfig, timeout: float = 5.0) -> ProviderProb
             probe="mock://health",
         )
 
-    if config.provider == ChatProvider.ANTHROPIC and not config.api_key:
+    if config.requires_api_key() and not config.api_key:
         return ProviderProbeResult(
             ok=False,
             provider=config.provider.value,
             api_url=config.normalized_base_url(),
             local_mode=config.local_mode,
-            requires_api_key=True,
-            probe=f"{config.normalized_base_url()}/v1/models",
+            requires_api_key=config.requires_api_key(),
+            probe=_probe_path(config.provider, config.normalized_base_url()),
             status=400,
-            error="Anthropic API key is required",
+            error=f"{config.provider.value} API key is required",
         )
 
     probe_candidates: list[tuple[str, dict[str, str]]] = []
     if config.provider == ChatProvider.ANTHROPIC:
         probe_candidates.append((f"{config.normalized_base_url()}/v1/models", {"x-api-key": config.api_key, "anthropic-version": "2023-06-01"}))
+    elif config.provider == ChatProvider.GITHUB_MODELS:
+        probe_candidates.append((f"{config.normalized_base_url()}/models", _github_headers(config.api_key)))
+    elif config.provider == ChatProvider.OPENAI:
+        probe_candidates.append((f"{config.normalized_base_url()}/v1/models", _bearer_headers(config.api_key)))
     elif config.provider == ChatProvider.OLLAMA:
         probe_candidates.extend(
             [
@@ -288,8 +298,8 @@ def _openai_chat_chunks(*, config: ProviderConfig, model: str, messages: list[di
         "max_tokens": max_tokens,
         "stream": stream,
     }
-    headers = {"Content-Type": "application/json", **_bearer_headers(config.api_key)}
-    status, body, _ = _request_json(f"{config.normalized_base_url()}/v1/chat/completions", method="POST", payload=payload, headers=headers, timeout=timeout)
+    headers = {"Content-Type": "application/json", **_provider_chat_headers(config)}
+    status, body, _ = _request_json(_chat_completions_url(config), method="POST", payload=payload, headers=headers, timeout=timeout)
     if not stream:
         data = json.loads(body.decode("utf-8"))
         choice = (data.get("choices") or [{}])[0]
@@ -303,3 +313,28 @@ def _openai_chat_chunks(*, config: ProviderConfig, model: str, messages: list[di
 
 def _bearer_headers(api_key: str) -> dict[str, str]:
     return {"Authorization": f"Bearer {api_key}"} if api_key else {}
+
+
+def _github_headers(api_key: str) -> dict[str, str]:
+    headers = _bearer_headers(api_key)
+    headers["X-GitHub-Api-Version"] = "2022-11-28"
+    return headers
+
+
+def _provider_chat_headers(config: ProviderConfig) -> dict[str, str]:
+    if config.provider == ChatProvider.GITHUB_MODELS:
+        return _github_headers(config.api_key)
+    return _bearer_headers(config.api_key)
+
+
+def _chat_completions_url(config: ProviderConfig) -> str:
+    base_url = config.normalized_base_url()
+    if config.provider == ChatProvider.GITHUB_MODELS:
+        return f"{base_url}/chat/completions"
+    return f"{base_url}/v1/chat/completions"
+
+
+def _probe_path(provider: ChatProvider, base_url: str) -> str:
+    if provider == ChatProvider.GITHUB_MODELS:
+        return f"{base_url}/models"
+    return f"{base_url}/v1/models"

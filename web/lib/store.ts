@@ -65,6 +65,7 @@ interface ChatState {
   settings: AppSettings;
   settingsOpen: boolean;
   researchOpen: boolean;
+  buddyOpen: boolean;
 
   // Sidebar state
   sidebarOpen: boolean;
@@ -118,6 +119,9 @@ interface ChatState {
   closeSettings: () => void;
   openResearch: () => void;
   closeResearch: () => void;
+  openBuddy: () => void;
+  closeBuddy: () => void;
+  toggleBuddy: () => void;
 
   // Sidebar actions
   toggleSidebar: () => void;
@@ -135,6 +139,7 @@ export const useChatStore = create<ChatState>()(
       settings: DEFAULT_SETTINGS,
       settingsOpen: false,
       researchOpen: false,
+      buddyOpen: false,
 
       sidebarOpen: true,
       sidebarWidth: 280,
@@ -408,6 +413,9 @@ export const useChatStore = create<ChatState>()(
       closeSettings: () => set({ settingsOpen: false }),
       openResearch: () => set({ researchOpen: true }),
       closeResearch: () => set({ researchOpen: false }),
+      openBuddy: () => set({ buddyOpen: true }),
+      closeBuddy: () => set({ buddyOpen: false }),
+      toggleBuddy: () => set((state) => ({ buddyOpen: !state.buddyOpen })),
 
       toggleSidebar: () => set((state) => ({ sidebarOpen: !state.sidebarOpen })),
       setSidebarWidth: (w) => set({ sidebarWidth: w }),
@@ -448,6 +456,7 @@ export const useChatStore = create<ChatState>()(
         // Never persist UI state
         settingsOpen: false,
         researchOpen: false,
+        buddyOpen: false,
         isSearchOpen: false,
         sidebarTab: "chats",
         selectedConversationIds: [],

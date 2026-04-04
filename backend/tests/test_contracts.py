@@ -16,6 +16,14 @@ class BackendContractTests(unittest.TestCase):
         config = ProviderConfig(provider=ChatProvider.ANTHROPIC, base_url="https://api.anthropic.com")
         self.assertTrue(config.requires_api_key())
 
+    def test_hosted_openai_requires_api_key(self) -> None:
+        config = ProviderConfig(provider=ChatProvider.OPENAI, base_url="https://api.openai.com")
+        self.assertTrue(config.requires_api_key())
+
+    def test_github_models_requires_api_key(self) -> None:
+        config = ProviderConfig(provider=ChatProvider.GITHUB_MODELS, base_url="https://models.github.ai/inference")
+        self.assertTrue(config.requires_api_key())
+
     def test_orchestrator_roles_are_built(self) -> None:
         request = ResearchRequest(
             prompt="Review this MES workflow.",

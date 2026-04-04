@@ -1,12 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import type { ChatProvider } from "@/lib/types";
-
-const DEFAULT_URLS: Record<ChatProvider, string> = {
-  anthropic: "https://api.anthropic.com",
-  "openai-compatible": "http://127.0.0.1:8000",
-  ollama: "http://127.0.0.1:11434",
-  vllm: "http://127.0.0.1:8000",
-};
+import { DEFAULT_PROVIDER_URLS } from "@/lib/constants";
 
 interface Probe {
   url: string;
@@ -14,11 +8,18 @@ interface Probe {
 }
 
 function normalizeBaseUrl(baseUrl: string | null, provider: ChatProvider) {
-  return (baseUrl?.trim() || DEFAULT_URLS[provider]).replace(/\/+$/, "");
+  return (baseUrl?.trim() || DEFAULT_PROVIDER_URLS[provider]).replace(/\/+$/, "");
 }
 
 function bearerHeaders(apiKey: string): Record<string, string> {
   return apiKey ? { Authorization: `Bearer ${apiKey}` } : {};
+}
+
+function githubHeaders(apiKey: string): Record<string, string> {
+  return {
+    ...bearerHeaders(apiKey),
+    "X-GitHub-Api-Version": "2022-11-28",
+  };
 }
 
 async function proxyToBackend(request: NextRequest) {
@@ -51,15 +52,17 @@ export async function GET(request: NextRequest) {
   try {
     const probes: Probe[] = provider === "anthropic"
       ? [{ url: `${apiUrl}/v1/models`, headers: { "x-api-key": apiKey, "anthropic-version": "2023-06-01" } }]
-      : provider === "ollama"
-        ? [
-            { url: `${apiUrl}/api/tags`, headers: {} },
-            { url: `${apiUrl}/v1/models`, headers: bearerHeaders(apiKey) },
-          ]
-        : [
-            { url: `${apiUrl}/health`, headers: bearerHeaders(apiKey) },
-            { url: `${apiUrl}/v1/models`, headers: bearerHeaders(apiKey) },
-          ];
+      : provider === "github-models"
+        ? [{ url: `${apiUrl}/models`, headers: githubHeaders(apiKey) }]
+        : provider === "ollama"
+          ? [
+              { url: `${apiUrl}/api/tags`, headers: {} },
+              { url: `${apiUrl}/v1/models`, headers: bearerHeaders(apiKey) },
+            ]
+          : [
+              { url: `${apiUrl}/health`, headers: bearerHeaders(apiKey) },
+              { url: `${apiUrl}/v1/models`, headers: bearerHeaders(apiKey) },
+            ];
 
     let lastStatus = 500;
     let lastError = "Connection failed";

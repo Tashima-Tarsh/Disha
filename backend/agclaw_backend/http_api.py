@@ -15,6 +15,13 @@ from .orchestrator import run_research_orchestration
 from .providers import ProviderConfig, ProviderError, chat_chunks, default_base_url, probe_provider
 
 
+HOSTED_PROVIDERS = {
+    ChatProvider.ANTHROPIC,
+    ChatProvider.GITHUB_MODELS,
+    ChatProvider.OPENAI,
+}
+
+
 def _json_bytes(payload: Any) -> bytes:
     return json.dumps(payload).encode("utf-8")
 
@@ -66,7 +73,7 @@ class AgClawApiHandler(BaseHTTPRequestHandler):
                 provider=provider,
                 base_url=params.get("apiUrl", [default_base_url(provider)])[0],
                 api_key=params.get("apiKey", [""])[0],
-                local_mode=provider != ChatProvider.ANTHROPIC,
+                local_mode=provider not in HOSTED_PROVIDERS,
             )
             result = probe_provider(config)
             self._send_json(asdict(result), HTTPStatus(result.status if result.status >= 400 else 200))
@@ -100,7 +107,7 @@ class AgClawApiHandler(BaseHTTPRequestHandler):
                 provider=provider,
                 base_url=settings.get("apiUrl") or default_base_url(provider),
                 api_key=settings.get("apiKey", ""),
-                local_mode=provider != ChatProvider.ANTHROPIC,
+                local_mode=provider not in HOSTED_PROVIDERS,
             )
             try:
                 chunks = chat_chunks(

@@ -1,17 +1,34 @@
-﻿"use client";
+"use client";
 
-import { useState, useRef, useCallback } from "react";
-import { Send, Square, Paperclip } from "lucide-react";
+import { useEffect, useMemo, useRef, useState, useCallback } from "react";
+import { Send, Square, Paperclip, PawPrint } from "lucide-react";
 import { useChatStore } from "@/lib/store";
 import { streamChat } from "@/lib/api";
 import { cn } from "@/lib/utils";
 import { MAX_MESSAGE_LENGTH } from "@/lib/constants";
+import type { BuddyProfile, BuddySuggestion } from "@/lib/buddy";
+import { getBuddyTake } from "@/lib/buddy";
+import { estimateWrappedLines } from "@/lib/pretextSpike";
 
 interface ChatInputProps {
   conversationId: string;
+  buddyProfile?: BuddyProfile;
+  latestPrompt?: string;
+  buddySuggestions?: BuddySuggestion[];
+  onOpenBuddy?: () => void;
+  pendingBuddyPrompt?: string;
+  onBuddyPromptApplied?: () => void;
 }
 
-export function ChatInput({ conversationId }: ChatInputProps) {
+export function ChatInput({
+  conversationId,
+  buddyProfile,
+  latestPrompt,
+  buddySuggestions,
+  onOpenBuddy,
+  pendingBuddyPrompt,
+  onBuddyPromptApplied,
+}: ChatInputProps) {
   const [input, setInput] = useState("");
   const [isStreaming, setIsStreaming] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -20,6 +37,25 @@ export function ChatInput({ conversationId }: ChatInputProps) {
   const { conversations, settings, addMessage, updateMessage } = useChatStore();
   const conversation = conversations.find((c) => c.id === conversationId);
 
+  useEffect(() => {
+    if (!pendingBuddyPrompt) {
+      return;
+    }
+    setInput(pendingBuddyPrompt);
+    onBuddyPromptApplied?.();
+    requestAnimationFrame(() => {
+      textareaRef.current?.focus();
+      adjustHeight();
+    });
+  }, [pendingBuddyPrompt, onBuddyPromptApplied]);
+
+  const helperSummary = useMemo(
+    () => (buddyProfile ? getBuddyTake(buddyProfile, latestPrompt ?? "") : "Buddy helper is unavailable in this layout."),
+    [buddyProfile, latestPrompt]
+  );
+
+  const estimatedRows = Math.min(6, estimateWrappedLines(input || helperSummary, 560));
+
   const handleSubmit = useCallback(async () => {
     const text = input.trim();
     if (!text || isStreaming) return;
@@ -27,14 +63,12 @@ export function ChatInput({ conversationId }: ChatInputProps) {
     setInput("");
     setIsStreaming(true);
 
-    // Add user message
     addMessage(conversationId, {
       role: "user",
       content: text,
       status: "complete",
     });
 
-    // Add placeholder assistant message
     const assistantId = addMessage(conversationId, {
       role: "assistant",
       content: "",
@@ -136,19 +170,55 @@ export function ChatInput({ conversationId }: ChatInputProps) {
   };
 
   return (
-    <div className="border-t border-surface-800 bg-surface-900/50 backdrop-blur-sm px-4 py-3">
-      <div className="max-w-3xl mx-auto">
+    <div className="border-t border-surface-800 bg-surface-900/50 px-4 py-3 backdrop-blur-sm">
+      <div className="mx-auto max-w-3xl space-y-3">
+        <div className="rounded-xl border border-surface-800 bg-surface-900/70 p-3">
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <div className="text-xs uppercase tracking-wide text-surface-500">Buddy helper</div>
+              <p className="mt-1 text-sm text-surface-200">{helperSummary}</p>
+            </div>
+            <button
+              type="button"
+              onClick={() => onOpenBuddy?.()}
+              className="inline-flex items-center gap-2 rounded-md border border-surface-700 px-2.5 py-1 text-xs text-surface-300 transition-colors hover:bg-surface-800 hover:text-surface-100"
+              disabled={!onOpenBuddy}
+            >
+              <PawPrint className="h-4 w-4" aria-hidden="true" />
+              Buddy panel
+            </button>
+          </div>
+          <div className="mt-3 flex flex-wrap gap-2">
+            {(buddySuggestions ?? []).map((suggestion) => (
+              <button
+                key={suggestion.id}
+                type="button"
+                onClick={() => {
+                  setInput(suggestion.prompt);
+                  requestAnimationFrame(() => {
+                    textareaRef.current?.focus();
+                    adjustHeight();
+                  });
+                }}
+                className="rounded-full border border-surface-700 px-3 py-1 text-xs text-surface-300 transition-colors hover:border-brand-500 hover:bg-surface-800 hover:text-surface-100"
+              >
+                {suggestion.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
         <div
           className={cn(
             "flex items-end gap-2 rounded-xl border bg-surface-800 px-3 py-2",
-            "border-surface-700 focus-within:border-brand-500 transition-colors"
+            "border-surface-700 transition-colors focus-within:border-brand-500"
           )}
         >
           <button
-            className="p-1 text-surface-500 hover:text-surface-300 transition-colors flex-shrink-0 mb-0.5"
+            className="mb-0.5 flex-shrink-0 p-1 text-surface-500 transition-colors hover:text-surface-300"
             aria-label="Attach file"
           >
-            <Paperclip className="w-4 h-4" aria-hidden="true" />
+            <Paperclip className="h-4 w-4" aria-hidden="true" />
           </button>
 
           <label htmlFor="chat-input" className="sr-only">
@@ -164,12 +234,11 @@ export function ChatInput({ conversationId }: ChatInputProps) {
             }}
             onKeyDown={handleKeyDown}
             placeholder="Message AG-Claw..."
-            rows={1}
+            rows={Math.max(1, estimatedRows)}
             aria-label="Message"
             className={cn(
-              "flex-1 resize-none bg-transparent text-sm text-surface-100",
-              "placeholder:text-surface-500 focus:outline-none",
-              "min-h-[24px] max-h-[200px] py-0.5"
+              "min-h-[24px] max-h-[200px] flex-1 resize-none bg-transparent py-0.5 text-sm text-surface-100",
+              "placeholder:text-surface-500 focus:outline-none"
             )}
           />
 
@@ -177,9 +246,9 @@ export function ChatInput({ conversationId }: ChatInputProps) {
             <button
               onClick={handleStop}
               aria-label="Stop generation"
-              className="p-1.5 rounded-lg bg-surface-700 text-surface-300 hover:bg-surface-600 transition-colors flex-shrink-0"
+              className="flex-shrink-0 rounded-lg bg-surface-700 p-1.5 text-surface-300 transition-colors hover:bg-surface-600"
             >
-              <Square className="w-4 h-4" aria-hidden="true" />
+              <Square className="h-4 w-4" aria-hidden="true" />
             </button>
           ) : (
             <button
@@ -187,23 +256,21 @@ export function ChatInput({ conversationId }: ChatInputProps) {
               disabled={!input.trim()}
               aria-label="Send message"
               className={cn(
-                "p-1.5 rounded-lg transition-colors flex-shrink-0",
+                "flex-shrink-0 rounded-lg p-1.5 transition-colors",
                 input.trim()
                   ? "bg-brand-600 text-white hover:bg-brand-700"
-                  : "bg-surface-700 text-surface-500 cursor-not-allowed"
+                  : "cursor-not-allowed bg-surface-700 text-surface-500"
               )}
             >
-              <Send className="w-4 h-4" aria-hidden="true" />
+              <Send className="h-4 w-4" aria-hidden="true" />
             </button>
           )}
         </div>
 
-        <p className="text-xs text-surface-600 text-center mt-2">
+        <p className="mt-2 text-center text-xs text-surface-600">
           AG-Claw can make mistakes. Verify important information.
         </p>
       </div>
     </div>
   );
 }
-
-

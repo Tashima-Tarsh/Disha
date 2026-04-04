@@ -1,15 +1,22 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Sun, Moon, Monitor } from "lucide-react";
+import { PawPrint, Sun, Moon, Monitor } from "lucide-react";
 import { useTheme } from "./ThemeProvider";
 import { useChatStore } from "@/lib/store";
 import { getModelOptions } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 import { NotificationCenter } from "@/components/notifications/NotificationCenter";
 import { ShareDialog } from "@/components/share/ShareDialog";
+import { BuddyWidget } from "@/components/buddy/BuddyWidget";
+import type { BuddyProfile } from "@/lib/buddy";
 
-export function Header() {
+interface HeaderProps {
+  buddyProfile: BuddyProfile;
+  onOpenBuddy: () => void;
+}
+
+export function Header({ buddyProfile, onOpenBuddy }: HeaderProps) {
   const { theme, setTheme } = useTheme();
   const { settings, updateSettings, openSettings, getActiveConversation } = useChatStore();
   const [shareOpen, setShareOpen] = useState(false);
@@ -35,6 +42,16 @@ export function Header() {
         </div>
 
         <div className="flex items-center gap-2">
+          <BuddyWidget profile={buddyProfile} onOpen={onOpenBuddy} />
+          <button
+            type="button"
+            onClick={onOpenBuddy}
+            className="inline-flex rounded-md border border-surface-700 px-2.5 py-1 text-xs text-surface-300 transition-colors hover:bg-surface-800 hover:text-surface-100 md:hidden"
+            aria-label="Open buddy panel"
+          >
+            <PawPrint className="h-4 w-4" aria-hidden="true" />
+          </button>
+
           <span className="hidden rounded-md border border-surface-700 px-2 py-1 text-[11px] text-surface-400 md:inline-flex">
             {settings.localMode ? "Local mode" : settings.provider}
           </span>

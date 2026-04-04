@@ -7,6 +7,9 @@ import {
   DEFAULT_PROVIDER_URLS,
   PROVIDERS,
   getDefaultModelForProvider,
+  getProviderHelpText,
+  getProviderKeyLabel,
+  getProviderKeyPlaceholder,
   isLocalProvider,
 } from "@/lib/constants";
 import type { ChatProvider } from "@/lib/types";
@@ -14,17 +17,6 @@ import { SettingRow, SectionHeader, Toggle } from "./SettingRow";
 import { cn } from "@/lib/utils";
 
 type ConnectionStatus = "idle" | "checking" | "ok" | "error";
-
-function getKeyPlaceholder(provider: ChatProvider) {
-  switch (provider) {
-    case "anthropic":
-      return "sk-ant-...";
-    case "ollama":
-      return "Optional for proxied Ollama";
-    default:
-      return "Optional bearer token";
-  }
-}
 
 export function ApiSettings() {
   const { settings, updateSettings, resetSettings } = useChatStore();
@@ -135,19 +127,18 @@ export function ApiSettings() {
       <SettingRow
         label="API key"
         description={
-          settings.provider === "anthropic"
-            ? "Required for direct Anthropic access. Stored locally in browser state only."
-            : "Optional for local providers unless your gateway requires a bearer token."
+          getProviderHelpText(settings.provider)
         }
         stack
       >
+        <div className="text-xs text-surface-500">{getProviderKeyLabel(settings.provider)}</div>
         <div className="flex gap-2">
           <div className="relative flex-1">
             <input
               type={showKey ? "text" : "password"}
               value={settings.apiKey}
               onChange={(event) => updateSettings({ apiKey: event.target.value })}
-              placeholder={getKeyPlaceholder(settings.provider)}
+              placeholder={getProviderKeyPlaceholder(settings.provider)}
               aria-label="API key"
               className={cn(
                 "w-full rounded-md border border-surface-700 bg-surface-800 px-3 py-1.5 pr-10 text-sm",

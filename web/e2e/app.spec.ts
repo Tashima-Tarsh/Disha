@@ -13,6 +13,10 @@ test("chat, research tools, collaboration, settings, file explorer, and share fl
   await expect(page.getByRole("heading", { name: "Settings" })).toBeVisible();
   await page.getByRole("button", { name: "API & Auth" }).click();
 
+  await page.getByRole("combobox", { name: "Provider" }).selectOption("openai");
+  await expect(page.getByText("Direct hosted OpenAI chat-completions endpoint")).toBeVisible();
+  await expect(page.getByRole("banner").getByRole("combobox", { name: "Model" })).toHaveValue("gpt-4.1-mini");
+
   const localModeSwitch = page.getByRole("switch").first();
   await localModeSwitch.click();
   await expect(page.getByText("Local Ollama service through its chat-completions interface")).toBeVisible();
@@ -28,6 +32,13 @@ test("chat, research tools, collaboration, settings, file explorer, and share fl
   await page.getByRole("button", { name: "Send message" }).click();
   await expect(page.getByRole("button", { name: "Stop generation" })).not.toBeVisible({ timeout: 10000 });
   await expect(page.getByText("AG-Claw research reply via ollama on qwen2.5-coder:7b: buddy status")).toBeVisible();
+
+  await expect(page.getByText("Buddy helper")).toBeVisible();
+  await page.getByRole("button", { name: "Open buddy panel" }).first().click();
+  await expect(page.getByText("Visible advisory companion")).toBeVisible();
+  await page.locator("div.fixed.inset-0").getByRole("button", { name: /Risk check/ }).click();
+  await expect(page.getByRole("textbox", { name: "Message" })).toHaveValue(/buddy: list the top 3 operational risks/i);
+  await expect(page.getByText("Visible advisory companion")).not.toBeVisible();
 
   await page.getByRole("button", { name: "Comment" }).click();
   await page.getByPlaceholder("Add a comment").fill("Buddy review note");
@@ -78,7 +89,7 @@ test("chat, research tools, collaboration, settings, file explorer, and share fl
 
   await page.getByRole("button", { name: "Files" }).click();
   await expect(page.getByText("Loading files...")).not.toBeVisible({ timeout: 10000 });
-  await page.getByRole("button", { name: "buddy" }).click();
+  await page.getByRole("button", { name: "buddy", exact: true }).click();
   await page.getByRole("button", { name: "companion.ts" }).click();
   await expect(page.getByText("companion.ts").first()).toBeVisible();
   await expect(page.getByText("companionUserId")).toBeVisible();
