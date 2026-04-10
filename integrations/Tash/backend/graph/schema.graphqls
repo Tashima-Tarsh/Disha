@@ -1,0 +1,148 @@
+# Tashu Auditor Core – GraphQL Schema
+# Phase 1 (Auth + Audit) + Phase 2 (Legal Intelligence Layer)
+
+# ── Auth ─────────────────────────────────────────────────────────────────────
+
+type User {
+  id: String!
+  email: String!
+  role: String!
+  createdAt: String!
+}
+
+type AuthPayload {
+  token: String!
+  user: User!
+}
+
+# ── Audit ─────────────────────────────────────────────────────────────────────
+
+type AuditCase {
+  id: String!
+  title: String!
+  description: String!
+  status: String!
+  createdAt: String!
+  updatedAt: String!
+}
+
+# ── Legal ─────────────────────────────────────────────────────────────────────
+
+type ConstitutionArticle {
+  id: String!
+  articleNumber: String!
+  title: String!
+  content: String!
+  part: String!
+  isActive: Boolean!
+  createdAt: String!
+}
+
+type Amendment {
+  id: String!
+  amendmentNumber: String!
+  date: String!           # YYYY-MM-DD
+  description: String!
+  createdAt: String!
+}
+
+type AmendmentArticleMap {
+  id: String!
+  amendmentId: String!
+  articleId: String!
+  changeType: String!     # modified | inserted | repealed
+}
+
+type LegalCase {
+  id: String!
+  caseName: String!
+  court: String!
+  judgmentDate: String!   # YYYY-MM-DD
+  summary: String!
+  createdAt: String!
+}
+
+type CaseArticleMap {
+  id: String!
+  caseId: String!
+  articleId: String!
+}
+
+type Law {
+  id: String!
+  name: String!
+  section: String!
+  ministry: String!
+  description: String!
+  createdAt: String!
+}
+
+type EvidenceSource {
+  id: String!
+  sourceType: String!     # gazette | court | cag | news
+  title: String!
+  url: String!
+  publishedAt: String!
+  credibilityScore: Float!
+  createdAt: String!
+}
+
+type EvidenceLink {
+  id: String!
+  evidenceId: String!
+  entityType: String!     # article | law | case
+  entityId: String!
+}
+
+type IngestResult {
+  inserted: Int!
+  skipped: Int!
+  errors: [String!]!
+}
+
+# ── Root Operations ───────────────────────────────────────────────────────────
+
+type Query {
+  me: User!
+  listAuditCases: [AuditCase!]!
+
+  listArticles: [ConstitutionArticle!]!
+  getArticle(id: String!): ConstitutionArticle
+  listAmendments: [Amendment!]!
+  listCases: [LegalCase!]!
+  listLaws: [Law!]!
+  listEvidenceSources: [EvidenceSource!]!
+}
+
+type Mutation {
+  # Auth
+  register(email: String!, password: String!): AuthPayload!
+  login(email: String!, password: String!): AuthPayload!
+
+  # Audit
+  createAuditCase(title: String!, description: String): AuditCase!
+
+  # Constitution articles
+  createArticle(articleNumber: String!, title: String!, content: String, part: String): ConstitutionArticle!
+
+  # Amendments (versioning — never overwrites articles)
+  createAmendment(amendmentNumber: String!, date: String!, description: String): Amendment!
+  linkAmendmentToArticle(amendmentId: String!, articleId: String!, changeType: String): AmendmentArticleMap!
+
+  # Legal cases
+  createCase(caseName: String!, court: String, judgmentDate: String!, summary: String): LegalCase!
+  linkCaseToArticle(caseId: String!, articleId: String!): CaseArticleMap!
+
+  # Laws
+  createLaw(name: String!, section: String, ministry: String, description: String): Law!
+
+  # Evidence
+  addEvidence(sourceType: String!, title: String!, url: String, publishedAt: String, credibilityScore: Float): EvidenceSource!
+  linkEvidence(evidenceId: String!, entityType: String!, entityId: String!): EvidenceLink!
+
+  # Bulk ingestion (JSON string payload)
+  ingestConstitution(data: String!): IngestResult!
+  ingestAmendments(data: String!): IngestResult!
+  ingestCases(data: String!): IngestResult!
+  ingestEvidenceSources(data: String!): IngestResult!
+}
