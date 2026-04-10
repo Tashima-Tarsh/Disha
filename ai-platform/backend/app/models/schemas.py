@@ -2,7 +2,7 @@
 
 from pydantic import BaseModel, Field
 from typing import Optional, Any
-from datetime import datetime
+from datetime import datetime, timezone
 from enum import Enum
 
 
@@ -59,7 +59,7 @@ class InvestigationResult(BaseModel):
     risk_score: float = Field(default=0.0, ge=0.0, le=1.0)
     summary: str = ""
     raw_data: dict[str, Any] = Field(default_factory=dict)
-    timestamp: datetime = Field(default_factory=lambda: datetime.now())
+    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 
 class AlertLevel(str, Enum):
@@ -79,7 +79,7 @@ class Alert(BaseModel):
     source: str
     entity_id: Optional[str] = None
     metadata: dict[str, Any] = Field(default_factory=dict)
-    timestamp: datetime = Field(default_factory=lambda: datetime.now())
+    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 
 class GraphInsightRequest(BaseModel):
