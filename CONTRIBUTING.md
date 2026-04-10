@@ -69,4 +69,4 @@ For any new code (MCP server, tooling, scripts):
 
 ## Questions?
 
-Open an issue or reach out to [aashuu ✦](https://www.x.com/warrioraashuu).
+
