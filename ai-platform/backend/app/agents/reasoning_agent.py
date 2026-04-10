@@ -76,7 +76,7 @@ class ReasoningAgent(BaseAgent):
 
         return "\n".join(prompt_parts)
 
-    def _format_data(self, data: dict[str, Any], max_depth: int = 3) -> str:
+    def _format_data(self, data: dict[str, Any]) -> str:
         """Format data dictionary for LLM consumption."""
         import json
         try:

@@ -194,7 +194,9 @@ class Orchestrator:
     ) -> list[dict[str, Any]]:
         """Run investigations on multiple targets."""
         tasks = [
-            self.investigate(target, investigation_type, depth, user_id=user_id)
+            self.investigate(
+                target, investigation_type=investigation_type, depth=depth, user_id=user_id
+            )
             for target in targets
         ]
         results = await asyncio.gather(*tasks, return_exceptions=True)

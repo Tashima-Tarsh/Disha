@@ -113,26 +113,26 @@ class GraphAgent(BaseAgent):
         """Get neighboring entities within a given depth."""
         try:
             driver = self._get_driver()
-            with driver.session() as session:
-                result = session.run(
-                    """
+            # Neo4j does not support parameterized relationship depth ranges,
+            # so we interpolate a validated integer directly into the query.
+            safe_depth = max(1, min(int(depth), 5))
+            query = f"""
                     MATCH (e:Entity)
                     WHERE e.id CONTAINS $target OR e.label CONTAINS $target
-                    CALL {
+                    CALL {{
                         WITH e
-                        MATCH path = (e)-[*1..$depth]-(neighbor:Entity)
+                        MATCH path = (e)-[*1..{safe_depth}]-(neighbor:Entity)
                         RETURN neighbor, length(path) as distance
-                    }
+                    }}
                     RETURN DISTINCT neighbor.id AS id, neighbor.label AS label,
                            neighbor.entity_type AS entity_type,
                            neighbor.risk_score AS risk_score,
                            min(distance) AS distance
                     ORDER BY distance
                     LIMIT 50
-                    """,
-                    target=target,
-                    depth=depth,
-                )
+                    """
+            with driver.session() as session:
+                result = session.run(query, target=target)
                 return [dict(record) for record in result]
         except Exception as e:
             self.logger.error("get_neighbors_failed", error=str(e))

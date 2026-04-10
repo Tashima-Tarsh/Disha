@@ -73,15 +73,21 @@ class DetectionAgent(BaseAgent):
             return self._simple_anomaly_detection(data_points)
 
     def _extract_features(self, data_points: list[dict[str, Any]]) -> list[list[float]]:
-        """Extract numerical features from data points."""
+        """Extract numerical features from data points with uniform dimensions."""
+        # Collect all numeric keys across all data points for a consistent schema
+        numeric_keys: list[str] = []
+        for point in data_points:
+            for key, value in point.items():
+                if isinstance(value, (int, float)) and key not in numeric_keys:
+                    numeric_keys.append(key)
+
+        if not numeric_keys:
+            return []
+
         features = []
         for point in data_points:
-            row = []
-            for value in point.values():
-                if isinstance(value, (int, float)):
-                    row.append(float(value))
-            if row:
-                features.append(row)
+            row = [float(point.get(key, 0.0)) for key in numeric_keys]
+            features.append(row)
         return features
 
     def _simple_anomaly_detection(self, data_points: list[dict[str, Any]]) -> list[dict[str, Any]]:
