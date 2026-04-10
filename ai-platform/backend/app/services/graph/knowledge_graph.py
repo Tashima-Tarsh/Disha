@@ -90,17 +90,19 @@ class KnowledgeGraph:
         """Get a subgraph around an entity."""
         try:
             driver = self._get_driver()
+            # Clamp depth to a safe range to prevent overly broad traversals
+            safe_depth = max(1, min(depth, 5))
             with driver.session() as session:
                 result = session.run(
-                    """
-                    MATCH path = (e:Entity {id: $id})-[*1..3]-(n:Entity)
+                    f"""
+                    MATCH path = (e:Entity {{id: $id}})-[*1..{safe_depth}]-(n:Entity)
                     WITH nodes(path) AS ns, relationships(path) AS rs
                     UNWIND ns AS node
-                    WITH COLLECT(DISTINCT {id: node.id, label: node.label, type: node.entity_type, risk: node.risk_score}) AS nodes,
+                    WITH COLLECT(DISTINCT {{id: node.id, label: node.label, type: node.entity_type, risk: node.risk_score}}) AS nodes,
                          rs
                     UNWIND rs AS rel
                     RETURN nodes,
-                           COLLECT(DISTINCT {source: startNode(rel).id, target: endNode(rel).id, type: rel.type}) AS edges
+                           COLLECT(DISTINCT {{source: startNode(rel).id, target: endNode(rel).id, type: rel.type}}) AS edges
                     LIMIT 1
                     """,
                     id=entity_id,
