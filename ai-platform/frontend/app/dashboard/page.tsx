@@ -15,7 +15,7 @@ export default function Dashboard() {
   const [activeTab, setActiveTab] = useState<string>("overview");
   const [alerts, setAlerts] = useState<Alert[]>([]);
   const [investigations, setInvestigations] = useState<Investigation[]>([]);
-  const { lastMessage } = useWebSocket("ws://localhost:8000/api/v1/ws/alerts");
+  const { lastMessage } = useWebSocket(process.env.NEXT_PUBLIC_WS_URL || "ws://localhost:8000/api/v1/ws/alerts");
   const api = useApi();
 
   useEffect(() => {

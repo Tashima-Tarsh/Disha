@@ -7,21 +7,21 @@ interface MapVisualizationProps {
   alerts: Alert[];
 }
 
+// Sample threat locations for demo
+const locations = [
+  { lat: 40.7128, lon: -74.006, label: "New York", risk: 0.8 },
+  { lat: 51.5074, lon: -0.1278, label: "London", risk: 0.6 },
+  { lat: 35.6762, lon: 139.6503, label: "Tokyo", risk: 0.4 },
+  { lat: 55.7558, lon: 37.6173, label: "Moscow", risk: 0.9 },
+  { lat: -33.8688, lon: 151.2093, label: "Sydney", risk: 0.3 },
+  { lat: 39.9042, lon: 116.4074, label: "Beijing", risk: 0.7 },
+  { lat: 48.8566, lon: 2.3522, label: "Paris", risk: 0.5 },
+];
+
 // Simple map visualization using canvas
 // In production, integrate with Leaflet or Kepler.gl
 export default function MapVisualization({ alerts }: MapVisualizationProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-
-  // Sample threat locations for demo
-  const locations = [
-    { lat: 40.7128, lon: -74.006, label: "New York", risk: 0.8 },
-    { lat: 51.5074, lon: -0.1278, label: "London", risk: 0.6 },
-    { lat: 35.6762, lon: 139.6503, label: "Tokyo", risk: 0.4 },
-    { lat: 55.7558, lon: 37.6173, label: "Moscow", risk: 0.9 },
-    { lat: -33.8688, lon: 151.2093, label: "Sydney", risk: 0.3 },
-    { lat: 39.9042, lon: 116.4074, label: "Beijing", risk: 0.7 },
-    { lat: 48.8566, lon: 2.3522, label: "Paris", risk: 0.5 },
-  ];
 
   useEffect(() => {
     const canvas = canvasRef.current;
