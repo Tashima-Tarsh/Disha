@@ -10,6 +10,9 @@ on:
     paths:
       - 'cyber-defense/**'
 
+permissions:
+  contents: read
+
 jobs:
   lint-python:
     name: Lint Python
