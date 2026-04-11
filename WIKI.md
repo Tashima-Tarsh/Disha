@@ -1,14 +1,13 @@
 <p align="center">
-  <img src="https://img.shields.io/badge/Disha-AGI%20Platform-blueviolet?style=for-the-badge&logo=data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZD0iTTEyIDJMMiA3bDEwIDVMMjIgN0wxMiAyeiIgZmlsbD0iI2ZmZiIvPjxwYXRoIGQ9Ik0yIDE3bDEwIDVsMTAtNSIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjIiLz48cGF0aCBkPSJNMiAxMmwxMCA1IDEwLTUiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2ZmZiIgc3Ryb2tlLXdpZHRoPSIyIi8+PC9zdmc+" alt="Disha">
-  <br>
-  <img src="https://img.shields.io/badge/Files-2%2C198-blue?style=flat-square" alt="Files">
-  <img src="https://img.shields.io/badge/Lines_of_Code-555K+-green?style=flat-square" alt="LoC">
-  <img src="https://img.shields.io/badge/Agents-7_Intelligence-orange?style=flat-square" alt="Agents">
-  <img src="https://img.shields.io/badge/Tools-40+-red?style=flat-square" alt="Tools">
-  <img src="https://img.shields.io/badge/Commands-50+-purple?style=flat-square" alt="Commands">
-  <img src="https://img.shields.io/badge/API_Endpoints-22-teal?style=flat-square" alt="Endpoints">
-  <img src="https://img.shields.io/badge/Web_Components-143-yellow?style=flat-square" alt="Components">
-  <img src="https://img.shields.io/badge/Hooks-14-cyan?style=flat-square" alt="Hooks">
+  <img src="docs/images/wiki-banner.svg" alt="Disha Wiki" width="100%">
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Sections-17-blue?style=flat-square" alt="Sections">
+  <img src="https://img.shields.io/badge/Systems-5-green?style=flat-square" alt="Systems">
+  <img src="https://img.shields.io/badge/API_Endpoints-22+-orange?style=flat-square" alt="Endpoints">
+  <img src="https://img.shields.io/badge/Components-143-purple?style=flat-square" alt="Components">
+  <img src="https://img.shields.io/badge/Hooks-14-red?style=flat-square" alt="Hooks">
 </p>
 
 ---
@@ -19,40 +18,41 @@
 
 ---
 
-## Table of Contents
+<details>
+<summary><h2>📑 Table of Contents</h2></summary>
 
 - [1. Executive Summary](#1-executive-summary)
 - [2. Architecture Overview](#2-architecture-overview)
 - [3. Core CLI Engine (TypeScript)](#3-core-cli-engine-typescript)
-  - [3.1 Query Engine](#31-query-engine)
-  - [3.2 Tool System (40+ Tools)](#32-tool-system-40-tools)
-  - [3.3 Command System (50+ Commands)](#33-command-system-50-commands)
-  - [3.4 Terminal UI (Ink)](#34-terminal-ui-ink)
-  - [3.5 Bridge & IDE Integration](#35-bridge--ide-integration)
-  - [3.6 MCP Protocol](#36-mcp-protocol)
-  - [3.7 AI Model Management](#37-ai-model-management)
-  - [3.8 Plugins, Skills & Memory](#38-plugins-skills--memory)
-  - [3.9 Multi-Agent Coordinator](#39-multi-agent-coordinator)
+- [3.1 Query Engine](#31-query-engine)
+- [3.2 Tool System (40+ Tools)](#32-tool-system-40-tools)
+- [3.3 Command System (50+ Commands)](#33-command-system-50-commands)
+- [3.4 Terminal UI (Ink)](#34-terminal-ui-ink)
+- [3.5 Bridge & IDE Integration](#35-bridge--ide-integration)
+- [3.6 MCP Protocol](#36-mcp-protocol)
+- [3.7 AI Model Management](#37-ai-model-management)
+- [3.8 Plugins, Skills & Memory](#38-plugins-skills--memory)
+- [3.9 Multi-Agent Coordinator](#39-multi-agent-coordinator)
 - [4. AI Intelligence Platform (Python)](#4-ai-intelligence-platform-python)
-  - [4.1 Agent System](#41-agent-system)
-  - [4.2 Reinforcement Learning Engine](#42-reinforcement-learning-engine)
-  - [4.3 Multimodal AGI (Vision + Audio)](#43-multimodal-agi-vision--audio)
-  - [4.4 Distributed AGI Cluster](#44-distributed-agi-cluster)
-  - [4.5 Self-Improving Prompts](#45-self-improving-prompts)
-  - [4.6 Intelligence Ranking System](#46-intelligence-ranking-system)
-  - [4.7 Services Layer](#47-services-layer)
-  - [4.8 Graph Neural Networks](#48-graph-neural-networks)
+- [4.1 Agent System](#41-agent-system)
+- [4.2 Reinforcement Learning Engine](#42-reinforcement-learning-engine)
+- [4.3 Multimodal AGI (Vision + Audio)](#43-multimodal-agi-vision--audio)
+- [4.4 Distributed AGI Cluster](#44-distributed-agi-cluster)
+- [4.5 Self-Improving Prompts](#45-self-improving-prompts)
+- [4.6 Intelligence Ranking System](#46-intelligence-ranking-system)
+- [4.7 Services Layer](#47-services-layer)
+- [4.8 Graph Neural Networks](#48-graph-neural-networks)
 - [5. API Reference](#5-api-reference)
 - [6. AI Platform Dashboard](#6-ai-platform-dashboard)
 - [7. Web Dashboard (Full-Featured)](#7-web-dashboard-full-featured)
-  - [7.1 Collaboration System](#71-collaboration-system)
-  - [7.2 Tool Visualization](#72-tool-visualization)
-  - [7.3 Accessibility (a11y)](#73-accessibility-a11y)
-  - [7.4 Notifications](#74-notifications)
-  - [7.5 Command Palette](#75-command-palette)
-  - [7.6 Settings & Configuration](#76-settings--configuration)
-  - [7.7 Mobile Support](#77-mobile-support)
-  - [7.8 Custom Hooks](#78-custom-hooks)
+- [7.1 Collaboration System](#71-collaboration-system)
+- [7.2 Tool Visualization](#72-tool-visualization)
+- [7.3 Accessibility (a11y)](#73-accessibility-a11y)
+- [7.4 Notifications](#74-notifications)
+- [7.5 Command Palette](#75-command-palette)
+- [7.6 Settings & Configuration](#76-settings--configuration)
+- [7.7 Mobile Support](#77-mobile-support)
+- [7.8 Custom Hooks](#78-custom-hooks)
 - [8. MCP Server](#8-mcp-server)
 - [9. Infrastructure & Deployment](#9-infrastructure--deployment)
 - [10. Tech Stack](#10-tech-stack)
@@ -60,16 +60,19 @@
 - [12. Getting Started](#12-getting-started)
 - [13. Contributing](#13-contributing)
 - [14. Historical Strategy Intelligence](#14-historical-strategy-intelligence)
-  - [14.1 Data Pipeline](#141-data-pipeline)
-  - [14.2 Strategy Classifier Model](#142-strategy-classifier-model)
-  - [14.3 Simulation Engine](#143-simulation-engine)
-  - [14.4 REST API](#144-rest-api)
-  - [14.5 Dashboard](#145-dashboard)
+- [14.1 Data Pipeline](#141-data-pipeline)
+- [14.2 Strategy Classifier Model](#142-strategy-classifier-model)
+- [14.3 Simulation Engine](#143-simulation-engine)
+- [14.4 REST API](#144-rest-api)
+- [14.5 Dashboard](#145-dashboard)
 - [15. Bug Fixes & Open-Source API Migration (v2.0)](#15-bug-fixes--open-source-api-migration-v20)
 - [16. Repository Value & Market Analysis](#16-repository-value--market-analysis)
 - [17. National Deployment Analysis — India](#17-national-deployment-analysis--india)
-
 ---
+
+</details>
+
+<img src="docs/images/divider.svg" width="100%" height="4">
 
 ## 1. Executive Summary
 
@@ -95,7 +98,7 @@ Disha is a **five-layer AI platform** combining:
 - **🛠️ 40+ AI Tools** — File I/O, shell execution, web search, LSP, MCP, agent spawning
 - **🔌 100% Open-Source APIs** — HackerTarget, ip-api.com, OpenStreetMap, Feodo Tracker, EmergingThreats, Chart.js, Leaflet — zero paid external API dependencies
 
----
+<img src="docs/images/divider.svg" width="100%" height="4">
 
 ## 2. Architecture Overview
 
@@ -161,7 +164,7 @@ User Input ──► CLI/API ──► Query Engine ──► Claude API (stream
                (Ink/React)   (Next.js)      (VS Code)
 ```
 
----
+<img src="docs/images/divider.svg" width="100%" height="4">
 
 ## 3. Core CLI Engine (TypeScript)
 
@@ -412,7 +415,7 @@ Orchestrates parallel agent swarms:
 - **Task isolation** per agent
 - Gated behind `feature('COORDINATOR_MODE')`
 
----
+<img src="docs/images/divider.svg" width="100%" height="4">
 
 ## 4. AI Intelligence Platform (Python)
 
@@ -753,7 +756,7 @@ Real-time broadcast to all connected WebSocket clients, in-memory storage (max 1
 
 **Graph Export:** Neo4j → 16-dim feature matrix (one-hot type + risk + hash features) → PyTorch tensors.
 
----
+<img src="docs/images/divider.svg" width="100%" height="4">
 
 ## 5. API Reference
 
@@ -809,7 +812,7 @@ Real-time broadcast to all connected WebSocket clients, in-memory storage (max 1
 | `/cluster/status` | GET | ✅ | Agent cluster health + metrics |
 | `/ws/alerts` | WebSocket | — | Live alert stream |
 
----
+<img src="docs/images/divider.svg" width="100%" height="4">
 
 ## 6. AI Platform Dashboard
 
@@ -841,7 +844,7 @@ RLMetrics       // reward metrics + prompt optimization metrics
 ClusterStatus   // agent status, capabilities, task counts
 ```
 
----
+<img src="docs/images/divider.svg" width="100%" height="4">
 
 ## 7. Web Dashboard (Full-Featured)
 
@@ -995,7 +998,7 @@ Includes mobile-optimized layouts, touch gesture support, and viewport-aware com
 | **Keyboard Shortcuts** | `shortcuts/` — ShortcutsHelp overlay, ShortcutBadge |
 | **Base UI Library** | `ui/` — 11 shadcn/ui components (button, dialog, input, tabs, select, badge, tooltip, avatar, toast, dropdown-menu, textarea) |
 
----
+<img src="docs/images/divider.svg" width="100%" height="4">
 
 ## 8. MCP Server
 
@@ -1019,7 +1022,7 @@ A standalone Model Context Protocol server exposing the codebase for AI-assisted
 
 **5 Prompts:** `explain_tool`, `explain_command`, `architecture_overview`, `how_does_it_work`, `compare_tools`
 
----
+<img src="docs/images/divider.svg" width="100%" height="4">
 
 ## 9. Infrastructure & Deployment
 
@@ -1050,7 +1053,7 @@ Services:
 | **Docker Compose** | Full platform stack (7 services) |
 | **Local** | Bun runtime CLI + Python venv backend |
 
----
+<img src="docs/images/divider.svg" width="100%" height="4">
 
 ## 10. Tech Stack
 
@@ -1092,7 +1095,7 @@ Services:
 | **State** | React hooks |
 | **Real-time** | WebSocket API |
 
----
+<img src="docs/images/divider.svg" width="100%" height="4">
 
 ## 11. Project Statistics
 
@@ -1120,7 +1123,7 @@ Services:
 | **a11y components** | 5 (WCAG-compliant) |
 | **Settings panels** | 6 (General, API, MCP, Keyboard, Permissions) |
 
----
+<img src="docs/images/divider.svg" width="100%" height="4">
 
 ## 12. Getting Started
 
@@ -1189,7 +1192,7 @@ cd mcp-server && npm install && npm run build
 node dist/index.js  # STDIO mode
 ```
 
----
+<img src="docs/images/divider.svg" width="100%" height="4">
 
 ## 13. Contributing
 
@@ -1246,7 +1249,7 @@ class MyAgent(BaseAgent):
   <sub>2,250+ files · 580K+ lines · 7 agents · 40+ tools · 50+ commands · 78 web components · PPO RL · PageRank · Vision + Audio · AutoGen collaboration · Historical Strategy AI</sub>
 </p>
 
----
+<img src="docs/images/divider.svg" width="100%" height="4">
 
 ## 14. Historical Strategy Intelligence
 
@@ -1417,7 +1420,7 @@ npm run dev
 3. Start command: `uvicorn api.main:app --host 0.0.0.0 --port $PORT`
 4. Deploy
 
----
+<img src="docs/images/divider.svg" width="100%" height="4">
 
 ## 15. Bug Fixes & Open-Source API Migration (v2.0)
 
@@ -1455,7 +1458,7 @@ This section documents all fixes applied in the v2.0 hardening pass.
 | `reports/generator.py` | Returned `None`; fixed filename `report.docx` (overwrites) | Returns absolute path; timestamped filenames |
 | `main.py` | Broken emoji `??`, no args handling, `run_pipeline()` with no signature | Proper argparse, logging, exit codes |
 
----
+<img src="docs/images/divider.svg" width="100%" height="4">
 
 ## 16. Repository Value & Market Analysis
 
@@ -1512,7 +1515,7 @@ At market rates including overhead and management (2× multiplier): **~$2.6M rep
 - **GitHub relevance**: Would rank in the top 50 cybersecurity repositories by feature depth if publicly promoted
 - **Academic relevance**: Suitable for research publication — novel combination of PPO-RL + multimodal OSINT + evolutionary prompt optimization
 
----
+<img src="docs/images/divider.svg" width="100%" height="4">
 
 ## 17. National Deployment Analysis — India
 
@@ -1593,6 +1596,12 @@ At market rates including overhead and management (2× multiplier): **~$2.6M rep
 | **Phase 3 — AI Learning** | Month 10–18 | RL engine trained on Indian incident data; knowledge graph operational |
 | **Phase 4 — Sovereign AI** | Month 19–24 | Replace all foreign AI coding tools with Disha CLI in government; full data sovereignty |
 
----
+<img src="docs/images/divider.svg" width="100%" height="4">
 
-*Disha WIKI — maintained by the Disha contributors. Last updated: April 2026.*
+<p align="center">
+  <b>Disha Wiki</b> — Complete Technical Documentation
+  <br>
+  <sub>Maintained by the Disha contributors · Last updated: April 2026</sub>
+  <br><br>
+  <a href="./README.md">← Back to README</a> · <a href="./USAGE_GUIDE.md">Usage Guide →</a>
+</p>
