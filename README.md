@@ -1,4 +1,4 @@
-# 🛡️ Disha — Self-Learning Distributed AGI Platform
+# 🛡️ Disha AGI Platform — A smart security system that observes, analyzes, and neutralizes digital threats using adaptive AI and behavioral intelligence.
 
 <p align="center">
   <img src="https://img.shields.io/badge/Files-2%2C198-blue?style=flat-square" alt="Files">
