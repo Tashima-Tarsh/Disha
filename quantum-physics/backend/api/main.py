@@ -133,7 +133,7 @@ async def classify_physics(req: ClassifyRequest) -> dict:
     try:
         result = _classifier.classify(req.text)
         if "error" in result:
-            raise HTTPException(status_code=400, detail=result["error"])
+            raise HTTPException(status_code=400, detail="Invalid input for classification")
         return result
     except HTTPException:
         raise
@@ -211,7 +211,7 @@ async def simulate_orbit(req: OrbitRequest) -> dict:
             raise HTTPException(status_code=400, detail="duration_days must be 1–36500")
         result = _space.simulate_orbit(req.planet, req.duration_days)
         if "error" in result:
-            raise HTTPException(status_code=400, detail=result["error"])
+            raise HTTPException(status_code=400, detail="Invalid planet or orbit parameters")
         return result
     except HTTPException:
         raise
@@ -246,7 +246,7 @@ async def analyze_suppressed(req: AnalyzeSupressedRequest) -> dict:
     try:
         result = _suppressed.analyze_theory(req.text)
         if "error" in result and result["error"] != "Empty text":
-            raise HTTPException(status_code=500, detail=result["error"])
+            raise HTTPException(status_code=500, detail="Internal server error")
         return result
     except HTTPException:
         raise
