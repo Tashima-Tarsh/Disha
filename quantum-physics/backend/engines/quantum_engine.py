@@ -4,11 +4,14 @@ Falls back to numpy when qiskit/pennylane are not installed.
 """
 from __future__ import annotations
 
+import logging
 import math
 import cmath
 from typing import Any
 
 import numpy as np
+
+logger = logging.getLogger(__name__)
 
 try:
     from qiskit import QuantumCircuit, transpile
@@ -86,7 +89,8 @@ class QuantumEngine:
                 return self._qiskit_simulate(gates, num_qubits)
             return self._numpy_simulate(gates, num_qubits)
         except Exception as exc:
-            return {"error": str(exc), "statevector": [], "probabilities": {}}
+            logger.exception("simulate_circuit failed")
+            return {"error": "Quantum simulation failed", "statevector": [], "probabilities": {}}
 
     def run_grover(self, target_state: str) -> dict:
         """Simulate Grover's search for target_state."""
@@ -115,7 +119,8 @@ class QuantumEngine:
                 "speedup": f"O(√{dim}) vs O({dim}) classical",
             }
         except Exception as exc:
-            return {"error": str(exc)}
+            logger.exception("run_grover failed")
+            return {"error": "Grover simulation failed"}
 
     def run_shor(self, N: int) -> dict:
         """Simplified Shor's algorithm simulation (classical period finding)."""
@@ -154,7 +159,8 @@ class QuantumEngine:
             return {"N": N, "factors": None, "note": "No factors found in simulation range",
                     "qubits_required": 2 * len(bin(N)), "circuit_depth": N * 10}
         except Exception as exc:
-            return {"error": str(exc), "N": N}
+            logger.exception("run_shor failed")
+            return {"error": "Shor simulation failed", "N": N}
 
     def bell_state_experiment(self) -> dict:
         """Create a Bell state and return measurement correlations."""
@@ -184,7 +190,8 @@ class QuantumEngine:
                 "description": "(|00⟩ + |11⟩)/√2 — maximally entangled",
             }
         except Exception as exc:
-            return {"error": str(exc)}
+            logger.exception("bell_state_experiment failed")
+            return {"error": "Bell state experiment failed"}
 
     def get_algorithms(self) -> list[dict]:
         return [
@@ -247,7 +254,8 @@ class QuantumEngine:
                 "is_maximally_entangled": entropy > 0.9,
             }
         except Exception as exc:
-            return {"error": str(exc)}
+            logger.exception("entangle failed")
+            return {"error": "Entanglement simulation failed"}
 
     # ── Private helpers ───────────────────────────────────────────────────────
 

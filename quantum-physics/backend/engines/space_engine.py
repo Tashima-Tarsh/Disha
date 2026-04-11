@@ -5,12 +5,15 @@ Uses only numpy (no poliastro required).
 from __future__ import annotations
 
 import json
+import logging
 import math
 import os
 from pathlib import Path
 from typing import Any
 
 import numpy as np
+
+logger = logging.getLogger(__name__)
 
 try:
     import httpx
@@ -208,7 +211,8 @@ class SpaceEngine:
                 "units": {"position": "AU", "velocity": "km/s"},
             }
         except Exception as exc:
-            return {"error": str(exc)}
+            logger.exception("simulate_orbit failed")
+            return {"error": "Orbit simulation failed"}
 
     def get_solar_system(self) -> dict:
         """Return planet data from knowledge JSON."""
@@ -223,7 +227,8 @@ class SpaceEngine:
                     }
             return {"planets": [], "error": "Solar system data not found"}
         except Exception as exc:
-            return {"error": str(exc)}
+            logger.exception("get_solar_system failed")
+            return {"error": "Failed to load solar system data"}
 
     # ── Private helpers ───────────────────────────────────────────────────────
 

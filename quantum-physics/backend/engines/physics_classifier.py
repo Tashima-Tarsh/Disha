@@ -5,10 +5,13 @@ or keyword fallback when sklearn is unavailable.
 from __future__ import annotations
 
 import json
+import logging
 import os
 import re
 from pathlib import Path
 from typing import Any
+
+logger = logging.getLogger(__name__)
 
 try:
     from sklearn.feature_extraction.text import TfidfVectorizer
@@ -96,7 +99,8 @@ class PhysicsClassifier:
                 return self._ml_classify(text)
             return self._keyword_classify(text)
         except Exception as exc:
-            return {"error": str(exc), "domain": "Unknown", "confidence": 0.0}
+            logger.exception("classify failed")
+            return {"error": "Classification failed", "domain": "Unknown", "confidence": 0.0}
 
     def get_domains(self) -> list[dict]:
         return [

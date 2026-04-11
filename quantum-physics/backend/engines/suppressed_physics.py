@@ -4,8 +4,11 @@ Suppressed Physics Engine — catalog and analysis of fringe/suppressed theories
 from __future__ import annotations
 
 import json
+import logging
 import re
 from pathlib import Path
+
+logger = logging.getLogger(__name__)
 
 _KNOWLEDGE_DIR = Path(__file__).parent.parent / "knowledge"
 
@@ -86,7 +89,8 @@ class SuppressedPhysicsEngine:
                 "disclaimer": self._data.get("disclaimer", ""),
             }
         except Exception as exc:
-            return {"error": str(exc)}
+            logger.exception("analyze_theory failed")
+            return {"error": "Analysis failed"}
 
     # ── Private helpers ───────────────────────────────────────────────────────
 
