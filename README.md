@@ -1,4 +1,4 @@
-# 🛡️ Disha AGI Platform
+# 🛡️ Disha AGI 
 
 <p align="center">
   <img src="https://img.shields.io/badge/Files-2%2C250-blue?style=flat-square" alt="Files">
@@ -195,63 +195,14 @@ docker-compose up -d
 
 ---
 
-## 💰 Repository Value & World Standing
-
-### Estimated Development Cost
-
-| Component | Effort (dev-months) | Est. Cost @ $150/hr |
-|---|---|---|
-| Core CLI Engine (TypeScript + Ink + MCP) | 18 | $540,000 |
-| AI Intelligence Platform (7 agents + RL + ranking) | 12 | $360,000 |
-| Cyber Defense System (honeypots + ML + ELK) | 8 | $240,000 |
-| Historical Strategy Intelligence | 4 | $120,000 |
-| Integrations (4 sub-systems) | 6 | $180,000 |
-| Documentation (32+ pages) | 2 | $60,000 |
-| **Total** | **50 dev-months** | **~$1,500,000** |
-
-### Commercial Comparable Products
-
-| Product | Annual License | What Disha Replaces |
-|---|---|---|
-| Darktrace Enterprise | $30K–$200K/yr | AI threat detection |
-| Recorded Future | $50K–$150K/yr | OSINT + threat intel |
-| GitHub Copilot Enterprise | $39/user/mo | AI coding assistant |
-| Maltego Pro | $5K–$40K/yr | Link analysis + OSINT |
-| Splunk SIEM | $50K–$500K/yr | Security event management |
-
-> Disha combines all five in a single open-source platform, representing **$1M–$3M+/yr** in replaced commercial licenses for an enterprise deployment.
-
+## Repository World Standing
 ### World Standing
 
 - **Open-source OSINT platforms**: Disha is more advanced than Maltego Community, SpiderFoot, and theHarvester — it adds RL-driven investigation, multimodal AI, and a full CLI agent.
 - **AI coding assistants**: Feature-comparable to GitHub Copilot and Cursor but fully open-source, self-hostable, and with MCP integration built in.
 - **Honeypot systems**: More sophisticated than standalone Cowrie or Dionaea — adds AI classifier, response engine, and ELK visualization.
 - **Uniqueness**: No other open-source project combines AI coding assistant + OSINT + honeypot + RL + historical strategy in one codebase.
-
----
-
-## 🇮🇳 National-Scale Value for India
-
-If deployed at national scale by an agency such as **CERT-In**, **NCA**, or state cyber cells:
-
-| Use Case | Impact |
-|---|---|
-| **Cyber crime early warning** | 1.7M+ cyber crimes reported in India (2023) — automated classification + alert routing could reduce investigation time by 60–70% |
-| **OSINT for law enforcement** | Real-time domain/IP lookups integrated with NCRB data → faster attribution |
-| **Critical infrastructure honeypots** | Decoy networks across power, banking, telecom — providing early warning of APT activity |
-| **AI coding assistant for government** | Self-hosted, data-sovereign alternative to foreign AI coding tools for government developers |
-| **Historical strategy education** | Used by NDA, IITs, defence research establishments for strategy simulation |
-| **Financial fraud detection** | UPI fraud (₹10,300+ crore lost in FY2023) — real-time pipeline classifies and alerts |
-
-**Estimated national value if deployed by India**: ₹5,000–₹15,000 crore ($600M–$1.8B USD) in:
-- Prevented fraud and cybercrime losses
-- Reduced MTTR (mean time to respond) for cyber incidents
-- Replaced import of foreign cybersecurity software
-- Created domestic AI/security capability
-
----
-
-## 📖 Documentation
+## Documentation
 
 | Document | Description |
 |----------|-------------|
@@ -278,19 +229,6 @@ If deployed at national scale by an agency such as **CERT-In**, **NCA**, or stat
 | Docker services | 7 |
 | Open-source APIs | 100% |
 | Documentation pages | 32+ |
-
----
-
-## 🤝 Contributing
-
-1. Fork and create a feature branch from `main`
-2. Keep PR scope focused — one feature per PR
-3. Add type annotations for all new Python/TypeScript code
-4. Update documentation for new modules
-5. All new external API calls must use free/open-source endpoints
-
----
-
 ## 🏛️ License
 
 MIT — see [LICENSE](./LICENSE) for details.
@@ -348,50 +286,10 @@ Disha is a **three-layer AI platform**:
 
 ---
 
-## 🏗️ Architecture
-
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                       DISHA PLATFORM                            │
-├─────────────────────────┬───────────────────────────────────────┤
-│  CORE CLI (TypeScript)  │   AI INTELLIGENCE (Python/FastAPI)    │
-│                         │                                       │
-│  Query Engine           │   7 Specialized Agents                │
-│  ├─ Claude API stream   │   ├─ OSINT (Shodan, DNS, SpiderFoot) │
-│  ├─ Tool-call loops     │   ├─ Crypto (Ethereum/Etherscan)     │
-│  └─ Auto-compaction     │   ├─ Detection (Isolation Forest)    │
-│                         │   ├─ Graph (Neo4j/Cypher)            │
-│  40+ Tools              │   ├─ Reasoning (GPT-4/LangChain)     │
-│  ├─ Bash, Files, Web    │   ├─ Vision (GPT-4o)                 │
-│  ├─ MCP, LSP, Agents    │   └─ Audio (Whisper)                 │
-│  └─ Plans, Tasks        │                                       │
-│                         │   RL Engine (PPO + Replay)            │
-│  50+ Commands           │   Prompt Optimizer (Evolutionary)     │
-│  ├─ Git, Review         │   Intelligence Ranker (PageRank)      │
-│  ├─ Config, Session     │   Cluster Coordinator (AutoGen)       │
-│  └─ MCP, Plugins        │   Knowledge Graph (Neo4j + GNN)       │
-│                         │                                       │
-│  Terminal UI (Ink)      │   Services:                           │
-│  Bridge (VS Code)       │   ChromaDB · Kafka · WebSocket        │
-│  Coordinator (Teams)    │   Alerts · Vector Store               │
-├─────────────────────────┴───────────────────────────────────────┤
-│              WEB DASHBOARD (Next.js + Tailwind)                 │
-│  78 Components · ⌘K Palette · Collaboration · a11y · Mobile    │
-│  Tools Viz · Notifications · Settings · File Viewer · Export    │
-├─────────────────────────┬───────────────────────────────────────┤
-│   AI Dashboard (9 comp) │  22 API Endpoints + WebSocket         │
-├─────────────────────────┼───────────────────────────────────────┤
-│   Docker (7 services)   │  PostgreSQL│Neo4j│ChromaDB│Kafka      │
-└─────────────────────────┴───────────────────────────────────────┘
-```
-
----
 
 ## ⚔️ Historical Strategy Intelligence System
 
 A new AI-powered module for **educational historical conflict analysis and strategy simulation**.
-
-> **⚠️ Scope**: This system is strictly for **historical education, research, and academic simulation**. It analyzes ancient-to-modern documented conflicts for strategic learning only.
 
 ### Features
 
