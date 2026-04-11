@@ -1,26 +1,28 @@
 # 🛡️ Disha AGI Platform — A smart security system that observes, analyzes, and neutralizes digital threats using adaptive AI and behavioral intelligence.
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Files-2%2C198-blue?style=flat-square" alt="Files">
-  <img src="https://img.shields.io/badge/Lines_of_Code-555K+-green?style=flat-square" alt="LoC">
+  <img src="https://img.shields.io/badge/Files-2%2C250-blue?style=flat-square" alt="Files">
+  <img src="https://img.shields.io/badge/Lines_of_Code-580K+-green?style=flat-square" alt="LoC">
   <img src="https://img.shields.io/badge/Agents-7-orange?style=flat-square" alt="Agents">
   <img src="https://img.shields.io/badge/Tools-40+-red?style=flat-square" alt="Tools">
   <img src="https://img.shields.io/badge/RL_Engine-PPO-purple?style=flat-square" alt="RL">
   <img src="https://img.shields.io/badge/Multimodal-Vision%20%2B%20Audio-teal?style=flat-square" alt="Multimodal">
+  <img src="https://img.shields.io/badge/Historical_Strategy-AI%20Simulation-gold?style=flat-square" alt="Historical Strategy">
 </p>
 
-> **Disha** (दिशा) — *"Direction"* in Sanskrit. A self-learning, multi-agent AGI platform combining a production-grade AI coding assistant with a distributed threat intelligence system featuring reinforcement learning, multimodal analysis, and autonomous agent collaboration.
+> **Disha** (दिशा) — *"Direction"* in Sanskrit. A self-learning, multi-agent AGI platform combining a production-grade AI coding assistant, a distributed threat intelligence system, and an AI-powered historical strategy intelligence module.
 
 ---
 
 ## ✨ What is Disha?
 
-Disha is a **two-layer AI platform**:
+Disha is a **three-layer AI platform**:
 
 | Layer | Stack | Purpose |
 |-------|-------|---------|
 | **Core CLI Engine** | TypeScript · Bun · React | AI coding assistant with 40+ tools, 50+ commands, IDE integration, streaming LLM |
 | **AI Intelligence Platform** | Python · FastAPI · PyTorch | Multi-agent threat intel with RL optimization, multimodal fusion, distributed collaboration |
+| **Historical Strategy Intelligence** | Python · FastAPI · Next.js | AI-powered analysis and simulation of historical military strategies for education & research |
 
 ### Key Capabilities
 
@@ -38,6 +40,7 @@ Disha is a **two-layer AI platform**:
 | 🖥️ **Web Dashboard** | 78 components, real-time collaboration, command palette, accessibility, mobile |
 | 👥 **Multiplayer Collaboration** | Presence avatars, cursor ghosts, typing indicators, annotations |
 | ♿ **Accessibility** | WCAG-compliant with skip nav, focus traps, live regions, screen reader support |
+| ⚔️ **Historical Strategy AI** | 32+ conflicts, strategy classifier, simulation engine, timeline & map dashboard |
 
 ---
 
@@ -77,6 +80,65 @@ Disha is a **two-layer AI platform**:
 │   Docker (7 services)   │  PostgreSQL│Neo4j│ChromaDB│Kafka      │
 └─────────────────────────┴───────────────────────────────────────┘
 ```
+
+---
+
+## ⚔️ Historical Strategy Intelligence System
+
+A new AI-powered module for **educational historical conflict analysis and strategy simulation**.
+
+> **⚠️ Scope**: This system is strictly for **historical education, research, and academic simulation**. It analyzes ancient-to-modern documented conflicts for strategic learning only.
+
+### Features
+
+| Feature | Description |
+|---------|-------------|
+| 📚 **32+ Historical Conflicts** | Ancient → Contemporary, organized by era/region/strategy |
+| 🤖 **Strategy Classifier** | Random Forest + MLP trained on historical outcomes |
+| 🎮 **Simulation Engine** | Scenario-based victory probability with historical parallels |
+| 🗺️ **Visualization Dashboard** | Timeline, world map, strategy comparison, simulation UI |
+| 🔌 **REST API** | 12 endpoints for data, stats, simulation, and recommendations |
+
+### Quick Start — Historical Strategy
+
+```bash
+# Backend API
+cd historical-strategy
+pip install -r requirements.txt
+uvicorn api.main:app --port 8001 --reload
+# API docs: http://localhost:8001/docs
+
+# Train the model (optional — pre-trained model included)
+python model/train.py
+
+# Dashboard
+cd dashboard
+npm install
+npm run dev
+# Dashboard: http://localhost:3002
+```
+
+### Or with Docker
+
+```bash
+cd historical-strategy
+docker-compose up -d
+# API:       http://localhost:8001
+# Dashboard: http://localhost:3002
+```
+
+### API Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/conflicts` | List all conflicts (filterable by era, region, strategy) |
+| GET | `/api/conflicts/{id}` | Single conflict details |
+| GET | `/api/stats` | Aggregate statistics |
+| GET | `/api/timeline` | Chronological conflict list |
+| GET | `/api/strategies` | Strategy types with descriptions |
+| POST | `/api/simulate` | Run a strategy simulation |
+| POST | `/api/analyze` | Get strategy recommendations for a scenario |
+| GET | `/api/leaders` | Historical leaders index |
 
 ---
 

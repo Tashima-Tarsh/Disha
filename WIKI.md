@@ -59,6 +59,12 @@
 - [11. Project Statistics](#11-project-statistics)
 - [12. Getting Started](#12-getting-started)
 - [13. Contributing](#13-contributing)
+- [14. Historical Strategy Intelligence](#14-historical-strategy-intelligence)
+  - [14.1 Data Pipeline](#141-data-pipeline)
+  - [14.2 Strategy Classifier Model](#142-strategy-classifier-model)
+  - [14.3 Simulation Engine](#143-simulation-engine)
+  - [14.4 REST API](#144-rest-api)
+  - [14.5 Dashboard](#145-dashboard)
 
 ---
 
@@ -1231,5 +1237,176 @@ class MyAgent(BaseAgent):
 <p align="center">
   <b>Disha</b> — A self-learning, distributed, multimodal AGI platform for intelligent threat analysis and AI-powered development.
   <br>
-  <sub>2,198 files · 555K+ lines · 7 agents · 40+ tools · 50+ commands · 78 web components · PPO RL · PageRank · Vision + Audio · AutoGen collaboration</sub>
+  <sub>2,250+ files · 580K+ lines · 7 agents · 40+ tools · 50+ commands · 78 web components · PPO RL · PageRank · Vision + Audio · AutoGen collaboration · Historical Strategy AI</sub>
 </p>
+
+---
+
+## 14. Historical Strategy Intelligence
+
+> ⚔️ **Scope**: Strictly educational — historical conflict analysis, strategy classification, and academic simulation only. No real-world offensive capabilities.
+
+The Historical Strategy Intelligence module is a standalone AI system within Disha that provides:
+- **Data pipeline** collecting and organizing 32+ documented historical conflicts
+- **ML classifier** that categorizes strategies based on historical patterns
+- **Simulation engine** providing probabilistic outcome analysis
+- **REST API** exposing all functionality
+- **Interactive dashboard** with timeline, world map, and simulation UI
+
+### 14.1 Data Pipeline
+
+**Location**: `historical-strategy/data/`
+
+The pipeline loads, cleans, and processes `historical_data.json` into feature vectors for ML training.
+
+```
+historical_data.json  →  pipeline.py  →  processed/features.npy
+                                      →  processed/labels.npy
+                                      →  processed/metadata.json
+```
+
+**Data Schema**:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | string | Unique identifier |
+| `name` | string | Conflict name |
+| `year` | int | Year (negative = BCE) |
+| `era` | string | Ancient / Medieval / Early Modern / Modern / Contemporary |
+| `country_a` / `country_b` | string | Opposing sides |
+| `region` | string | Geographic region |
+| `strategy_type` | string | Primary strategy used |
+| `outcome` | string | Victory / Defeat / Draw |
+| `terrain` | string | Battlefield terrain type |
+| `technology_level` | string | Era technology classification |
+| `key_tactics` | array | Specific tactical approaches |
+| `lessons` | array | Key strategic lessons |
+| `notable_leaders` | array | Key commanders |
+
+**Run pipeline**:
+```bash
+cd historical-strategy
+python data/pipeline.py
+```
+
+### 14.2 Strategy Classifier Model
+
+**Location**: `historical-strategy/model/`
+
+Trains two models:
+- **RandomForestClassifier** — primary model, interpretable feature importances
+- **MLPClassifier** — neural network alternative for comparison
+
+```bash
+# Train models (saves to model/saved/)
+python model/train.py
+
+# Evaluate
+python model/evaluate.py
+```
+
+**Strategy Types Classified**:
+`Guerrilla` · `Conventional` · `Naval` · `Siege` · `Psychological` · `Blitzkrieg` · `Attrition` · `Flanking` · `Deception` · `Coalition`
+
+**Model files**:
+- `model/saved/strategy_classifier.pkl` — trained RandomForest
+- `model/saved/metrics.json` — accuracy, precision, recall, F1
+
+### 14.3 Simulation Engine
+
+**Location**: `historical-strategy/simulation/`
+
+The `HistoricalSimulationEngine` computes strategy outcomes using:
+1. Historical success rates per terrain (10×6 effectiveness matrix)
+2. Force ratio multipliers (numerical advantage/disadvantage)
+3. Technology gap modifiers (±20% per level)
+4. Supply line and morale factors
+5. Strategy counter-effectiveness (e.g. Guerrilla counters Conventional)
+
+**Simulation inputs**:
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `attacker_strategy` | string | Strategy type attacker employs |
+| `defender_strategy` | string | Strategy type defender employs |
+| `terrain` | string | Battlefield terrain |
+| `force_ratio` | float | Attacker/Defender force ratio (0.1–5.0) |
+| `technology_gap` | float | Attacker advantage in technology (-2 to +2) |
+| `supply_lines` | float | Supply line integrity (0–1) |
+| `morale` | float | Attacker morale (0–1) |
+| `weather` | string | Weather conditions |
+
+**Simulation output**:
+```json
+{
+  "victory_probability": 0.73,
+  "recommended_strategy": "Guerrilla",
+  "alternative_strategies": ["Deception", "Attrition"],
+  "risk_assessment": {"supply": "Medium", "terrain": "Favorable", "tech": "Disadvantage"},
+  "historical_parallels": [{"name": "Battle of Thermopylae", "similarity": 0.82, ...}],
+  "tactical_advice": ["Use terrain advantage", "Extend supply lines early", ...]
+}
+```
+
+### 14.4 REST API
+
+**Location**: `historical-strategy/api/main.py`
+
+FastAPI server on port **8001**.
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/` | Health check |
+| GET | `/api/conflicts` | All conflicts (query: `era`, `region`, `strategy_type`, `country`) |
+| GET | `/api/conflicts/{id}` | Single conflict detail |
+| GET | `/api/stats` | Aggregate stats (win rates, era breakdown, etc.) |
+| GET | `/api/timeline` | Chronological conflict list |
+| GET | `/api/strategies` | Strategy types + descriptions + examples |
+| GET | `/api/eras` | Eras with conflict counts |
+| GET | `/api/leaders` | Historical leaders index |
+| POST | `/api/simulate` | Run simulation (see schema above) |
+| POST | `/api/analyze` | Analyze scenario → strategy recommendations |
+
+**Start API**:
+```bash
+cd historical-strategy
+pip install -r requirements.txt
+uvicorn api.main:app --port 8001 --reload
+# Swagger UI: http://localhost:8001/docs
+```
+
+### 14.5 Dashboard
+
+**Location**: `historical-strategy/dashboard/`
+
+Next.js 14 dashboard with dark cyberpunk theme on port **3002**.
+
+**Pages/Tabs**:
+
+| Tab | Component | Description |
+|-----|-----------|-------------|
+| Overview | `StatsPanel` | Conflict counts, strategy win rates (charts) |
+| Timeline | `Timeline` | Vertical chronological conflict timeline |
+| Strategy Map | `ConflictMap` | World map with conflict markers (react-leaflet) |
+| Simulation | `SimulationPanel` | Interactive scenario simulator |
+| Compare | `StrategyComparison` | Side-by-side strategy analysis |
+
+**Start dashboard**:
+```bash
+cd historical-strategy/dashboard
+npm install
+npm run dev
+# Open: http://localhost:3002
+```
+
+**Deploy to Vercel**:
+1. Import repo to Vercel
+2. Set Root Directory: `historical-strategy/dashboard`
+3. Set env var: `NEXT_PUBLIC_API_URL=https://your-api.railway.app`
+4. Deploy
+
+**Deploy API to Railway**:
+1. Connect repo to Railway
+2. Set Root Directory: `historical-strategy`
+3. Start command: `uvicorn api.main:app --host 0.0.0.0 --port $PORT`
+4. Deploy
