@@ -1,21 +1,24 @@
 {
-  "name": "warrioraashuu-codemaster",
+  "name": "Monster-codemaster",
   "version": "1.1.0",
-  "mcpName": "io.github.warrioraashuu/warrioraashuu-codemaster",
-  "description": "MCP server for exploring the Claude Code source code — rebranded and published by warrioraashuu. STDIO, HTTP, and SSE transports.",
+  "mcpName": "io.github.Monster/Monster-codemaster",
+  "description": "MCP server for exploring the Claude Code source code — rebranded and published by Monster. STDIO, HTTP, and SSE transports.",
   "repository": {
     "type": "git",
-    "url": "https://github.com/codeaashu/claude-code.git"
+    "url": "https://github.com/Monster/claude-code.git"
   },
   "author": "Monster",
+copilot/replace-contributor-handles-monster
   "homepage": "https://github.com/codeaashu/claude-code#readme",
+  "homepage": "https://github.com/Monster/claude-code#readme",
+ main
   "bugs": {
-    "url": "https://github.com/codeaashu/claude-code/issues"
+    "url": "https://github.com/Monster/claude-code/issues"
   },
   "type": "module",
   "main": "dist/index.js",
   "bin": {
-    "warrioraashuu-codemaster": "dist/index.js"
+    "Monster-codemaster": "dist/index.js"
   },
   "scripts": {
     "build": "tsc",
@@ -34,5 +37,3 @@
     "typescript": "^6.0.2"
   }
 }
-
-
