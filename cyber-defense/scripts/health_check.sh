@@ -15,7 +15,7 @@ cd "$COMPOSE_DIR"
 
 echo "[$(date -u '+%Y-%m-%dT%H:%M:%SZ')] Running health check..."
 
-SERVICES="cowrie dionaea fakeapi model-engine elasticsearch logstash kibana"
+SERVICES="cowrie dionaea opencanary model-engine elasticsearch logstash kibana"
 FAILED=0
 
 for svc in $SERVICES; do

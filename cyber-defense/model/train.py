@@ -107,17 +107,35 @@ class HoneypotLogDataset(Dataset):
         ]
 
     def _featurize(self, entry: dict) -> torch.Tensor:
-        """Extract numerical features from a log entry."""
-        endpoint = str(entry.get("endpoint", ""))
-        payload = str(entry.get("payload", ""))
+        """Extract numerical features from a log entry.
+
+        Supports both Cowrie-style and OpenCanary-style log formats:
+        - Cowrie: ip, endpoint, method, payload, user_agent
+        - OpenCanary: src_host, logdata.PATH, logdata.USERAGENT, logtype
+        """
+        logdata = entry.get("logdata", {}) or {}
+
+        # Normalize IP field across formats
+        ip = str(entry.get("ip", entry.get("src_host", "")))
+
+        # Normalize path/endpoint field
+        endpoint = str(entry.get("endpoint", logdata.get("PATH", "")))
+
+        # Normalize user agent field
+        user_agent = str(entry.get("user_agent", logdata.get("USERAGENT", "")))
+
+        # Normalize payload (POST body, Redis CMD, FTP credentials)
+        payload = str(
+            entry.get("payload", logdata.get("CMD", logdata.get("USERNAME", "")))
+        )
+
         method = str(entry.get("method", ""))
-        user_agent = str(entry.get("user_agent", ""))
-        ip = str(entry.get("ip", ""))
+        logtype = int(entry.get("logtype", 0))
 
         features = [
             len(endpoint),
             len(payload),
-            1.0 if method == "POST" else 0.0,
+            1.0 if method == "POST" or logtype in (2000, 17000) else 0.0,
             1.0 if "admin" in endpoint.lower() else 0.0,
             1.0 if "select" in payload.lower() or "union" in payload.lower() else 0.0,
             len(user_agent),
@@ -269,7 +287,7 @@ def main():
     log_dir = os.environ.get("LOG_DIR", "/logs")
     log_files = [
         os.path.join(log_dir, "cowrie", "cowrie.json"),
-        os.path.join(log_dir, "fakeapi", "api-activity.json"),
+        os.path.join(log_dir, "opencanary", "opencanary.log"),
     ]
 
     print("=" * 60)

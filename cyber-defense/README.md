@@ -15,7 +15,7 @@ cyber-defense/
 ├── honeypot/                  # Honeypot services
 │   ├── cowrie/                # SSH honeypot (Cowrie)
 │   ├── dionaea/               # Multi-protocol honeypot (Dionaea)
-│   ├── fakeapi/               # Fake API honeypot (Node.js)
+│   ├── opencanary/               # Multi-service honeypot (OpenCanary)
 │   └── fail2ban/              # IP blocking configuration
 ├── model/                     # AI detection engine
 │   ├── train.py               # Training pipeline (PyTorch)
@@ -31,7 +31,7 @@ cyber-defense/
 ├── logs/                      # Centralized log storage
 │   ├── cowrie/                # SSH honeypot logs
 │   ├── dionaea/               # Multi-protocol logs
-│   └── fakeapi/               # API honeypot logs
+│   └── opencanary/               # OpenCanary logs (HTTP, FTP, Git, Redis)
 ├── test/                      # Test suite
 ├── docker-compose.yml         # Full system orchestration
 ├── .env.example               # Environment template
@@ -44,7 +44,7 @@ cyber-defense/
 |-----------|-------------|
 | **SSH Honeypot** | Cowrie-based SSH/Telnet honeypot capturing login attempts and commands |
 | **Multi-Protocol Honeypot** | Dionaea capturing HTTP, SMB, and MySQL attack traffic |
-| **Fake API Honeypot** | Express.js app simulating vulnerable REST API endpoints |
+| **OpenCanary Honeypot** | Open-source multi-service honeypot (HTTP, FTP, Git, Redis) by Thinkst |
 | **AI Detection Engine** | PyTorch binary & multi-class attack classifier + anomaly detection |
 | **Response Engine** | Simulated tarpit, fake shell, decoy filesystem, containment zones |
 | **ELK Dashboard** | Real-time monitoring of attackers, attack types, threat scores |
@@ -80,7 +80,10 @@ docker compose up --build -d
 |---------|-----|-------------|
 | Kibana Dashboard | http://localhost:5601 | Real-time attack monitoring |
 | Elasticsearch | http://localhost:9200 | Log search API |
-| Fake API Honeypot | http://localhost:5000 | Simulated vulnerable API |
+| OpenCanary HTTP | http://localhost:8081 | HTTP honeypot (open-source) |
+| OpenCanary FTP | `ftp localhost 2121` | FTP honeypot |
+| OpenCanary Redis | `redis-cli -p 6379` | Redis honeypot |
+| OpenCanary Git | `git clone git://localhost:9418/test` | Git honeypot |
 | SSH Honeypot | `ssh -p 2222 localhost` | Cowrie SSH trap |
 
 ### 4. Train AI Models
@@ -104,6 +107,46 @@ docker compose run --rm model-engine python inference.py
 ```bash
 docker compose run --rm threat-intel
 ```
+
+## OpenCanary Honeypot
+
+[OpenCanary](https://github.com/thinkst/opencanary) is an open-source multi-service honeypot by Thinkst. It simulates real services and logs all interactions to structured JSON.
+
+### Simulated Services
+
+| Service | Port | Description |
+|---------|------|-------------|
+| HTTP | 8081 | Web server honeypot (Apache banner) |
+| FTP | 2121 | FTP login trap |
+| Git | 9418 | Git repository access trap |
+| Redis | 6379 | Redis command trap |
+
+### Log Format
+
+OpenCanary outputs JSON lines with the following key fields:
+
+```json
+{
+  "src_host": "172.17.0.1",
+  "dst_port": 8080,
+  "logtype": 3000,
+  "logdata": {
+    "PATH": "/admin",
+    "USERAGENT": "curl/7.68.0"
+  },
+  "utc_time": "2026-04-11T01:23:45.123456Z",
+  "node_id": "disha-opencanary-1"
+}
+```
+
+### Log Types
+
+| logtype | Service |
+|---------|---------|
+| 2000 | FTP login attempt |
+| 3000 | HTTP request |
+| 14000 | Git access |
+| 17000 | Redis command |
 
 ## AI Detection Engine
 
@@ -169,9 +212,6 @@ Install cron jobs: `crontab scripts/cron.txt`
 ```bash
 # Python tests (model + response engine)
 cd cyber-defense && python -m pytest test/ -v
-
-# Fake API tests
-cd honeypot/fakeapi && npm test
 
 # Validate configurations
 docker compose config --quiet

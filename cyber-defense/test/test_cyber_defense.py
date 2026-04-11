@@ -56,10 +56,11 @@ class TestAttackClassifier(unittest.TestCase):
         self.assertEqual(output.shape, x.shape)
 
     def test_dataset_featurization(self):
-        """Test that log entries are featurized correctly."""
+        """Test that log entries are featurized correctly for both formats."""
         from train import HoneypotLogDataset
 
         with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False) as f:
+            # Cowrie-style entry
             f.write(
                 json.dumps(
                     {
@@ -73,15 +74,15 @@ class TestAttackClassifier(unittest.TestCase):
                 )
                 + "\n"
             )
+            # OpenCanary-style entry
             f.write(
                 json.dumps(
                     {
-                        "ip": "10.0.0.2",
-                        "endpoint": "/data",
-                        "method": "GET",
-                        "payload": "",
-                        "user_agent": "Mozilla/5.0",
-                        "label": "benign",
+                        "src_host": "10.0.0.2",
+                        "logtype": 3000,
+                        "logdata": {"PATH": "/admin", "USERAGENT": "DirBuster/1.0"},
+                        "utc_time": "2026-04-11T01:27:00.000000Z",
+                        "label": "scan",
                     }
                 )
                 + "\n"
@@ -93,6 +94,9 @@ class TestAttackClassifier(unittest.TestCase):
             self.assertEqual(len(dataset), 2)
             features, label = dataset[0]
             self.assertEqual(features.shape[0], HoneypotLogDataset.FEATURE_DIM)
+            # Verify OpenCanary entry is also featurized correctly
+            features_oc, label_oc = dataset[1]
+            self.assertEqual(features_oc.shape[0], HoneypotLogDataset.FEATURE_DIM)
         finally:
             os.unlink(temp_path)
 
@@ -240,12 +244,14 @@ class TestLogFormat(unittest.TestCase):
     def test_example_logs_valid_json(self):
         """Test that example log files contain valid JSON."""
         log_dir = os.path.join(os.path.dirname(__file__), "..", "logs")
+        # Each entry: (filepath, required_field)
+        # Cowrie uses "timestamp"; OpenCanary uses "utc_time"
         log_files = [
-            os.path.join(log_dir, "fakeapi", "api-activity.json"),
-            os.path.join(log_dir, "cowrie", "cowrie.json"),
+            (os.path.join(log_dir, "opencanary", "opencanary.log"), "utc_time"),
+            (os.path.join(log_dir, "cowrie", "cowrie.json"), "timestamp"),
         ]
 
-        for log_file in log_files:
+        for log_file, required_field in log_files:
             if not os.path.exists(log_file):
                 continue
             with open(log_file) as f:
@@ -256,7 +262,7 @@ class TestLogFormat(unittest.TestCase):
                     try:
                         entry = json.loads(line)
                         self.assertIsInstance(entry, dict)
-                        self.assertIn("timestamp", entry)
+                        self.assertIn(required_field, entry)
                     except json.JSONDecodeError:
                         self.fail(f"Invalid JSON in {log_file} line {i}")
 

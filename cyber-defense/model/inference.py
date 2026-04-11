@@ -174,7 +174,7 @@ def main():
     # Process log files
     log_files = [
         os.path.join(log_dir, "cowrie", "cowrie.json"),
-        os.path.join(log_dir, "fakeapi", "api-activity.json"),
+        os.path.join(log_dir, "opencanary", "opencanary.log"),
     ]
 
     print("\nRunning inference on honeypot logs...")
