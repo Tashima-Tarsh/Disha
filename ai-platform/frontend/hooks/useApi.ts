@@ -22,5 +22,43 @@ export function useApi() {
     [],
   );
 
-  return { investigate, getAlerts, getGraphInsights };
+  const getClusterStatus = useCallback(async () => {
+    return apiClient.getClusterStatus();
+  }, []);
+
+  const getRLMetrics = useCallback(async () => {
+    return apiClient.getRLMetrics();
+  }, []);
+
+  const evolvePrompts = useCallback(async () => {
+    return apiClient.evolvePrompts();
+  }, []);
+
+  const getEntityRankings = useCallback(async (topN?: number, entityType?: string) => {
+    return apiClient.getEntityRankings(topN, entityType);
+  }, []);
+
+  const getAgentRankings = useCallback(async () => {
+    return apiClient.getAgentRankings();
+  }, []);
+
+  const submitFeedback = useCallback(
+    async (investigationId: string, truePositive?: boolean, rating?: number) => {
+      return apiClient.submitFeedback(investigationId, truePositive, rating);
+    },
+    [],
+  );
+
+  return {
+    investigate,
+    getAlerts,
+    getGraphInsights,
+    getClusterStatus,
+    getRLMetrics,
+    evolvePrompts,
+    getEntityRankings,
+    getAgentRankings,
+    submitFeedback,
+  };
 }
+

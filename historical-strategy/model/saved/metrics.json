@@ -1,0 +1,100 @@
+{
+  "random_forest": {
+    "test_accuracy": 0.4286,
+    "cv_mean": 0.4,
+    "cv_std": 0.2191,
+    "cv_scores": [
+      0.6,
+      0.4,
+      0.4,
+      0.0,
+      0.6
+    ],
+    "confusion_matrix": [
+      [
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        1,
+        0,
+        1,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0
+      ],
+      [
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1
+      ]
+    ]
+  },
+  "mlp": {
+    "test_accuracy": 0.2857
+  },
+  "dataset": {
+    "n_classes": 10,
+    "strategy_classes": [
+      "Attrition",
+      "Blitzkrieg",
+      "Coalition",
+      "Conventional",
+      "Deception",
+      "Flanking",
+      "Guerrilla",
+      "Naval",
+      "Psychological",
+      "Siege"
+    ],
+    "train_size": 25,
+    "test_size": 7,
+    "n_features": 9
+  }
+}

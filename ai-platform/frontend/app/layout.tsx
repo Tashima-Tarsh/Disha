@@ -2,8 +2,9 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "AI Intelligence Platform",
-  description: "Multi-agent AI system for OSINT, cybersecurity, and blockchain analysis",
+  title: "Disha AGI Platform",
+  description: "Self-learning, multi-agent AGI platform — threat intelligence, cyber defense, RL optimization, and multimodal analysis",
+  icons: { icon: "/favicon.ico" },
 };
 
 export default function RootLayout({
@@ -13,7 +14,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="min-h-screen bg-dark-900 text-gray-100">{children}</body>
+      <body className="min-h-screen cyber-grid-bg text-[var(--text-primary)] antialiased">
+        {children}
+      </body>
     </html>
   );
 }

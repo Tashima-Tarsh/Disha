@@ -22,19 +22,23 @@ class GPTModel:
 
 class GPT3Turbo_4K(GPTModel):
     def __init__(self):
-        super().__init__('gpt-3.5-turbo', 0.0015, 0.002, 4096)
+        # gpt-3.5-turbo is deprecated; use gpt-4o-mini (faster, cheaper, more capable)
+        super().__init__('gpt-4o-mini', 0.00015, 0.0006, 128000)
 
 class GPT3Turbo_16K(GPTModel):
     def __init__(self):
-        super().__init__('gpt-3.5-turbo-1106', 0.003, 0.004, 16384)
+        # gpt-3.5-turbo-1106 is deprecated; use gpt-4o-mini
+        super().__init__('gpt-4o-mini', 0.00015, 0.0006, 128000)
 
 class GPT4_8K(GPTModel):
     def __init__(self):
-        super().__init__('gpt-4', 0.03, 0.06, 8192)
+        # gpt-4 (8K) is deprecated; use gpt-4o
+        super().__init__('gpt-4o', 0.0025, 0.01, 128000)
 
 class GPT4_32K(GPTModel):
     def __init__(self):
-        super().__init__('gpt-4-32k', 0.06, 0.12, 32768)
+        # gpt-4-32k is deprecated; use gpt-4o (128K context window)
+        super().__init__('gpt-4o', 0.0025, 0.01, 128000)
 
 # =========================================================================== #
 

@@ -1,0 +1,18 @@
+# =============================================================================
+# Disha Virtual Cyber Defense System - Cron Jobs
+#
+# Install with: crontab scripts/cron.txt
+# Or copy individual lines to your system crontab.
+# =============================================================================
+
+# Update threat intelligence feeds daily at 4:00 AM UTC
+0 4 * * * cd /opt/disha/cyber-defense && docker compose run --rm threat-intel
+
+# Health check every 15 minutes
+*/15 * * * * /opt/disha/cyber-defense/scripts/health_check.sh >> /opt/disha/cyber-defense/logs/health_check.log 2>&1
+
+# Pull latest container images weekly (Sunday 3:00 AM UTC)
+0 3 * * 0 cd /opt/disha/cyber-defense && docker compose pull && docker compose up -d
+
+# Rotate logs monthly (1st of month, 2:00 AM UTC)
+0 2 1 * * find /opt/disha/cyber-defense/logs -name "*.json" -mtime +30 -exec gzip {} \;

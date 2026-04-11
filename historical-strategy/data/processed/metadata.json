@@ -1,0 +1,84 @@
+{
+  "feature_names": [
+    "era_enc",
+    "region_enc",
+    "terrain_enc",
+    "technology_level_enc",
+    "year_norm",
+    "duration_norm",
+    "casualties_norm",
+    "log_casualties",
+    "outcome_score"
+  ],
+  "strategy_classes": [
+    "Attrition",
+    "Blitzkrieg",
+    "Coalition",
+    "Conventional",
+    "Deception",
+    "Flanking",
+    "Guerrilla",
+    "Naval",
+    "Psychological",
+    "Siege"
+  ],
+  "era_classes": [
+    "Ancient",
+    "Contemporary",
+    "Early Modern",
+    "Medieval",
+    "Modern"
+  ],
+  "region_classes": [
+    "Africa",
+    "Americas",
+    "Asia",
+    "Europe",
+    "Middle East"
+  ],
+  "terrain_classes": [
+    "Desert",
+    "Forest",
+    "Mountains",
+    "Plains",
+    "Sea",
+    "Urban"
+  ],
+  "technology_classes": [
+    "Gunpowder",
+    "Industrial",
+    "Iron Age",
+    "Medieval",
+    "Modern"
+  ],
+  "train_size": 25,
+  "test_size": 7,
+  "n_features": 9,
+  "n_classes": 10,
+  "strategy_distribution": {
+    "Attrition": 7,
+    "Flanking": 5,
+    "Deception": 5,
+    "Psychological": 3,
+    "Siege": 3,
+    "Guerrilla": 3,
+    "Conventional": 2,
+    "Blitzkrieg": 2,
+    "Coalition": 1,
+    "Naval": 1
+  },
+  "era_distribution": {
+    "Modern": 10,
+    "Contemporary": 9,
+    "Ancient": 6,
+    "Medieval": 5,
+    "Early Modern": 2
+  },
+  "region_distribution": {
+    "Europe": 17,
+    "Asia": 7,
+    "Middle East": 4,
+    "Americas": 2,
+    "Africa": 2
+  }
+}
