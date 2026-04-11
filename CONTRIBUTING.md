@@ -17,7 +17,7 @@ This repo archives the **leaked source code** of Anthropic's Claude Code CLI. Co
 ## What Not to Change
 
 - **`src/` directory** — This is the original leaked source, preserved as-is. Don't modify it.
-- The [`backup` branch](https://github.com/codeaashu/claude-code/tree/backup) contains the unmodified original.
+- The [`backup` branch](https://github.com/Monster/claude-code/tree/backup) contains the unmodified original.
 
 ## Getting Started
 
@@ -29,7 +29,7 @@ This repo archives the **leaked source code** of Anthropic's Claude Code CLI. Co
 ### Setup
 
 ```bash
-git clone https://github.com/codeaashu/claude-code.git
+git clone https://github.com/Monster/claude-code.git
 cd claude-code
 ```
 
