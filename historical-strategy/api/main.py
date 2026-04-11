@@ -4,6 +4,7 @@ Provides REST endpoints for conflict data, simulation, and analysis.
 """
 
 import json
+import logging
 import sys
 from contextlib import asynccontextmanager
 from pathlib import Path
@@ -21,6 +22,8 @@ from simulation.scenarios import SCENARIOS  # noqa: E402
 
 DATA_FILE = Path(__file__).parent.parent / "data" / "historical_data.json"
 
+logger = logging.getLogger(__name__)
+
 # Global state
 conflicts_db: List[Dict[str, Any]] = []
 engine: Optional[HistoricalSimulationEngine] = None
@@ -33,9 +36,9 @@ async def lifespan(app: FastAPI):
     if DATA_FILE.exists():
         with open(DATA_FILE) as f:
             conflicts_db = json.load(f)
-        print(f"[API] Loaded {len(conflicts_db)} conflicts from {DATA_FILE}")
+        logger.info("Loaded %d conflicts from %s", len(conflicts_db), DATA_FILE)
     else:
-        print(f"[API] WARNING: Data file not found at {DATA_FILE}")
+        logger.warning("Data file not found at %s", DATA_FILE)
     engine = HistoricalSimulationEngine()
     yield
     # Shutdown: nothing to clean up for now

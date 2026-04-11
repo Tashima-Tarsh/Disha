@@ -1,7 +1,8 @@
 import { c as _c } from "react/compiler-runtime";
 import { homedir } from 'node:os';
 import { join } from 'node:path';
-import React, { useEffect, useState } from 'react';
+import type React from 'react';
+import { useEffect, useState } from 'react';
 import type { CommandResultDisplay } from 'src/commands.js';
 import { logEvent } from 'src/services/analytics/index.js';
 import { StatusIcon } from '../components/design-system/StatusIcon.js';

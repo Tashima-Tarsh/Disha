@@ -1,5 +1,5 @@
 import { c as _c } from "react/compiler-runtime";
-import React from 'react';
+import type React from 'react';
 import { FpsMetricsProvider } from '../context/fpsMetrics.js';
 import { StatsProvider, type StatsStore } from '../context/stats.js';
 import { type AppState, AppStateProvider } from '../state/AppState.js';

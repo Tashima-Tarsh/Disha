@@ -1,15 +1,4 @@
 import { c as _c } from "react/compiler-runtime";
-/**
- * Component that registers keybinding handlers for command bindings.
- *
- * Must be rendered inside KeybindingSetup to have access to the keybinding context.
- * Reads "command:*" actions from the current keybinding configuration and registers
- * handlers that invoke the corresponding slash command via onSubmit.
- *
- * Commands triggered via keybinding are treated as "immediate" - they execute right
- * away and preserve the user's existing input text (the prompt is not cleared).
- */
-import { useMemo } from 'react';
 import { useIsModalOverlayActive } from '../context/overlayContext.js';
 import { useOptionalKeybindingContext } from '../keybindings/KeybindingContext.js';
 import { useKeybindings } from '../keybindings/useKeybinding.js';

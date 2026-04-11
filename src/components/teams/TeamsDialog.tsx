@@ -1,7 +1,7 @@
 import { c as _c } from "react/compiler-runtime";
 import { randomUUID } from 'crypto';
 import figures from 'figures';
-import * as React from 'react';
+import type * as React from 'react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useInterval } from 'usehooks-ts';
 import { useRegisterOverlay } from '../../context/overlayContext.js';
@@ -23,8 +23,8 @@ import { IT2_COMMAND, isInsideTmuxSync } from '../../utils/swarm/backends/detect
 import { ensureBackendsRegistered, getBackendByType, getCachedBackend } from '../../utils/swarm/backends/registry.js';
 import type { PaneBackendType } from '../../utils/swarm/backends/types.js';
 import { getSwarmSocketName, TMUX_COMMAND } from '../../utils/swarm/constants.js';
-import { addHiddenPaneId, removeHiddenPaneId, removeMemberFromTeam, setMemberMode, setMultipleMemberModes } from '../../utils/swarm/teamHelpers.js';
-import { listTasks, type Task, unassignTeammateTasks } from '../../utils/tasks.js';
+import { removeMemberFromTeam, setMemberMode, setMultipleMemberModes } from '../../utils/swarm/teamHelpers.js';
+import { listTasks, unassignTeammateTasks } from '../../utils/tasks.js';
 import { getTeammateStatuses, type TeammateStatus, type TeamSummary } from '../../utils/teamDiscovery.js';
 import { createModeSetRequestMessage, sendShutdownRequestToMailbox, writeToMailbox } from '../../utils/teammateMailbox.js';
 import { Dialog } from '../design-system/Dialog.js';
@@ -70,7 +70,6 @@ export function TeamsDialog({
   const teammateStatuses = useMemo(() => {
     return getTeammateStatuses(dialogLevel.teamName);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    // biome-ignore lint/correctness/useExhaustiveDependencies: intentional
   }, [dialogLevel.teamName, refreshKey]);
 
   // Periodically refresh to pick up mode changes from teammates
@@ -630,13 +629,13 @@ async function toggleTeammateVisibility(teammate: TeammateStatus, teamName: stri
  * Hide a teammate pane using the backend abstraction.
  * Only available for ant users (gated for dead code elimination in external builds)
  */
-async function hideTeammate(teammate: TeammateStatus, teamName: string): Promise<void> {}
+async function hideTeammate(_teammate: TeammateStatus, _teamName: string): Promise<void> {}
 
 /**
  * Show a previously hidden teammate pane using the backend abstraction.
  * Only available for ant users (gated for dead code elimination in external builds)
  */
-async function showTeammate(teammate: TeammateStatus, teamName: string): Promise<void> {}
+async function showTeammate(_teammate: TeammateStatus, _teamName: string): Promise<void> {}
 
 /**
  * Send a mode change message to a single teammate

@@ -1,4 +1,4 @@
-import * as React from 'react';
+import type * as React from 'react';
 import { useEffect, useRef, useState } from 'react';
 import { TEARDROP_ASTERISK } from '../../constants/figures.js';
 import { Box, Text, useAnimationFrame } from '../../ink.js';

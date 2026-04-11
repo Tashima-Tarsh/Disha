@@ -1,12 +1,4 @@
 import { c as _c } from "react/compiler-runtime";
-/**
- * SelectHookMode shows all hooks configured for a given event+matcher pair.
- *
- * The /hooks menu is read-only: this view no longer offers "add new hook"
- * and selecting a hook shows its read-only details instead of a delete
- * confirmation.
- */
-import * as React from 'react';
 import type { HookEvent } from 'src/entrypoints/agentSdkTypes.js';
 import type { HookEventMetadata } from 'src/utils/hooks/hooksConfigManager.js';
 import { Box, Text } from '../../ink.js';

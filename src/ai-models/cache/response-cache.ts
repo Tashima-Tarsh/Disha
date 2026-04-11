@@ -29,7 +29,7 @@ export class ResponseCache {
     return this.cache.has(key)
   }
 
-  invalidateModel(modelId: string): void {
+  invalidateModel(_modelId: string): void {
     // Cache doesn't expose iteration by modelId prefix in this impl;
     // in production this would be done with a secondary index
     this.cache.clear()

@@ -1,5 +1,6 @@
 import { feature } from 'bun:bundle';
-import React, { useCallback, useEffect, useRef } from 'react';
+import type React from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { setMainLoopModelOverride } from '../bootstrap/state.js';
 import { type BridgePermissionCallbacks, type BridgePermissionResponse, isBridgePermissionResponse } from '../bridge/bridgePermissionCallbacks.js';
 import { buildBridgeConnectUrl } from '../bridge/bridgeStatusUtil.js';

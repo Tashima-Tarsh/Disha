@@ -1,4 +1,4 @@
-import * as React from 'react';
+import type * as React from 'react';
 import { AgentsMenu } from '../../components/agents/AgentsMenu.js';
 import type { ToolUseContext } from '../../Tool.js';
 import { getTools } from '../../tools.js';

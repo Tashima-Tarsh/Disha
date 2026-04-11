@@ -1,5 +1,5 @@
 import type { Token, Tokens } from 'marked';
-import React from 'react';
+import type React from 'react';
 import stripAnsi from 'strip-ansi';
 import { useTerminalSize } from '../hooks/useTerminalSize.js';
 import { stringWidth } from '../ink/stringWidth.js';

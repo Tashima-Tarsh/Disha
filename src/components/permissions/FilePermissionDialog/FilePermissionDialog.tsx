@@ -1,5 +1,6 @@
 import { relative } from 'path';
-import React, { useMemo } from 'react';
+import type React from 'react';
+import { useMemo } from 'react';
 import { useDiffInIDE } from '../../../hooks/useDiffInIDE.js';
 import { Box, Text } from '../../../ink.js';
 import type { ToolUseContext } from '../../../Tool.js';

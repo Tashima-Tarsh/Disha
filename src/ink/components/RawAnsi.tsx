@@ -1,5 +1,4 @@
 import { c as _c } from "react/compiler-runtime";
-import React from 'react';
 type Props = {
   /**
    * Pre-rendered ANSI lines. Each element must be exactly one terminal row

@@ -1,4 +1,4 @@
-import * as React from 'react';
+import type * as React from 'react';
 import { useCallback, useEffect, useState } from 'react';
 import type { CommandResultDisplay } from '../../commands.js';
 import { TEARDROP_ASTERISK } from '../../constants/figures.js';

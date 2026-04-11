@@ -1,6 +1,6 @@
 import { c as _c } from "react/compiler-runtime";
 import type { ToolResultBlockParam, ToolUseBlockParam } from '@anthropic-ai/sdk/resources/index.mjs';
-import * as React from 'react';
+import type * as React from 'react';
 import { ConfigurableShortcutHint } from 'src/components/ConfigurableShortcutHint.js';
 import { CtrlOToExpand, SubAgentProvider } from 'src/components/CtrlOToExpand.js';
 import { Byline } from 'src/components/design-system/Byline.js';
@@ -288,7 +288,7 @@ function VerboseAgentTranscript(t0) {
   }
   let t3;
   if ($[13] !== t2) {
-    t3 = <>{t2}</>;
+    t3 = t2;
     $[13] = t2;
     $[14] = t3;
   } else {

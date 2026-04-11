@@ -4,7 +4,7 @@ import { join } from "path";
 import type { IncomingMessage } from "http";
 import type { Application, Request, Response, NextFunction } from "express";
 import type { AuthAdapter, AuthUser, AuthenticatedRequest } from "./adapter.js";
-import { SessionStore } from "./adapter.js";
+import type { SessionStore } from "./adapter.js";
 
 /**
  * API-key authentication adapter.

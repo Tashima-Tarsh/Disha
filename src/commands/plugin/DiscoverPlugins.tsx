@@ -764,7 +764,6 @@ function EmptyStateMessage(t0) {
         }
         return t1;
       }
-    case "no-marketplaces-configured":
     default:
       {
         let t1;

@@ -1,18 +1,5 @@
 import { c as _c } from "react/compiler-runtime";
-/**
- * HooksConfigMenu is a read-only browser for configured hooks.
- *
- * Users can drill into each hook event, see configured matchers and hooks
- * (of any type: command, prompt, agent, http), and view individual hook
- * details. To add or modify hooks, users should edit settings.json directly
- * or ask Claude — the menu directs them there.
- *
- * The menu is read-only because the old editing UI only supported
- * command-type hooks and duplicating the settings.json editing surface
- * in-menu for all four types would be a maintenance burden.
- */
-import * as React from 'react';
-import { useCallback, useMemo, useState } from 'react';
+import { useState } from 'react';
 import type { HookEvent } from 'src/entrypoints/agentSdkTypes.js';
 import { useAppState, useAppStateStore } from 'src/state/AppState.js';
 import type { CommandResultDisplay } from '../../commands.js';

@@ -1,6 +1,6 @@
 import { c as _c } from "react/compiler-runtime";
 import figures from 'figures';
-import * as React from 'react';
+import type * as React from 'react';
 import { useEffect, useRef, useState } from 'react';
 import { type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS, logEvent } from 'src/services/analytics/index.js';
 import { ConfigurableShortcutHint } from '../../components/ConfigurableShortcutHint.js';
@@ -162,7 +162,6 @@ export function ManageMarketplaces({
     }
     void loadMarketplaces();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    // biome-ignore lint/correctness/useExhaustiveDependencies: intentional
   }, [targetMarketplace, action, error]);
 
   // Check if there are any pending changes

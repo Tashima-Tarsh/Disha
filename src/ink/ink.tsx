@@ -2,7 +2,7 @@ import autoBind from 'auto-bind';
 import { closeSync, constants as fsConstants, openSync, readSync, writeSync } from 'fs';
 import noop from 'lodash-es/noop.js';
 import throttle from 'lodash-es/throttle.js';
-import React, { type ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import type { FiberRoot } from 'react-reconciler';
 import { ConcurrentRoot } from 'react-reconciler/constants.js';
 import { onExit } from 'signal-exit';
@@ -1569,7 +1569,6 @@ export default class Ink {
     this.backFrame.screen.hyperlinkPool = this.hyperlinkPool;
   }
   patchConsole(): () => void {
-    // biome-ignore lint/suspicious/noConsole: intentionally patching global console
     const con = console;
     const originals: Partial<Record<keyof Console, Console[keyof Console]>> = {};
     const toDebug = (...args: unknown[]) => logForDebugging(`console.log: ${format(...args)}`);

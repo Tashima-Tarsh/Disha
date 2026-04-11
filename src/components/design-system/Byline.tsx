@@ -63,7 +63,7 @@ export function Byline(t0) {
   }
   let t3;
   if ($[3] !== t1) {
-    t3 = <>{t1}</>;
+    t3 = t1;
     $[3] = t1;
     $[4] = t3;
   } else {

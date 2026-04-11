@@ -1,5 +1,4 @@
 import { c as _c } from "react/compiler-runtime";
-import React from 'react';
 import { Box, Text } from '../../ink.js';
 import type { Workflow } from './types.js';
 interface CreatingStepProps {
@@ -43,7 +42,7 @@ export function CreatingStep(t0) {
   }
   let t4;
   if ($[7] !== currentWorkflowInstallStep || $[8] !== progressSteps) {
-    t4 = <><Box flexDirection="column" borderStyle="round" paddingX={1}>{t3}{progressSteps.map((stepText, index) => {
+    t4 = <Box flexDirection="column" borderStyle="round" paddingX={1}>{t3}{progressSteps.map((stepText, index) => {
           let status = "pending";
           if (index < currentWorkflowInstallStep) {
             status = "completed";
@@ -53,7 +52,7 @@ export function CreatingStep(t0) {
             }
           }
           return <Box key={index}><Text color={status === "completed" ? "success" : status === "in-progress" ? "warning" : undefined}>{status === "completed" ? "\u2713 " : ""}{stepText}{status === "in-progress" ? "\u2026" : ""}</Text></Box>;
-        })}</Box></>;
+        })}</Box>;
     $[7] = currentWorkflowInstallStep;
     $[8] = progressSteps;
     $[9] = t4;

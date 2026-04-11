@@ -1,5 +1,5 @@
 import type { ToolResultBlockParam } from '@anthropic-ai/sdk/resources/index.mjs';
-import * as React from 'react';
+import type * as React from 'react';
 import { SubAgentProvider } from 'src/components/CtrlOToExpand.js';
 import { FallbackToolUseErrorMessage } from 'src/components/FallbackToolUseErrorMessage.js';
 import { FallbackToolUseRejectedMessage } from 'src/components/FallbackToolUseRejectedMessage.js';

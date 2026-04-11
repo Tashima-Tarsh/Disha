@@ -18,7 +18,6 @@ import {
   type PaymentPayload,
   type PaymentRequirement,
   USDC_ADDRESSES,
-  X402_HEADERS,
   type X402PaymentRecord,
 } from './types.js'
 

@@ -1101,7 +1101,6 @@ async function execCommandHook(
                 child.stdin.destroy()
               }
             })
-            continue
           }
         } catch {
           // Not JSON, just a normal line

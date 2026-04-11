@@ -1,7 +1,8 @@
 import { c as _c } from "react/compiler-runtime";
 import chalk from 'chalk';
 import * as path from 'path';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import type React from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { logEvent } from 'src/services/analytics/index.js';
 import type { CommandResultDisplay, LocalJSXCommandContext } from '../../commands.js';
 import { Select } from '../../components/CustomSelect/index.js';
@@ -51,7 +52,7 @@ function IDEScreen(t0) {
         if (value === "None" && shouldShowDisableAutoConnectDialog()) {
           setShowDisableAutoConnectDialog(true);
         } else {
-          onSelect(availableIDEs.find(ide => ide.port === parseInt(value)));
+          onSelect(availableIDEs.find(ide => ide.port === parseInt(value, 10)));
         }
       }
     };
@@ -243,7 +244,7 @@ function IDEOpenSelection(t0) {
   let t2;
   if ($[2] !== availableIDEs || $[3] !== onSelectIDE) {
     t2 = value => {
-      const selectedIDE = availableIDEs.find(ide => ide.port === parseInt(value));
+      const selectedIDE = availableIDEs.find(ide => ide.port === parseInt(value, 10));
       onSelectIDE(selectedIDE);
     };
     $[2] = availableIDEs;

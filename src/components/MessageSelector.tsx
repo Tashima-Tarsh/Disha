@@ -2,7 +2,7 @@ import { c as _c } from "react/compiler-runtime";
 import type { ContentBlockParam, TextBlockParam } from '@anthropic-ai/sdk/resources/index.mjs';
 import { randomUUID, type UUID } from 'crypto';
 import figures from 'figures';
-import * as React from 'react';
+import type * as React from 'react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS, logEvent } from 'src/services/analytics/index.js';
 import { useAppState } from 'src/state/AppState.js';
@@ -26,7 +26,6 @@ import type { Output as FileWriteToolOutput } from 'src/tools/FileWriteTool/File
 import { BASH_STDERR_TAG, BASH_STDOUT_TAG, COMMAND_MESSAGE_TAG, LOCAL_COMMAND_STDERR_TAG, LOCAL_COMMAND_STDOUT_TAG, TASK_NOTIFICATION_TAG, TEAMMATE_MESSAGE_TAG, TICK_TAG } from '../constants/xml.js';
 import { count } from '../utils/array.js';
 import { formatRelativeTimeAgo, truncate } from '../utils/format.js';
-import type { Theme } from '../utils/theme.js';
 import { Divider } from './design-system/Divider.js';
 type RestoreOption = 'both' | 'conversation' | 'code' | 'summarize' | 'summarize_up_to' | 'nevermind';
 function isSummarizeOption(option: RestoreOption | null): option is 'summarize' | 'summarize_up_to' {
@@ -374,14 +373,12 @@ export function MessageSelector({
                           <UserMessageOption userMessage={msg} color={isSelected ? 'suggestion' : undefined} isCurrent={isCurrent} paddingRight={10} />
                         </Box>
                         {isFileHistoryEnabled && metadataLoaded && <Box height={1} flexDirection="row">
-                            {metadata ? <>
-                                <Text dimColor={!isSelected} color="inactive">
+                            {metadata ? <Text dimColor={!isSelected} color="inactive">
                                   {numFilesChanged ? <>
                                       {numFilesChanged === 1 && metadata.filesChanged![0] ? `${path.basename(metadata.filesChanged![0])} ` : `${numFilesChanged} files changed `}
                                       <DiffStatsText diffStats={metadata} />
                                     </> : <>No code changes</>}
-                                </Text>
-                              </> : <Text dimColor color="warning">
+                                </Text> : <Text dimColor color="warning">
                                 {figures.warning} No code restore
                               </Text>}
                           </Box>}
@@ -532,7 +529,7 @@ function RestoreCodeConfirmation(t0) {
   }
   let t2;
   if ($[11] !== fileLabel || $[12] !== t1) {
-    t2 = <><Text dimColor={true}>The code will be restored{" "}{t1} in {fileLabel}.</Text></>;
+    t2 = <Text dimColor={true}>The code will be restored{" "}{t1} in {fileLabel}.</Text>;
     $[11] = fileLabel;
     $[12] = t1;
     $[13] = t2;
@@ -755,7 +752,6 @@ function computeDiffStatsBetweenMessages(messages: Message[], fromMessageId: UUI
         }
       }
     } catch {
-      continue;
     }
   }
   return {

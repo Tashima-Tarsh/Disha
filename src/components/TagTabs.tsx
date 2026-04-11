@@ -1,4 +1,4 @@
-import React from 'react';
+import type React from 'react';
 import { stringWidth } from '../ink/stringWidth.js';
 import { Box, Text } from '../ink.js';
 import { truncateToWidth } from '../utils/format.js';

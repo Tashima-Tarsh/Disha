@@ -1,7 +1,6 @@
 import { c as _c } from "react/compiler-runtime";
 import figures from 'figures';
-import React, { useState } from 'react';
-import type { KeyboardEvent } from '../../ink/events/keyboard-event.js';
+import { useState } from 'react';
 import { Box, Text } from '../../ink.js';
 import { AGENT_COLOR_TO_THEME_COLOR, AGENT_COLORS, type AgentColorName } from '../../tools/AgentTool/agentColorManager.js';
 import { capitalize } from '../../utils/stringUtils.js';
@@ -22,7 +21,7 @@ export function ColorPicker(t0) {
   const currentColor = t1 === undefined ? "automatic" : t1;
   let t2;
   if ($[0] !== currentColor) {
-    t2 = COLOR_OPTIONS.findIndex(opt => opt === currentColor);
+    t2 = COLOR_OPTIONS.indexOf(currentColor);
     $[0] = currentColor;
     $[1] = t2;
   } else {

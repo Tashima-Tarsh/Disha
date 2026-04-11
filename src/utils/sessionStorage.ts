@@ -567,8 +567,6 @@ class Project {
   private FLUSH_INTERVAL_MS = 100
   private readonly MAX_CHUNK_BYTES = 100 * 1024 * 1024
 
-  constructor() {}
-
   /** @internal Reset flush/queue state for testing. */
   _resetFlushState(): void {
     this.pendingWriteCount = 0
@@ -4900,7 +4898,6 @@ function extractFirstPromptFromChunk(chunk: string): string {
         return result
       }
     } catch {
-      continue
     }
   }
   // Session started with a slash command but had no subsequent real message —

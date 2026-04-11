@@ -1,5 +1,6 @@
 import figures from 'figures';
-import React, { useEffect, useState } from 'react';
+import type React from 'react';
+import { useEffect, useState } from 'react';
 import { Box, Text } from '../ink.js';
 import { logForDebugging } from '../utils/debug.js';
 import type { GitFileStatus } from '../utils/git.js';

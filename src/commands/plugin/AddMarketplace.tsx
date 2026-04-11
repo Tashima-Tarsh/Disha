@@ -1,4 +1,4 @@
-import * as React from 'react';
+import type * as React from 'react';
 import { useEffect, useRef, useState } from 'react';
 import { type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS, logEvent } from 'src/services/analytics/index.js';
 import { ConfigurableShortcutHint } from '../../components/ConfigurableShortcutHint.js';
@@ -117,7 +117,6 @@ export function AddMarketplace({
       void handleAdd();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    // biome-ignore lint/correctness/useExhaustiveDependencies: intentional
   }, []); // Only run once on mount
 
   return <Box flexDirection="column">

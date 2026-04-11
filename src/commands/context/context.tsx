@@ -1,5 +1,5 @@
 import { feature } from 'bun:bundle';
-import * as React from 'react';
+import type * as React from 'react';
 import type { LocalJSXCommandContext } from '../../commands.js';
 import { ContextVisualization } from '../../components/ContextVisualization.js';
 import { microcompactMessages } from '../../services/compact/microCompact.js';

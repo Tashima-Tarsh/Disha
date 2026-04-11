@@ -157,7 +157,6 @@ export function AutoUpdater({
     // instead so the guard is always current without changing callback
     // identity (which would re-trigger the initial-check useEffect below).
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    // biome-ignore lint/correctness/useExhaustiveDependencies: isUpdating read via ref
   }, [onAutoUpdaterResult]);
 
   // Initial check
@@ -178,13 +177,11 @@ export function AutoUpdater({
           globalVersion: {versions.global} &middot; latestVersion:{' '}
           {versions.latest}
         </Text>}
-      {isUpdating ? <>
-          <Box>
+      {isUpdating ? <Box>
             <Text color="text" dimColor wrap="truncate">
               Auto-updating…
             </Text>
-          </Box>
-        </> : autoUpdaterResult?.status === 'success' && showSuccessMessage && updateSemver && <Text color="success" wrap="truncate">
+          </Box> : autoUpdaterResult?.status === 'success' && showSuccessMessage && updateSemver && <Text color="success" wrap="truncate">
             ✓ Update installed · Restart to apply
           </Text>}
       {(autoUpdaterResult?.status === 'install_failed' || autoUpdaterResult?.status === 'no_permissions') && <Text color="error" wrap="truncate">

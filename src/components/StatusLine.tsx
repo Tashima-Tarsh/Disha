@@ -1,5 +1,5 @@
 import { feature } from 'bun:bundle';
-import * as React from 'react';
+import type * as React from 'react';
 import { memo, useCallback, useEffect, useRef } from 'react';
 import { logEvent } from 'src/services/analytics/index.js';
 import { useAppState, useSetAppState } from 'src/state/AppState.js';
@@ -287,7 +287,6 @@ function StatusLineInner({
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    // biome-ignore lint/correctness/useExhaustiveDependencies: intentional
   }, []); // Only run once on mount - settings stable for initial logging
 
   // Initial update on mount + cleanup on unmount
@@ -300,7 +299,6 @@ function StatusLineInner({
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    // biome-ignore lint/correctness/useExhaustiveDependencies: intentional
   }, []); // Only run once on mount, not when doUpdate changes
 
   // Get padding from settings or default to 0

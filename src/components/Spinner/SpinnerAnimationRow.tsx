@@ -1,6 +1,6 @@
 import { c as _c } from "react/compiler-runtime";
 import figures from 'figures';
-import * as React from 'react';
+import type * as React from 'react';
 import { useMemo, useRef } from 'react';
 import { stringWidth } from '../../ink/stringWidth.js';
 import { Box, Text, useAnimationFrame } from '../../ink.js';

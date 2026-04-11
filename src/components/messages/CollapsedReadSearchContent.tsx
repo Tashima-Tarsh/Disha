@@ -1,7 +1,8 @@
 import { c as _c } from "react/compiler-runtime";
 import { feature } from 'bun:bundle';
 import { basename } from 'path';
-import React, { useRef } from 'react';
+import type React from 'react';
+import { useRef } from 'react';
 import { useMinDisplayTime } from '../../hooks/useMinDisplayTime.js';
 import { Ansi, Box, Text, useTheme } from '../../ink.js';
 import { findToolByName, type Tools } from '../../Tool.js';
@@ -13,7 +14,6 @@ import { getDisplayPath } from '../../utils/file.js';
 import { formatDuration, formatSecondsShort } from '../../utils/format.js';
 import { isFullscreenEnvEnabled } from '../../utils/fullscreen.js';
 import type { buildMessageLookups } from '../../utils/messages.js';
-import type { ThemeName } from '../../utils/theme.js';
 import { CtrlOToExpand } from '../CtrlOToExpand.js';
 import { useSelectedMessageBg } from '../messageActions.js';
 import { PrBadge } from '../PrBadge.js';

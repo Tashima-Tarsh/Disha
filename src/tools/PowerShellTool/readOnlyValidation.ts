@@ -1380,7 +1380,6 @@ export function isAllowlistedCommand(
   if (!cmd.elementTypes) {
     return false
   }
-  {
     for (let i = 1; i < cmd.elementTypes.length; i++) {
       const t = cmd.elementTypes[i]
       if (t !== 'StringConstant' && t !== 'Parameter') {
@@ -1424,7 +1423,6 @@ export function isAllowlistedCommand(
         }
       }
     }
-  }
 
   const canonical = resolveToCanonical(cmd.name)
 

@@ -455,7 +455,6 @@ export class StructuredIO {
       }
       return message
     } catch (error) {
-      // biome-ignore lint/suspicious/noConsole:: intentional console output
       console.error(`Error parsing streaming input line: ${line}: ${error}`)
       // eslint-disable-next-line custom-rules/no-process-exit
       process.exit(1)
@@ -680,7 +679,6 @@ export class StructuredIO {
           )
           return result
         } catch (error) {
-          // biome-ignore lint/suspicious/noConsole:: intentional console output
           console.error(`Error in hook callback ${callbackId}:`, error)
           return {}
         }
@@ -774,7 +772,6 @@ export class StructuredIO {
 }
 
 function exitWithMessage(message: string): never {
-  // biome-ignore lint/suspicious/noConsole:: intentional console output
   console.error(message)
   // eslint-disable-next-line custom-rules/no-process-exit
   process.exit(1)

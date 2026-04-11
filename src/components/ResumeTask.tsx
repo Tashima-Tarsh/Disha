@@ -1,4 +1,5 @@
-import React, { useCallback, useState } from 'react';
+import type React from 'react';
+import { useCallback, useState } from 'react';
 import { useTerminalSize } from 'src/hooks/useTerminalSize.js';
 import { type CodeSession, fetchCodeSessionsFromSessionsAPI } from 'src/utils/teleport/api.js';
 // eslint-disable-next-line custom-rules/prefer-use-keybindings -- raw j/k/arrow list navigation

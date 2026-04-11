@@ -1,5 +1,4 @@
 import { c as _c } from "react/compiler-runtime";
-// biome-ignore-all assist/source/organizeImports: ANT-ONLY import markers must not be reordered
 import { feature } from 'bun:bundle';
 import { spawnSync } from 'child_process';
 import { snapshotOutputTokensForTurn, getCurrentTurnTokenBudget, getTurnOutputTokens, getBudgetContinuationCount, getTotalInputTokens } from '../bootstrap/state.js';
@@ -723,7 +722,7 @@ export function REPL({
   } = useNotifications();
 
   // eslint-disable-next-line prefer-const
-  let trySuggestBgPRIntercept = SUGGEST_BG_PR_NOOP;
+  const trySuggestBgPRIntercept = SUGGEST_BG_PR_NOOP;
   const mcpClients = useMergedClients(initialMcpClients, mcp.clients);
 
   // IDE integration
@@ -2389,7 +2388,7 @@ export function REPL({
       reject
     }]);
   }), []);
-  const getToolUseContext = useCallback((messages: MessageType[], newMessages: MessageType[], abortController: AbortController, mainLoopModel: string): ProcessUserInputContext => {
+  const getToolUseContext = useCallback((messages: MessageType[], _newMessages: MessageType[], abortController: AbortController, mainLoopModel: string): ProcessUserInputContext => {
     // Read mutable values fresh from the store rather than closure-capturing
     // useAppState() snapshots. Same values today (closure is refreshed by the
     // render between turns); decouples freshness from React's render cycle for
@@ -4051,7 +4050,6 @@ export function REPL({
     // useScheduledTasks's effect (not here) since wrapping a hook call in a dynamic
     // condition would break rules-of-hooks.
     const assistantMode = store.getState().kairosEnabled;
-    // biome-ignore lint/correctness/useHookAtTopLevel: feature() is a compile-time constant
     useScheduledTasks!({
       isLoading,
       assistantMode,

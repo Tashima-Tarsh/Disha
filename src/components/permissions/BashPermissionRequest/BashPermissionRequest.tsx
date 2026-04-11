@@ -1,7 +1,8 @@
 import { c as _c } from "react/compiler-runtime";
 import { feature } from 'bun:bundle';
 import figures from 'figures';
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import type React from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Box, Text, useTheme } from '../../../ink.js';
 import { useKeybinding } from '../../../keybindings/useKeybinding.js';
 import { getFeatureValue_CACHED_MAY_BE_STALE } from '../../../services/analytics/growthbook.js';
