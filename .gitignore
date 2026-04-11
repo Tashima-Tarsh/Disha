@@ -12,3 +12,10 @@ decision-framework/data/index/*.json
 cyber-defense/*.pt
 cyber-defense/model/*.pt
 cyber-defense/honeypot/fakeapi/node_modules/
+
+# Decision Engine build artifacts
+decision-engine/data/index/*.faiss
+decision-engine/data/index/*.json
+decision-engine/data/index/*_clauses.txt
+decision-engine/data/index/*_lines.txt
+!decision-engine/data/index/.gitkeep
