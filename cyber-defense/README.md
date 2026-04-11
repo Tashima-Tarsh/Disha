@@ -1,3 +1,11 @@
+<a>← Back to main README</a>
+
+## Table of Contents
+- <a>Architecture</a>
+- <a>Quick Start</a>
+- <a>Project Structure</a>
+- <a>API Reference</a>
+
 # 🛡️ Disha Virtual Cyber Defense System
 
 > **STRICTLY DEFENSIVE — SAFE — ISOLATED**

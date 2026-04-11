@@ -1,3 +1,11 @@
+<a>← Back to main README</a>
+
+## Table of Contents
+- <a>Architecture</a>
+- <a>Quick Start</a>
+- <a>Project Structure</a>
+- <a>API Reference</a>
+
 # 🛡️ AI Intelligence Platform
 
 A production-grade, multi-agent AI system for intelligence gathering, cybersecurity analysis, blockchain tracking, and real-time threat detection.
