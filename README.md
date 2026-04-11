@@ -406,26 +406,6 @@ DISHA_MODEL_PROVIDER=mock python -m pytest tests/ -v
 | **[🔧 docs/subsystems.md](./docs/subsystems.md)** | Bridge, MCP, plugins, skills, memory |
 | **[🧭 docs/exploration-guide.md](./docs/exploration-guide.md)** | Code navigation guide |
 | **[⚖️ decision-engine/README.md](./decision-engine/README.md)** | Decision Engine setup, index building, llama-cpp usage |
-| **[🤝 CONTRIBUTING.md](./CONTRIBUTING.md)** | How to contribute |
-
----
-
-## 🤝 Contributing
-
-1. Create a feature branch from `main`
-2. Keep PR scope focused (one feature per PR)
-3. Add type annotations for all new code
-4. Update documentation for new modules
-5. Request review before merge
-
----
-
-## 👥 Contributors
-
-<a href="https://github.com/Tashima-Tarsh/Disha/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=Tashima-Tarsh/Disha" alt="Contributors" />
-</a>
-
 ---
 
 ## 🏛️ License
