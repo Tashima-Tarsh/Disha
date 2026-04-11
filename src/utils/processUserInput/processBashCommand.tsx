@@ -1,6 +1,6 @@
 import type { ContentBlockParam } from '@anthropic-ai/sdk/resources';
 import { randomUUID } from 'crypto';
-import * as React from 'react';
+import type * as React from 'react';
 import { BashModeProgress } from 'src/components/BashModeProgress.js';
 import type { SetToolJSXFn } from 'src/Tool.js';
 import { BashTool } from 'src/tools/BashTool/BashTool.js';

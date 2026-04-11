@@ -1,6 +1,6 @@
 import { feature } from 'bun:bundle';
 import { appendFileSync } from 'fs';
-import React from 'react';
+import type React from 'react';
 import { logEvent } from 'src/services/analytics/index.js';
 import { gracefulShutdown, gracefulShutdownSync } from 'src/utils/gracefulShutdown.js';
 import { type ChannelEntry, getAllowedChannels, setAllowedChannels, setHasDevChannels, setSessionTrustAccepted, setStatsStore } from './bootstrap/state.js';

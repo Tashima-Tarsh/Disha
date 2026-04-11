@@ -1,4 +1,30 @@
+# Node.js
+node_modules/
+dist/
+*.tsbuildinfo
+
+# Python
 __pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+.coverage
+.ruff_cache/
+*.egg-info/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor files
+*.swp
+*.swo
+*~
 
 # Decision Framework
 decision-framework/__pycache__/

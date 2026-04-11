@@ -1,5 +1,4 @@
 import type {
-  BudgetLevel,
   EnsembleOptions,
   EnsembleResult,
   InvokeOptions,
@@ -100,9 +99,5 @@ export class UnifiedModelAPI {
     await new Promise(resolve => setTimeout(resolve, 10 + Math.random() * 50))
     const _used = { temperature, maxTokens }
     return `[${model.name}] Response to: "${prompt.slice(0, 60)}${prompt.length > 60 ? '...' : ''}"`
-  }
-
-  private selectBudgetModels(_budget: BudgetLevel, _count: number): Model[] {
-    return this.registry.sortByWeight().slice(0, _count)
   }
 }

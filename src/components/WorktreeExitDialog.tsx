@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import type React from 'react';
+import { useEffect, useState } from 'react';
 import type { CommandResultDisplay } from 'src/commands.js';
 import { logEvent } from 'src/services/analytics/index.js';
 import { logForDebugging } from 'src/utils/debug.js';
@@ -50,7 +51,7 @@ export function WorktreeExitDialog({
         const {
           stdout: commitsStr
         } = await execFileNoThrow('git', ['rev-list', '--count', `${worktreeSession.originalHeadCommit}..HEAD`]);
-        const count = parseInt(commitsStr.trim()) || 0;
+        const count = parseInt(commitsStr.trim(), 10) || 0;
         setCommitCount(count);
 
         // If no changes and no commits, clean up silently

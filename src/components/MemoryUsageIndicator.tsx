@@ -1,4 +1,4 @@
-import * as React from 'react';
+import type * as React from 'react';
 import { useMemoryUsage } from '../hooks/useMemoryUsage.js';
 import { Box, Text } from '../ink.js';
 import { formatFileSize } from '../utils/format.js';

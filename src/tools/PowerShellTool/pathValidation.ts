@@ -1526,7 +1526,7 @@ function extractPathsFromCommand(cmd: ParsedCommandElement): {
  * - 'passthrough' if no path commands were found or all paths are valid
  */
 export function checkPathConstraints(
-  input: { command: string },
+  _input: { command: string },
   parsed: ParsedPowerShellCommand,
   toolPermissionContext: ToolPermissionContext,
   compoundCommandHasCd = false,

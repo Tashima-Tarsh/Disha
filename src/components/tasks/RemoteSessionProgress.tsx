@@ -1,7 +1,6 @@
 import { c as _c } from "react/compiler-runtime";
-import React, { useRef } from 'react';
+import { useRef } from 'react';
 import type { RemoteAgentTaskState } from 'src/tasks/RemoteAgentTask/RemoteAgentTask.js';
-import type { DeepImmutable } from 'src/types/utils.js';
 import { DIAMOND_FILLED, DIAMOND_OPEN } from '../../constants/figures.js';
 import { useSettings } from '../../hooks/useSettings.js';
 import { Text, useAnimationFrame } from '../../ink.js';
@@ -57,7 +56,7 @@ function RainbowText(t0) {
   }
   let t3;
   if ($[2] !== phase || $[3] !== t2) {
-    t3 = <>{t2.map((ch, i) => <Text key={i} color={getRainbowColor(i + phase)}>{ch}</Text>)}</>;
+    t3 = t2.map((ch, i) => <Text key={i} color={getRainbowColor(i + phase)}>{ch}</Text>);
     $[2] = phase;
     $[3] = t2;
     $[4] = t3;

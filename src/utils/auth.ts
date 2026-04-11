@@ -1777,7 +1777,7 @@ export function getOtelHeadersFromHelper(): Record<string, string> {
   // Return cached headers if still valid (debounce)
   const debounceMs = parseInt(
     process.env.CLAUDE_CODE_OTEL_HEADERS_HELPER_DEBOUNCE_MS ||
-      DEFAULT_OTEL_HEADERS_DEBOUNCE_MS.toString(),
+      DEFAULT_OTEL_HEADERS_DEBOUNCE_MS.toString(), 10
   )
   if (
     cachedOtelHeaders &&

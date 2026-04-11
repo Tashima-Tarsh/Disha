@@ -61,8 +61,6 @@ export function getSystemDirectories(
         DOWNLOADS: env.XDG_DOWNLOAD_DIR || defaults.DOWNLOADS,
       }
     }
-
-    case 'macos':
     default: {
       // macOS and unknown platforms use standard paths
       if (platform === 'unknown') {

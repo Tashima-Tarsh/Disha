@@ -1,9 +1,8 @@
 import { c as _c } from "react/compiler-runtime";
 import { toString as qrToString } from 'qrcode';
-import * as React from 'react';
-import { useCallback, useEffect, useState } from 'react';
+import type * as React from 'react';
+import { useEffect, useState } from 'react';
 import { Pane } from '../../components/design-system/Pane.js';
-import type { KeyboardEvent } from '../../ink/events/keyboard-event.js';
 import { Box, Text } from '../../ink.js';
 import { useKeybinding } from '../../keybindings/useKeybinding.js';
 import type { LocalJSXCommandOnDone } from '../../types/command.js';

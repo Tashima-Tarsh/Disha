@@ -1,7 +1,7 @@
 import { c as _c } from "react/compiler-runtime";
 import type { ToolResultBlockParam } from '@anthropic-ai/sdk/resources/index.mjs';
 import type { StructuredPatchHunk } from 'diff';
-import * as React from 'react';
+import type * as React from 'react';
 import { Suspense, use, useState } from 'react';
 import { FileEditToolUseRejectedMessage } from 'src/components/FileEditToolUseRejectedMessage.js';
 import { MessageResponse } from 'src/components/MessageResponse.js';

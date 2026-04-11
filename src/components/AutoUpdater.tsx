@@ -178,13 +178,11 @@ export function AutoUpdater({
           globalVersion: {versions.global} &middot; latestVersion:{' '}
           {versions.latest}
         </Text>}
-      {isUpdating ? <>
-          <Box>
+      {isUpdating ? <Box>
             <Text color="text" dimColor wrap="truncate">
               Auto-updating…
             </Text>
-          </Box>
-        </> : autoUpdaterResult?.status === 'success' && showSuccessMessage && updateSemver && <Text color="success" wrap="truncate">
+          </Box> : autoUpdaterResult?.status === 'success' && showSuccessMessage && updateSemver && <Text color="success" wrap="truncate">
             ✓ Update installed · Restart to apply
           </Text>}
       {(autoUpdaterResult?.status === 'install_failed' || autoUpdaterResult?.status === 'no_permissions') && <Text color="error" wrap="truncate">

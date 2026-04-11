@@ -1,5 +1,5 @@
 import { join } from 'path';
-import React from 'react';
+import type React from 'react';
 import { ExportDialog } from '../../components/ExportDialog.js';
 import type { ToolUseContext } from '../../Tool.js';
 import type { LocalJSXCommandOnDone } from '../../types/command.js';

@@ -1,7 +1,6 @@
 import { c as _c } from "react/compiler-runtime";
 import chalk from 'chalk';
 import figures from 'figures';
-import Fuse from 'fuse.js';
 import React from 'react';
 import { getOriginalCwd, getSessionId } from '../bootstrap/state.js';
 import { useExitOnCtrlCDWithKeybindings } from '../hooks/useExitOnCtrlCDWithKeybindings.js';
@@ -72,7 +71,7 @@ const CHILD_PREFIX_WIDTH = 4; // '  ▸ '
 const DEEP_SEARCH_MAX_MESSAGES = 2000;
 const DEEP_SEARCH_CROP_SIZE = 1000;
 const DEEP_SEARCH_MAX_TEXT_LENGTH = 50000; // Cap searchable text per session
-const FUSE_THRESHOLD = 0.3;
+const _FUSE_THRESHOLD = 0.3;
 const DATE_TIE_THRESHOLD_MS = 60 * 1000; // 1 minute - use relevance as tie-breaker within this window
 const SNIPPET_CONTEXT_CHARS = 50; // Characters to show before/after match
 
@@ -169,7 +168,7 @@ export function LogSelector(t0) {
     t3 = $[0];
   }
   const isResumeWithRenameEnabled = t3;
-  const isDeepSearchEnabled = false;
+  const _isDeepSearchEnabled = false;
   const [themeName] = useTheme();
   let t4;
   if ($[1] !== themeName) {
@@ -189,7 +188,7 @@ export function LogSelector(t0) {
     t5 = $[4];
   }
   const highlightColor = t5;
-  const isAgenticSearchEnabled = false;
+  const _isAgenticSearchEnabled = false;
   const [currentBranch, setCurrentBranch] = React.useState(null);
   const [branchFilterEnabled, setBranchFilterEnabled] = React.useState(false);
   const [showAllWorktrees, setShowAllWorktrees] = React.useState(false);
@@ -318,9 +317,9 @@ export function LogSelector(t0) {
     t18 = $[18];
   }
   React.useEffect(t17, t18);
-  const searchableTextByLog = new Map(logs.map(_temp));
-  let t19;
-  t19 = null;
+  const _searchableTextByLog = new Map(logs.map(_temp));
+  let _t19;
+  _t19 = null;
   let t20;
   if ($[19] !== logs) {
     t20 = getUniqueTags(logs);

@@ -1,6 +1,6 @@
 import { c as _c } from "react/compiler-runtime";
 import type { RefObject } from 'react';
-import * as React from 'react';
+import type * as React from 'react';
 import { useCallback, useContext, useEffect, useImperativeHandle, useRef, useState, useSyncExternalStore } from 'react';
 import { useVirtualScroll } from '../hooks/useVirtualScroll.js';
 import type { ScrollBoxHandle } from '../ink/components/ScrollBox.js';

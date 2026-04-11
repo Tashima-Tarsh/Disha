@@ -1,4 +1,4 @@
-import * as React from 'react';
+import type * as React from 'react';
 import { MessageResponse } from '../../components/MessageResponse.js';
 import { supportsHyperlinks } from '../../ink/supports-hyperlinks.js';
 import { Link, Text } from '../../ink.js';

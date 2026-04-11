@@ -1,4 +1,4 @@
-import React from 'react';
+import type React from 'react';
 import { MessageResponse } from '../../components/MessageResponse.js';
 import { stringWidth } from '../../ink/stringWidth.js';
 import { Text } from '../../ink.js';

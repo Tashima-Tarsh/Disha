@@ -68,7 +68,7 @@ export async function setup(
 
   // Check for Node.js version < 18
   const nodeVersion = process.version.match(/^v(\d+)\./)?.[1]
-  if (!nodeVersion || parseInt(nodeVersion) < 18) {
+  if (!nodeVersion || parseInt(nodeVersion, 10) < 18) {
     // biome-ignore lint/suspicious/noConsole:: intentional console output
     console.error(
       chalk.bold.red(
