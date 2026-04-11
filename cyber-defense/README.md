@@ -1,8 +1,16 @@
+[← Back to main README](../README.md)
+
 # 🛡️ Disha Virtual Cyber Defense System
 
 > **STRICTLY DEFENSIVE — SAFE — ISOLATED**
 >
 > For Blue Team Research, Education, and Defense Simulation Only.
+
+## Table of Contents
+- [Overview](#overview)
+- [Architecture](#architecture)
+- [Quick Start](#quick-start)
+- [Testing](#testing)
 
 ## Overview
 
