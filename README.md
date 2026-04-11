@@ -1,7 +1,7 @@
 # 🛡️ Disha — Self-learning Multi-Agent AGI Platform
 
 <p align="center">
-  <img src="docs/assets/disha-hero.png" alt="Disha dashboard preview" width="820" />
+  <img src="docs/assets/disha-hero.svg" alt="Disha dashboard preview" width="820" />
 </p>
 
 <p align="center">

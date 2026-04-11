@@ -7,8 +7,8 @@ A production-grade, multi-agent AI system for intelligence gathering, cybersecur
 ## Table of Contents
 - [Architecture](#-architecture)
 - [Quick Start](#-quick-start)
-- [Project Structure](#project-structure)
-- [API Reference](#api-reference)
+- [Project Structure](#-project-structure)
+- [API Reference](#-api-reference)
 
 ## 🏗️ Architecture
 
