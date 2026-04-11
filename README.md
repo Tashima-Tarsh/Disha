@@ -3,7 +3,7 @@
 </p>
 
 <p align="center">
-  <a href="#-quick-start"><img src="https://img.shields.io/badge/🚀_Get_Started-blue?style=for-the-badge" alt="Get Started"></a>
+  <a href="./WIKI.md#12-getting-started"><img src="https://img.shields.io/badge/🚀_Get_Started-blue?style=for-the-badge" alt="Get Started"></a>
   <a href="./WIKI.md"><img src="https://img.shields.io/badge/📖_Wiki-blueviolet?style=for-the-badge" alt="Wiki"></a>
   <a href="./CONTRIBUTING.md"><img src="https://img.shields.io/badge/🤝_Contribute-green?style=for-the-badge" alt="Contribute"></a>
   <a href="./LICENSE"><img src="https://img.shields.io/badge/📄_MIT_License-lightgrey?style=for-the-badge" alt="License"></a>
@@ -132,6 +132,7 @@ All previously stubbed or paid-API dependencies have been replaced:
 | Threat intelligence feeds | — | **Feodo Tracker**, **EmergingThreats**, **IPsum** (all free) |
 | Maps | Google Maps | **OpenStreetMap + Leaflet** (free, open-source) |
 | Charts | — | **Chart.js** (MIT) |
+
 ---
 
 ## 🌐 Live Demo
@@ -267,7 +268,7 @@ A new AI-powered module for **educational historical conflict analysis and strat
 <td align="center"><b>7</b><br><sub>Intelligence Agents</sub></td>
 <td align="center"><b>40+</b><br><sub>AI Tools</sub></td>
 <td align="center"><b>50+</b><br><sub>CLI Commands</sub></td>
-<td align="center"><b>22+</b><br><sub>API Endpoints</sub></td>
+<td align="center"><b>49+</b><br><sub>API Endpoints</sub></td>
 </tr>
 <tr>
 <td align="center"><b>78+</b><br><sub>Web Components</sub></td>
