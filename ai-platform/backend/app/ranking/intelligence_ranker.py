@@ -8,7 +8,7 @@ import math
 import time
 from dataclasses import dataclass, field
 from typing import Optional
-from collections import Counter, defaultdict
+from collections import Counter
 import structlog
 
 logger = structlog.get_logger(__name__)

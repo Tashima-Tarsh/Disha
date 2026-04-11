@@ -10,6 +10,7 @@ import StatsPanel from "@/components/layout/StatsPanel";
 import ClusterPanel from "@/components/cluster/ClusterPanel";
 import RankingPanel from "@/components/ranking/RankingPanel";
 import RLMetricsPanel from "@/components/rl/RLMetricsPanel";
+import QuantumPhysicsPanel from "@/components/quantum/QuantumPhysicsPanel";
 import { useWebSocket } from "@/hooks/useWebSocket";
 import { useApi } from "@/hooks/useApi";
 import type { Alert, Investigation } from "@/lib/types";
@@ -23,6 +24,7 @@ const TAB_META: Record<string, { label: string; color: string }> = {
   cluster:     { label: "AGI Cluster",        color: "var(--neon-purple)" },
   rankings:    { label: "Intel Rankings",     color: "var(--neon-yellow)" },
   rl:          { label: "RL Neural Engine",   color: "var(--neon-green)"  },
+  quantum:     { label: "Quantum Physics",    color: "#7c3aed"            },
 };
 
 export default function Dashboard() {
@@ -173,6 +175,12 @@ export default function Dashboard() {
           {activeTab === "rl" && (
             <div className="max-w-3xl mx-auto animate-fade-in-up">
               <RLMetricsPanel />
+            </div>
+          )}
+
+          {activeTab === "quantum" && (
+            <div className="animate-fade-in-up">
+              <QuantumPhysicsPanel />
             </div>
           )}
         </main>

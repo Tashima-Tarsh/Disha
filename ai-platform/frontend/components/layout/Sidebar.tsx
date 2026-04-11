@@ -101,6 +101,19 @@ const tabs = [
     ),
     color: "#00ff88",
   },
+  {
+    id: "quantum",
+    label: "Quantum Physics",
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-4 h-4">
+        <circle cx="12" cy="12" r="3" />
+        <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10" />
+        <path d="M2 12c0-2.5 4.5-5 10-5s10 2.5 10 5" />
+        <path d="M12 7c2.5 0 5 2 5 5" />
+      </svg>
+    ),
+    color: "#7c3aed",
+  },
 ];
 
 export default function Sidebar({ activeTab, onTabChange, alertCount = 0 }: SidebarProps) {

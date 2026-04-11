@@ -126,6 +126,25 @@ services:
     networks:
       - intelligence-net
 
+  quantum-physics:
+    image: quantum-physics-backend:latest
+    build:
+      context: ../../quantum-physics/backend
+      dockerfile: Dockerfile
+    ports:
+      - "8002:8002"
+    environment:
+      - NASA_API_KEY=${NASA_API_KEY:-DEMO_KEY}
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8002/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+    restart: unless-stopped
+    networks:
+      - intelligence-net
+
 volumes:
   postgres_data:
   neo4j_data:

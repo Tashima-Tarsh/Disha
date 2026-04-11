@@ -16,8 +16,8 @@ from pydantic import BaseModel, Field
 # Add project root to sys.path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from simulation.engine import HistoricalSimulationEngine, STRATEGY_EFFECTIVENESS
-from simulation.scenarios import SCENARIOS
+from simulation.engine import HistoricalSimulationEngine, STRATEGY_EFFECTIVENESS  # noqa: E402
+from simulation.scenarios import SCENARIOS  # noqa: E402
 
 DATA_FILE = Path(__file__).parent.parent / "data" / "historical_data.json"
 
@@ -144,7 +144,7 @@ async def list_conflicts(
         results = [
             c for c in results
             if country_lower in c.get("country_a", "").lower()
-            or country_lower in c.get("country_b", "").lower()
+            or country_lower in c.get("country_b", "").lower()  # noqa: W503
         ]
 
     total = len(results)
@@ -401,8 +401,6 @@ async def analyze_scenario(request: AnalysisRequest):
     Analyze a scenario context and return strategy recommendations based on historical patterns.
     """
     terrain = request.terrain or "Plains"
-    force_ratio = 1.0
-    technology_gap = 0.0
 
     scores: Dict[str, float] = {}
     for strategy, terrain_map in STRATEGY_EFFECTIVENESS.items():

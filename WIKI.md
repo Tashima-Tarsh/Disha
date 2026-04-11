@@ -1,14 +1,13 @@
 <p align="center">
-  <img src="https://img.shields.io/badge/Disha-AGI%20Platform-blueviolet?style=for-the-badge&logo=data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZD0iTTEyIDJMMiA3bDEwIDVMMjIgN0wxMiAyeiIgZmlsbD0iI2ZmZiIvPjxwYXRoIGQ9Ik0yIDE3bDEwIDVsMTAtNSIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjIiLz48cGF0aCBkPSJNMiAxMmwxMCA1IDEwLTUiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2ZmZiIgc3Ryb2tlLXdpZHRoPSIyIi8+PC9zdmc+" alt="Disha">
-  <br>
-  <img src="https://img.shields.io/badge/Files-2%2C198-blue?style=flat-square" alt="Files">
-  <img src="https://img.shields.io/badge/Lines_of_Code-555K+-green?style=flat-square" alt="LoC">
-  <img src="https://img.shields.io/badge/Agents-7_Intelligence-orange?style=flat-square" alt="Agents">
-  <img src="https://img.shields.io/badge/Tools-40+-red?style=flat-square" alt="Tools">
-  <img src="https://img.shields.io/badge/Commands-50+-purple?style=flat-square" alt="Commands">
-  <img src="https://img.shields.io/badge/API_Endpoints-22-teal?style=flat-square" alt="Endpoints">
-  <img src="https://img.shields.io/badge/Web_Components-143-yellow?style=flat-square" alt="Components">
-  <img src="https://img.shields.io/badge/Hooks-14-cyan?style=flat-square" alt="Hooks">
+  <img src="docs/images/wiki-banner.svg" alt="Disha Wiki" width="100%">
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Sections-18-blue?style=flat-square" alt="Sections">
+  <img src="https://img.shields.io/badge/Systems-6-green?style=flat-square" alt="Systems">
+  <img src="https://img.shields.io/badge/API_Endpoints-49+-orange?style=flat-square" alt="Endpoints">
+  <img src="https://img.shields.io/badge/Components-143-purple?style=flat-square" alt="Components">
+  <img src="https://img.shields.io/badge/Hooks-14-red?style=flat-square" alt="Hooks">
 </p>
 
 ---
@@ -19,7 +18,8 @@
 
 ---
 
-## Table of Contents
+<details>
+<summary><h2>📑 Table of Contents</h2></summary>
 
 - [1. Executive Summary](#1-executive-summary)
 - [2. Architecture Overview](#2-architecture-overview)
@@ -65,15 +65,24 @@
   - [14.3 Simulation Engine](#143-simulation-engine)
   - [14.4 REST API](#144-rest-api)
   - [14.5 Dashboard](#145-dashboard)
-- [15. Bug Fixes & Open-Source API Migration (v2.0)](#15-bug-fixes--open-source-api-migration-v20)
-- [16. Repository Value & Market Analysis](#16-repository-value--market-analysis)
-- [17. National Deployment Analysis — India](#17-national-deployment-analysis--india)
-
+- [15. Quantum Physics Intelligence](#15-quantum-physics-intelligence)
+  - [15.1 Engines](#151-engines)
+  - [15.2 Knowledge Base](#152-knowledge-base)
+  - [15.3 REST API (Port 8002)](#153-rest-api-port-8002)
+  - [15.4 Frontend (Port 3003)](#154-frontend-port-3003)
+  - [15.5 CLI Command](#155-cli-command)
+- [16. Bug Fixes & Open-Source API Migration (v2.0)](#16-bug-fixes--open-source-api-migration-v20)
+- [17. Repository Value & Market Analysis](#17-repository-value--market-analysis)
+- [18. National Deployment Analysis — India](#18-national-deployment-analysis--india)
 ---
+
+</details>
+
+<img src="docs/images/divider.svg" width="100%" height="4">
 
 ## 1. Executive Summary
 
-Disha is a **five-layer AI platform** combining:
+Disha is a **six-layer AI platform** combining:
 
 | Layer | Technology | Purpose |
 |-------|-----------|---------|
@@ -81,6 +90,7 @@ Disha is a **five-layer AI platform** combining:
 | **AI Intelligence Platform** | Python / FastAPI / PyTorch | Multi-agent threat intelligence with RL optimization, multimodal analysis, distributed collaboration |
 | **Cyber Defense System** | Cowrie / Dionaea / OpenCanary / PyTorch | AI-powered honeypot stack with threat classifier and simulated countermeasures |
 | **Historical Strategy Intelligence** | Python / FastAPI / sklearn / Next.js | AI classifier and simulation engine for 32+ historical military conflicts |
+| **Quantum Physics Intelligence** | Python / FastAPI / Qiskit / Next.js | Quantum circuit simulator, physics classifier, space science APIs, unified field theory |
 | **Integrations** | Python / FastAPI / Leaflet | Cyber-intelligence pipeline, OSINT analyser, PentAGI bridge |
 
 ### What Makes Disha Unique
@@ -95,7 +105,7 @@ Disha is a **five-layer AI platform** combining:
 - **🛠️ 40+ AI Tools** — File I/O, shell execution, web search, LSP, MCP, agent spawning
 - **🔌 100% Open-Source APIs** — HackerTarget, ip-api.com, OpenStreetMap, Feodo Tracker, EmergingThreats, Chart.js, Leaflet — zero paid external API dependencies
 
----
+<img src="docs/images/divider.svg" width="100%" height="4">
 
 ## 2. Architecture Overview
 
@@ -161,7 +171,7 @@ User Input ──► CLI/API ──► Query Engine ──► Claude API (stream
                (Ink/React)   (Next.js)      (VS Code)
 ```
 
----
+<img src="docs/images/divider.svg" width="100%" height="4">
 
 ## 3. Core CLI Engine (TypeScript)
 
@@ -412,7 +422,7 @@ Orchestrates parallel agent swarms:
 - **Task isolation** per agent
 - Gated behind `feature('COORDINATOR_MODE')`
 
----
+<img src="docs/images/divider.svg" width="100%" height="4">
 
 ## 4. AI Intelligence Platform (Python)
 
@@ -427,21 +437,20 @@ A **self-improving threat intelligence system** built on FastAPI with 7 speciali
 All agents inherit from `BaseAgent`:
 ```
 BaseAgent (Abstract)
-├── OSINTAgent          — Open-source intelligence (Shodan, DNS, SpiderFoot)
+├── OSINTAgent          — Open-source intelligence (HackerTarget, ip-api.com)
 ├── CryptoAgent         — Blockchain analysis (Etherscan, Ethereum)
 ├── DetectionAgent      — Anomaly detection (Isolation Forest, Z-score)
 ├── GraphAgent          — Knowledge graph ops (Neo4j, Cypher)
-├── ReasoningAgent      — LLM analysis (GPT-4 via LangChain)
-├── VisionAgent         — Image intelligence (GPT-4o Vision)
-└── AudioAgent          — Audio intelligence (Whisper API)
+├── ReasoningAgent      — LLM analysis (GPT-4o via LangChain)
+├── VisionAgent         — Image intelligence (GPT-4o Vision / LLaVA)
+└── AudioAgent          — Audio intelligence (Whisper local / API)
 ```
 
 #### OSINTAgent
 | Source | Data |
 |--------|------|
-| **Shodan API** | IPs, ports, vulnerabilities, OS, geolocation |
-| **Google DNS** | Domain resolution, A/AAAA records |
-| **SpiderFoot** | Comprehensive OSINT framework |
+| **HackerTarget** | Passive DNS — domains, hosts, A/AAAA records (free, no key) |
+| **ip-api.com** | IP geo-location, ASN, ISP, country (free, no key) |
 | **Entity extraction** | Hosts, domains, DNS records with risk scoring |
 
 #### CryptoAgent
@@ -753,7 +762,7 @@ Real-time broadcast to all connected WebSocket clients, in-memory storage (max 1
 
 **Graph Export:** Neo4j → 16-dim feature matrix (one-hot type + risk + hash features) → PyTorch tensors.
 
----
+<img src="docs/images/divider.svg" width="100%" height="4">
 
 ## 5. API Reference
 
@@ -809,7 +818,7 @@ Real-time broadcast to all connected WebSocket clients, in-memory storage (max 1
 | `/cluster/status` | GET | ✅ | Agent cluster health + metrics |
 | `/ws/alerts` | WebSocket | — | Live alert stream |
 
----
+<img src="docs/images/divider.svg" width="100%" height="4">
 
 ## 6. AI Platform Dashboard
 
@@ -841,7 +850,7 @@ RLMetrics       // reward metrics + prompt optimization metrics
 ClusterStatus   // agent status, capabilities, task counts
 ```
 
----
+<img src="docs/images/divider.svg" width="100%" height="4">
 
 ## 7. Web Dashboard (Full-Featured)
 
@@ -995,7 +1004,7 @@ Includes mobile-optimized layouts, touch gesture support, and viewport-aware com
 | **Keyboard Shortcuts** | `shortcuts/` — ShortcutsHelp overlay, ShortcutBadge |
 | **Base UI Library** | `ui/` — 11 shadcn/ui components (button, dialog, input, tabs, select, badge, tooltip, avatar, toast, dropdown-menu, textarea) |
 
----
+<img src="docs/images/divider.svg" width="100%" height="4">
 
 ## 8. MCP Server
 
@@ -1019,7 +1028,7 @@ A standalone Model Context Protocol server exposing the codebase for AI-assisted
 
 **5 Prompts:** `explain_tool`, `explain_command`, `architecture_overview`, `how_does_it_work`, `compare_tools`
 
----
+<img src="docs/images/divider.svg" width="100%" height="4">
 
 ## 9. Infrastructure & Deployment
 
@@ -1050,7 +1059,7 @@ Services:
 | **Docker Compose** | Full platform stack (7 services) |
 | **Local** | Bun runtime CLI + Python venv backend |
 
----
+<img src="docs/images/divider.svg" width="100%" height="4">
 
 ## 10. Tech Stack
 
@@ -1092,16 +1101,16 @@ Services:
 | **State** | React hooks |
 | **Real-time** | WebSocket API |
 
----
+<img src="docs/images/divider.svg" width="100%" height="4">
 
 ## 11. Project Statistics
 
 | Metric | Value |
 |--------|-------|
-| **Total source files** | 2,198 |
-| **Total lines of code** | 555,457+ |
+| **Total source files** | 2,250+ |
+| **Total lines of code** | 580K+ |
 | **TypeScript/TSX files** | ~2,100+ |
-| **Python files** | ~60 |
+| **Python files** | ~80 |
 | **Web dashboard components** | 78 (in 15 directories) |
 | **AI platform components** | 9 |
 | **Web dashboard hooks** | 14 custom hooks |
@@ -1120,7 +1129,7 @@ Services:
 | **a11y components** | 5 (WCAG-compliant) |
 | **Settings panels** | 6 (General, API, MCP, Keyboard, Permissions) |
 
----
+<img src="docs/images/divider.svg" width="100%" height="4">
 
 ## 12. Getting Started
 
@@ -1155,7 +1164,7 @@ cd backend
 python -m venv venv && source venv/bin/activate
 pip install -r requirements.txt
 cp .env.example .env
-# Add: OPENAI_API_KEY, NEO4J_URI, SHODAN_API_KEY, ETHERSCAN_API_KEY
+# Add: OPENAI_API_KEY, NEO4J_URI, ETHERSCAN_API_KEY
 uvicorn app.main:app --reload --port 8000
 
 # Frontend (new terminal)
@@ -1189,7 +1198,7 @@ cd mcp-server && npm install && npm run build
 node dist/index.js  # STDIO mode
 ```
 
----
+<img src="docs/images/divider.svg" width="100%" height="4">
 
 ## 13. Contributing
 
@@ -1246,7 +1255,7 @@ class MyAgent(BaseAgent):
   <sub>2,250+ files · 580K+ lines · 7 agents · 40+ tools · 50+ commands · 78 web components · PPO RL · PageRank · Vision + Audio · AutoGen collaboration · Historical Strategy AI</sub>
 </p>
 
----
+<img src="docs/images/divider.svg" width="100%" height="4">
 
 ## 14. Historical Strategy Intelligence
 
@@ -1370,8 +1379,10 @@ FastAPI server on port **8001**.
 | GET | `/api/strategies` | Strategy types + descriptions + examples |
 | GET | `/api/eras` | Eras with conflict counts |
 | GET | `/api/leaders` | Historical leaders index |
+| GET | `/api/scenarios` | Pre-built simulation scenarios |
 | POST | `/api/simulate` | Run simulation (see schema above) |
 | POST | `/api/analyze` | Analyze scenario → strategy recommendations |
+| POST | `/api/compare` | Side-by-side strategy comparison |
 
 **Start API**:
 ```bash
@@ -1417,13 +1428,133 @@ npm run dev
 3. Start command: `uvicorn api.main:app --host 0.0.0.0 --port $PORT`
 4. Deploy
 
----
+<img src="docs/images/divider.svg" width="100%" height="4">
 
-## 15. Bug Fixes & Open-Source API Migration (v2.0)
+## 15. Quantum Physics Intelligence
+
+**Location:** `quantum-physics/`
+
+> ⚛ Layer 6 of Disha AGI — quantum mechanics, space science, physics timeline, suppressed theories, and unified field theory powered by FastAPI + Next.js.
+
+### 15.1 Engines
+
+**Location:** `quantum-physics/backend/engines/`
+
+| Engine | File | Purpose |
+|--------|------|---------|
+| **QuantumEngine** | `quantum_engine.py` | Qiskit / NumPy quantum circuit simulator — state vectors, gates, entanglement, Bell states |
+| **PhysicsClassifier** | `physics_classifier.py` | TF-IDF + Logistic Regression domain classifier over 6 knowledge domains |
+| **SpaceEngine** | `space_engine.py` | NASA APOD & NEO feeds, Keplerian orbit simulation, solar system data |
+| **SuppressedPhysicsEngine** | `suppressed_physics.py` | Fringe / suppressed theory catalog with relevance scorer |
+| **UnifiedFieldEngine** | `unified_field.py` | 4-force unification history and energy-scale prediction model |
+
+### 15.2 Knowledge Base
+
+**Location:** `quantum-physics/backend/knowledge/`
+
+6 structured JSON knowledge files:
+
+| File | Domain |
+|------|--------|
+| `classical_physics.json` | Classical mechanics, thermodynamics, electromagnetism |
+| `modern_physics.json` | Relativity, atomic theory, nuclear physics |
+| `ancient_physics.json` | Pre-Newtonian natural philosophy and cosmology |
+| `quantum_physics.json` | Quantum mechanics, wave-particle duality, QFT |
+| `space_science.json` | Astrophysics, cosmology, space exploration |
+| `suppressed_physics.json` | Fringe and disputed theories catalog |
+
+### 15.3 REST API (Port 8002)
+
+**Location:** `quantum-physics/backend/api/main.py`
+
+FastAPI server on port **8002**.
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/` | Health check |
+| GET | `/api/physics/domains` | All physics domains from knowledge base |
+| GET | `/api/physics/timeline` | Chronological physics discoveries |
+| POST | `/api/physics/classify` | Classify free-text into a physics domain |
+| POST | `/api/quantum/simulate` | Run a quantum circuit (gates + qubits) |
+| GET | `/api/quantum/algorithms` | List supported quantum algorithms |
+| POST | `/api/quantum/entangle` | Create GHZ entangled state |
+| GET | `/api/quantum/bell` | Bell state experiment results |
+| GET | `/api/space/apod` | NASA Astronomy Picture of the Day |
+| GET | `/api/space/neo` | Near-Earth Objects feed |
+| POST | `/api/space/orbit` | Compute Keplerian orbit trajectory |
+| GET | `/api/space/solar-system` | Solar system planet data |
+| GET | `/api/suppressed/theories` | All suppressed / fringe theories |
+| POST | `/api/suppressed/analyze` | Match text against known fringe theories |
+| GET | `/api/unified/forces` | 4 fundamental forces data |
+| GET | `/api/unified/history` | Force unification history |
+| POST | `/api/unified/model` | Predict unification at an energy scale |
+
+**Start backend:**
+```bash
+cd quantum-physics/backend
+pip install fastapi uvicorn numpy scikit-learn httpx python-dotenv qiskit
+uvicorn api.main:app --host 0.0.0.0 --port 8002 --reload
+# Swagger UI: http://localhost:8002/docs
+```
+
+### 15.4 Frontend (Port 3003)
+
+**Location:** `quantum-physics/frontend/`
+
+Next.js 14 dashboard with 5 pages and 4 visualisation components.
+
+**Pages:**
+
+| Page | File | Description |
+|------|------|-------------|
+| Dashboard | `pages/index.tsx` | Overview with domain stats and quick actions |
+| Quantum Lab | `pages/quantum.tsx` | Interactive circuit builder and simulator |
+| Physics Timeline | `pages/physics-timeline.tsx` | Chronological discoveries explorer |
+| Space | `pages/space.tsx` | NASA feeds, orbital simulator, solar system |
+| Suppressed | `pages/suppressed.tsx` | Fringe theory browser and analyzer |
+
+**Components:**
+
+| Component | Purpose |
+|-----------|---------|
+| `CircuitVisualizer.tsx` | Renders quantum gate circuits visually |
+| `PhysicsClassifier.tsx` | Free-text input → domain classification UI |
+| `OrbitalSimulator.tsx` | Interactive Keplerian orbit animation |
+| `UnifiedFieldMap.tsx` | Force unification energy-scale diagram |
+
+**Start frontend:**
+```bash
+cd quantum-physics/frontend
+npm install
+npm run dev   # http://localhost:3003
+```
+
+**Docker Compose (both services):**
+```bash
+cd quantum-physics
+docker-compose up -d
+# Backend: http://localhost:8002
+# Frontend: http://localhost:3003
+```
+
+### 15.5 CLI Command
+
+**Location:** `src/commands/quantum/`
+
+The `/quantum` CLI command allows querying the Quantum Physics API directly from the Disha REPL:
+```
+/quantum classify "What is quantum entanglement?"
+/quantum simulate --qubits 2 --gates H,CNOT
+/quantum space apod
+```
+
+<img src="docs/images/divider.svg" width="100%" height="4">
+
+## 16. Bug Fixes & Open-Source API Migration (v2.0)
 
 This section documents all fixes applied in the v2.0 hardening pass.
 
-### 15.1 Stub APIs Replaced
+### 16.1 Stub APIs Replaced
 
 | File | Was | Fixed To |
 |------|-----|----------|
@@ -1433,20 +1564,20 @@ This section documents all fixes applied in the v2.0 hardening pass.
 | `integrations/osint-analyser/shared/gpt_api.py` | `gpt-4-32k` (deprecated 2024) | **gpt-4o** (128K context, current pricing) |
 | `integrations/cyber-intelligence-platform/ui/dashboard.py` | `random.randint(50, 150)` fake crime stats | Real alert counts aggregated from `alerts_data` |
 
-### 15.2 Security Bugs Fixed
+### 16.2 Security Bugs Fixed
 
 | File | Issue | Fix |
 |------|-------|-----|
 | `ai-platform/backend/app/core/config.py` | `SECRET_KEY = "change-me-in-production"` shipped as default | Empty string — startup raises `ValidationError` if not set via env var |
 | `automation/git_sync.py` | `os.system("git ...")` — no error handling, shell-injection surface | `subprocess.run([...], check=True)` with full error handling |
 
-### 15.3 Deprecated Patterns Updated
+### 16.3 Deprecated Patterns Updated
 
 | File | Deprecated Pattern | Replacement |
 |------|-------------------|-------------|
 | `historical-strategy/api/main.py` | `@app.on_event("startup")` (deprecated FastAPI ≥0.93) | `@asynccontextmanager async def lifespan(app)` |
 
-### 15.4 Logic Bugs Fixed
+### 16.4 Logic Bugs Fixed
 
 | File | Bug | Fix |
 |------|-----|-----|
@@ -1455,11 +1586,11 @@ This section documents all fixes applied in the v2.0 hardening pass.
 | `reports/generator.py` | Returned `None`; fixed filename `report.docx` (overwrites) | Returns absolute path; timestamped filenames |
 | `main.py` | Broken emoji `??`, no args handling, `run_pipeline()` with no signature | Proper argparse, logging, exit codes |
 
----
+<img src="docs/images/divider.svg" width="100%" height="4">
 
-## 16. Repository Value & Market Analysis
+## 17. Repository Value & Market Analysis
 
-### 16.1 Estimated Development Cost
+### 17.1 Estimated Development Cost
 
 | Sub-system | Senior Dev-Months | @ $150/hr (160 hrs/mo) |
 |---|---|---|
@@ -1474,7 +1605,7 @@ This section documents all fixes applied in the v2.0 hardening pass.
 
 At market rates including overhead and management (2× multiplier): **~$2.6M replacement cost**.
 
-### 16.2 Commercial Comparable Products
+### 17.2 Commercial Comparable Products
 
 | Commercial Product | Annual Price | What Disha Replaces |
 |---|---|---|
@@ -1488,7 +1619,7 @@ At market rates including overhead and management (2× multiplier): **~$2.6M rep
 > **Disha combines all six** in a single open-source platform.
 > For a 100-person enterprise team: **$400K–$1M+/yr** in replaced commercial licenses.
 
-### 16.3 World Standing Compared to Peers
+### 17.3 World Standing Compared to Peers
 
 | Capability | SpiderFoot | Maltego | Darktrace | GitHub Copilot | **Disha** |
 |---|---|---|---|---|---|
@@ -1505,18 +1636,18 @@ At market rates including overhead and management (2× multiplier): **~$2.6M rep
 
 **Disha is the only open-source platform that combines all ten capabilities.**
 
-### 16.4 Global Positioning
+### 17.4 Global Positioning
 
 - **Tier**: Production-grade open-source AGI security platform
 - **Closest commercial peer**: Palantir Gotham / Darktrace + GitHub Copilot combined
 - **GitHub relevance**: Would rank in the top 50 cybersecurity repositories by feature depth if publicly promoted
 - **Academic relevance**: Suitable for research publication — novel combination of PPO-RL + multimodal OSINT + evolutionary prompt optimization
 
----
+<img src="docs/images/divider.svg" width="100%" height="4">
 
-## 17. National Deployment Analysis — India
+## 18. National Deployment Analysis — India
 
-### 17.1 Problem Scale
+### 18.1 Problem Scale
 
 | Problem | Scale in India (2023–24) |
 |---|---|
@@ -1527,7 +1658,7 @@ At market rates including overhead and management (2× multiplier): **~$2.6M rep
 | Government data breaches | Multiple (AIIMS, ICMR, CoWIN) |
 | Cyber crime conviction rate | < 10% |
 
-### 17.2 How Disha Solves These
+### 18.2 How Disha Solves These
 
 | Disha Component | Indian Use Case | Expected Impact |
 |---|---|---|
@@ -1540,7 +1671,7 @@ At market rates including overhead and management (2× multiplier): **~$2.6M rep
 | **RL Investigation Engine** | Learn from successful investigations to guide future ones | Continuously improving detection accuracy |
 | **Financial Fraud Detection** | Real-time UPI fraud classification and alerting | Detect fraud within seconds of transaction patterns |
 
-### 17.3 Deployment Scenarios
+### 18.3 Deployment Scenarios
 
 #### Scenario A — CERT-In National Deployment
 
@@ -1570,7 +1701,7 @@ At market rates including overhead and management (2× multiplier): **~$2.6M rep
 - Dashboard deployed per district with live alert map
 - **Expected outcome**: 3× increase in cyber crime resolution rate
 
-### 17.4 Total National Value Estimate
+### 18.4 Total National Value Estimate
 
 | Category | Annual Value (₹ crore) |
 |---|---|
@@ -1584,7 +1715,7 @@ At market rates including overhead and management (2× multiplier): **~$2.6M rep
 
 > These estimates are based on CERT-In/NCRB reported figures, RBI fraud statistics, and comparable national cybersecurity program costs (EU NIS2, US CISA budget).
 
-### 17.5 Implementation Roadmap for India
+### 18.5 Implementation Roadmap for India
 
 | Phase | Timeline | Milestones |
 |---|---|---|
@@ -1593,6 +1724,12 @@ At market rates including overhead and management (2× multiplier): **~$2.6M rep
 | **Phase 3 — AI Learning** | Month 10–18 | RL engine trained on Indian incident data; knowledge graph operational |
 | **Phase 4 — Sovereign AI** | Month 19–24 | Replace all foreign AI coding tools with Disha CLI in government; full data sovereignty |
 
----
+<img src="docs/images/divider.svg" width="100%" height="4">
 
-*Disha WIKI — maintained by the Disha contributors. Last updated: April 2026.*
+<p align="center">
+  <b>Disha Wiki</b> — Complete Technical Documentation
+  <br>
+  <sub>Maintained by the Disha contributors · Last updated: April 2026</sub>
+  <br><br>
+  <a href="./README.md">← Back to README</a> · <a href="./USAGE_GUIDE.md">Usage Guide →</a>
+</p>

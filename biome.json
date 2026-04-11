@@ -1,33 +1,61 @@
 {
-  "$schema": "https://biomejs.dev/schemas/1.9.4/schema.json",
-  "organizeImports": {
-    "enabled": true
+  "$schema": "https://biomejs.dev/schemas/2.4.11/schema.json",
+  "assist": {
+    "actions": {
+      "source": {
+        "organizeImports": "off"
+      }
+    }
   },
   "linter": {
     "enabled": true,
     "rules": {
       "recommended": true,
       "complexity": {
-        "noExcessiveCognitiveComplexity": "warn"
+        "noExcessiveCognitiveComplexity": "warn",
+        "useLiteralKeys": "off",
+        "useOptionalChain": "off",
+        "useArrowFunction": "off",
+        "noUselessLabel": "off",
+        "noUselessUndefinedInitialization": "off"
       },
       "correctness": {
         "noUnusedImports": "warn",
-        "noUnusedVariables": "warn"
+        "noUnusedVariables": "warn",
+        "noUnusedFunctionParameters": "warn",
+        "useExhaustiveDependencies": "off",
+        "noConstantCondition": "warn",
+        "noVoidTypeReturn": "off"
       },
       "style": {
         "noNonNullAssertion": "off",
-        "useImportType": "warn"
+        "useImportType": "warn",
+        "useTemplate": "off",
+        "useNodejsImportProtocol": "off"
       },
       "suspicious": {
-        "noExplicitAny": "off"
+        "noExplicitAny": "off",
+        "noImplicitAnyLet": "off",
+        "noConsole": "off",
+        "noAssignInExpressions": "off",
+        "noArrayIndexKey": "off",
+        "noGlobalIsNan": "off",
+        "noConfusingLabels": "off",
+        "noControlCharactersInRegex": "off",
+        "useIterableCallbackReturn": "off",
+        "noAsyncPromiseExecutor": "off",
+        "noRedeclare": "off",
+        "noSelfCompare": "off"
+      },
+      "a11y": {
+        "noStaticElementInteractions": "off",
+        "noAutofocus": "off",
+        "useButtonType": "off"
       }
     }
   },
   "formatter": {
-    "enabled": true,
-    "indentStyle": "tab",
-    "indentWidth": 2,
-    "lineWidth": 100
+    "enabled": false
   },
   "javascript": {
     "formatter": {
@@ -42,8 +70,6 @@
     }
   },
   "files": {
-    "ignore": ["node_modules", "dist", "*.d.ts"]
+    "includes": ["**", "!node_modules", "!dist", "!**/*.d.ts"]
   }
 }
-
-

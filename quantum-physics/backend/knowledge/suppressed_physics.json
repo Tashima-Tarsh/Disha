@@ -1,0 +1,91 @@
+{
+  "domain": "Suppressed & Fringe Physics",
+  "disclaimer": "These theories are speculative, unverified, or contradicted by mainstream physics. Presented for educational and research purposes only.",
+  "theories": [
+    {
+      "id": "aether_theory",
+      "name": "Luminiferous Aether",
+      "status": "historically_rejected",
+      "description": "Proposed medium through which light propagates; disproved by Michelson-Morley experiment (1887)",
+      "key_proponents": ["Descartes", "Newton", "Fresnel", "Lorentz"],
+      "refutation": "Michelson-Morley null result; special relativity made aether unnecessary",
+      "claimed_effects": ["absolute frame of reference", "light propagation medium"],
+      "revival_theories": ["Quantum vacuum (ZPE) as modern aether analog", "Digital physics aether"],
+      "confidence_score": 0.05
+    },
+    {
+      "id": "torsion_fields",
+      "name": "Torsion Fields",
+      "status": "fringe",
+      "description": "Hypothetical fields arising from spin of matter; claimed to propagate superluminally",
+      "key_proponents": ["Nikolai Kozyrev", "Gennady Shipov", "Anatoly Akimov"],
+      "refutation": "No reproducible experimental evidence; theoretical basis disputed",
+      "claimed_effects": ["instantaneous action at distance", "consciousness effects", "time manipulation"],
+      "confidence_score": 0.03
+    },
+    {
+      "id": "cold_fusion",
+      "name": "Cold Fusion / LENR",
+      "status": "controversial",
+      "description": "Nuclear fusion at near room temperature; controversial since Pons-Fleischmann announcement (1989)",
+      "key_proponents": ["Pons", "Fleischmann", "Andrea Rossi (E-Cat)"],
+      "refutation": "Results not reliably reproducible; US DOE review inconclusive (2004)",
+      "claimed_effects": ["excess heat production", "nuclear transmutation at low temperature"],
+      "active_research": "LENR (Low Energy Nuclear Reactions) still studied by some mainstream labs",
+      "confidence_score": 0.15
+    },
+    {
+      "id": "zero_point_energy",
+      "name": "Zero-Point Energy (ZPE) Extraction",
+      "status": "partially_mainstream",
+      "description": "The quantum vacuum has non-zero ground state energy. Extraction as usable energy is disputed.",
+      "key_proponents": ["Harold Puthoff", "Moray King", "Thomas Bearden"],
+      "mainstream_note": "ZPE is real and observed (Casimir effect); large-scale extraction violates thermodynamics",
+      "claimed_effects": ["free energy", "over-unity devices"],
+      "confidence_score": 0.08
+    },
+    {
+      "id": "tesla_free_energy",
+      "name": "Tesla Free Energy / Radiant Energy",
+      "status": "unverified",
+      "description": "Nikola Tesla claimed to tap atmospheric electrical energy for wireless power transmission",
+      "key_proponents": ["Nikola Tesla"],
+      "historical_context": "Wardenclyffe Tower project (1901) aimed at global wireless power; funding cut by J.P. Morgan",
+      "claimed_effects": ["wireless global power transmission", "atmospheric electricity tapping"],
+      "modern_relevance": "Modern resonant inductive coupling (WiTricity) partially validates wireless power transfer",
+      "confidence_score": 0.2
+    },
+    {
+      "id": "electric_universe",
+      "name": "Electric Universe Theory",
+      "status": "fringe",
+      "description": "Plasma and electromagnetic forces, not gravity, are the dominant forces shaping the universe",
+      "key_proponents": ["Wallace Thornhill", "David Talbott", "Hannes Alfvén (partially)"],
+      "refutation": "Contradicts extensive gravitational observations; does not explain CMB, BBN, or large-scale structure",
+      "claimed_effects": ["plasma cosmology", "solar formation by electrical discharge", "mythology as cosmic memory"],
+      "confidence_score": 0.04
+    },
+    {
+      "id": "hollow_earth",
+      "name": "Hollow Earth Physics",
+      "status": "rejected",
+      "description": "The Earth is hollow with an interior sun; gravity works differently",
+      "key_proponents": ["John Symmes", "Edmund Halley (early version)"],
+      "refutation": "Seismic data clearly shows Earth's internal structure (crust, mantle, outer/inner core)",
+      "confidence_score": 0.01
+    },
+    {
+      "id": "faster_than_light",
+      "name": "Faster-Than-Light (FTL) Physics",
+      "status": "theoretically_explored",
+      "description": "Mechanisms for effective FTL travel within or beyond general relativity",
+      "variants": [
+        {"name": "Alcubierre warp drive", "status": "theoretical", "note": "Requires exotic matter with negative energy density"},
+        {"name": "Wormholes", "status": "theoretical", "note": "Topological shortcuts in spacetime; stability requires exotic matter"},
+        {"name": "Tachyons", "status": "undetected", "note": "Hypothetical superluminal particles; would violate causality"}
+      ],
+      "confidence_score": 0.12
+    }
+  ],
+  "keywords": ["aether", "torsion", "cold fusion", "free energy", "Tesla", "ZPE", "fringe", "suppressed", "alternative physics"]
+}

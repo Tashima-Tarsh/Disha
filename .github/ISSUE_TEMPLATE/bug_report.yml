@@ -1,0 +1,91 @@
+name: 🐛 Bug Report
+description: Something isn't working as expected
+labels: ["bug", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report a bug! Please fill in as much detail as possible.
+
+  - type: dropdown
+    id: component
+    attributes:
+      label: Component
+      description: Which part of Disha is affected?
+      options:
+        - Core CLI Engine (TypeScript/Bun)
+        - AI Intelligence Platform (FastAPI/PyTorch)
+        - Cyber Defense System (Honeypot/ML)
+        - Historical Strategy Intelligence
+        - Quantum Physics Module
+        - Integrations (Cyber Intel / OSINT)
+        - MCP Server
+        - Docker / Deployment
+        - Documentation
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Bug Description
+      description: A clear and concise description of what the bug is.
+      placeholder: When I do X, Y happens instead of Z…
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to Reproduce
+      description: How can we reproduce the issue?
+      placeholder: |
+        1. Run `bun run dev`
+        2. Type command `…`
+        3. See error
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Behavior
+      placeholder: What did you expect to happen?
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual Behavior
+      placeholder: What actually happened? Include any error messages or stack traces.
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: Disha Version / Commit
+      placeholder: e.g. main@abc1234
+    validations:
+      required: false
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: OS, Node/Bun/Python version, Docker version, etc.
+      placeholder: |
+        - OS: Ubuntu 22.04 / macOS 14
+        - Bun: 1.1.0
+        - Python: 3.11
+    validations:
+      required: false
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional Context
+      description: Any other context, screenshots, or logs.
+    validations:
+      required: false

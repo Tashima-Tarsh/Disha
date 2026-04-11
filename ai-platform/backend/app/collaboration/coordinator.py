@@ -23,7 +23,7 @@ logger = structlog.get_logger(__name__)
 
 class AgentNode:
     """Represents an agent in the distributed cluster."""
-    
+
     def __init__(self, name: str, agent_instance, capabilities: list = None):
         self.name = name
         self.agent = agent_instance
@@ -32,7 +32,7 @@ class AgentNode:
         self.tasks_completed = 0
         self.total_time = 0.0
         self.last_active = time.time()
-    
+
     @property
     def avg_response_time(self) -> float:
         if self.tasks_completed == 0:
@@ -43,7 +43,7 @@ class AgentNode:
 class ClusterCoordinator:
     """
     Coordinates multi-agent self-collaboration in AutoGen style.
-    
+
     Agents can:
     - Receive tasks and break them into sub-problems
     - Request help from other agents with specific capabilities
@@ -51,29 +51,29 @@ class ClusterCoordinator:
     - Vote on conclusions (consensus mechanism)
     - Iterate on solutions until quality threshold is met
     """
-    
+
     MAX_CONVERSATION_ROUNDS = 10
     CONSENSUS_THRESHOLD = 0.6  # 60% agreement needed
-    
+
     def __init__(self):
         self.router = MessageRouter()
         self.nodes: dict = {}
         self.active_tasks: dict = {}
-    
+
     def register_agent(self, name: str, agent_instance, capabilities: list = None):
         """Add an agent to the cluster."""
         node = AgentNode(name, agent_instance, capabilities or [])
         self.nodes[name] = node
         self.router.register_agent(name)
         logger.info("cluster_agent_registered", name=name, capabilities=capabilities)
-    
+
     def get_capable_agents(self, capability: str) -> list:
         """Find agents with a specific capability."""
         return [
             node for node in self.nodes.values()
             if capability in node.capabilities and node.status != "offline"
         ]
-    
+
     async def collaborative_investigate(
         self,
         target: str,
@@ -82,7 +82,7 @@ class ClusterCoordinator:
     ) -> dict:
         """
         Run a collaborative investigation where agents self-organize.
-        
+
         Flow:
         1. Coordinator broadcasts task to all agents
         2. Agents claim subtasks based on capabilities
@@ -93,7 +93,7 @@ class ClusterCoordinator:
         """
         conversation = self.router.create_conversation(topic=target)
         context = context or {}
-        
+
         # Phase 1: Broadcast task
         task_msg = AgentMessage(
             sender="coordinator",
@@ -108,23 +108,23 @@ class ClusterCoordinator:
         )
         self.router.send(task_msg)
         conversation.add_message(task_msg)
-        
+
         # Phase 2: Parallel execution by all capable agents
         results = await self._parallel_execute(target, context)
-        
+
         # Phase 3: Share results for peer review
         review_results = await self._peer_review(results, conversation)
-        
+
         # Phase 4: Consensus building
         consensus = self._build_consensus(results, review_results)
-        
+
         # Phase 5: Compile final result
         final_result = self._compile_results(
             target, results, review_results, consensus, conversation
         )
-        
+
         conversation.conclude(final_result)
-        
+
         logger.info(
             "collaborative_investigation_complete",
             target=target,
@@ -132,20 +132,20 @@ class ClusterCoordinator:
             consensus_score=consensus.get("score", 0),
             risk_score=final_result.get("risk_score", 0),
         )
-        
+
         return final_result
-    
+
     async def _parallel_execute(self, target: str, context: dict) -> dict:
         """Execute all available agents in parallel."""
         results = {}
         tasks = []
-        
+
         for name, node in self.nodes.items():
             if node.status == "offline":
                 continue
             node.status = "busy"
             tasks.append((name, node))
-        
+
         async def run_agent(name, node):
             start = time.time()
             try:
@@ -159,44 +159,44 @@ class ClusterCoordinator:
                 return name, {"error": str(e), "status": "failed"}
             finally:
                 node.status = "idle"
-        
+
         if tasks:
             agent_results = await asyncio.gather(
                 *[run_agent(name, node) for name, node in tasks],
                 return_exceptions=True,
             )
-            
+
             for item in agent_results:
                 if isinstance(item, Exception):
                     logger.error("agent_task_exception", error=str(item))
                     continue
                 name, result = item
                 results[name] = result
-        
+
         return results
-    
+
     async def _peer_review(
         self, results: dict, conversation: Conversation
     ) -> dict:
         """
         Agents review each other's outputs.
-        
+
         Each agent scores the quality and accuracy of other agents' findings.
         """
         reviews = {}
-        
+
         for reviewer_name, reviewer_node in self.nodes.items():
             if reviewer_node.status == "offline":
                 continue
-            
+
             agent_reviews = {}
             for reviewed_name, result in results.items():
                 if reviewed_name == reviewer_name:
                     continue
-                
+
                 # Score the result based on completeness and consistency
                 score = self._score_result(result)
-                
+
                 review_msg = AgentMessage(
                     sender=reviewer_name,
                     receiver=reviewed_name,
@@ -208,69 +208,69 @@ class ClusterCoordinator:
                 )
                 self.router.send(review_msg)
                 conversation.add_message(review_msg)
-                
+
                 agent_reviews[reviewed_name] = score
-            
+
             reviews[reviewer_name] = agent_reviews
-        
+
         return reviews
-    
+
     def _score_result(self, result: dict) -> float:
         """Score an agent's result for quality."""
         if not isinstance(result, dict):
             return 0.0
-        
+
         score = 0.0
-        
+
         # Has entities?
         entities = result.get("entities", [])
         if entities:
             score += min(len(entities) * 0.1, 0.3)
-        
+
         # Has risk assessment?
         if "risk_score" in result:
             score += 0.2
-        
+
         # No errors?
         if result.get("status") == "success":
             score += 0.3
         elif "error" not in result:
             score += 0.1
-        
+
         # Has analysis content?
         if result.get("results") or result.get("analysis"):
             score += 0.2
-        
+
         return min(score, 1.0)
-    
+
     def _build_consensus(self, results: dict, reviews: dict) -> dict:
         """
         Build consensus from agent results and peer reviews.
-        
+
         Agents effectively "vote" on the overall threat assessment
         through their risk scores and peer review scores.
         """
         risk_scores = []
         review_scores = []
-        
+
         for name, result in results.items():
             if isinstance(result, dict) and "risk_score" in result:
                 risk_scores.append(result["risk_score"])
-        
+
         for reviewer, agent_reviews in reviews.items():
             for reviewed, score in agent_reviews.items():
                 review_scores.append(score)
-        
+
         avg_risk = sum(risk_scores) / max(len(risk_scores), 1)
         avg_review = sum(review_scores) / max(len(review_scores), 1)
-        
+
         # Consensus score: how much agents agree
         if risk_scores:
             risk_variance = sum((r - avg_risk) ** 2 for r in risk_scores) / max(len(risk_scores), 1)
             agreement = max(0, 1.0 - risk_variance * 4)  # High variance = low agreement
         else:
             agreement = 0.0
-        
+
         return {
             "avg_risk": round(avg_risk, 4),
             "avg_review_quality": round(avg_review, 4),
@@ -279,7 +279,7 @@ class ClusterCoordinator:
             "agents_contributing": len(results),
             "consensus_reached": agreement >= self.CONSENSUS_THRESHOLD,
         }
-    
+
     def _compile_results(
         self,
         target: str,
@@ -292,14 +292,14 @@ class ClusterCoordinator:
         all_entities = []
         all_anomalies = []
         all_relationships = []
-        
+
         for name, result in results.items():
             if not isinstance(result, dict):
                 continue
             all_entities.extend(result.get("entities", []))
             all_anomalies.extend(result.get("anomalies", []))
             all_relationships.extend(result.get("relationships", []))
-        
+
         return {
             "target": target,
             "entities": all_entities,
@@ -312,7 +312,7 @@ class ClusterCoordinator:
             "conversation_id": conversation.conversation_id,
             "conversation_rounds": len(conversation.messages),
         }
-    
+
     def get_cluster_status(self) -> dict:
         """Get current cluster status."""
         return {

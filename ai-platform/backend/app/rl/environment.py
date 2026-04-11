@@ -61,46 +61,46 @@ class Experience:
 class InvestigationEnvironment:
     """
     RL Environment that wraps the investigation pipeline.
-    
+
     The agent observes the current investigation state and decides
     which intelligence-gathering action to take next.
     """
-    
+
     STATE_DIM = 13  # Matches State.to_vector() output
     ACTION_DIM = len(ActionType)
     MAX_STEPS = 20
-    
+
     def __init__(self):
         self.state = State()
         self._done = False
         self._total_reward = 0.0
-    
+
     def reset(self) -> np.ndarray:
         """Reset environment for a new investigation episode."""
         self.state = State()
         self._done = False
         self._total_reward = 0.0
         return self.state.to_vector()
-    
+
     def step(self, action: int, outcome: Optional[dict] = None) -> tuple:
         """
         Execute action and return (next_state, reward, done, info).
-        
+
         Args:
             action: ActionType integer
             outcome: Optional dict with actual results from executing the action
-                     Keys: entities_found, relationships_found, anomalies_found, 
+                     Keys: entities_found, relationships_found, anomalies_found,
                            risk_score, time_taken
         """
         reward = 0.0
         info = {"action": ActionType(action).name}
-        
+
         if outcome:
             # Update state from actual investigation results
             prev_entities = self.state.entities_found
             prev_anomalies = self.state.anomalies_found
             prev_risk = self.state.current_risk_score
-            
+
             self.state.entities_found += outcome.get("entities_found", 0)
             self.state.relationships_found += outcome.get("relationships_found", 0)
             self.state.anomalies_found += outcome.get("anomalies_found", 0)
@@ -109,22 +109,22 @@ class InvestigationEnvironment:
                 outcome.get("risk_score", 0.0)
             )
             self.state.time_elapsed += outcome.get("time_taken", 1.0)
-            
+
             # Reward for new discoveries
             new_entities = self.state.entities_found - prev_entities
             reward += new_entities * 0.1
-            
+
             # Reward for finding anomalies (important signals)
             new_anomalies = self.state.anomalies_found - prev_anomalies
             reward += new_anomalies * 0.5
-            
+
             # Reward for risk score increases (finding threats)
             risk_increase = self.state.current_risk_score - prev_risk
             reward += risk_increase * 2.0
-            
+
             # Penalty for time (encourage efficiency)
             reward -= outcome.get("time_taken", 1.0) * 0.01
-        
+
         # Track which agents were used
         if action < 5:
             self.state.agents_used[action] = 1
@@ -148,18 +148,18 @@ class InvestigationEnvironment:
                 completeness = sum(self.state.agents_used) / 5.0
                 reward += completeness * 1.0
             self._done = True
-        
+
         self.state.step_count += 1
-        
+
         # Auto-stop at max steps
         if self.state.step_count >= self.MAX_STEPS:
             self._done = True
             reward -= 0.5  # Penalty for not stopping voluntarily
-        
+
         self._total_reward += reward
-        
+
         return self.state.to_vector(), reward, self._done, info
-    
+
     def get_valid_actions(self) -> list:
         """Return list of valid action indices in current state."""
         valid = list(range(self.ACTION_DIM))

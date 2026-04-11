@@ -1,6 +1,5 @@
 """Alert management system with WebSocket broadcasting."""
 
-import json
 import uuid
 from datetime import datetime, timezone
 from typing import Any

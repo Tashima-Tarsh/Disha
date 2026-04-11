@@ -1,0 +1,54 @@
+name: AI Platform CI
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'ai-platform/**'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'ai-platform/**'
+
+permissions:
+  contents: read
+
+jobs:
+  lint-python:
+    name: Lint Python (AI Platform)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install flake8
+        run: pip install flake8
+
+      - name: Lint backend
+        run: flake8 ai-platform/backend/app/ --max-line-length=120 --ignore=E501,W503,W504
+
+  test-python:
+    name: Test Python (AI Platform)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install lightweight dependencies
+        run: |
+          pip install fastapi uvicorn pydantic pydantic-settings httpx pytest pytest-asyncio \
+            python-jose[cryptography] passlib[bcrypt] python-multipart python-dotenv structlog \
+            numpy pandas networkx
+
+      - name: Run tests
+        run: |
+          cd ai-platform/backend
+          python -m pytest tests/ -v --tb=short

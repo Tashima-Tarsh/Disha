@@ -8,7 +8,7 @@ import sys
 def setup_logging(debug: bool = False) -> None:
     """Configure structured logging for the application."""
     log_level = logging.DEBUG if debug else logging.INFO
-    
+
     structlog.configure(
         processors=[
             structlog.contextvars.merge_contextvars,
@@ -23,7 +23,7 @@ def setup_logging(debug: bool = False) -> None:
         logger_factory=structlog.PrintLoggerFactory(),
         cache_logger_on_first_use=True,
     )
-    
+
     # Configure standard library logging
     logging.basicConfig(
         format="%(message)s",

@@ -29,22 +29,22 @@ class InvestigationFeedback:
 class RewardComputer:
     """
     Computes rewards for RL training from investigation outcomes.
-    
+
     Combines automated metrics (risk accuracy, speed) with
     human feedback (true/false positive rates, user ratings).
     """
-    
+
     # Reward weights
     DISCOVERY_WEIGHT = 0.3
     ACCURACY_WEIGHT = 0.3
     EFFICIENCY_WEIGHT = 0.2
     FEEDBACK_WEIGHT = 0.2
-    
+
     def __init__(self, history_size: int = 1000):
         self.feedback_history: deque = deque(maxlen=history_size)
         self.reward_history: deque = deque(maxlen=history_size)
         self._baseline_reward = 0.0
-    
+
     def compute_step_reward(
         self,
         entities_found: int,
@@ -56,10 +56,10 @@ class RewardComputer:
         discovery = (entities_found * 0.1 + anomalies_found * 0.5) * self.DISCOVERY_WEIGHT
         risk_reward = risk_delta * 2.0 * self.ACCURACY_WEIGHT
         efficiency = -time_taken * 0.01 * self.EFFICIENCY_WEIGHT
-        
+
         reward = discovery + risk_reward + efficiency
         return reward
-    
+
     def compute_episode_reward(
         self,
         investigation_result: dict,
@@ -67,7 +67,7 @@ class RewardComputer:
     ) -> float:
         """
         Compute total reward for a completed investigation episode.
-        
+
         Args:
             investigation_result: Dict with entities, anomalies, risk_score, etc.
             feedback: Optional human feedback on the investigation
@@ -76,21 +76,21 @@ class RewardComputer:
         entities = investigation_result.get("entities", [])
         anomalies = investigation_result.get("anomalies", [])
         risk_score = investigation_result.get("risk_score", 0.0)
-        
+
         discovery_reward = (
-            len(entities) * 0.05
-            + len(anomalies) * 0.3
+            len(entities) * 0.05 +
+            len(anomalies) * 0.3
         ) * self.DISCOVERY_WEIGHT
-        
+
         # Risk score confidence (penalize extreme uncertainty)
         risk_reward = 0.0
         if risk_score > 0.0:
             risk_reward = risk_score * self.ACCURACY_WEIGHT
-        
+
         # Efficiency (fewer steps = better)
         steps = investigation_result.get("steps_taken", 10)
         efficiency_reward = max(0, (20 - steps) / 20.0) * self.EFFICIENCY_WEIGHT
-        
+
         # Human feedback component
         feedback_reward = 0.0
         if feedback:
@@ -102,17 +102,17 @@ class RewardComputer:
             if feedback.actionable_findings > 0:
                 feedback_reward += min(feedback.actionable_findings * 0.1, 0.5)
             feedback_reward *= self.FEEDBACK_WEIGHT
-        
+
         total = discovery_reward + risk_reward + efficiency_reward + feedback_reward
-        
+
         # Subtract baseline for variance reduction
         total -= self._baseline_reward
-        
+
         # Update baseline with exponential moving average
         self.reward_history.append(total + self._baseline_reward)
         if len(self.reward_history) > 10:
             self._baseline_reward = float(np.mean(list(self.reward_history)))
-        
+
         logger.info(
             "episode_reward_computed",
             total=round(total, 4),
@@ -121,18 +121,18 @@ class RewardComputer:
             efficiency=round(efficiency_reward, 4),
             feedback=round(feedback_reward, 4),
         )
-        
+
         return total
-    
+
     def get_metrics(self) -> dict:
         """Get reward tracking metrics."""
         rewards = list(self.reward_history)
         feedbacks = list(self.feedback_history)
-        
+
         tp_count = sum(1 for f in feedbacks if f.true_positive is True)
         fp_count = sum(1 for f in feedbacks if f.true_positive is False)
         total_labeled = tp_count + fp_count
-        
+
         return {
             "total_episodes": len(rewards),
             "avg_reward": float(np.mean(rewards)) if rewards else 0.0,

@@ -70,7 +70,7 @@ class OSINTAgent(BaseAgent):
         try:
             async with httpx.AsyncClient(timeout=15.0) as client:
                 response = await client.get(
-                    f"https://dns.google/resolve",
+                    "https://dns.google/resolve",
                     params={"name": target, "type": "A"},
                 )
                 if response.status_code == 200:

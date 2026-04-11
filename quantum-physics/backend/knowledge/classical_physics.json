@@ -1,0 +1,72 @@
+{
+  "domain": "Classical Physics",
+  "description": "Physics from Newton to Maxwell, governing macroscopic phenomena",
+  "theories": [
+    {
+      "id": "newtonian_mechanics",
+      "name": "Newtonian Mechanics",
+      "year": 1687,
+      "key_equations": ["F = ma", "F = Gm1m2/r²", "p = mv"],
+      "description": "Laws of motion and universal gravitation",
+      "contributors": ["Isaac Newton"],
+      "concepts": ["inertia", "force", "momentum", "gravity", "acceleration"]
+    },
+    {
+      "id": "lagrangian_mechanics",
+      "name": "Lagrangian Mechanics",
+      "year": 1788,
+      "key_equations": ["L = T - V", "d/dt(∂L/∂q̇) - ∂L/∂q = 0"],
+      "description": "Reformulation of classical mechanics using generalized coordinates",
+      "contributors": ["Joseph-Louis Lagrange"],
+      "concepts": ["generalized coordinates", "action principle", "Lagrangian", "degrees of freedom"]
+    },
+    {
+      "id": "hamiltonian_mechanics",
+      "name": "Hamiltonian Mechanics",
+      "year": 1833,
+      "key_equations": ["H = T + V", "dq/dt = ∂H/∂p", "dp/dt = -∂H/∂q"],
+      "description": "Phase-space formulation bridging classical and quantum mechanics",
+      "contributors": ["William Rowan Hamilton"],
+      "concepts": ["phase space", "canonical coordinates", "Hamiltonian", "symplectic geometry"]
+    },
+    {
+      "id": "thermodynamics",
+      "name": "Classical Thermodynamics",
+      "year": 1850,
+      "key_equations": ["ΔU = Q - W", "dS ≥ 0", "PV = nRT"],
+      "description": "Laws governing heat, energy, and entropy",
+      "contributors": ["Carnot", "Clausius", "Kelvin", "Boltzmann"],
+      "concepts": ["entropy", "heat", "work", "temperature", "thermodynamic equilibrium"]
+    },
+    {
+      "id": "electromagnetism",
+      "name": "Classical Electromagnetism",
+      "year": 1865,
+      "key_equations": ["∇·E = ρ/ε₀", "∇×B = μ₀J + μ₀ε₀∂E/∂t", "c = 1/√(μ₀ε₀)"],
+      "description": "Maxwell's equations unifying electricity, magnetism, and light",
+      "contributors": ["James Clerk Maxwell", "Michael Faraday"],
+      "concepts": ["electric field", "magnetic field", "electromagnetic waves", "Lorentz force"]
+    },
+    {
+      "id": "fluid_mechanics",
+      "name": "Fluid Mechanics",
+      "year": 1738,
+      "key_equations": ["∂ρ/∂t + ∇·(ρv) = 0", "ρ(∂v/∂t + v·∇v) = -∇p + μ∇²v + F"],
+      "description": "Dynamics of liquids and gases",
+      "contributors": ["Daniel Bernoulli", "Leonhard Euler", "Claude-Louis Navier", "George Stokes"],
+      "concepts": ["pressure", "viscosity", "turbulence", "laminar flow", "Bernoulli principle"]
+    },
+    {
+      "id": "wave_optics",
+      "name": "Wave Optics",
+      "year": 1801,
+      "key_equations": ["nλ = d sinθ", "I = I₀ cos²(θ/2)"],
+      "description": "Wave nature of light: diffraction, interference, polarization",
+      "contributors": ["Thomas Young", "Augustin-Jean Fresnel"],
+      "concepts": ["diffraction", "interference", "polarization", "wavelength", "coherence"]
+    }
+  ],
+  "timeline_start": -400,
+  "timeline_end": 1905,
+  "keywords": ["Newton", "Euler", "Maxwell", "Lagrange", "Hamilton", "thermodynamics", "mechanics", "optics"]
+}

@@ -1,0 +1,72 @@
+{
+  "domain": "Modern Physics",
+  "description": "20th century physics: relativity, quantum field theory, and beyond",
+  "theories": [
+    {
+      "id": "special_relativity",
+      "name": "Special Relativity",
+      "year": 1905,
+      "key_equations": ["E = mc²", "γ = 1/√(1-v²/c²)", "t' = γ(t - vx/c²)"],
+      "description": "Space and time are relative; the speed of light is constant in all inertial frames",
+      "contributors": ["Albert Einstein"],
+      "concepts": ["time dilation", "length contraction", "mass-energy equivalence", "Lorentz transformation", "spacetime"]
+    },
+    {
+      "id": "general_relativity",
+      "name": "General Relativity",
+      "year": 1915,
+      "key_equations": ["Gμν + Λgμν = 8πG/c⁴ · Tμν"],
+      "description": "Gravity is the curvature of spacetime caused by mass and energy",
+      "contributors": ["Albert Einstein"],
+      "concepts": ["spacetime curvature", "geodesics", "black holes", "gravitational waves", "cosmological constant"]
+    },
+    {
+      "id": "quantum_mechanics",
+      "name": "Quantum Mechanics",
+      "year": 1925,
+      "key_equations": ["iℏ ∂ψ/∂t = Ĥψ", "ΔxΔp ≥ ℏ/2", "E = hν"],
+      "description": "Physics of the very small: particles exhibit wave-particle duality",
+      "contributors": ["Heisenberg", "Schrödinger", "Dirac", "Bohr", "Born"],
+      "concepts": ["wavefunction", "uncertainty principle", "superposition", "quantization", "probability amplitude"]
+    },
+    {
+      "id": "quantum_field_theory",
+      "name": "Quantum Field Theory",
+      "year": 1948,
+      "key_equations": ["L = ψ̄(iγμ∂μ - m)ψ", "S = ∫d⁴x L"],
+      "description": "Particles are excitations of underlying quantum fields",
+      "contributors": ["Feynman", "Schwinger", "Tomonaga", "Dyson"],
+      "concepts": ["field quantization", "Feynman diagrams", "renormalization", "virtual particles", "propagators"]
+    },
+    {
+      "id": "standard_model",
+      "name": "Standard Model of Particle Physics",
+      "year": 1970,
+      "key_equations": ["L_SM = L_gauge + L_Yukawa + L_Higgs"],
+      "description": "Complete theory of fundamental particles and three of four forces",
+      "contributors": ["Glashow", "Weinberg", "Salam", "Higgs", "Anderson"],
+      "concepts": ["quarks", "leptons", "gauge bosons", "Higgs field", "electroweak unification", "color charge"]
+    },
+    {
+      "id": "string_theory",
+      "name": "String Theory",
+      "year": 1984,
+      "key_equations": ["S = -T/2 ∫d²σ √(-h) hαβ ∂αXμ ∂βXν gμν"],
+      "description": "Fundamental entities are 1D strings; may unify all forces",
+      "contributors": ["Schwarz", "Green", "Witten", "Veneziano"],
+      "concepts": ["strings", "branes", "extra dimensions", "supersymmetry", "M-theory", "Calabi-Yau manifolds"]
+    },
+    {
+      "id": "loop_quantum_gravity",
+      "name": "Loop Quantum Gravity",
+      "year": 1986,
+      "key_equations": ["A_min = 4πγℓ_P²√(j(j+1))"],
+      "description": "Quantization of spacetime itself; area and volume are discrete",
+      "contributors": ["Penrose", "Rovelli", "Smolin", "Ashtekar"],
+      "concepts": ["spin networks", "spin foam", "Planck length", "discrete spacetime", "Barbero-Immirzi parameter"]
+    }
+  ],
+  "timeline_start": 1900,
+  "timeline_end": 2024,
+  "keywords": ["Einstein", "Heisenberg", "Schrödinger", "Dirac", "Feynman", "Higgs", "strings", "relativity", "quantum"]
+}

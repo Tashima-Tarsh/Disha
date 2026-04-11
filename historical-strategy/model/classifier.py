@@ -3,7 +3,6 @@ Strategy Classifier and Recommender for Historical Strategy Intelligence System.
 Wraps RandomForestClassifier with additional utilities for strategy recommendation.
 """
 
-import json
 import numpy as np
 import joblib
 from pathlib import Path
@@ -144,8 +143,9 @@ class StrategyRecommender:
 
         return results[0] if len(results) == 1 else results
 
-    def recommend_from_params(self, params: Dict[str, Any], encoders: Dict[str, LabelEncoder],
-                               feature_names: List[str]) -> List[Dict[str, Any]]:
+    def recommend_from_params(
+            self, params: Dict[str, Any], encoders: Dict[str, LabelEncoder],
+            feature_names: List[str]) -> List[Dict[str, Any]]:
         """
         Recommend strategies from a raw parameter dictionary.
         Handles encoding and normalization internally.
@@ -156,8 +156,9 @@ class StrategyRecommender:
         feature_vector = self._encode_params(params, encoders, feature_names)
         return self.recommend(feature_vector.reshape(1, -1))
 
-    def _encode_params(self, params: Dict[str, Any], encoders: Dict[str, LabelEncoder],
-                        feature_names: List[str]) -> np.ndarray:
+    def _encode_params(
+            self, params: Dict[str, Any], encoders: Dict[str, LabelEncoder],
+            feature_names: List[str]) -> np.ndarray:
         """Encode raw parameters into feature vector."""
         feature_map: Dict[str, float] = {}
 

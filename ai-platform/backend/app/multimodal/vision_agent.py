@@ -6,7 +6,6 @@ document OCR, face detection (anonymized), object recognition,
 and visual pattern matching for OSINT investigations.
 """
 import base64
-import io
 from typing import Optional
 import structlog
 import httpx
@@ -20,7 +19,7 @@ logger = structlog.get_logger(__name__)
 class VisionAgent(BaseAgent):
     """
     Multimodal vision agent for image-based intelligence gathering.
-    
+
     Capabilities:
     - Image classification and object detection
     - OCR text extraction from documents/screenshots
@@ -28,7 +27,7 @@ class VisionAgent(BaseAgent):
     - Satellite/aerial imagery analysis
     - Screenshot analysis for web-based threats
     """
-    
+
     def __init__(self):
         super().__init__(
             name="VisionAgent",
@@ -36,16 +35,16 @@ class VisionAgent(BaseAgent):
         )
         self.settings = get_settings()
         self._client: Optional[httpx.AsyncClient] = None
-    
+
     async def _get_client(self) -> httpx.AsyncClient:
         if self._client is None or self._client.is_closed:
             self._client = httpx.AsyncClient(timeout=60.0)
         return self._client
-    
+
     async def execute(self, target: str, context: Optional[dict] = None) -> dict:
         """
         Analyze visual content for intelligence.
-        
+
         Args:
             target: Image URL or base64-encoded image data
             context: Optional dict with:
@@ -54,9 +53,9 @@ class VisionAgent(BaseAgent):
         """
         context = context or {}
         analysis_type = context.get("analysis_type", "classify")
-        
+
         image_data = context.get("image_data") or await self._fetch_image(target)
-        
+
         if not image_data:
             return {
                 "agent": self.name,
@@ -64,10 +63,10 @@ class VisionAgent(BaseAgent):
                 "error": "Could not obtain image data",
                 "entities": [],
             }
-        
+
         results = {}
         entities = []
-        
+
         # Run GPT-4 Vision analysis via OpenAI API
         if analysis_type in ("classify", "detect", "ocr"):
             vision_result = await self._analyze_with_vision_model(
@@ -75,13 +74,13 @@ class VisionAgent(BaseAgent):
             )
             results["vision_analysis"] = vision_result
             entities.extend(self._extract_entities_from_analysis(vision_result))
-        
+
         if analysis_type == "similarity":
             embedding = await self._compute_visual_embedding(image_data)
             results["visual_embedding"] = embedding
-        
+
         risk_score = self._compute_visual_risk(results)
-        
+
         return {
             "agent": self.name,
             "status": "success",
@@ -90,7 +89,7 @@ class VisionAgent(BaseAgent):
             "entities": entities,
             "risk_score": risk_score,
         }
-    
+
     async def _fetch_image(self, url: str) -> Optional[str]:
         """Fetch image from URL and convert to base64."""
         try:
@@ -101,13 +100,13 @@ class VisionAgent(BaseAgent):
         except Exception as e:
             logger.warning("image_fetch_failed", url=url, error=str(e))
             return None
-    
+
     async def _analyze_with_vision_model(
         self, image_base64: str, analysis_type: str
     ) -> dict:
         """
         Use OpenAI GPT-4 Vision to analyze an image.
-        
+
         Constructs appropriate prompts based on analysis type.
         """
         prompts = {
@@ -134,13 +133,13 @@ class VisionAgent(BaseAgent):
                 "4) Security relevance (if any)"
             ),
         }
-        
+
         prompt = prompts.get(analysis_type, prompts["classify"])
-        
+
         try:
             client = await self._get_client()
             api_key = self.settings.OPENAI_API_KEY
-            
+
             response = await client.post(
                 "https://api.openai.com/v1/chat/completions",
                 headers={"Authorization": f"Bearer {api_key}"},
@@ -169,7 +168,7 @@ class VisionAgent(BaseAgent):
             response.raise_for_status()
             data = response.json()
             content = data["choices"][0]["message"]["content"]
-            
+
             return {
                 "analysis": content,
                 "model": "gpt-4o",
@@ -183,11 +182,11 @@ class VisionAgent(BaseAgent):
                 "error": str(e),
                 "analysis_type": analysis_type,
             }
-    
+
     async def _compute_visual_embedding(self, image_base64: str) -> Optional[list]:
         """
         Compute a visual embedding for similarity search.
-        
+
         Uses a simple hash-based embedding as fallback when
         dedicated embedding model is unavailable.
         """
@@ -196,7 +195,7 @@ class VisionAgent(BaseAgent):
             image_bytes = base64.b64decode(image_base64)
             import hashlib
             import numpy as np
-            
+
             # Create 128-dim embedding from image content
             hash_bytes = hashlib.sha512(image_bytes).digest()
             embedding = np.frombuffer(hash_bytes, dtype=np.uint8).astype(np.float32)
@@ -208,14 +207,14 @@ class VisionAgent(BaseAgent):
         except Exception as e:
             logger.error("embedding_computation_failed", error=str(e))
             return None
-    
+
     def _extract_entities_from_analysis(self, analysis_result: dict) -> list:
         """Extract structured entities from vision analysis text."""
         entities = []
         content = analysis_result.get("analysis", "")
         if not content:
             return entities
-        
+
         # Create an entity for the analyzed image itself
         entities.append({
             "id": f"image_{hash(content) % 10**8}",
@@ -227,28 +226,28 @@ class VisionAgent(BaseAgent):
             },
             "risk_score": 0.0,
         })
-        
+
         return entities
-    
+
     def _compute_visual_risk(self, results: dict) -> float:
         """Compute risk score from visual analysis results."""
         risk = 0.0
-        
+
         analysis = results.get("vision_analysis", {})
         content = (analysis.get("analysis") or "").lower()
-        
+
         threat_keywords = [
             "malware", "phishing", "exploit", "vulnerability",
             "suspicious", "threat", "attack", "compromise",
             "credential", "password", "secret", "classified",
         ]
-        
+
         for keyword in threat_keywords:
             if keyword in content:
                 risk += 0.1
-        
+
         return min(risk, 1.0)
-    
+
     async def close(self):
         """Clean up HTTP client."""
         if self._client and not self._client.is_closed:
