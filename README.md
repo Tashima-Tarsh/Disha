@@ -41,7 +41,7 @@
 
 ## ✨ What is Disha?
 
-Disha is a **five-layer AI platform** unified in a single repository:
+Disha is a **six-layer AI platform** unified in a single repository:
 
 <table>
 <tr>
@@ -63,6 +63,11 @@ Disha is a **five-layer AI platform** unified in a single repository:
 <td align="center">⚔️</td>
 <td><b>Historical Strategy Intelligence</b><br><sub>Python · FastAPI · Next.js · sklearn</sub></td>
 <td>AI classifier + simulation engine for 32+ documented historical conflicts</td>
+</tr>
+<tr>
+<td align="center">⚖️</td>
+<td><b>Decision Framework</b><br><sub>Python · FAISS · llama-cpp-python</sub></td>
+<td>Multi-agent debate system with Legal, Political, Ideology, and Security agents — FAISS retrieval, OSINT feeds, local LLM support</td>
 </tr>
 <tr>
 <td align="center">🔗</td>
@@ -282,6 +287,65 @@ A new AI-powered module for **educational historical conflict analysis and strat
 
 <img src="docs/images/divider.svg" width="100%" height="4">
 
+---
+
+## ⚖️ Decision Framework
+
+A multi-agent AI system for political decision-making, legal reasoning (grounded in the Constitution of India), ethical/ideological analysis, and national security assessment. Each agent debates and a consensus engine produces a weighted final recommendation.
+
+### Agents
+
+| Agent | Role | Sources |
+|-------|------|---------|
+| **PoliticalAgent** | Governance implications, stakeholder analysis | Policy precedents |
+| **LegalAgent** | Constitutional & case-law reasoning | FAISS-indexed clauses, case law corpus |
+| **IdeologyAgent** | Multi-lens ethical analysis (Marxist, Gandhian, Ambedkarite, Utilitarian) | Philosophical frameworks |
+| **SecurityAgent** | Threat modeling, OSINT integration | RSS/JSON feeds, structured threat models |
+
+### Quick Start (mock mode — no dependencies)
+
+```bash
+cd decision-framework
+pip install -r requirements.txt
+DISHA_MODEL_PROVIDER=mock python example/use_case.py
+```
+
+### Commands to Run
+
+**a) Install optional dependencies:**
+
+```bash
+pip install faiss-cpu sentence-transformers "llama-cpp-python>=0.1.71"
+```
+
+**b) Build FAISS index:**
+
+```bash
+cd decision-framework
+python utils/text_segmenter.py data/raw/constitution_of_india.txt \
+    --out data/index/constitution_clauses.txt
+python utils/build_faiss_index.py data/index/constitution_clauses.txt \
+    --out data/index/constitution.faiss \
+    --meta data/index/constitution_meta.json
+```
+
+**c) Run with llama-cpp-python (local LLaMA / Mistral model):**
+
+```bash
+export DISHA_MODEL_PROVIDER=llamacpp
+export DISHA_MODEL_PATH=/path/to/model.gguf
+cd decision-framework
+python example/use_case.py
+```
+
+**d) Run tests:**
+
+```bash
+cd decision-framework
+DISHA_MODEL_PROVIDER=mock python -m pytest tests/ -v
+```
+
+<img src="docs/images/divider.svg" width="100%" height="4">
 
 ---
 
