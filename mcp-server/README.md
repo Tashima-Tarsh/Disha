@@ -1,7 +1,5 @@
 # Monster Codemaster — MCP Server
 
-A standalone [Model Context Protocol](https://modelcontextprotocol.io/) (MCP) server that lets any MCP-compatible client explore the Claude Code source code. Rebranded and published by [Monster](https://www.npmjs.com/~Monster). Supports **STDIO**, **Streamable HTTP**, and **SSE** transports.
-
 ## What It Does
 
 Exposes 8 tools, 3 resources, and 5 prompts for navigating the ~1,900-file, 512K+ line Claude Code codebase. This is the official npm package: `Monster-codemaster`.
