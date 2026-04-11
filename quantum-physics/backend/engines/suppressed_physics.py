@@ -88,7 +88,7 @@ class SuppressedPhysicsEngine:
                 "all_matches": all_matches[:5],
                 "disclaimer": self._data.get("disclaimer", ""),
             }
-        except Exception as exc:
+        except Exception:
             logger.exception("analyze_theory failed")
             return {"error": "Analysis failed"}
 

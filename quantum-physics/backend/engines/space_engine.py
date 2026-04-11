@@ -9,9 +9,6 @@ import logging
 import math
 import os
 from pathlib import Path
-from typing import Any
-
-import numpy as np
 
 logger = logging.getLogger(__name__)
 
@@ -210,7 +207,7 @@ class SpaceEngine:
                 "positions": positions,
                 "units": {"position": "AU", "velocity": "km/s"},
             }
-        except Exception as exc:
+        except Exception:
             logger.exception("simulate_orbit failed")
             return {"error": "Orbit simulation failed"}
 
@@ -226,7 +223,7 @@ class SpaceEngine:
                         "source": "space_science.json",
                     }
             return {"planets": [], "error": "Solar system data not found"}
-        except Exception as exc:
+        except Exception:
             logger.exception("get_solar_system failed")
             return {"error": "Failed to load solar system data"}
 

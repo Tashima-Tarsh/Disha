@@ -10,11 +10,11 @@ class UnifiedFieldEngine:
     """Models the four fundamental forces and their unification at energy scales."""
 
     # Running coupling constants (approximate, at relevant scales)
-    _ALPHA_EM = 1 / 137.036      # at low energy
-    _ALPHA_W  = 0.0338           # weak at M_Z
-    _ALPHA_S  = 0.1179           # strong at M_Z
-    _G_N      = 6.674e-11        # Newton's constant (SI)
-    _M_PLANCK = 1.221e19         # GeV
+    _ALPHA_EM = 1 / 137.036  # at low energy
+    _ALPHA_W = 0.0338        # weak at M_Z
+    _ALPHA_S = 0.1179        # strong at M_Z
+    _G_N = 6.674e-11         # Newton's constant (SI)
+    _M_PLANCK = 1.221e19     # GeV
 
     def get_fundamental_forces(self) -> list[dict]:
         return [

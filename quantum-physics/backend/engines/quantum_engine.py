@@ -21,21 +21,21 @@ except Exception:
     _QISKIT = False
 
 try:
-    import pennylane as qml
+    import pennylane as qml  # noqa: F401
     _PENNYLANE = True
 except Exception:
     _PENNYLANE = False
 
 
 # ── Gate matrices ─────────────────────────────────────────────────────────────
-_I  = np.eye(2, dtype=complex)
-_X  = np.array([[0, 1], [1, 0]], dtype=complex)
-_Y  = np.array([[0, -1j], [1j, 0]], dtype=complex)
-_Z  = np.array([[1, 0], [0, -1]], dtype=complex)
-_H  = np.array([[1, 1], [1, -1]], dtype=complex) / math.sqrt(2)
-_S  = np.array([[1, 0], [0, 1j]], dtype=complex)
-_T  = np.array([[1, 0], [0, cmath.exp(1j * math.pi / 4)]], dtype=complex)
-_CNOT = np.array([[1,0,0,0],[0,1,0,0],[0,0,0,1],[0,0,1,0]], dtype=complex)
+_I = np.eye(2, dtype=complex)
+_X = np.array([[0, 1], [1, 0]], dtype=complex)
+_Y = np.array([[0, -1j], [1j, 0]], dtype=complex)
+_Z = np.array([[1, 0], [0, -1]], dtype=complex)
+_H = np.array([[1, 1], [1, -1]], dtype=complex) / math.sqrt(2)
+_S = np.array([[1, 0], [0, 1j]], dtype=complex)
+_T = np.array([[1, 0], [0, cmath.exp(1j * math.pi / 4)]], dtype=complex)
+_CNOT = np.array([[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 0, 1], [0, 0, 1, 0]], dtype=complex)
 
 _SINGLE_GATE_MAP: dict[str, np.ndarray] = {
     "I": _I, "X": _X, "Y": _Y, "Z": _Z,
@@ -88,7 +88,7 @@ class QuantumEngine:
             if _QISKIT:
                 return self._qiskit_simulate(gates, num_qubits)
             return self._numpy_simulate(gates, num_qubits)
-        except Exception as exc:
+        except Exception:
             logger.exception("simulate_circuit failed")
             return {"error": "Quantum simulation failed", "statevector": [], "probabilities": {}}
 
@@ -118,7 +118,7 @@ class QuantumEngine:
                 "success_probability": probs.get(target_state, 0.0),
                 "speedup": f"O(√{dim}) vs O({dim}) classical",
             }
-        except Exception as exc:
+        except Exception:
             logger.exception("run_grover failed")
             return {"error": "Grover simulation failed"}
 
@@ -146,7 +146,6 @@ class QuantumEngine:
                         if r % 2 == 0:
                             x_r2 = pow(a, r // 2, N)
                             f1 = _math.gcd(x_r2 - 1, N)
-                            f2 = _math.gcd(x_r2 + 1, N)
                             if f1 > 1 and f1 < N:
                                 return {"N": N, "factors": [f1, N // f1], "base": a,
                                         "period": r, "method": "Shor period finding",
@@ -158,7 +157,7 @@ class QuantumEngine:
 
             return {"N": N, "factors": None, "note": "No factors found in simulation range",
                     "qubits_required": 2 * len(bin(N)), "circuit_depth": N * 10}
-        except Exception as exc:
+        except Exception:
             logger.exception("run_shor failed")
             return {"error": "Shor simulation failed", "N": N}
 
@@ -189,7 +188,7 @@ class QuantumEngine:
                 "entangled": True,
                 "description": "(|00⟩ + |11⟩)/√2 — maximally entangled",
             }
-        except Exception as exc:
+        except Exception:
             logger.exception("bell_state_experiment failed")
             return {"error": "Bell state experiment failed"}
 
@@ -243,7 +242,7 @@ class QuantumEngine:
             return {
                 "num_qubits": n,
                 "state_name": f"GHZ-{n}",
-                "description": f"(|{'0'*n}⟩ + |{'1'*n}⟩)/√2",
+                "description": f"(|{'0' * n}⟩ + |{'1' * n}⟩)/√2",
                 "probabilities": probs,
                 "entanglement_entropy": round(entropy, 4),
                 "density_matrix_qubit0": {
@@ -253,7 +252,7 @@ class QuantumEngine:
                 },
                 "is_maximally_entangled": entropy > 0.9,
             }
-        except Exception as exc:
+        except Exception:
             logger.exception("entangle failed")
             return {"error": "Entanglement simulation failed"}
 

@@ -113,8 +113,6 @@ class Orchestrator:
     def _build_relationships(self, entities: list[dict[str, Any]]) -> list[dict[str, Any]]:
         """Build relationships between extracted entities."""
         relationships = []
-        entity_ids = [e["id"] for e in entities]
-
         for i, entity in enumerate(entities):
             for j, other in enumerate(entities):
                 if i >= j:

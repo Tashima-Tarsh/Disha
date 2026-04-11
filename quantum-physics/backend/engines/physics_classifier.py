@@ -6,7 +6,6 @@ from __future__ import annotations
 
 import json
 import logging
-import os
 import re
 from pathlib import Path
 from typing import Any
@@ -98,7 +97,7 @@ class PhysicsClassifier:
             if _SKLEARN and self._pipeline is not None:
                 return self._ml_classify(text)
             return self._keyword_classify(text)
-        except Exception as exc:
+        except Exception:
             logger.exception("classify failed")
             return {"error": "Classification failed", "domain": "Unknown", "confidence": 0.0}
 

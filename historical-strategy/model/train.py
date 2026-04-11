@@ -12,17 +12,16 @@ from pathlib import Path
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from sklearn.model_selection import cross_val_score, StratifiedKFold
-from sklearn.metrics import (
+from sklearn.model_selection import cross_val_score, StratifiedKFold  # noqa: E402
+from sklearn.metrics import (  # noqa: E402
     classification_report,
     confusion_matrix,
     accuracy_score,
 )
-from sklearn.neural_network import MLPClassifier
-from sklearn.preprocessing import LabelEncoder
-import joblib
+from sklearn.neural_network import MLPClassifier  # noqa: E402
+import joblib  # noqa: E402
 
-from model.classifier import StrategyClassifier
+from model.classifier import StrategyClassifier  # noqa: E402
 
 DATA_DIR = Path(__file__).parent.parent / "data" / "processed"
 MODEL_DIR = Path(__file__).parent / "saved"
@@ -45,8 +44,8 @@ def load_processed_data():
 def print_confusion_matrix_text(cm: np.ndarray, labels: list):
     """Print a text-based confusion matrix."""
     print("\n--- Confusion Matrix ---")
-    col_width = max(len(str(l)) for l in labels) + 2
-    header = " " * col_width + "".join(f"{str(l):>{col_width}}" for l in labels)
+    col_width = max(len(str(lbl)) for lbl in labels) + 2
+    header = " " * col_width + "".join(f"{str(lbl):>{col_width}}" for lbl in labels)
     print(header)
     for i, label in enumerate(labels):
         row = f"{str(label):>{col_width}}" + "".join(f"{cm[i, j]:>{col_width}}" for j in range(len(labels)))

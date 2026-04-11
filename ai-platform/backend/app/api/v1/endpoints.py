@@ -1,7 +1,5 @@
 """API v1 endpoints for the AI Intelligence Platform."""
 
-from typing import Any
-
 from fastapi import APIRouter, Depends, WebSocket, WebSocketDisconnect, HTTPException, status
 
 from app.agents.orchestrator import Orchestrator
@@ -14,7 +12,6 @@ from app.models.schemas import (
     AuthRequest,
     AuthResponse,
     HealthResponse,
-    Alert,
     VisionAnalysisRequest,
     AudioAnalysisRequest,
     MultimodalRequest,

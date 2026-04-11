@@ -229,22 +229,22 @@ class HistoricalSimulationEngine:
 
         # Compute attacker score
         attacker_score = (
-            attacker_base
-            * counter_modifier
-            * atk_terrain_mult
-            * weather_mod
-            + force_effect
-            + tech_effect
-            + supply_effect
-            + morale_effect
+            attacker_base *
+            counter_modifier *
+            atk_terrain_mult *
+            weather_mod +
+            force_effect +
+            tech_effect +
+            supply_effect +
+            morale_effect
         )
 
         # Compute defender score (defender gets terrain bonus but no counter modifier advantage here)
         defender_score = (
-            defender_base
-            * def_terrain_mult
-            * weather_mod
-            + (1.0 - supply_lines) * 0.1
+            defender_base *
+            def_terrain_mult *
+            weather_mod +
+            (1.0 - supply_lines) * 0.1
         )
 
         # Convert scores to probability using sigmoid
@@ -456,8 +456,9 @@ class HistoricalSimulationEngine:
             "risk_score": self._compute_risk_score(supply_lines, morale, force_ratio, technology_gap, weather),
         }
 
-    def _compute_risk_score(self, supply: float, morale: float, force_ratio: float,
-                             tech_gap: float, weather: str) -> float:
+    def _compute_risk_score(
+            self, supply: float, morale: float, force_ratio: float,
+            tech_gap: float, weather: str) -> float:
         """Compute a normalized risk score 0-1 (1=highest risk)."""
         supply_risk = max(0.0, 1.0 - supply)
         morale_risk = max(0.0, 1.0 - morale)

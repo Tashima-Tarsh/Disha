@@ -33,7 +33,7 @@ jobs:
           pip install -r historical-strategy/requirements.txt
 
       - name: Lint
-        run: flake8 historical-strategy/ --max-line-length=120 --ignore=E501 --exclude=historical-strategy/dashboard/
+        run: flake8 historical-strategy/ --max-line-length=120 --ignore=E501,W503,W504 --exclude=historical-strategy/dashboard/
 
       - name: Run tests (if any)
         run: |
@@ -57,4 +57,4 @@ jobs:
           pip install -r quantum-physics/backend/requirements.txt
 
       - name: Lint
-        run: flake8 quantum-physics/backend/ --max-line-length=120 --ignore=E501
+        run: flake8 quantum-physics/backend/ --max-line-length=120 --ignore=E501,W503,W504

@@ -14,24 +14,24 @@ class MultimodalFusion:
     """
     Fuses intelligence from multiple modalities (text, vision, audio)
     into unified threat assessments.
-    
+
     Performs:
     - Cross-modal entity linking (same entity in image + audio)
     - Combined risk scoring with modality weighting
     - Correlation detection across modalities
     - Unified entity deduplication
     """
-    
+
     # Modality confidence weights
     MODALITY_WEIGHTS = {
         "text": 0.4,
         "vision": 0.35,
         "audio": 0.25,
     }
-    
+
     def __init__(self):
         self.fusion_history: list = []
-    
+
     def fuse(
         self,
         text_results: Optional[dict] = None,
@@ -40,12 +40,12 @@ class MultimodalFusion:
     ) -> dict:
         """
         Fuse results from multiple modalities into unified assessment.
-        
+
         Args:
             text_results: Results from text-based agents (OSINT, Crypto, etc.)
             vision_results: Results from VisionAgent
             audio_results: Results from AudioAgent
-        
+
         Returns:
             Unified assessment with merged entities, combined risk, correlations.
         """
@@ -53,7 +53,7 @@ class MultimodalFusion:
         all_risks = []
         modalities_used = []
         correlations = []
-        
+
         # Collect entities from each modality
         if text_results:
             modalities_used.append("text")
@@ -63,7 +63,7 @@ class MultimodalFusion:
             all_entities.extend(entities)
             risk = text_results.get("risk_score", 0.0)
             all_risks.append(("text", risk))
-        
+
         if vision_results:
             modalities_used.append("vision")
             entities = vision_results.get("entities", [])
@@ -72,7 +72,7 @@ class MultimodalFusion:
             all_entities.extend(entities)
             risk = vision_results.get("risk_score", 0.0)
             all_risks.append(("vision", risk))
-        
+
         if audio_results:
             modalities_used.append("audio")
             entities = audio_results.get("entities", [])
@@ -81,20 +81,20 @@ class MultimodalFusion:
             all_entities.extend(entities)
             risk = audio_results.get("risk_score", 0.0)
             all_risks.append(("audio", risk))
-        
+
         # Deduplicate entities by label similarity
         merged_entities = self._deduplicate_entities(all_entities)
-        
+
         # Find cross-modal correlations
         correlations = self._find_correlations(all_entities)
-        
+
         # Compute weighted risk score
         combined_risk = self._compute_combined_risk(all_risks)
-        
+
         # Boost risk if multiple modalities confirm threats
         if len(modalities_used) > 1 and correlations:
             combined_risk = min(combined_risk * 1.2, 1.0)
-        
+
         result = {
             "modalities_used": modalities_used,
             "total_entities": len(merged_entities),
@@ -106,7 +106,7 @@ class MultimodalFusion:
                 modalities_used, correlations
             ),
         }
-        
+
         self.fusion_history.append(result)
         logger.info(
             "multimodal_fusion_complete",
@@ -115,17 +115,17 @@ class MultimodalFusion:
             correlations=len(correlations),
             risk=combined_risk,
         )
-        
+
         return result
-    
+
     def _deduplicate_entities(self, entities: list) -> list:
         """Merge duplicate entities across modalities."""
         seen = {}
         merged = []
-        
+
         for entity in entities:
             label = entity.get("label", "").lower().strip()
-            
+
             if label in seen:
                 # Merge: take higher risk, combine properties
                 existing = seen[label]
@@ -147,28 +147,28 @@ class MultimodalFusion:
                 entity["modalities"] = [entity.get("source_modality", "unknown")]
                 seen[label] = entity
                 merged.append(entity)
-        
+
         return merged
-    
+
     def _find_correlations(self, entities: list) -> list:
         """Find cross-modal correlations between entities."""
         correlations = []
-        
+
         # Group entities by modality
         by_modality = {}
         for e in entities:
             modality = e.get("source_modality", "unknown")
             by_modality.setdefault(modality, []).append(e)
-        
+
         modalities = list(by_modality.keys())
-        
+
         # Check pairs of modalities for shared labels
         for i in range(len(modalities)):
             for j in range(i + 1, len(modalities)):
                 m1, m2 = modalities[i], modalities[j]
                 labels1 = {e.get("label", "").lower() for e in by_modality[m1]}
                 labels2 = {e.get("label", "").lower() for e in by_modality[m2]}
-                
+
                 shared = labels1 & labels2
                 for label in shared:
                     if label:
@@ -178,30 +178,30 @@ class MultimodalFusion:
                             "type": "cross_modal_match",
                             "confidence": 0.8,
                         })
-        
+
         return correlations
-    
+
     def _compute_combined_risk(self, modality_risks: list) -> float:
         """Weighted risk aggregation across modalities."""
         if not modality_risks:
             return 0.0
-        
+
         weighted_sum = 0.0
         weight_total = 0.0
-        
+
         for modality, risk in modality_risks:
             weight = self.MODALITY_WEIGHTS.get(modality, 0.2)
             weighted_sum += risk * weight
             weight_total += weight
-        
+
         return weighted_sum / max(weight_total, 1e-6)
-    
+
     def _compute_cross_modal_confidence(
         self, modalities: list, correlations: list
     ) -> float:
         """
         Confidence boost from cross-modal agreement.
-        
+
         More modalities + more correlations = higher confidence.
         """
         modality_factor = len(modalities) / 3.0

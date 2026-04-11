@@ -71,17 +71,17 @@ def plot_confusion_matrix(cm: List[List[int]], labels: List[str]) -> str:
     """
     cm_arr = np.array(cm)
     n = len(labels)
-    col_w = max(max(len(str(l)) for l in labels), 4) + 2
+    col_w = max(max(len(str(lbl)) for lbl in labels), 4) + 2
     lines = []
 
     # Header
     lines.append("Predicted →")
-    header = "Actual ↓" + " " * (col_w - 8) + "".join(f"{str(l)[:col_w-1]:>{col_w}}" for l in labels)
+    header = "Actual ↓" + " " * (col_w - 8) + "".join(f"{str(lbl)[:col_w - 1]:>{col_w}}" for lbl in labels)
     lines.append(header)
     lines.append("-" * len(header))
 
     for i in range(n):
-        row_label = f"{str(labels[i])[:col_w-1]:>{col_w}}"
+        row_label = f"{str(labels[i])[:col_w - 1]:>{col_w}}"
         row_values = "".join(f"{cm_arr[i, j]:>{col_w}}" for j in range(n))
         # Highlight diagonal
         lines.append(row_label + row_values)
@@ -259,7 +259,6 @@ def generate_report(metrics: Dict[str, Any], patterns: Dict[str, Any]) -> str:
 
 
 if __name__ == "__main__":
-    import json
     from pathlib import Path
 
     data_file = Path(__file__).parent.parent / "data" / "historical_data.json"

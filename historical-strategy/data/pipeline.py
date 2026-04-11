@@ -4,7 +4,6 @@ Loads, cleans, preprocesses, and prepares data for ML training.
 """
 
 import json
-import os
 import numpy as np
 import pandas as pd
 from pathlib import Path
@@ -106,8 +105,8 @@ def engineer_features(df: pd.DataFrame):
     df["outcome_score"] = df["outcome"].map(outcome_map).fillna(0.5)
 
     feature_cols = (
-        [col + "_enc" for col in categorical_features]
-        + ["year_norm", "duration_norm", "casualties_norm", "log_casualties", "outcome_score"]
+        [col + "_enc" for col in categorical_features] +
+        ["year_norm", "duration_norm", "casualties_norm", "log_casualties", "outcome_score"]
     )
 
     X = df[feature_cols].values

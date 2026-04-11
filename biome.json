@@ -42,7 +42,7 @@
     }
   },
   "files": {
-    "ignore": ["node_modules", "dist", "*.d.ts"]
+    "includes": ["**", "!node_modules/**", "!dist/**", "!**/*.d.ts"]
   }
 }
 
