@@ -10,6 +10,16 @@
 </p>
 
 <p align="center">
+  <a href="https://github.com/Tashima-Tarsh/Disha/stargazers"><img src="https://img.shields.io/github/stars/Tashima-Tarsh/Disha?style=flat-square&color=yellow" alt="GitHub Stars"></a>
+  <a href="https://github.com/Tashima-Tarsh/Disha/network/members"><img src="https://img.shields.io/github/forks/Tashima-Tarsh/Disha?style=flat-square&color=blue" alt="GitHub Forks"></a>
+  <a href="https://github.com/Tashima-Tarsh/Disha/graphs/contributors"><img src="https://img.shields.io/github/contributors/Tashima-Tarsh/Disha?style=flat-square&color=green" alt="Contributors"></a>
+  <a href="https://github.com/Tashima-Tarsh/Disha/issues"><img src="https://img.shields.io/github/issues/Tashima-Tarsh/Disha?style=flat-square&color=red" alt="Open Issues"></a>
+  <a href="https://github.com/Tashima-Tarsh/Disha/commits/main"><img src="https://img.shields.io/github/last-commit/Tashima-Tarsh/Disha?style=flat-square&color=purple" alt="Last Commit"></a>
+  <a href="https://github.com/Tashima-Tarsh/Disha/actions/workflows/ci.yml"><img src="https://github.com/Tashima-Tarsh/Disha/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
+  <a href="https://github.com/Tashima-Tarsh/Disha/actions/workflows/cyber-defense-ci.yml"><img src="https://github.com/Tashima-Tarsh/Disha/actions/workflows/cyber-defense-ci.yml/badge.svg" alt="Cyber Defense CI"></a>
+</p>
+
+<p align="center">
   <img src="https://img.shields.io/badge/Files-2%2C250+-blue?style=flat-square" alt="Files">
   <img src="https://img.shields.io/badge/Lines_of_Code-580K+-green?style=flat-square" alt="LoC">
   <img src="https://img.shields.io/badge/Agents-7-orange?style=flat-square" alt="Agents">
@@ -207,6 +217,20 @@ docker-compose up -d
 
 <br>
 
+## 🌐 Live Demo
+
+The **Disha MCP Server** is deployed on Vercel and publicly accessible:
+
+| Endpoint | URL | Description |
+|----------|-----|-------------|
+| Health check | [`/health`](https://disha.vercel.app/health) | Server liveness |
+| MCP endpoint | `/mcp` | Model Context Protocol |
+| SSE stream | `/sse` | Server-Sent Events |
+
+> **Note:** The full platform (AI backend, honeypots, historical strategy) requires Docker and cannot be hosted on Vercel's serverless platform. See [Quick Start](#-quick-start) to run everything locally, or deploy the Docker stacks on any cloud VM (Railway, Fly.io, DigitalOcean).
+
+<br>
+
 ## 🤖 Intelligence Agents
 
 <table>
@@ -364,6 +388,14 @@ A new AI-powered module for **educational historical conflict analysis and strat
 3. Add type annotations for all new code
 4. Update documentation for new modules
 5. Request review before merge
+
+<br>
+
+## 👥 Contributors
+
+<a href="https://github.com/Tashima-Tarsh/Disha/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=Tashima-Tarsh/Disha" alt="Contributors" />
+</a>
 
 <br>
 

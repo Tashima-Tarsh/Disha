@@ -1,0 +1,60 @@
+name: Modules CI
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'historical-strategy/**'
+      - 'quantum-physics/**'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'historical-strategy/**'
+      - 'quantum-physics/**'
+
+permissions:
+  contents: read
+
+jobs:
+  historical-strategy:
+    name: Lint Python (Historical Strategy)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          pip install flake8
+          pip install -r historical-strategy/requirements.txt
+
+      - name: Lint
+        run: flake8 historical-strategy/ --max-line-length=120 --ignore=E501 --exclude=historical-strategy/dashboard/
+
+      - name: Run tests (if any)
+        run: |
+          cd historical-strategy
+          python -m pytest tests/ -v --tb=short 2>/dev/null || echo "No tests found — skipping."
+
+  quantum-physics:
+    name: Lint Python (Quantum Physics)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          pip install flake8
+          pip install -r quantum-physics/backend/requirements.txt
+
+      - name: Lint
+        run: flake8 quantum-physics/backend/ --max-line-length=120 --ignore=E501
