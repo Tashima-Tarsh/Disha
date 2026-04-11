@@ -22,7 +22,7 @@ fi
 
 if [ ! -d "${GITPRETTY_HOME}" ]; then
   echo "Installing gitpretty into ${GITPRETTY_HOME} ..."
-  git clone https://github.com/codeaashu/gitpretty.git "${GITPRETTY_HOME}"
+  git clone https://github.com/Monster/gitpretty.git "${GITPRETTY_HOME}"
 fi
 
 chmod +x "${GITPRETTY_HOME}"/*.sh "${GITPRETTY_HOME}"/scripts/*.sh
