@@ -121,8 +121,8 @@ class PolicyNetwork:
         valid_actions: Optional[list] = None,
     ) -> tuple:
         """Fallback heuristic policy when PyTorch is unavailable."""
-        agents_used = state[5:10] if len(state) > 10 else [0] * 5
-        step = int(state[11] * 20) if len(state) > 11 else 0
+        agents_used = state[5:10] if len(state) >= 13 else [0] * 5
+        step = int(state[11] * 20) if len(state) >= 13 else 0
         
         # Simple strategy: run each agent in order, then stop
         for i in range(5):
