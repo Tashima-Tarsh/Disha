@@ -3,6 +3,7 @@ Quantum Physics API — FastAPI app on port 8002 (Layer 6 of Disha AGI).
 """
 from __future__ import annotations
 
+import logging
 import sys
 import os
 from pathlib import Path
@@ -20,6 +21,8 @@ from engines.physics_classifier import PhysicsClassifier
 from engines.space_engine import SpaceEngine
 from engines.suppressed_physics import SuppressedPhysicsEngine
 from engines.unified_field import UnifiedFieldEngine
+
+logger = logging.getLogger(__name__)
 
 app = FastAPI(
     title="Disha Quantum Physics API",
@@ -112,7 +115,8 @@ async def get_domains() -> dict:
     try:
         return {"domains": _classifier.get_domains()}
     except Exception as exc:
-        raise HTTPException(status_code=500, detail=str(exc))
+        logger.exception("Internal error")
+        raise HTTPException(status_code=500, detail="Internal server error")
 
 
 @app.get("/api/physics/timeline")
@@ -120,7 +124,8 @@ async def get_timeline() -> dict:
     try:
         return {"timeline": _classifier.get_timeline()}
     except Exception as exc:
-        raise HTTPException(status_code=500, detail=str(exc))
+        logger.exception("Internal error")
+        raise HTTPException(status_code=500, detail="Internal server error")
 
 
 @app.post("/api/physics/classify")
@@ -133,7 +138,8 @@ async def classify_physics(req: ClassifyRequest) -> dict:
     except HTTPException:
         raise
     except Exception as exc:
-        raise HTTPException(status_code=500, detail=str(exc))
+        logger.exception("Internal error")
+        raise HTTPException(status_code=500, detail="Internal server error")
 
 
 @app.post("/api/quantum/simulate")
@@ -145,7 +151,8 @@ async def simulate_circuit(req: SimulateRequest) -> dict:
     except HTTPException:
         raise
     except Exception as exc:
-        raise HTTPException(status_code=500, detail=str(exc))
+        logger.exception("Internal error")
+        raise HTTPException(status_code=500, detail="Internal server error")
 
 
 @app.get("/api/quantum/algorithms")
@@ -153,7 +160,8 @@ async def get_algorithms() -> dict:
     try:
         return {"algorithms": _quantum.get_algorithms()}
     except Exception as exc:
-        raise HTTPException(status_code=500, detail=str(exc))
+        logger.exception("Internal error")
+        raise HTTPException(status_code=500, detail="Internal server error")
 
 
 @app.post("/api/quantum/entangle")
@@ -165,7 +173,8 @@ async def entangle(req: EntangleRequest) -> dict:
     except HTTPException:
         raise
     except Exception as exc:
-        raise HTTPException(status_code=500, detail=str(exc))
+        logger.exception("Internal error")
+        raise HTTPException(status_code=500, detail="Internal server error")
 
 
 @app.get("/api/quantum/bell")
@@ -173,7 +182,8 @@ async def bell_state() -> dict:
     try:
         return _quantum.bell_state_experiment()
     except Exception as exc:
-        raise HTTPException(status_code=500, detail=str(exc))
+        logger.exception("Internal error")
+        raise HTTPException(status_code=500, detail="Internal server error")
 
 
 @app.get("/api/space/apod")
@@ -181,7 +191,8 @@ async def get_apod() -> dict:
     try:
         return _space.get_apod()
     except Exception as exc:
-        raise HTTPException(status_code=500, detail=str(exc))
+        logger.exception("Internal error")
+        raise HTTPException(status_code=500, detail="Internal server error")
 
 
 @app.get("/api/space/neo")
@@ -189,7 +200,8 @@ async def get_neo() -> dict:
     try:
         return _space.get_neo()
     except Exception as exc:
-        raise HTTPException(status_code=500, detail=str(exc))
+        logger.exception("Internal error")
+        raise HTTPException(status_code=500, detail="Internal server error")
 
 
 @app.post("/api/space/orbit")
@@ -204,7 +216,8 @@ async def simulate_orbit(req: OrbitRequest) -> dict:
     except HTTPException:
         raise
     except Exception as exc:
-        raise HTTPException(status_code=500, detail=str(exc))
+        logger.exception("Internal error")
+        raise HTTPException(status_code=500, detail="Internal server error")
 
 
 @app.get("/api/space/solar-system")
@@ -212,7 +225,8 @@ async def get_solar_system() -> dict:
     try:
         return _space.get_solar_system()
     except Exception as exc:
-        raise HTTPException(status_code=500, detail=str(exc))
+        logger.exception("Internal error")
+        raise HTTPException(status_code=500, detail="Internal server error")
 
 
 @app.get("/api/suppressed/theories")
@@ -223,7 +237,8 @@ async def get_suppressed_theories() -> dict:
             "disclaimer": "These theories are speculative, unverified, or contradicted by mainstream physics. For educational and research purposes only.",
         }
     except Exception as exc:
-        raise HTTPException(status_code=500, detail=str(exc))
+        logger.exception("Internal error")
+        raise HTTPException(status_code=500, detail="Internal server error")
 
 
 @app.post("/api/suppressed/analyze")
@@ -236,7 +251,8 @@ async def analyze_suppressed(req: AnalyzeSupressedRequest) -> dict:
     except HTTPException:
         raise
     except Exception as exc:
-        raise HTTPException(status_code=500, detail=str(exc))
+        logger.exception("Internal error")
+        raise HTTPException(status_code=500, detail="Internal server error")
 
 
 @app.get("/api/unified/forces")
@@ -244,7 +260,8 @@ async def get_forces() -> dict:
     try:
         return {"forces": _unified.get_fundamental_forces()}
     except Exception as exc:
-        raise HTTPException(status_code=500, detail=str(exc))
+        logger.exception("Internal error")
+        raise HTTPException(status_code=500, detail="Internal server error")
 
 
 @app.get("/api/unified/history")
@@ -252,7 +269,8 @@ async def get_unification_history() -> dict:
     try:
         return {"history": _unified.get_unification_history()}
     except Exception as exc:
-        raise HTTPException(status_code=500, detail=str(exc))
+        logger.exception("Internal error")
+        raise HTTPException(status_code=500, detail="Internal server error")
 
 
 @app.post("/api/unified/model")
@@ -264,7 +282,8 @@ async def model_unification(req: UnificationRequest) -> dict:
     except HTTPException:
         raise
     except Exception as exc:
-        raise HTTPException(status_code=500, detail=str(exc))
+        logger.exception("Internal error")
+        raise HTTPException(status_code=500, detail="Internal server error")
 
 
 if __name__ == "__main__":

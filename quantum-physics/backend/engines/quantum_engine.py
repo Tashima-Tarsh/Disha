@@ -100,23 +100,11 @@ class QuantumEngine:
 
             iterations = max(1, round(math.pi / 4 * math.sqrt(dim)))
             for _ in range(iterations):
-                # Oracle: flip phase of target
+                # Oracle: flip phase of target state
                 sv[target_idx] *= -1
-                # Diffusion operator: 2|ψ⟩⟨ψ| - I
+                # Diffusion (inversion about the mean): 2|ψ_uniform⟩⟨ψ_uniform| - I
                 mean_amp = sv.mean()
                 sv = 2 * mean_amp - sv
-                sv[target_idx] = 2 * mean_amp - sv[target_idx]  # re-apply correct
-                sv = 2 * sv.mean() * np.ones(dim, dtype=complex) + (sv - sv)
-                # Correct diffusion
-                mean_amp = float(np.mean(sv.real))
-                sv = 2 * mean_amp - sv
-                # Re-apply oracle
-                sv[target_idx] *= -1
-                mean_amp = float(np.mean(sv.real))
-                sv = 2 * mean_amp - sv
-
-            # Final oracle
-            sv[target_idx] *= -1
 
             probs = _statevector_to_probs(sv, n)
             return {
