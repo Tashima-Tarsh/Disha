@@ -8,7 +8,7 @@ import math
 import time
 from dataclasses import dataclass, field
 from typing import Optional
-from collections import defaultdict
+from collections import Counter, defaultdict
 import structlog
 
 logger = structlog.get_logger(__name__)
@@ -328,11 +328,7 @@ class IntelligenceRanker:
             "avg_composite_score": (
                 sum(e.composite_score for e in entities) / max(len(entities), 1)
             ),
-            "entity_types": dict(defaultdict(
-                int,
-                {e.entity_type: sum(1 for x in entities if x.entity_type == e.entity_type)
-                 for e in entities},
-            )),
+            "entity_types": dict(Counter(e.entity_type for e in entities)),
             "tracked_agents": len(self.agent_reliability),
             "total_investigations": sum(
                 a.total_investigations for a in self.agent_reliability.values()
