@@ -10,7 +10,7 @@ import time
 from celery import Celery, shared_task
 # Project
 from database import Database, connect_db
-from gpt_api import *
+from gpt_api import GPT
 from models import ContentModel
 from analysis_service import AnalysisService, AnalysisException
 
