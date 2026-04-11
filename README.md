@@ -44,111 +44,6 @@ All previously stubbed or paid-API dependencies have been replaced:
 | Threat intelligence feeds | — | **Feodo Tracker**, **EmergingThreats**, **IPsum** (all free) |
 | Maps | Google Maps | **OpenStreetMap + Leaflet** (free, open-source) |
 | Charts | — | **Chart.js** (MIT) |
-
----
-
-## 🏗️ Architecture
-
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                       DISHA PLATFORM                            │
-├─────────────────────────┬───────────────────────────────────────┤
-│  CORE CLI (TypeScript)  │   AI INTELLIGENCE (Python/FastAPI)    │
-│  Query Engine           │   7 Specialized Agents                │
-│  ├─ Claude/GPT stream   │   ├─ OSINT (HackerTarget, ip-api)    │
-│  ├─ Tool-call loops     │   ├─ Crypto (Etherscan)              │
-│  └─ Auto-compaction     │   ├─ Detection (Isolation Forest)    │
-│  40+ Tools              │   ├─ Graph (Neo4j/Cypher)            │
-│  50+ Commands           │   ├─ Reasoning (GPT-4o/LangChain)    │
-│  Terminal UI (Ink)      │   ├─ Vision (GPT-4o / LLaVA)        │
-│  Bridge (VS Code)       │   └─ Audio (Whisper local/API)       │
-│                         │   RL Engine (PPO + Replay)            │
-│                         │   Prompt Optimizer (Evolutionary)     │
-│                         │   Intelligence Ranker (PageRank)      │
-├─────────────────────────┴───────────────────────────────────────┤
-│              WEB DASHBOARD (Next.js + Tailwind + Chart.js)      │
-│  OpenStreetMap · Real-Time Alerts · Command Palette · a11y     │
-├─────────────────────────┬───────────────────────────────────────┤
-│  CYBER DEFENSE          │  HISTORICAL STRATEGY                  │
-│  Cowrie SSH honeypot    │  32+ documented conflicts             │
-│  Dionaea multi-protocol │  sklearn Random Forest + MLP         │
-│  OpenCanary services    │  Simulation engine                    │
-│  PyTorch classifier     │  Next.js timeline/map dashboard       │
-│  Simulated responses    │  FastAPI (port 8001)                 │
-├─────────────────────────┴───────────────────────────────────────┤
-│  INTEGRATIONS                                                   │
-│  cyber-intelligence-platform  (FastAPI + Leaflet + python-docx) │
-│  osint-analyser               (Celery + MySQL + GPT-4o-mini)   │
-│  PentAGI bridge               (full pentest agent stack)        │
-└─────────────────────────────────────────────────────────────────┘
-```
-
----
-
-## 🚀 Quick Start
-
-### Option 1 — Core CLI Engine
-
-```bash
-curl -fsSL https://bun.sh/install | bash   # Install Bun
-bun install
-cp .env.example .env                        # Add your ANTHROPIC_API_KEY
-bun run dev
-```
-
-### Option 2 — AI Intelligence Platform
-
-```bash
-cd ai-platform/backend
-python -m venv venv && source venv/bin/activate
-pip install -r requirements.txt
-export SECRET_KEY=$(python -c "import secrets; print(secrets.token_hex(32))")
-uvicorn app.main:app --reload --port 8000
-
-cd ../frontend
-npm install && npm run dev                  # http://localhost:3001
-```
-
-### Option 3 — Cyber Defense System
-
-```bash
-cd cyber-defense
-cp .env.example .env
-docker-compose up -d
-# Honeypots: ports 2222 (SSH), 8080 (HTTP), 8081 (OpenCanary)
-# Kibana dashboard: http://localhost:5601
-```
-
-### Option 4 — Historical Strategy Intelligence
-
-```bash
-cd historical-strategy
-pip install -r requirements.txt
-uvicorn api.main:app --port 8001 --reload   # http://localhost:8001/docs
-
-cd dashboard
-npm install && npm run dev                  # http://localhost:3002
-```
-
-### Option 5 — Cyber Intelligence Pipeline
-
-```bash
-cd integrations/cyber-intelligence-platform
-pip install fastapi uvicorn requests python-docx
-python main.py "UPI fraud via OTP scam" google.com
-uvicorn ui.dashboard:app --port 7000        # Live dashboard
-```
-
-### Option 6 — Full Stack (Docker Compose)
-
-```bash
-cd ai-platform/docker
-docker-compose up -d
-# Backend:  http://localhost:8000
-# Frontend: http://localhost:3001
-# Neo4j:    http://localhost:7474
-```
-
 ---
 
 ## 🤖 Intelligence Agents
@@ -286,7 +181,6 @@ Disha is a **three-layer AI platform**:
 
 ---
 
-
 ## ⚔️ Historical Strategy Intelligence System
 
 A new AI-powered module for **educational historical conflict analysis and strategy simulation**.
@@ -300,34 +194,6 @@ A new AI-powered module for **educational historical conflict analysis and strat
 | 🎮 **Simulation Engine** | Scenario-based victory probability with historical parallels |
 | 🗺️ **Visualization Dashboard** | Timeline, world map, strategy comparison, simulation UI |
 | 🔌 **REST API** | 12 endpoints for data, stats, simulation, and recommendations |
-
-### Quick Start — Historical Strategy
-
-```bash
-# Backend API
-cd historical-strategy
-pip install -r requirements.txt
-uvicorn api.main:app --port 8001 --reload
-# API docs: http://localhost:8001/docs
-
-# Train the model (optional — pre-trained model included)
-python model/train.py
-
-# Dashboard
-cd dashboard
-npm install
-npm run dev
-# Dashboard: http://localhost:3002
-```
-
-### Or with Docker
-
-```bash
-cd historical-strategy
-docker-compose up -d
-# API:       http://localhost:8001
-# Dashboard: http://localhost:3002
-```
 
 ### API Endpoints
 
@@ -376,9 +242,6 @@ docker-compose up -d
 # Frontend: http://localhost:3001
 # Neo4j:    http://localhost:7474
 ```
-
----
-
 ## 🤖 Intelligence Agents
 
 | Agent | Data Sources | Output |
@@ -397,8 +260,6 @@ docker-compose up -d
 Data Collection ──► Anomaly Detection ──► Graph Storage ──► LLM Reasoning ──► Report
   (OSINT+Crypto)    (Isolation Forest)    (Neo4j+GNN)      (GPT-4)         (Compiled)
 ```
-
----
 
 ## 🧠 Reinforcement Learning
 
@@ -480,17 +341,6 @@ composite_score = threat×0.30 + impact×0.25 + confidence×0.20 + centrality×0
 | **[ai-platform/README.md](./ai-platform/README.md)** | AI platform setup guide |
 
 ---
-
-## 🤝 Contributing
-
-1. Create a feature branch from `main`
-2. Keep PR scope focused (one feature per PR)
-3. Add type annotations for all new code
-4. Update documentation for new modules
-5. Request review before merge
-
----
-
 ## 🏛️ License
 
 See [LICENSE](./LICENSE) for details.
