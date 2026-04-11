@@ -1,1 +1,7 @@
 __pycache__/
+
+# Cyber Defense System artifacts
+cyber-defense/*.pt
+cyber-defense/model/*.pt
+cyber-defense/honeypot/fakeapi/node_modules/
+cyber-defense/.env

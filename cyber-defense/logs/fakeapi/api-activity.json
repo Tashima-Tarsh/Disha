@@ -1,0 +1,8 @@
+{"ip":"172.17.0.1","endpoint":"/auth","method":"POST","payload":{"user":"root","pass":"toor"},"user_agent":"curl/7.68.0","timestamp":"2026-04-11T01:23:45Z","label":"brute_force"}
+{"ip":"10.8.34.56","endpoint":"/data","method":"GET","query":{},"user_agent":"Mozilla/5.0","timestamp":"2026-04-11T01:24:12Z","label":"benign"}
+{"ip":"192.168.1.50","endpoint":"/admin","method":"GET","query":{},"user_agent":"python-requests/2.28.1","timestamp":"2026-04-11T01:25:00Z","label":"scan"}
+{"ip":"172.17.0.1","endpoint":"/auth","method":"POST","payload":{"user":"admin","pass":"password123"},"user_agent":"curl/7.68.0","timestamp":"2026-04-11T01:25:30Z","label":"brute_force"}
+{"ip":"10.0.0.5","endpoint":"/api/v1/users","method":"GET","query":{"id":"1 OR 1=1"},"user_agent":"Bot/1.0","timestamp":"2026-04-11T01:26:00Z","label":"injection"}
+{"ip":"192.168.2.10","endpoint":"/upload","method":"POST","payload":"<script>alert(1)</script>","user_agent":"Mozilla/5.0","timestamp":"2026-04-11T01:27:00Z","label":"injection"}
+{"ip":"10.8.34.56","endpoint":"/data","method":"GET","query":{"page":"2"},"user_agent":"Mozilla/5.0","timestamp":"2026-04-11T01:28:00Z","label":"benign"}
+{"ip":"172.20.0.1","endpoint":"/.env","method":"GET","query":{},"user_agent":"DirBuster/1.0","timestamp":"2026-04-11T01:29:00Z","label":"scan"}
