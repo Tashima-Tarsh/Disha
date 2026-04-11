@@ -41,7 +41,7 @@
 
 ## ✨ What is Disha?
 
-Disha is a **five-layer AI platform** unified in a single repository:
+Disha is a **six-layer AI platform** unified in a single repository:
 
 <table>
 <tr>
@@ -63,6 +63,11 @@ Disha is a **five-layer AI platform** unified in a single repository:
 <td align="center">⚔️</td>
 <td><b>Historical Strategy Intelligence</b><br><sub>Python · FastAPI · Next.js · sklearn</sub></td>
 <td>AI classifier + simulation engine for 32+ documented historical conflicts</td>
+</tr>
+<tr>
+<td align="center">⚖️</td>
+<td><b>Decision Engine</b><br><sub>Python · FAISS · llama-cpp-python</sub></td>
+<td>Multi-agent reasoning: political, legal (Constitution + case-law), ideological, security &amp; OSINT</td>
 </tr>
 <tr>
 <td align="center">🔗</td>
@@ -238,6 +243,51 @@ A new AI-powered module for **educational historical conflict analysis and strat
 </tr>
 </table>
 
+<br>
+
+## ⚖️ Decision Engine
+
+A **multi-agent reasoning framework** for political, legal, ideological, and security analysis — powered by FAISS retrieval and llama-cpp-python.
+
+<table>
+<tr>
+<td align="center" width="20%">
+  <h4>🏛️ Legal Agent</h4>
+  <sub>FAISS clause + case-law retrieval</sub>
+</td>
+<td align="center" width="20%">
+  <h4>🗳️ Political Agent</h4>
+  <sub>Stakeholder &amp; coalition analysis</sub>
+</td>
+<td align="center" width="20%">
+  <h4>📖 Ideology Agent</h4>
+  <sub>Gandhian · Marxist · Utilitarian · Rawlsian</sub>
+</td>
+<td align="center" width="20%">
+  <h4>🛡️ Security Agent</h4>
+  <sub>Threat modelling + OSINT</sub>
+</td>
+<td align="center" width="20%">
+  <h4>🤖 Orchestrator</h4>
+  <sub>Weighted multi-agent consensus</sub>
+</td>
+</tr>
+</table>
+
+```bash
+# Quick start (mock LLM — no model download needed)
+pip install -r decision-engine/requirements.txt
+cd decision-engine && DISHA_MODEL_PROVIDER=mock python -m pytest tests/ -v
+
+# Optional: FAISS retriever
+pip install faiss-cpu sentence-transformers
+
+# Optional: local LLM
+pip install llama-cpp-python
+```
+
+> See [`decision-engine/README.md`](./decision-engine/README.md) for full setup, index-building, and llama-cpp usage instructions.
+
 <img src="docs/images/divider.svg" width="100%" height="4">
 
 <br>
@@ -296,6 +346,7 @@ A new AI-powered module for **educational historical conflict analysis and strat
 | **[⌨️ docs/commands.md](./docs/commands.md)** | Complete command catalog |
 | **[🔧 docs/subsystems.md](./docs/subsystems.md)** | Bridge, MCP, plugins, skills, memory |
 | **[🧭 docs/exploration-guide.md](./docs/exploration-guide.md)** | Code navigation guide |
+| **[⚖️ decision-engine/README.md](./decision-engine/README.md)** | Decision Engine setup, index building, llama-cpp usage |
 | **[🤝 CONTRIBUTING.md](./CONTRIBUTING.md)** | How to contribute |
 
 ---
