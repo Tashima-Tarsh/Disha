@@ -513,7 +513,6 @@ async function _runAndCache(
   } catch (e) {
     if (epoch !== _apiKeyHelperEpoch) return ' '
     const detail = e instanceof Error ? e.message : String(e)
-    // biome-ignore lint/suspicious/noConsole: user-configured script failed; must be visible without --debug
     console.error(chalk.red(`apiKeyHelper failed: ${detail}`))
     logForDebugging(`Error getting API key from apiKeyHelper: ${detail}`, {
       level: 'error',
@@ -689,7 +688,6 @@ export function refreshAwsAuth(awsAuthRefresh: string): Promise<boolean> {
           : chalk.red(
               'Error running awsAuthRefresh (in settings or ~/.claude.json):',
             )
-        // biome-ignore lint/suspicious/noConsole:: intentional console output
         console.error(message)
         authStatusManager.endAuthentication(false)
         void resolve(false)
@@ -768,10 +766,8 @@ async function getAwsCredsFromCredentialExport(): Promise<{
         'Error getting AWS credentials from awsCredentialExport (in settings or ~/.claude.json):',
       )
       if (e instanceof Error) {
-        // biome-ignore lint/suspicious/noConsole:: intentional console output
         console.error(message, e.message)
       } else {
-        // biome-ignore lint/suspicious/noConsole:: intentional console output
         console.error(message, e)
       }
       return null
@@ -957,7 +953,6 @@ export function refreshGcpAuth(gcpAuthRefresh: string): Promise<boolean> {
           : chalk.red(
               'Error running gcpAuthRefresh (in settings or ~/.claude.json):',
             )
-        // biome-ignore lint/suspicious/noConsole:: intentional console output
         console.error(message)
         authStatusManager.endAuthentication(false)
         void resolve(false)

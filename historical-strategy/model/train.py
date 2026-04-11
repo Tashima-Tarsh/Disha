@@ -5,6 +5,7 @@ evaluates with cross-validation, and saves models and metrics.
 """
 
 import json
+import logging
 import sys
 import numpy as np
 from pathlib import Path
@@ -26,6 +27,8 @@ from model.classifier import StrategyClassifier  # noqa: E402
 DATA_DIR = Path(__file__).parent.parent / "data" / "processed"
 MODEL_DIR = Path(__file__).parent / "saved"
 
+logger = logging.getLogger(__name__)
+
 
 def load_processed_data():
     """Load preprocessed feature/label arrays and metadata."""
@@ -37,25 +40,25 @@ def load_processed_data():
     with open(DATA_DIR / "metadata.json") as f:
         metadata = json.load(f)
 
-    print(f"[Train] Loaded: X_train={X_train.shape}, X_test={X_test.shape}")
+    logger.info("Loaded: X_train=%s, X_test=%s", X_train.shape, X_test.shape)
     return X_train, X_test, y_train, y_test, metadata
 
 
 def print_confusion_matrix_text(cm: np.ndarray, labels: list):
     """Print a text-based confusion matrix."""
-    print("\n--- Confusion Matrix ---")
+    logger.info("--- Confusion Matrix ---")
     col_width = max(len(str(lbl)) for lbl in labels) + 2
     header = " " * col_width + "".join(f"{str(lbl):>{col_width}}" for lbl in labels)
-    print(header)
+    logger.info(header)
     for i, label in enumerate(labels):
         row = f"{str(label):>{col_width}}" + "".join(f"{cm[i, j]:>{col_width}}" for j in range(len(labels)))
-        print(row)
-    print()
+        logger.info(row)
+    logger.info("")
 
 
 def train_random_forest(X_train, y_train, metadata):
     """Train and cross-validate the RandomForest model."""
-    print("\n[Train] Training RandomForest StrategyClassifier...")
+    logger.info("Training RandomForest StrategyClassifier...")
 
     clf = StrategyClassifier(n_estimators=200, max_depth=15, random_state=42)
     clf.train(X_train, y_train, feature_names=metadata["feature_names"])
@@ -63,15 +66,15 @@ def train_random_forest(X_train, y_train, metadata):
     cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
     cv_scores = cross_val_score(clf.model, X_train, y_train, cv=cv, scoring="accuracy")
 
-    print(f"[Train] 5-fold CV accuracy: {cv_scores.mean():.4f} ± {cv_scores.std():.4f}")
-    print(f"[Train] CV scores per fold: {[round(s, 4) for s in cv_scores.tolist()]}")
+    logger.info("5-fold CV accuracy: %.4f ± %.4f", cv_scores.mean(), cv_scores.std())
+    logger.info("CV scores per fold: %s", [round(s, 4) for s in cv_scores.tolist()])
 
     return clf, cv_scores
 
 
 def train_mlp(X_train, y_train):
     """Train an MLP (neural network) as an alternative model."""
-    print("\n[Train] Training MLPClassifier (neural network)...")
+    logger.info("Training MLPClassifier (neural network)...")
 
     mlp = MLPClassifier(
         hidden_layer_sizes=(128, 64, 32),
@@ -85,7 +88,7 @@ def train_mlp(X_train, y_train):
         learning_rate_init=0.001,
     )
     mlp.fit(X_train, y_train)
-    print(f"[Train] MLP trained in {mlp.n_iter_} iterations.")
+    logger.info("MLP trained in %d iterations.", mlp.n_iter_)
     return mlp
 
 
@@ -93,35 +96,35 @@ def evaluate_models(rf_clf, mlp_clf, X_test, y_test, metadata):
     """Evaluate both models on test set."""
     labels = metadata["strategy_classes"]
 
-    print("\n" + "=" * 60)
-    print("RANDOM FOREST EVALUATION")
-    print("=" * 60)
+    logger.info("=" * 60)
+    logger.info("RANDOM FOREST EVALUATION")
+    logger.info("=" * 60)
     rf_preds = rf_clf.predict(X_test)
     rf_accuracy = accuracy_score(y_test, rf_preds)
-    print(f"Test Accuracy: {rf_accuracy:.4f}")
+    logger.info("Test Accuracy: %.4f", rf_accuracy)
     present_labels = sorted(list(set(y_test) | set(rf_preds)))
     present_names = [labels[i] for i in present_labels if i < len(labels)]
-    print("\n--- Classification Report ---")
-    print(classification_report(y_test, rf_preds, labels=present_labels, target_names=present_names, zero_division=0))
+    logger.info("--- Classification Report ---")
+    logger.info(classification_report(y_test, rf_preds, labels=present_labels, target_names=present_names, zero_division=0))
     rf_cm = confusion_matrix(y_test, rf_preds, labels=present_labels)
     print_confusion_matrix_text(rf_cm, present_names)
 
-    print("\n--- Feature Importances ---")
+    logger.info("--- Feature Importances ---")
     importances = rf_clf.get_feature_importance()
     for feat, imp in list(importances.items())[:10]:
         bar = "█" * int(imp * 40)
-        print(f"  {feat:<25} {bar} {imp:.4f}")
+        logger.info("  %-25s %s %.4f", feat, bar, imp)
 
-    print("\n" + "=" * 60)
-    print("MLP CLASSIFIER EVALUATION")
-    print("=" * 60)
+    logger.info("=" * 60)
+    logger.info("MLP CLASSIFIER EVALUATION")
+    logger.info("=" * 60)
     mlp_preds = mlp_clf.predict(X_test)
     mlp_accuracy = accuracy_score(y_test, mlp_preds)
-    print(f"Test Accuracy: {mlp_accuracy:.4f}")
+    logger.info("Test Accuracy: %.4f", mlp_accuracy)
     mlp_present = sorted(list(set(y_test) | set(mlp_preds)))
     mlp_names = [labels[i] for i in mlp_present if i < len(labels)]
-    print("\n--- Classification Report ---")
-    print(classification_report(y_test, mlp_preds, labels=mlp_present, target_names=mlp_names, zero_division=0))
+    logger.info("--- Classification Report ---")
+    logger.info(classification_report(y_test, mlp_preds, labels=mlp_present, target_names=mlp_names, zero_division=0))
 
     return rf_accuracy, mlp_accuracy, rf_cm
 
@@ -135,7 +138,7 @@ def save_models_and_metrics(rf_clf, mlp_clf, rf_accuracy, mlp_accuracy, cv_score
 
     # Save MLP
     joblib.dump(mlp_clf, MODEL_DIR / "mlp_classifier.pkl")
-    print(f"[Train] Saved MLP to {MODEL_DIR / 'mlp_classifier.pkl'}")
+    logger.info("Saved MLP to %s", MODEL_DIR / "mlp_classifier.pkl")
 
     # Save metrics
     metrics = {
@@ -160,14 +163,14 @@ def save_models_and_metrics(rf_clf, mlp_clf, rf_accuracy, mlp_accuracy, cv_score
 
     with open(MODEL_DIR / "metrics.json", "w") as f:
         json.dump(metrics, f, indent=2)
-    print(f"[Train] Saved metrics to {MODEL_DIR / 'metrics.json'}")
+    logger.info("Saved metrics to %s", MODEL_DIR / "metrics.json")
 
     return metrics
 
 
 def main():
     """Main training pipeline."""
-    print("[Train] Starting training pipeline...")
+    logger.info("Starting training pipeline...")
 
     X_train, X_test, y_train, y_test, metadata = load_processed_data()
 
@@ -181,8 +184,8 @@ def main():
         rf_clf, mlp_clf, rf_accuracy, mlp_accuracy, cv_scores, rf_cm, metadata
     )
 
-    print("\n[Train] Training pipeline complete.")
-    print(f"[Train] Best model: RandomForest with {metrics['random_forest']['test_accuracy']:.4f} test accuracy")
+    logger.info("Training pipeline complete.")
+    logger.info("Best model: RandomForest with %.4f test accuracy", metrics["random_forest"]["test_accuracy"])
     return metrics
 
 

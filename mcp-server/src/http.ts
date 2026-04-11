@@ -65,9 +65,10 @@ async function startStreamableHTTP(app: express.Express): Promise<void> {
       await server.connect(transport);
 
       // Store session after first request so we can retrieve it later
+      const currentTransport = transport;
       transport.onclose = () => {
-        if (transport!.sessionId) {
-          transports.delete(transport!.sessionId);
+        if (currentTransport.sessionId) {
+          transports.delete(currentTransport.sessionId);
         }
       };
     }
@@ -87,17 +88,23 @@ async function startStreamableHTTP(app: express.Express): Promise<void> {
       res.status(400).json({ error: "Invalid or missing session ID" });
       return;
     }
-    const transport = transports.get(sessionId)!;
+    const transport = transports.get(sessionId);
+    if (!transport) {
+      res.status(400).json({ error: "Invalid or missing session ID" });
+      return;
+    }
     await transport.handleRequest(req, res);
   });
 
   // DELETE — session cleanup
   app.delete("/mcp", async (req, res) => {
     const sessionId = req.headers["mcp-session-id"] as string | undefined;
-    if (sessionId && transports.has(sessionId)) {
-      const transport = transports.get(sessionId)!;
-      await transport.close();
-      transports.delete(sessionId);
+    if (sessionId) {
+      const transport = transports.get(sessionId);
+      if (transport) {
+        await transport.close();
+        transports.delete(sessionId);
+      }
     }
     res.status(200).json({ ok: true });
   });

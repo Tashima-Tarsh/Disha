@@ -562,8 +562,9 @@ export function createServer(): Server {
             const lines = content.split("\n");
             for (let i = 0; i < lines.length; i++) {
               if (matches.length >= maxResults) break;
-              if (regex.test(lines[i]!)) {
-                matches.push(`${file}:${i + 1}: ${lines[i]!.trim()}`);
+              const line = lines[i];
+              if (line !== undefined && regex.test(line)) {
+                matches.push(`${file}:${i + 1}: ${line.trim()}`);
               }
             }
           }

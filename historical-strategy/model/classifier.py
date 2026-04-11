@@ -3,12 +3,15 @@ Strategy Classifier and Recommender for Historical Strategy Intelligence System.
 Wraps RandomForestClassifier with additional utilities for strategy recommendation.
 """
 
+import logging
 import numpy as np
 import joblib
 from pathlib import Path
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.preprocessing import LabelEncoder
 from typing import List, Dict, Any, Optional
+
+logger = logging.getLogger(__name__)
 
 
 class StrategyClassifier:
@@ -38,7 +41,7 @@ class StrategyClassifier:
         self.classes_ = self.model.classes_
         self.feature_names_ = feature_names or [f"feature_{i}" for i in range(X.shape[1])]
         self.is_trained = True
-        print(f"[Classifier] Trained on {X.shape[0]} samples, {X.shape[1]} features, {len(np.unique(y))} classes.")
+        logger.info("Trained on %d samples, %d features, %d classes.", X.shape[0], X.shape[1], len(np.unique(y)))
         return self
 
     def predict(self, X: np.ndarray) -> np.ndarray:
@@ -73,7 +76,7 @@ class StrategyClassifier:
             "is_trained": self.is_trained,
         }
         joblib.dump(payload, save_path)
-        print(f"[Classifier] Saved model to {save_path}")
+        logger.info("Saved model to %s", save_path)
 
     def load(self, path: str) -> "StrategyClassifier":
         """Load model and metadata from disk."""
@@ -82,7 +85,7 @@ class StrategyClassifier:
         self.classes_ = payload["classes_"]
         self.feature_names_ = payload["feature_names_"]
         self.is_trained = payload["is_trained"]
-        print(f"[Classifier] Loaded model from {path}")
+        logger.info("Loaded model from %s", path)
         return self
 
 

@@ -4,6 +4,7 @@ Provides probabilistic battle outcome simulation based on historical strategy pa
 """
 
 import json
+import logging
 import math
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -16,6 +17,8 @@ from simulation.scenarios import (
 )
 
 DATA_FILE = Path(__file__).parent.parent / "data" / "historical_data.json"
+
+logger = logging.getLogger(__name__)
 
 # Historical success rates by strategy and terrain
 STRATEGY_EFFECTIVENESS: Dict[str, Dict[str, float]] = {
@@ -174,9 +177,9 @@ class HistoricalSimulationEngine:
         if DATA_FILE.exists():
             with open(DATA_FILE) as f:
                 self.historical_data = json.load(f)
-            print(f"[Engine] Loaded {len(self.historical_data)} historical conflicts.")
+            logger.info("Loaded %d historical conflicts.", len(self.historical_data))
         else:
-            print(f"[Engine] WARNING: Data file not found at {DATA_FILE}")
+            logger.warning("Data file not found at %s", DATA_FILE)
 
     def run_simulation(self, scenario_params: Dict[str, Any]) -> SimulationResult:
         """
