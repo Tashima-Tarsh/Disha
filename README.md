@@ -119,7 +119,7 @@ All previously stubbed or paid-API dependencies have been replaced:
 | Audio transcription | OpenAI Whisper API (paid) | `openai-whisper` Python package (runs locally) |
 | Vision analysis | GPT-4o Vision (paid) | GPT-4o or **LLaVA** via Ollama (self-hostable) |
 | LLM (analysis) | gpt-3.5-turbo (deprecated) | **gpt-4o-mini** / gpt-4o with current pricing |
-| Threat intel feeds | — | **Feodo Tracker**, **EmergingThreats**, **IPsum** (all free) |
+| Threat intelligence feeds | — | **Feodo Tracker**, **EmergingThreats**, **IPsum** (all free) |
 | Maps | Google Maps | **OpenStreetMap + Leaflet** (free, open-source) |
 | Charts | — | **Chart.js** (MIT) |
 
