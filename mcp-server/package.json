@@ -8,7 +8,10 @@
     "url": "https://github.com/Monster/claude-code.git"
   },
   "author": "Monster",
+copilot/replace-contributor-handles-monster
+  "homepage": "https://github.com/codeaashu/claude-code#readme",
   "homepage": "https://github.com/Monster/claude-code#readme",
+ main
   "bugs": {
     "url": "https://github.com/Monster/claude-code/issues"
   },
@@ -34,5 +37,3 @@
     "typescript": "^6.0.2"
   }
 }
-
-
