@@ -41,7 +41,7 @@
 
 ## ✨ What is Disha?
 
-Disha is a **five-layer AI platform** unified in a single repository:
+Disha is a **six-layer AI platform** unified in a single repository:
 
 <table>
 <tr>
@@ -63,6 +63,11 @@ Disha is a **five-layer AI platform** unified in a single repository:
 <td align="center">⚔️</td>
 <td><b>Historical Strategy Intelligence</b><br><sub>Python · FastAPI · Next.js · sklearn</sub></td>
 <td>AI classifier + simulation engine for 32+ documented historical conflicts</td>
+</tr>
+<tr>
+<td align="center">⚖️</td>
+<td><b>Decision Engine</b><br><sub>Python · FAISS · llama-cpp-python</sub></td>
+<td>Multi-agent reasoning: political, legal (Constitution + case-law), ideological, security &amp; OSINT</td>
 </tr>
 <tr>
 <td align="center">🔗</td>
@@ -238,6 +243,51 @@ A new AI-powered module for **educational historical conflict analysis and strat
 </tr>
 </table>
 
+<br>
+
+## ⚖️ Decision Engine
+
+A **multi-agent reasoning framework** for political, legal, ideological, and security analysis — powered by FAISS retrieval and llama-cpp-python.
+
+<table>
+<tr>
+<td align="center" width="20%">
+  <h4>🏛️ Legal Agent</h4>
+  <sub>FAISS clause + case-law retrieval</sub>
+</td>
+<td align="center" width="20%">
+  <h4>🗳️ Political Agent</h4>
+  <sub>Stakeholder &amp; coalition analysis</sub>
+</td>
+<td align="center" width="20%">
+  <h4>📖 Ideology Agent</h4>
+  <sub>Gandhian · Marxist · Utilitarian · Rawlsian</sub>
+</td>
+<td align="center" width="20%">
+  <h4>🛡️ Security Agent</h4>
+  <sub>Threat modelling + OSINT</sub>
+</td>
+<td align="center" width="20%">
+  <h4>🤖 Orchestrator</h4>
+  <sub>Weighted multi-agent consensus</sub>
+</td>
+</tr>
+</table>
+
+```bash
+# Quick start (mock LLM — no model download needed)
+pip install -r decision-engine/requirements.txt
+cd decision-engine && DISHA_MODEL_PROVIDER=mock python -m pytest tests/ -v
+
+# Optional: FAISS retriever
+pip install faiss-cpu sentence-transformers
+
+# Optional: local LLM
+pip install llama-cpp-python
+```
+
+> See [`decision-engine/README.md`](./decision-engine/README.md) for full setup, index-building, and llama-cpp usage instructions.
+
 <img src="docs/images/divider.svg" width="100%" height="4">
 
 <br>
@@ -282,6 +332,65 @@ A new AI-powered module for **educational historical conflict analysis and strat
 
 <img src="docs/images/divider.svg" width="100%" height="4">
 
+---
+
+## ⚖️ Decision Framework
+
+A multi-agent AI system for political decision-making, legal reasoning (grounded in the Constitution of India), ethical/ideological analysis, and national security assessment. Each agent debates and a consensus engine produces a weighted final recommendation.
+
+### Agents
+
+| Agent | Role | Sources |
+|-------|------|---------|
+| **PoliticalAgent** | Governance implications, stakeholder analysis | Policy precedents |
+| **LegalAgent** | Constitutional & case-law reasoning | FAISS-indexed clauses, case law corpus |
+| **IdeologyAgent** | Multi-lens ethical analysis (Marxist, Gandhian, Ambedkarite, Utilitarian) | Philosophical frameworks |
+| **SecurityAgent** | Threat modeling, OSINT integration | RSS/JSON feeds, structured threat models |
+
+### Quick Start (mock mode — no dependencies)
+
+```bash
+cd decision-framework
+pip install -r requirements.txt
+DISHA_MODEL_PROVIDER=mock python example/use_case.py
+```
+
+### Commands to Run
+
+**a) Install optional dependencies:**
+
+```bash
+pip install faiss-cpu sentence-transformers "llama-cpp-python>=0.1.71"
+```
+
+**b) Build FAISS index:**
+
+```bash
+cd decision-framework
+python utils/text_segmenter.py data/raw/constitution_of_india.txt \
+    --out data/index/constitution_clauses.txt
+python utils/build_faiss_index.py data/index/constitution_clauses.txt \
+    --out data/index/constitution.faiss \
+    --meta data/index/constitution_meta.json
+```
+
+**c) Run with llama-cpp-python (local LLaMA / Mistral model):**
+
+```bash
+export DISHA_MODEL_PROVIDER=llamacpp
+export DISHA_MODEL_PATH=/path/to/model.gguf
+cd decision-framework
+python example/use_case.py
+```
+
+**d) Run tests:**
+
+```bash
+cd decision-framework
+DISHA_MODEL_PROVIDER=mock python -m pytest tests/ -v
+```
+
+<img src="docs/images/divider.svg" width="100%" height="4">
 
 ---
 
@@ -296,6 +405,7 @@ A new AI-powered module for **educational historical conflict analysis and strat
 | **[⌨️ docs/commands.md](./docs/commands.md)** | Complete command catalog |
 | **[🔧 docs/subsystems.md](./docs/subsystems.md)** | Bridge, MCP, plugins, skills, memory |
 | **[🧭 docs/exploration-guide.md](./docs/exploration-guide.md)** | Code navigation guide |
+| **[⚖️ decision-engine/README.md](./decision-engine/README.md)** | Decision Engine setup, index building, llama-cpp usage |
 | **[🤝 CONTRIBUTING.md](./CONTRIBUTING.md)** | How to contribute |
 
 ---
