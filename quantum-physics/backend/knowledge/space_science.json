@@ -1,0 +1,82 @@
+{
+  "domain": "Space Science",
+  "description": "Cosmology, orbital mechanics, exoplanets, and space exploration",
+  "topics": [
+    {
+      "id": "cosmology",
+      "name": "Cosmology",
+      "description": "The large-scale structure and history of the universe",
+      "key_facts": [
+        "Universe age: 13.8 billion years",
+        "Observable universe diameter: ~93 billion light-years",
+        "CMB temperature: 2.725 K",
+        "Dark matter: ~27% of universe",
+        "Dark energy: ~68% of universe",
+        "Ordinary matter: ~5% of universe"
+      ],
+      "models": ["ΛCDM (Standard Model of Cosmology)", "Inflationary cosmology", "String landscape", "Ekpyrotic scenario"],
+      "key_events": [
+        {"name": "Big Bang", "time_ago": "13.8 billion years"},
+        {"name": "Cosmic inflation", "time_ago": "13.8 billion years - 10⁻³²s"},
+        {"name": "Quark epoch", "time_ago": "13.8 billion years - 10⁻¹²s"},
+        {"name": "CMB emission (recombination)", "time_ago": "13.8 billion years - 380,000 years"},
+        {"name": "First stars", "time_ago": "~13.5 billion years"},
+        {"name": "Milky Way formation", "time_ago": "~13.6 billion years"},
+        {"name": "Solar System formation", "time_ago": "4.6 billion years"},
+        {"name": "Life on Earth", "time_ago": "3.8 billion years"}
+      ]
+    },
+    {
+      "id": "orbital_mechanics",
+      "name": "Orbital Mechanics",
+      "description": "The motion of celestial bodies under gravity",
+      "key_laws": [
+        "Kepler's First Law: Orbits are ellipses with the central body at one focus",
+        "Kepler's Second Law: Equal areas swept in equal times (conservation of angular momentum)",
+        "Kepler's Third Law: T² ∝ a³",
+        "Vis-viva equation: v² = GM(2/r - 1/a)"
+      ],
+      "orbit_types": ["LEO", "MEO", "GEO", "HEO", "Molniya", "Lagrange point", "transfer orbit", "escape trajectory"]
+    },
+    {
+      "id": "solar_system",
+      "name": "Solar System",
+      "description": "Our planetary system",
+      "planets": [
+        {"name": "Mercury", "mass_kg": 3.3e23, "radius_km": 2440, "orbital_period_days": 87.97, "distance_au": 0.387},
+        {"name": "Venus", "mass_kg": 4.87e24, "radius_km": 6052, "orbital_period_days": 224.7, "distance_au": 0.723},
+        {"name": "Earth", "mass_kg": 5.97e24, "radius_km": 6371, "orbital_period_days": 365.25, "distance_au": 1.0},
+        {"name": "Mars", "mass_kg": 6.39e23, "radius_km": 3390, "orbital_period_days": 686.97, "distance_au": 1.524},
+        {"name": "Jupiter", "mass_kg": 1.90e27, "radius_km": 69911, "orbital_period_days": 4332.6, "distance_au": 5.203},
+        {"name": "Saturn", "mass_kg": 5.68e26, "radius_km": 58232, "orbital_period_days": 10759.2, "distance_au": 9.537},
+        {"name": "Uranus", "mass_kg": 8.68e25, "radius_km": 25362, "orbital_period_days": 30688.5, "distance_au": 19.191},
+        {"name": "Neptune", "mass_kg": 1.02e26, "radius_km": 24622, "orbital_period_days": 60182.0, "distance_au": 30.07}
+      ]
+    },
+    {
+      "id": "exoplanets",
+      "name": "Exoplanets",
+      "description": "Planets orbiting stars beyond our solar system",
+      "discovery_methods": ["Transit photometry", "Radial velocity", "Direct imaging", "Gravitational microlensing", "Astrometry"],
+      "notable_systems": [
+        {"name": "TRAPPIST-1", "planets": 7, "habitable_zone_planets": 3, "distance_ly": 39.5},
+        {"name": "Kepler-442", "planets": 1, "habitable_zone_planets": 1, "distance_ly": 1206},
+        {"name": "Proxima Centauri", "planets": 2, "habitable_zone_planets": 1, "distance_ly": 4.2}
+      ],
+      "total_confirmed": 5500
+    },
+    {
+      "id": "black_holes",
+      "name": "Black Holes",
+      "description": "Regions of spacetime where gravity is so strong nothing can escape",
+      "types": ["Stellar black hole", "Intermediate black hole", "Supermassive black hole", "Primordial black hole"],
+      "key_facts": [
+        "Event horizon: Schwarzschild radius r_s = 2GM/c²",
+        "Hawking radiation: T_H = ℏc³/(8πGMk_B)",
+        "Milky Way SMBH: Sagittarius A* — 4 million solar masses",
+        "First image: M87* imaged by Event Horizon Telescope in 2019"
+      ]
+    }
+  ],
+  "keywords": ["cosmos", "orbit", "planet", "star", "galaxy", "NASA", "space", "black hole", "exoplanet", "cosmology"]
+}
