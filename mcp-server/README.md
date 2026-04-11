@@ -1,8 +1,17 @@
 # Monster Codemaster — MCP Server
+copilot/update-contributor-handles
+
+A standalone [Model Context Protocol](https://modelcontextprotocol.io/) (MCP) server that lets any MCP-compatible client explore the Claude Code source code. Rebranded and published by Monster. Supports **STDIO**, **Streamable HTTP**, and **SSE** transports.
+
+## What It Does
+
+Exposes 8 tools, 3 resources, and 5 prompts for navigating the ~1,900-file, 512K+ line Claude Code codebase. This is the official npm package: `monster-codemaster`.
+
 
 ## What It Does
 
 Exposes 8 tools, 3 resources, and 5 prompts for navigating the ~1,900-file, 512K+ line Claude Code codebase. This is the official npm package: `Monster-codemaster`.
+ main
 
 ### Transports
 
@@ -85,7 +94,10 @@ Add to `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS)
 ```json
 {
   "mcpServers": {
+copilot/update-contributor-handles
+    "monster-codemaster": {
     "Monster-codemaster": {
+ main
       "command": "node",
       "args": ["/absolute/path/to/claude-code/mcp-server/dist/index.js"],
       "env": {
@@ -245,7 +257,10 @@ cd mcp-server
 ../mcp-publisher publish
 ```
 
+ copilot/update-contributor-handles
+Registry name: `monster-codemaster`
 Registry name: `Monster-codemaster`
+ main
 
 ## Development
 
