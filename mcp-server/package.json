@@ -1,21 +1,36 @@
 {
+copilot/update-contributor-handles
   "name": "monster-codemaster",
   "version": "1.1.0",
   "mcpName": "io.github.monster/monster-codemaster",
+
+  "name": "Monster-codemaster",
+  "version": "1.1.0",
+  "mcpName": "io.github.Monster/Monster-codemaster",
+ main
   "description": "MCP server for exploring the Claude Code source code — rebranded and published by Monster. STDIO, HTTP, and SSE transports.",
   "repository": {
     "type": "git",
-    "url": "https://github.com/codeaashu/claude-code.git"
+    "url": "https://github.com/Monster/claude-code.git"
   },
   "author": "Monster",
+copilot/update-contributor-handles
+copilot/replace-contributor-handles-monster
+main
   "homepage": "https://github.com/codeaashu/claude-code#readme",
+  "homepage": "https://github.com/Monster/claude-code#readme",
+ main
   "bugs": {
-    "url": "https://github.com/codeaashu/claude-code/issues"
+    "url": "https://github.com/Monster/claude-code/issues"
   },
   "type": "module",
   "main": "dist/index.js",
   "bin": {
+copilot/update-contributor-handles
     "monster-codemaster": "dist/index.js"
+
+    "Monster-codemaster": "dist/index.js"
+ main
   },
   "scripts": {
     "build": "tsc",
@@ -34,5 +49,3 @@
     "typescript": "^6.0.2"
   }
 }
-
-
