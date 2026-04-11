@@ -1,10 +1,22 @@
 # Monster Codemaster — MCP Server
+copilot/remove-ashu-metadata-again
+copilot/update-contributor-handles
+main
 
 A standalone [Model Context Protocol](https://modelcontextprotocol.io/) (MCP) server that lets any MCP-compatible client explore the Claude Code source code. Rebranded and published by Monster. Supports **STDIO**, **Streamable HTTP**, and **SSE** transports.
 
 ## What It Does
 
 Exposes 8 tools, 3 resources, and 5 prompts for navigating the ~1,900-file, 512K+ line Claude Code codebase. This is the official npm package: `monster-codemaster`.
+copilot/remove-ashu-metadata-again
+
+
+
+## What It Does
+
+Exposes 8 tools, 3 resources, and 5 prompts for navigating the ~1,900-file, 512K+ line Claude Code codebase. This is the official npm package: `Monster-codemaster`.
+ main
+main
 
 ### Transports
 
@@ -87,7 +99,14 @@ Add to `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS)
 ```json
 {
   "mcpServers": {
+copilot/remove-ashu-metadata-again
     "monster-codemaster": {
+
+copilot/update-contributor-handles
+    "monster-codemaster": {
+    "Monster-codemaster": {
+ main
+main
       "command": "node",
       "args": ["/absolute/path/to/claude-code/mcp-server/dist/index.js"],
       "env": {
@@ -247,7 +266,13 @@ cd mcp-server
 ../mcp-publisher publish
 ```
 
+copilot/remove-ashu-metadata-again
 Registry name: `monster-codemaster`
+ copilot/update-contributor-handles
+Registry name: `monster-codemaster`
+Registry name: `Monster-codemaster`
+ main
+main
 
 ## Development
 
