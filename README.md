@@ -1,189 +1,230 @@
-# Claude Platform — Unified AI for Science, Space, Risk, and Alerts
+# 🛡️ Disha — Self-Learning Distributed AGI Platform
 
-A modular AI platform designed to combine:
-- multi-model intelligence orchestration
-- geospatial (GIS) risk analysis
-- disaster early-warning and response workflows
-- science/space reasoning (ISRO/NASA context)
-- safe knowledge retrieval across technical and human domains
+<p align="center">
+  <img src="https://img.shields.io/badge/Files-2%2C177-blue?style=flat-square" alt="Files">
+  <img src="https://img.shields.io/badge/Lines_of_Code-546K+-green?style=flat-square" alt="LoC">
+  <img src="https://img.shields.io/badge/Agents-7-orange?style=flat-square" alt="Agents">
+  <img src="https://img.shields.io/badge/Tools-40+-red?style=flat-square" alt="Tools">
+  <img src="https://img.shields.io/badge/RL_Engine-PPO-purple?style=flat-square" alt="RL">
+  <img src="https://img.shields.io/badge/Multimodal-Vision%20%2B%20Audio-teal?style=flat-square" alt="Multimodal">
+</p>
 
-> This repository is structured to evolve via PR-driven modules and production-ready integrations.
-
----
-
-## What this repo is built for
-
-This project aims to provide a single operational AI stack that can:
-
-1. **Understand complex domains**
-   - space missions, planetary context, solar system concepts
-   - geospatial context (maps, regions, hazard layers)
-   - scientific reasoning (math + simulation-ready workflows)
-
-2. **Support public-impact workflows**
-   - disaster monitoring and response (India-focused templates)
-   - event detection, prioritization, and alert routing
-   - coordination-ready output for teams and operators
-
-3. **Deliver actionable outputs**
-   - API responses with confidence-aware structure
-   - dashboard visibility for monitoring and triage
-   - CLI support for automation and operations
+> **Disha** (दिशा) — *"Direction"* in Sanskrit. A self-learning, multi-agent AGI platform combining a production-grade AI coding assistant with a distributed threat intelligence system featuring reinforcement learning, multimodal analysis, and autonomous agent collaboration.
 
 ---
 
-## Current capability map
+## ✨ What is Disha?
 
-### 1) AI Orchestration Layer
-- Multi-model routing and response aggregation
-- Task-based reasoning pipelines
-- Extensible plugin/module model
+Disha is a **two-layer AI platform**:
 
-### 2) Space + Science Layer (in PR scope)
-- ISRO/NASA contextual knowledge ingestion
-- Solar system entity modeling
-- Mathematical/simulation-oriented interfaces
+| Layer | Stack | Purpose |
+|-------|-------|---------|
+| **Core CLI Engine** | TypeScript · Bun · React | AI coding assistant with 40+ tools, 50+ commands, IDE integration, streaming LLM |
+| **AI Intelligence Platform** | Python · FastAPI · PyTorch | Multi-agent threat intel with RL optimization, multimodal fusion, distributed collaboration |
 
-### 3) GIS + Disaster Intelligence Layer
-- Geospatial overlays and hazard context
-- Region/state/city-oriented response templates
-- Early-warning decision support workflows
+### Key Capabilities
 
-### 4) Alerting Layer
-- Policy-based severity classification
-- Multi-channel notifications (email/webhook/push-ready)
-- Escalation pathways and operational logging
-
-### 5) Security + Safety Layer
-- Secret-safe docs and configs
-- Guardrails for sensitive categories
-- Audit-friendly design conventions
+| Feature | Description |
+|---------|-------------|
+| 🧠 **Self-Learning RL** | PPO reinforcement learning optimizes investigation strategies from human feedback |
+| 👁️ **Multimodal AGI** | Fuses text + GPT-4o vision + Whisper audio for comprehensive threat analysis |
+| 🌐 **Distributed Cluster** | AutoGen-style multi-agent collaboration with peer review and consensus voting |
+| 📈 **Self-Improving Prompts** | Evolutionary optimization with Thompson sampling, mutation, crossover, few-shot |
+| 🏆 **Intelligence Ranking** | PageRank + temporal decay + multi-criteria entity scoring |
+| 🔗 **Knowledge Graph** | Neo4j entity mapping + GNN link prediction |
+| ⚡ **Real-Time Streaming** | WebSocket alerts, Kafka event streaming, live dashboard |
+| 🛠️ **40+ AI Tools** | File I/O, shell, web, MCP, LSP, agent spawning |
+| 🔌 **50+ Commands** | Git, review, security, config, session, MCP management |
 
 ---
 
-## High-level architecture
+## 🏗️ Architecture
 
-```text
-[Data Sources]
-   ├─ Space/Science
-   ├─ GIS/Environmental
-   ├─ Operational Events
-   └─ Knowledge Corpora
-        |
-        v
-[Ingestion + Normalization]
-        |
-        v
-[Reasoning + Model Orchestration]
-   ├─ Risk Scoring
-   ├─ Scientific Context
-   ├─ Policy Logic
-   └─ Confidence Layer
-        |
-        +-------------------+
-        |                   |
-        v                   v
- [API / CLI]          [Alert Engine]
-        |                   |
-        +---------+---------+
-                  v
-            [Web Dashboard]
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                       DISHA PLATFORM                            │
+├─────────────────────────┬───────────────────────────────────────┤
+│  CORE CLI (TypeScript)  │   AI INTELLIGENCE (Python/FastAPI)    │
+│                         │                                       │
+│  Query Engine           │   7 Specialized Agents                │
+│  ├─ Claude API stream   │   ├─ OSINT (Shodan, DNS, SpiderFoot) │
+│  ├─ Tool-call loops     │   ├─ Crypto (Ethereum/Etherscan)     │
+│  └─ Auto-compaction     │   ├─ Detection (Isolation Forest)    │
+│                         │   ├─ Graph (Neo4j/Cypher)            │
+│  40+ Tools              │   ├─ Reasoning (GPT-4/LangChain)     │
+│  ├─ Bash, Files, Web    │   ├─ Vision (GPT-4o)                 │
+│  ├─ MCP, LSP, Agents    │   └─ Audio (Whisper)                 │
+│  └─ Plans, Tasks        │                                       │
+│                         │   RL Engine (PPO + Replay)            │
+│  50+ Commands           │   Prompt Optimizer (Evolutionary)     │
+│  ├─ Git, Review         │   Intelligence Ranker (PageRank)      │
+│  ├─ Config, Session     │   Cluster Coordinator (AutoGen)       │
+│  └─ MCP, Plugins        │   Knowledge Graph (Neo4j + GNN)       │
+│                         │                                       │
+│  Terminal UI (Ink)      │   Services:                           │
+│  Bridge (VS Code)       │   ChromaDB · Kafka · WebSocket        │
+│  Coordinator (Teams)    │   Alerts · Vector Store               │
+├─────────────────────────┼───────────────────────────────────────┤
+│   Web Dashboard (Next.js + Tailwind)  │  22 API Endpoints      │
+├─────────────────────────┼───────────────────────────────────────┤
+│   Docker (7 services)   │  PostgreSQL│Neo4j│ChromaDB│Kafka      │
+└─────────────────────────┴───────────────────────────────────────┘
 ```
 
 ---
 
-## What it can do (practical)
+## 🚀 Quick Start
 
-- Correlate event signals with region/hazard context
-- Generate structured alerts by severity and policy
-- Provide space/science contextual answers for exploration use-cases
-- Support operators with dashboard + API + CLI access
-- Enable modular expansion by PR without breaking core services
+### Option 1: CLI Engine
 
----
-
-## Quick start
-
-### Install
 ```bash
-npm install
+curl -fsSL https://bun.sh/install | bash   # Install Bun
+bun install                                  # Install dependencies
+cp .env.example .env                         # Configure API keys
+bun run dev                                  # Start CLI
 ```
 
-### Configure
+### Option 2: AI Platform
+
 ```bash
-cp .env.example .env
+cd ai-platform/backend
+python -m venv venv && source venv/bin/activate
+pip install -r requirements.txt
+uvicorn app.main:app --reload --port 8000    # Start backend
+
+cd ../frontend
+npm install && npm run dev                   # Start dashboard
 ```
 
-### Run (dev)
+### Option 3: Full Stack (Docker)
+
 ```bash
-npm run dev
+cd ai-platform/docker
+docker-compose up -d
+# Backend:  http://localhost:8000
+# Frontend: http://localhost:3001
+# Neo4j:    http://localhost:7474
 ```
 
-### Test
-```bash
-npm test
+---
+
+## 🤖 Intelligence Agents
+
+| Agent | Data Sources | Output |
+|-------|-------------|--------|
+| **OSINT** | Shodan, DNS, SpiderFoot | Hosts, domains, vulnerabilities |
+| **Crypto** | Etherscan API | Wallets, transactions, risk scores |
+| **Detection** | Isolation Forest / Z-score | Ranked anomalies |
+| **Graph** | Neo4j / Cypher | Entity relationships, communities |
+| **Reasoning** | GPT-4 / LangChain | Risk assessment, threat reports |
+| **Vision** | GPT-4o Vision API | Image classification, OCR, object detection |
+| **Audio** | Whisper API | Transcription, keyword spotting, threat analysis |
+
+### Investigation Pipeline
+
+```
+Data Collection ──► Anomaly Detection ──► Graph Storage ──► LLM Reasoning ──► Report
+  (OSINT+Crypto)    (Isolation Forest)    (Neo4j+GNN)      (GPT-4)         (Compiled)
 ```
 
 ---
 
-## Environment variables (no secrets in git)
+## 🧠 Reinforcement Learning
 
-Use `.env.example` with placeholders only.
-
-Suggested keys:
-- `APP_PORT`
-- `NODE_ENV`
-- `DATABASE_URL`
-- `REDIS_URL`
-- `JWT_SECRET`
-- `ALERT_WEBHOOK_URL`
-- `EMAIL_PROVIDER_API_KEY`
-- `SMS_PROVIDER_API_KEY`
+| Component | Detail |
+|-----------|--------|
+| **Algorithm** | Proximal Policy Optimization (PPO) |
+| **State** | 13-dim (entities, anomalies, risk, depth, agents_used, time) |
+| **Actions** | 8 (run 5 agents, increase/decrease depth, stop) |
+| **Reward** | Entity discovery (+0.1), anomaly (+0.5), risk change (×2.0), time penalty (-0.01) |
+| **Policy** | Actor-Critic MLP (13→64→64→8) with action masking |
+| **Replay** | Prioritized experience buffer (10K transitions, α=0.6) |
+| **Feedback** | Human true_positive/rating → RL reward signal |
 
 ---
 
-## Operational principles
+## 📊 Intelligence Ranking
 
-- **No secret leakage**: keys/tokens never committed
-- **PR-first development**: all major additions via scoped PRs
-- **Traceable changes**: docs + tests with feature updates
-- **Safety-aware outputs**: avoid harmful or non-compliant behavior
+```
+composite_score = threat×0.30 + impact×0.25 + confidence×0.20 + centrality×0.15 + recency×0.10
+```
 
----
-
-## Build & PR status workflow
-
-Track progress in:
-- GitHub Pull Requests
-- Copilot task sessions (if used)
-
-Recommended status tags:
-- `Queued`
-- `In Progress`
-- `Completed`
-- `Blocked`
+- **Centrality**: PageRank (damping=0.85, 20 iterations)
+- **Recency**: Exponential decay (24h half-life)
+- **Confidence**: Multi-source corroboration (1 source=0.3, 3+=1.0)
+- **Agent Reliability**: F1-score tracking with precision/recall per agent
 
 ---
 
-## Roadmap (active direction)
+## 🛠️ Tech Stack
 
-- Strengthen ISRO/NASA + GIS integration depth
-- Expand disaster playbooks and response automation
-- Improve confidence scoring and citation support
-- Add production deployment profiles and SLO monitoring
+| Component | Technology |
+|-----------|-----------|
+| **CLI Runtime** | Bun 1.1+ · TypeScript · React 19 + Ink |
+| **Backend** | FastAPI 0.115 · Uvicorn · Pydantic |
+| **LLM** | Anthropic Claude · OpenAI GPT-4/4o · LangChain |
+| **ML** | PyTorch 2.6 · PyTorch Geometric · PyOD |
+| **Vector DB** | ChromaDB 0.5 |
+| **Graph DB** | Neo4j 5.24 |
+| **Streaming** | Kafka · WebSocket |
+| **Frontend** | Next.js 14 · Tailwind CSS |
+| **Protocol** | Model Context Protocol (MCP) v1.29 |
+| **Deployment** | Docker · Vercel · Railway |
 
 ---
 
-## Contributing
+## 📈 Project Stats
 
-1. Create a feature branch  
-2. Keep PR scope focused  
-3. Add tests + docs for new modules  
-4. Request review before merge  
+| Metric | Count |
+|--------|-------|
+| Source files | 2,177 |
+| Lines of code | 546,425+ |
+| Intelligence agents | 7 |
+| AI tools | 40+ |
+| CLI commands | 50+ |
+| API endpoints | 22 |
+| React components | 140+ |
+| Dashboard tabs | 8 |
+| Docker services | 7 |
+| Documentation pages | 25+ |
 
 ---
 
-## License
+## 📖 Documentation
 
-Add your preferred license:
-- MIT / Apache-2.0 / Proprietary
+| Document | Description |
+|----------|-------------|
+| **[WIKI.md](./WIKI.md)** | Complete project wiki with every system documented |
+| **[USAGE_GUIDE.md](./USAGE_GUIDE.md)** | CLI usage, API endpoints, advanced features |
+| **[docs/architecture.md](./docs/architecture.md)** | System architecture deep-dive |
+| **[docs/tools.md](./docs/tools.md)** | Complete tool catalog with schemas |
+| **[docs/commands.md](./docs/commands.md)** | Complete command catalog |
+| **[docs/subsystems.md](./docs/subsystems.md)** | Bridge, MCP, plugins, skills, memory |
+| **[docs/exploration-guide.md](./docs/exploration-guide.md)** | Code navigation guide |
+| **[CONTRIBUTING.md](./CONTRIBUTING.md)** | How to contribute |
+| **[Skill.md](./Skill.md)** | Development conventions |
+| **[ai-platform/README.md](./ai-platform/README.md)** | AI platform setup guide |
+
+---
+
+## 🤝 Contributing
+
+1. Create a feature branch from `main`
+2. Keep PR scope focused (one feature per PR)
+3. Add type annotations for all new code
+4. Update documentation for new modules
+5. Request review before merge
+
+---
+
+## 🏛️ License
+
+See [LICENSE](./LICENSE) for details.
+
+---
+
+<p align="center">
+  <b>Disha</b> — Self-learning · Distributed · Multimodal · Autonomous
+  <br>
+  <sub>7 agents · 40+ tools · 50+ commands · PPO RL · PageRank · Vision + Audio · AutoGen collaboration</sub>
+</p>
