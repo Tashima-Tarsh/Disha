@@ -1,8 +1,8 @@
 # 🛡️ Disha — Self-Learning Distributed AGI Platform
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Files-2%2C177-blue?style=flat-square" alt="Files">
-  <img src="https://img.shields.io/badge/Lines_of_Code-546K+-green?style=flat-square" alt="LoC">
+  <img src="https://img.shields.io/badge/Files-2%2C198-blue?style=flat-square" alt="Files">
+  <img src="https://img.shields.io/badge/Lines_of_Code-555K+-green?style=flat-square" alt="LoC">
   <img src="https://img.shields.io/badge/Agents-7-orange?style=flat-square" alt="Agents">
   <img src="https://img.shields.io/badge/Tools-40+-red?style=flat-square" alt="Tools">
   <img src="https://img.shields.io/badge/RL_Engine-PPO-purple?style=flat-square" alt="RL">
@@ -35,6 +35,9 @@ Disha is a **two-layer AI platform**:
 | ⚡ **Real-Time Streaming** | WebSocket alerts, Kafka event streaming, live dashboard |
 | 🛠️ **40+ AI Tools** | File I/O, shell, web, MCP, LSP, agent spawning |
 | 🔌 **50+ Commands** | Git, review, security, config, session, MCP management |
+| 🖥️ **Web Dashboard** | 78 components, real-time collaboration, command palette, accessibility, mobile |
+| 👥 **Multiplayer Collaboration** | Presence avatars, cursor ghosts, typing indicators, annotations |
+| ♿ **Accessibility** | WCAG-compliant with skip nav, focus traps, live regions, screen reader support |
 
 ---
 
@@ -64,8 +67,12 @@ Disha is a **two-layer AI platform**:
 │  Terminal UI (Ink)      │   Services:                           │
 │  Bridge (VS Code)       │   ChromaDB · Kafka · WebSocket        │
 │  Coordinator (Teams)    │   Alerts · Vector Store               │
-├─────────────────────────┼───────────────────────────────────────┤
-│   Web Dashboard (Next.js + Tailwind)  │  22 API Endpoints      │
+├─────────────────────────┴───────────────────────────────────────┤
+│              WEB DASHBOARD (Next.js + Tailwind)                 │
+│  78 Components · ⌘K Palette · Collaboration · a11y · Mobile    │
+│  Tools Viz · Notifications · Settings · File Viewer · Export    │
+├─────────────────────────┬───────────────────────────────────────┤
+│   AI Dashboard (9 comp) │  22 API Endpoints + WebSocket         │
 ├─────────────────────────┼───────────────────────────────────────┤
 │   Docker (7 services)   │  PostgreSQL│Neo4j│ChromaDB│Kafka      │
 └─────────────────────────┴───────────────────────────────────────┘
@@ -177,16 +184,19 @@ composite_score = threat×0.30 + impact×0.25 + confidence×0.20 + centrality×0
 
 | Metric | Count |
 |--------|-------|
-| Source files | 2,177 |
-| Lines of code | 546,425+ |
+| Source files | 2,198 |
+| Lines of code | 555,457+ |
 | Intelligence agents | 7 |
 | AI tools | 40+ |
 | CLI commands | 50+ |
 | API endpoints | 22 |
-| React components | 140+ |
+| Web components | 78 (+ 9 AI dashboard) |
+| Custom hooks | 14 |
 | Dashboard tabs | 8 |
 | Docker services | 7 |
-| Documentation pages | 25+ |
+| Collaboration features | 5 (presence, cursors, typing, annotations) |
+| a11y components | 5 (WCAG-compliant) |
+| Documentation pages | 32+ |
 
 ---
 
@@ -224,7 +234,7 @@ See [LICENSE](./LICENSE) for details.
 ---
 
 <p align="center">
-  <b>Disha</b> — Self-learning · Distributed · Multimodal · Autonomous
+  <b>Disha</b> — Self-learning · Distributed · Multimodal · Collaborative · Accessible
   <br>
-  <sub>7 agents · 40+ tools · 50+ commands · PPO RL · PageRank · Vision + Audio · AutoGen collaboration</sub>
+  <sub>2,198 files · 555K+ lines · 7 agents · 40+ tools · 50+ commands · PPO RL · PageRank · Vision + Audio · AutoGen · 78 web components</sub>
 </p>

@@ -1,12 +1,14 @@
 <p align="center">
   <img src="https://img.shields.io/badge/Disha-AGI%20Platform-blueviolet?style=for-the-badge&logo=data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZD0iTTEyIDJMMiA3bDEwIDVMMjIgN0wxMiAyeiIgZmlsbD0iI2ZmZiIvPjxwYXRoIGQ9Ik0yIDE3bDEwIDVsMTAtNSIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjIiLz48cGF0aCBkPSJNMiAxMmwxMCA1IDEwLTUiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2ZmZiIgc3Ryb2tlLXdpZHRoPSIyIi8+PC9zdmc+" alt="Disha">
   <br>
-  <img src="https://img.shields.io/badge/Files-2%2C177-blue?style=flat-square" alt="Files">
-  <img src="https://img.shields.io/badge/Lines_of_Code-546K+-green?style=flat-square" alt="LoC">
+  <img src="https://img.shields.io/badge/Files-2%2C198-blue?style=flat-square" alt="Files">
+  <img src="https://img.shields.io/badge/Lines_of_Code-555K+-green?style=flat-square" alt="LoC">
   <img src="https://img.shields.io/badge/Agents-7_Intelligence-orange?style=flat-square" alt="Agents">
   <img src="https://img.shields.io/badge/Tools-40+-red?style=flat-square" alt="Tools">
   <img src="https://img.shields.io/badge/Commands-50+-purple?style=flat-square" alt="Commands">
   <img src="https://img.shields.io/badge/API_Endpoints-22-teal?style=flat-square" alt="Endpoints">
+  <img src="https://img.shields.io/badge/Web_Components-143-yellow?style=flat-square" alt="Components">
+  <img src="https://img.shields.io/badge/Hooks-14-cyan?style=flat-square" alt="Hooks">
 </p>
 
 ---
@@ -41,13 +43,22 @@
   - [4.7 Services Layer](#47-services-layer)
   - [4.8 Graph Neural Networks](#48-graph-neural-networks)
 - [5. API Reference](#5-api-reference)
-- [6. Frontend Dashboard](#6-frontend-dashboard)
-- [7. MCP Server](#7-mcp-server)
-- [8. Infrastructure & Deployment](#8-infrastructure--deployment)
-- [9. Tech Stack](#9-tech-stack)
-- [10. Project Statistics](#10-project-statistics)
-- [11. Getting Started](#11-getting-started)
-- [12. Contributing](#12-contributing)
+- [6. AI Platform Dashboard](#6-ai-platform-dashboard)
+- [7. Web Dashboard (Full-Featured)](#7-web-dashboard-full-featured)
+  - [7.1 Collaboration System](#71-collaboration-system)
+  - [7.2 Tool Visualization](#72-tool-visualization)
+  - [7.3 Accessibility (a11y)](#73-accessibility-a11y)
+  - [7.4 Notifications](#74-notifications)
+  - [7.5 Command Palette](#75-command-palette)
+  - [7.6 Settings & Configuration](#76-settings--configuration)
+  - [7.7 Mobile Support](#77-mobile-support)
+  - [7.8 Custom Hooks](#78-custom-hooks)
+- [8. MCP Server](#8-mcp-server)
+- [9. Infrastructure & Deployment](#9-infrastructure--deployment)
+- [10. Tech Stack](#10-tech-stack)
+- [11. Project Statistics](#11-project-statistics)
+- [12. Getting Started](#12-getting-started)
+- [13. Contributing](#13-contributing)
 
 ---
 
@@ -788,7 +799,7 @@ Real-time broadcast to all connected WebSocket clients, in-memory storage (max 1
 
 ---
 
-## 6. Frontend Dashboard
+## 6. AI Platform Dashboard
 
 **Location:** `ai-platform/frontend/` (Next.js + Tailwind CSS)
 
@@ -820,7 +831,161 @@ ClusterStatus   // agent status, capabilities, task counts
 
 ---
 
-## 7. MCP Server
+## 7. Web Dashboard (Full-Featured)
+
+**Location:** `web/` — 143 TypeScript/React files across 15 component directories
+
+The full-featured web dashboard is a **Next.js 14+ application** with real-time collaboration, accessibility features, mobile support, and a comprehensive component library. It serves as the primary user interface for the Disha platform.
+
+### Architecture
+
+```
+web/
+├── app/                     # Next.js App Router
+│   ├── page.tsx             # Main landing page
+│   ├── layout.tsx           # Root layout with providers
+│   └── globals.css          # Global styles
+├── components/              # 78 React components in 15 directories
+│   ├── collaboration/       # Real-time multiplayer features
+│   ├── tools/               # AI tool output visualization
+│   ├── layout/              # App structure (Sidebar, Header)
+│   ├── ui/                  # Base UI library (shadcn/ui)
+│   ├── a11y/                # Accessibility components
+│   ├── notifications/       # Toast & notification center
+│   ├── command-palette/     # ⌘K command palette
+│   ├── shortcuts/           # Keyboard shortcut system
+│   ├── file-viewer/         # File browser & previewer
+│   ├── settings/            # Settings panels
+│   ├── chat/                # Chat interface
+│   ├── adapted/             # Adaptive display components
+│   ├── export/              # Export functionality
+│   └── mobile/              # Mobile-optimized components
+├── hooks/                   # 14 custom React hooks
+├── lib/                     # Utilities & type definitions
+├── public/                  # Static assets + PWA manifest
+├── tailwind.config.ts       # Tailwind CSS configuration
+└── next.config.ts           # Next.js configuration
+```
+
+### 7.1 Collaboration System
+
+**Location:** `web/components/collaboration/` — Real-time multiplayer collaboration
+
+| Component | Purpose |
+|-----------|---------|
+| `CollaborationProvider` | Context provider wrapping the app with collaboration state |
+| `PresenceAvatars` | Shows online users with live avatar indicators |
+| `CursorGhost` | Renders other users' cursor positions in real-time |
+| `TypingIndicator` | Shows when collaborators are typing |
+| `AnnotationBadge` | Inline annotation markers for code review |
+
+### 7.2 Tool Visualization
+
+**Location:** `web/components/tools/` — Renders output from all 40+ AI tools
+
+| Component | Tool Visualized |
+|-----------|----------------|
+| `ToolBash` | Terminal command execution with ANSI color support |
+| `ToolFileRead` | File content viewer with syntax highlighting |
+| `ToolFileWrite` | File creation confirmation with content preview |
+| `ToolFileEdit` | Side-by-side diff view of file changes |
+| `ToolGlob` | File pattern matching results |
+| `ToolGrep` | Search results with line number context |
+| `ToolWebSearch` | Web search results with links |
+| `ToolWebFetch` | Fetched web content display |
+| `ToolUseBlock` | Generic tool output container |
+| `DiffView` | Unified/split diff rendering |
+| `FileIcon` | File type icon resolver |
+| `SyntaxHighlight` | Multi-language syntax highlighting |
+| `AnsiRenderer` | ANSI escape code → styled HTML |
+
+### 7.3 Accessibility (a11y)
+
+**Location:** `web/components/a11y/` — WCAG-compliant accessibility layer
+
+| Component | Purpose |
+|-----------|---------|
+| `SkipToContent` | Skip navigation link for keyboard users |
+| `Announcer` | Screen reader announcements for dynamic content |
+| `FocusTrap` | Traps focus within modal/dialog boundaries |
+| `LiveRegion` | ARIA live region for real-time updates |
+| `VisuallyHidden` | Content visible only to screen readers |
+
+### 7.4 Notifications
+
+**Location:** `web/components/notifications/` — Multi-channel notification system
+
+| Component | Purpose |
+|-----------|---------|
+| `NotificationCenter` | Central notification hub with history |
+| `NotificationBadge` | Unread count indicator |
+| `NotificationItem` | Individual notification card |
+| `ToastProvider` | Toast notification context provider |
+| `ToastStack` | Stacked toast position manager |
+| `Toast` | Individual toast notification with actions |
+
+### 7.5 Command Palette
+
+**Location:** `web/components/command-palette/` — ⌘K quick actions
+
+| Component | Purpose |
+|-----------|---------|
+| `CommandPalette` | Full command palette overlay with fuzzy search |
+| `CommandPaletteItem` | Individual command entry with icon & shortcut |
+
+### 7.6 Settings & Configuration
+
+**Location:** `web/components/settings/` — User preferences
+
+| Component | Purpose |
+|-----------|---------|
+| `GeneralSettings` | Theme, language, display preferences |
+| `ApiSettings` | API key management & endpoint configuration |
+| `McpSettings` | MCP server connection settings |
+| `KeyboardSettings` | Custom keybinding configuration |
+| `PermissionSettings` | Tool permission management |
+| `SettingRow` | Reusable settings row component |
+
+### 7.7 Mobile Support
+
+**Location:** `web/components/mobile/` — Responsive mobile experience
+
+Includes mobile-optimized layouts, touch gesture support, and viewport-aware components.
+
+### 7.8 Custom Hooks
+
+**Location:** `web/hooks/` — 14 specialized React hooks
+
+| Hook | Purpose |
+|------|---------|
+| `useCollaboration` | Manages real-time collaboration state |
+| `usePresence` | Tracks online users and their activity |
+| `useConversation` | Chat/conversation state management |
+| `useCommandRegistry` | Registers and resolves ⌘K commands |
+| `useKeyboardShortcuts` | Global keyboard shortcut binding |
+| `useNotifications` | Notification state & actions |
+| `useToast` | Toast creation & lifecycle |
+| `useTheme` | Dark/light theme switching |
+| `useMediaQuery` | Responsive breakpoint detection |
+| `useViewportHeight` | Mobile viewport height tracking |
+| `useTouchGesture` | Touch gesture recognition (swipe, pinch) |
+| `useFocusReturn` | Returns focus after modal closes |
+| `useReducedMotion` | Respects `prefers-reduced-motion` setting |
+| `useAriaLive` | Programmatic screen reader announcements |
+
+### Additional Web Features
+
+| Feature | Component/Location |
+|---------|--------------------|
+| **File Browser** | `file-viewer/` — FileBreadcrumb, ImageViewer, FileInfoBar, SearchBar |
+| **Export** | `export/` — Session and conversation export |
+| **Chat UI** | `chat/` — Full chat interface components |
+| **Keyboard Shortcuts** | `shortcuts/` — ShortcutsHelp overlay, ShortcutBadge |
+| **Base UI Library** | `ui/` — 11 shadcn/ui components (button, dialog, input, tabs, select, badge, tooltip, avatar, toast, dropdown-menu, textarea) |
+
+---
+
+## 8. MCP Server
 
 **Location:** `mcp-server/`
 
@@ -844,7 +1009,7 @@ A standalone Model Context Protocol server exposing the codebase for AI-assisted
 
 ---
 
-## 8. Infrastructure & Deployment
+## 9. Infrastructure & Deployment
 
 ### Docker
 
@@ -875,7 +1040,7 @@ Services:
 
 ---
 
-## 9. Tech Stack
+## 10. Tech Stack
 
 ### Core CLI Engine
 
@@ -917,15 +1082,17 @@ Services:
 
 ---
 
-## 10. Project Statistics
+## 11. Project Statistics
 
 | Metric | Value |
 |--------|-------|
-| **Total source files** | 2,177 |
-| **Total lines of code** | 546,425+ |
-| **TypeScript/TSX files** | ~2,000 |
+| **Total source files** | 2,198 |
+| **Total lines of code** | 555,457+ |
+| **TypeScript/TSX files** | ~2,100+ |
 | **Python files** | ~60 |
-| **React components** | 140+ |
+| **Web dashboard components** | 78 (in 15 directories) |
+| **AI platform components** | 9 |
+| **Web dashboard hooks** | 14 custom hooks |
 | **AI tools** | 40+ |
 | **CLI commands** | 50+ |
 | **API endpoints** | 22 |
@@ -935,12 +1102,15 @@ Services:
 | **Prompt variants** | 3 types × 5 population |
 | **Threat keywords** | 32+ |
 | **Docker services** | 7 |
-| **Documentation files** | 25+ |
+| **Documentation files** | 32+ |
 | **Build prompts** | 16 guided steps |
+| **Collaboration features** | 5 (presence, cursors, typing, annotations) |
+| **a11y components** | 5 (WCAG-compliant) |
+| **Settings panels** | 6 (General, API, MCP, Keyboard, Permissions) |
 
 ---
 
-## 11. Getting Started
+## 12. Getting Started
 
 ### Quick Start — CLI Engine
 
@@ -1009,7 +1179,7 @@ node dist/index.js  # STDIO mode
 
 ---
 
-## 12. Contributing
+## 13. Contributing
 
 ### Architecture Principles
 
@@ -1061,5 +1231,5 @@ class MyAgent(BaseAgent):
 <p align="center">
   <b>Disha</b> — A self-learning, distributed, multimodal AGI platform for intelligent threat analysis and AI-powered development.
   <br>
-  <sub>2,177 files · 546K+ lines · 7 agents · 40+ tools · 50+ commands · Self-improving RL loop</sub>
+  <sub>2,198 files · 555K+ lines · 7 agents · 40+ tools · 50+ commands · 78 web components · PPO RL · PageRank · Vision + Audio · AutoGen collaboration</sub>
 </p>
