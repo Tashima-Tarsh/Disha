@@ -1,0 +1,37 @@
+.DS_Store
+.env
+.env.*
+.state
+!.env.example
+!backend/cmd/installer/files/links/.env
+
+backend/tmp
+backend/build
+
+frontend/coverage
+frontend/dist
+frontend/node_modules
+frontend/ssl
+node_modules
+
+.cursorrules
+.cursorignore
+.cursor/
+.agents/
+skills-lock.json
+
+build/*
+data/*
+.bak/*
+!.gitkeep
+.claude/
+
+# IDE
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+Thumbs.db
+
