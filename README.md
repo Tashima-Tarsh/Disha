@@ -210,38 +210,7 @@ A new AI-powered module for **educational historical conflict analysis and strat
 
 ---
 
-## 🚀 Quick Start
 
-### Option 1: CLI Engine
-
-```bash
-curl -fsSL https://bun.sh/install | bash   # Install Bun
-bun install                                  # Install dependencies
-cp .env.example .env                         # Configure API keys
-bun run dev                                  # Start CLI
-```
-
-### Option 2: AI Platform
-
-```bash
-cd ai-platform/backend
-python -m venv venv && source venv/bin/activate
-pip install -r requirements.txt
-uvicorn app.main:app --reload --port 8000    # Start backend
-
-cd ../frontend
-npm install && npm run dev                   # Start dashboard
-```
-
-### Option 3: Full Stack (Docker)
-
-```bash
-cd ai-platform/docker
-docker-compose up -d
-# Backend:  http://localhost:8000
-# Frontend: http://localhost:3001
-# Neo4j:    http://localhost:7474
-```
 ## 🤖 Intelligence Agents
 
 | Agent | Data Sources | Output |
