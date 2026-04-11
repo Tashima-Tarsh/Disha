@@ -1,4 +1,9 @@
 {
+copilot/replace-contributor-handles-with-monster-again
+  "name": "monster-codemaster",
+  "version": "1.1.0",
+  "mcpName": "io.github.monster/monster-codemaster",
+=======
 copilot/remove-ashu-metadata-again
   "name": "monster-codemaster",
   "version": "1.1.0",
@@ -14,17 +19,21 @@ copilot/update-contributor-handles
   "mcpName": "io.github.Monster/Monster-codemaster",
  main
  main
+main
   "description": "MCP server for exploring the Claude Code source code — rebranded and published by Monster. STDIO, HTTP, and SSE transports.",
   "repository": {
     "type": "git",
     "url": "https://github.com/Monster/claude-code.git"
   },
   "author": "Monster",
+copilot/replace-contributor-handles-with-monster-again
+=======
 copilot/remove-ashu-metadata-again
   "homepage": "https://github.com/Monster/claude-code#readme",
 
 copilot/update-contributor-handles
 copilot/replace-contributor-handles-monster
+main
 main
   "homepage": "https://github.com/codeaashu/claude-code#readme",
   "homepage": "https://github.com/Monster/claude-code#readme",
@@ -36,6 +45,9 @@ main
   "type": "module",
   "main": "dist/index.js",
   "bin": {
+copilot/replace-contributor-handles-with-monster-again
+    "monster-codemaster": "dist/index.js"
+=======
 copilot/remove-ashu-metadata-again
     "monster-codemaster": "dist/index.js"
 
@@ -44,6 +56,7 @@ copilot/update-contributor-handles
 
     "Monster-codemaster": "dist/index.js"
  main
+main
 main
   },
   "scripts": {
