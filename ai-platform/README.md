@@ -1,6 +1,19 @@
 # 🛡️ AI Intelligence Platform
 
+> ← Back to [main README](../README.md)
+
 A production-grade, multi-agent AI system for intelligence gathering, cybersecurity analysis, blockchain tracking, and real-time threat detection.
+
+## Table of Contents
+- [Architecture](#-architecture)
+- [Quick Start](#-quick-start)
+- [Project Structure](#-project-structure)
+- [API Reference](#-api-reference)
+- [Multi-Agent System](#-multi-agent-system)
+- [Development Setup](#-development-setup)
+- [Configuration](#️-configuration)
+- [Security](#-security)
+- [License](#-license)
 
 ## 🏗️ Architecture
 

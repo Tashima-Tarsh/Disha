@@ -1,8 +1,23 @@
 # 🛡️ Disha Virtual Cyber Defense System
 
+> ← Back to [main README](../README.md)
+
 > **STRICTLY DEFENSIVE — SAFE — ISOLATED**
 >
 > For Blue Team Research, Education, and Defense Simulation Only.
+
+## Table of Contents
+- [Overview](#overview)
+- [Architecture](#architecture)
+- [Features](#features)
+- [Quick Start](#quick-start)
+- [OpenCanary Honeypot](#opencanary-honeypot)
+- [AI Detection Engine](#ai-detection-engine)
+- [Response Engine](#response-engine-simulation-only)
+- [Monitoring & Dashboard](#monitoring--dashboard)
+- [Testing](#testing)
+- [Security & Safety](#security--safety)
+- [License](#license)
 
 ## Overview
 
