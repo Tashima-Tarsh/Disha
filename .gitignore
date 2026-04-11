@@ -1,5 +1,13 @@
 __pycache__/
 
+# Decision Framework
+decision-framework/__pycache__/
+decision-framework/**/__pycache__/
+decision-framework/data/index/*.faiss
+decision-framework/data/index/*.json
+!decision-framework/data/index/.gitkeep
+*.pyc
+
 # Cyber Defense System artifacts
 cyber-defense/*.pt
 cyber-defense/model/*.pt
