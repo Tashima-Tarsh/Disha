@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="640" viewBox="0 0 1600 640">
+  <defs>
+    <linearGradient id="g" x1="0" x2="1">
+      <stop offset="0" stop-color="#0ea5a2"/>
+      <stop offset="1" stop-color="#2563eb"/>
+    </linearGradient>
+  </defs>
+  <rect width="100%" height="100%" fill="url(#g)" />
+  <g fill="#ffffff" font-family="Segoe UI, Roboto, Arial" text-anchor="middle">
+    <text x="50%" y="40%" font-size="56" font-weight="700">Disha</text>
+    <text x="50%" y="52%" font-size="24">Self-learning Multi-Agent AGI Platform</text>
+  </g>
+</svg>
