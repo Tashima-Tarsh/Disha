@@ -7,6 +7,9 @@ import AlertsFeed from "@/components/alerts/AlertsFeed";
 import GraphVisualization from "@/components/graph/GraphVisualization";
 import MapVisualization from "@/components/map/MapVisualization";
 import StatsPanel from "@/components/layout/StatsPanel";
+import ClusterPanel from "@/components/cluster/ClusterPanel";
+import RankingPanel from "@/components/ranking/RankingPanel";
+import RLMetricsPanel from "@/components/rl/RLMetricsPanel";
 import { useWebSocket } from "@/hooks/useWebSocket";
 import { useApi } from "@/hooks/useApi";
 import type { Alert, Investigation } from "@/lib/types";
@@ -46,7 +49,7 @@ export default function Dashboard() {
               AI Intelligence Platform
             </h1>
             <p className="text-sm text-gray-400">
-              Multi-agent intelligence gathering and analysis
+              Multi-agent intelligence gathering, RL optimization, and distributed analysis
             </p>
           </header>
 
@@ -73,6 +76,17 @@ export default function Dashboard() {
             {activeTab === "graph" && <GraphVisualization />}
 
             {activeTab === "map" && <MapVisualization alerts={alerts} />}
+
+            {activeTab === "cluster" && (
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <ClusterPanel />
+                <RLMetricsPanel />
+              </div>
+            )}
+
+            {activeTab === "rankings" && <RankingPanel />}
+
+            {activeTab === "rl" && <RLMetricsPanel />}
           </div>
         </div>
       </main>

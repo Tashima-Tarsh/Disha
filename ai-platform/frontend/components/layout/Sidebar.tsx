@@ -11,6 +11,9 @@ const tabs = [
   { id: "alerts", label: "Alerts", icon: "🚨" },
   { id: "graph", label: "Graph", icon: "🕸️" },
   { id: "map", label: "Map", icon: "🗺️" },
+  { id: "cluster", label: "AGI Cluster", icon: "🌐" },
+  { id: "rankings", label: "Rankings", icon: "🏆" },
+  { id: "rl", label: "RL System", icon: "🧠" },
 ];
 
 export default function Sidebar({ activeTab, onTabChange }: SidebarProps) {

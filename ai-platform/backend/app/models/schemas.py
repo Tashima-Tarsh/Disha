@@ -114,3 +114,59 @@ class HealthResponse(BaseModel):
     status: str = "healthy"
     version: str
     services: dict[str, str] = Field(default_factory=dict)
+
+
+# --- Multimodal Analysis ---
+
+class VisionAnalysisRequest(BaseModel):
+    """Request for vision-based analysis."""
+    target: str = Field(..., description="Image URL or identifier")
+    analysis_type: str = Field(default="classify", description="classify | ocr | detect | similarity")
+    image_data: Optional[str] = Field(default=None, description="Base64-encoded image data")
+
+
+class AudioAnalysisRequest(BaseModel):
+    """Request for audio-based analysis."""
+    target: str = Field(..., description="Audio URL or identifier")
+    analysis_type: str = Field(default="transcribe", description="transcribe | analyze | keywords")
+    audio_data: Optional[str] = Field(default=None, description="Base64-encoded audio data")
+    language: Optional[str] = Field(default=None, description="Expected language code")
+
+
+class MultimodalRequest(BaseModel):
+    """Request for fused multimodal analysis."""
+    target: str = Field(..., description="Primary target identifier")
+    text_target: Optional[str] = None
+    image_url: Optional[str] = None
+    image_data: Optional[str] = None
+    audio_url: Optional[str] = None
+    audio_data: Optional[str] = None
+    investigation_type: InvestigationType = Field(default=InvestigationType.FULL)
+
+
+# --- Collaborative Investigation ---
+
+class CollaborativeRequest(BaseModel):
+    """Request for multi-agent collaborative investigation."""
+    target: str = Field(..., description="Target to investigate")
+    task_description: str = Field(default="", description="Description of the investigation task")
+    depth: int = Field(default=2, ge=1, le=5)
+
+
+# --- RL Feedback ---
+
+class FeedbackRequest(BaseModel):
+    """User feedback on investigation results."""
+    investigation_id: str
+    true_positive: Optional[bool] = None
+    user_rating: Optional[float] = Field(default=None, ge=0.0, le=1.0)
+    actionable_findings: int = Field(default=0, ge=0)
+
+
+# --- Intelligence Ranking ---
+
+class RankingRequest(BaseModel):
+    """Request for intelligence rankings."""
+    top_n: int = Field(default=50, ge=1, le=500)
+    entity_type: Optional[str] = None
+    min_score: float = Field(default=0.0, ge=0.0, le=1.0)

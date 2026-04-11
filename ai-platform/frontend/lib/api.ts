@@ -88,6 +88,105 @@ class ApiClient {
   async healthCheck() {
     return this.fetch<{ status: string; version: string }>("/health");
   }
+
+  // --- Multimodal Analysis ---
+
+  async analyzeVision(target: string, analysisType: string = "classify", imageData?: string) {
+    return this.fetch<Record<string, unknown>>("/analyze/vision", {
+      method: "POST",
+      body: JSON.stringify({
+        target,
+        analysis_type: analysisType,
+        image_data: imageData,
+      }),
+    });
+  }
+
+  async analyzeAudio(target: string, analysisType: string = "transcribe", audioData?: string) {
+    return this.fetch<Record<string, unknown>>("/analyze/audio", {
+      method: "POST",
+      body: JSON.stringify({
+        target,
+        analysis_type: analysisType,
+        audio_data: audioData,
+      }),
+    });
+  }
+
+  async analyzeMultimodal(params: {
+    target: string;
+    imageUrl?: string;
+    audioUrl?: string;
+    investigationType?: string;
+  }) {
+    return this.fetch<Record<string, unknown>>("/analyze/multimodal", {
+      method: "POST",
+      body: JSON.stringify({
+        target: params.target,
+        image_url: params.imageUrl,
+        audio_url: params.audioUrl,
+        investigation_type: params.investigationType || "full",
+      }),
+    });
+  }
+
+  // --- Collaborative Investigation ---
+
+  async collaborativeInvestigate(target: string, taskDescription?: string) {
+    return this.fetch<Record<string, unknown>>("/investigate/collaborative", {
+      method: "POST",
+      body: JSON.stringify({
+        target,
+        task_description: taskDescription || `Investigate: ${target}`,
+      }),
+    });
+  }
+
+  async getClusterStatus() {
+    return this.fetch<Record<string, unknown>>("/cluster/status");
+  }
+
+  // --- RL Feedback ---
+
+  async submitFeedback(investigationId: string, truePositive?: boolean, rating?: number) {
+    return this.fetch<Record<string, unknown>>("/feedback", {
+      method: "POST",
+      body: JSON.stringify({
+        investigation_id: investigationId,
+        true_positive: truePositive,
+        user_rating: rating,
+      }),
+    });
+  }
+
+  async getRLMetrics() {
+    return this.fetch<Record<string, unknown>>("/rl/metrics");
+  }
+
+  async evolvePrompts() {
+    return this.fetch<Record<string, unknown>>("/rl/evolve-prompts", {
+      method: "POST",
+    });
+  }
+
+  // --- Intelligence Ranking ---
+
+  async getEntityRankings(topN: number = 50, entityType?: string) {
+    return this.fetch<{ rankings: Record<string, unknown>[]; total: number }>(
+      "/rankings/entities",
+      {
+        method: "POST",
+        body: JSON.stringify({
+          top_n: topN,
+          entity_type: entityType,
+        }),
+      },
+    );
+  }
+
+  async getAgentRankings() {
+    return this.fetch<Record<string, unknown>>("/rankings/agents");
+  }
 }
 
 export const apiClient = new ApiClient();

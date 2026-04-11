@@ -15,11 +15,36 @@ from app.models.schemas import (
     AuthResponse,
     HealthResponse,
     Alert,
+    VisionAnalysisRequest,
+    AudioAnalysisRequest,
+    MultimodalRequest,
+    CollaborativeRequest,
+    FeedbackRequest,
+    RankingRequest,
 )
 from app.services.alerts.alert_manager import AlertManager, ConnectionManager
 from app.services.graph.knowledge_graph import KnowledgeGraph
 from app.services.memory.vector_store import VectorStore
 from app.core.config import get_settings
+
+# Multimodal agents
+from app.multimodal.vision_agent import VisionAgent
+from app.multimodal.audio_agent import AudioAgent
+from app.multimodal.fusion import MultimodalFusion
+
+# Collaboration
+from app.collaboration.coordinator import ClusterCoordinator
+
+# RL system
+from app.rl.reward import RewardComputer, InvestigationFeedback
+from app.rl.policy import PolicyNetwork
+from app.rl.environment import InvestigationEnvironment
+
+# Prompt optimization
+from app.prompts.optimizer import PromptOptimizer
+
+# Intelligence ranking
+from app.ranking.intelligence_ranker import IntelligenceRanker
 
 router = APIRouter()
 
@@ -29,6 +54,17 @@ alert_manager = AlertManager(connection_manager)
 orchestrator = Orchestrator()
 vector_store = VectorStore()
 knowledge_graph = KnowledgeGraph()
+
+# New system instances
+vision_agent = VisionAgent()
+audio_agent = AudioAgent()
+multimodal_fusion = MultimodalFusion()
+cluster_coordinator = ClusterCoordinator()
+reward_computer = RewardComputer()
+policy_network = PolicyNetwork()
+rl_environment = InvestigationEnvironment()
+prompt_optimizer = PromptOptimizer()
+intelligence_ranker = IntelligenceRanker()
 
 # Simple in-memory user store for demo (replace with database in production)
 _demo_users: dict[str, dict[str, str]] = {}
@@ -188,3 +224,253 @@ async def websocket_alerts(websocket: WebSocket):
             await websocket.send_json({"type": "ack", "message": data})
     except WebSocketDisconnect:
         connection_manager.disconnect(websocket)
+
+
+# ============================================================
+# Multimodal AGI Endpoints (Vision + Audio)
+# ============================================================
+
+
+@router.post("/analyze/vision")
+async def analyze_vision(
+    request: VisionAnalysisRequest,
+    current_user: dict = Depends(get_current_user),
+):
+    """Analyze an image for threat intelligence."""
+    context = {
+        "analysis_type": request.analysis_type,
+        "image_data": request.image_data,
+    }
+    result = await vision_agent.run(request.target, context)
+    return result
+
+
+@router.post("/analyze/audio")
+async def analyze_audio(
+    request: AudioAnalysisRequest,
+    current_user: dict = Depends(get_current_user),
+):
+    """Analyze audio for threat intelligence."""
+    context = {
+        "analysis_type": request.analysis_type,
+        "audio_data": request.audio_data,
+        "language": request.language,
+    }
+    result = await audio_agent.run(request.target, context)
+    return result
+
+
+@router.post("/analyze/multimodal")
+async def analyze_multimodal(
+    request: MultimodalRequest,
+    current_user: dict = Depends(get_current_user),
+):
+    """Run fused multimodal analysis combining text, vision, and audio."""
+    text_results = None
+    vision_results = None
+    audio_results = None
+
+    # Text-based investigation
+    if request.text_target or request.target:
+        text_target = request.text_target or request.target
+        text_results = await orchestrator.investigate(
+            target=text_target,
+            investigation_type=request.investigation_type.value,
+            depth=2,
+            user_id=current_user["user_id"],
+        )
+
+    # Vision analysis
+    if request.image_url or request.image_data:
+        img_target = request.image_url or request.target
+        vision_results = await vision_agent.run(
+            img_target,
+            {"analysis_type": "classify", "image_data": request.image_data},
+        )
+
+    # Audio analysis
+    if request.audio_url or request.audio_data:
+        aud_target = request.audio_url or request.target
+        audio_results = await audio_agent.run(
+            aud_target,
+            {"analysis_type": "transcribe", "audio_data": request.audio_data},
+        )
+
+    # Fuse results
+    fused = multimodal_fusion.fuse(
+        text_results=text_results,
+        vision_results=vision_results,
+        audio_results=audio_results,
+    )
+
+    return fused
+
+
+# ============================================================
+# Distributed AGI Cluster / Collaborative Investigation
+# ============================================================
+
+
+@router.post("/investigate/collaborative")
+async def collaborative_investigate(
+    request: CollaborativeRequest,
+    current_user: dict = Depends(get_current_user),
+):
+    """Run a multi-agent collaborative investigation with peer review and consensus."""
+    # Register agents if not already done
+    if not cluster_coordinator.nodes:
+        _register_cluster_agents()
+
+    task_desc = request.task_description or f"Investigate target: {request.target}"
+
+    result = await cluster_coordinator.collaborative_investigate(
+        target=request.target,
+        task_description=task_desc,
+        context={"depth": request.depth, "user_id": current_user["user_id"]},
+    )
+
+    # Index entities for ranking
+    intelligence_ranker.index_entities_from_investigation(result)
+
+    return result
+
+
+@router.get("/cluster/status")
+async def cluster_status(
+    current_user: dict = Depends(get_current_user),
+):
+    """Get the status of the distributed agent cluster."""
+    if not cluster_coordinator.nodes:
+        _register_cluster_agents()
+    return cluster_coordinator.get_cluster_status()
+
+
+def _register_cluster_agents():
+    """Register all available agents in the cluster coordinator."""
+    from app.agents.osint_agent import OSINTAgent
+    from app.agents.crypto_agent import CryptoAgent
+    from app.agents.detection_agent import DetectionAgent
+    from app.agents.graph_agent import GraphAgent
+    from app.agents.reasoning_agent import ReasoningAgent
+
+    cluster_coordinator.register_agent(
+        "osint", OSINTAgent(), ["osint", "dns", "shodan", "reconnaissance"]
+    )
+    cluster_coordinator.register_agent(
+        "crypto", CryptoAgent(), ["blockchain", "ethereum", "wallet", "transactions"]
+    )
+    cluster_coordinator.register_agent(
+        "detection", DetectionAgent(), ["anomaly", "detection", "ml", "isolation_forest"]
+    )
+    cluster_coordinator.register_agent(
+        "graph", GraphAgent(), ["graph", "neo4j", "relationships", "communities"]
+    )
+    cluster_coordinator.register_agent(
+        "reasoning", ReasoningAgent(), ["analysis", "llm", "reasoning", "risk"]
+    )
+    cluster_coordinator.register_agent(
+        "vision", vision_agent, ["vision", "image", "ocr", "multimodal"]
+    )
+    cluster_coordinator.register_agent(
+        "audio", audio_agent, ["audio", "speech", "transcription", "multimodal"]
+    )
+
+
+# ============================================================
+# Reinforcement Learning / Feedback Loop
+# ============================================================
+
+
+@router.post("/feedback")
+async def submit_feedback(
+    request: FeedbackRequest,
+    current_user: dict = Depends(get_current_user),
+):
+    """Submit feedback on an investigation for RL training."""
+    feedback = InvestigationFeedback(
+        investigation_id=request.investigation_id,
+        true_positive=request.true_positive,
+        user_rating=request.user_rating,
+        actionable_findings=request.actionable_findings,
+    )
+
+    # Compute episode reward from feedback
+    reward = reward_computer.compute_episode_reward(
+        investigation_result={"investigation_id": request.investigation_id},
+        feedback=feedback,
+    )
+
+    # Update policy if enough experience collected
+    update_metrics = policy_network.update()
+
+    return {
+        "feedback_recorded": True,
+        "reward": round(reward, 4),
+        "policy_update": update_metrics,
+    }
+
+
+@router.get("/rl/metrics")
+async def rl_metrics(
+    current_user: dict = Depends(get_current_user),
+):
+    """Get RL system metrics including reward tracking and policy status."""
+    return {
+        "reward_metrics": reward_computer.get_metrics(),
+        "prompt_metrics": prompt_optimizer.get_metrics(),
+    }
+
+
+@router.post("/rl/evolve-prompts")
+async def evolve_prompts(
+    current_user: dict = Depends(get_current_user),
+):
+    """Trigger one generation of prompt evolution."""
+    prompt_optimizer.evolve()
+    return prompt_optimizer.get_metrics()
+
+
+# ============================================================
+# Intelligence Ranking
+# ============================================================
+
+
+@router.post("/rankings/entities")
+async def get_entity_rankings(
+    request: RankingRequest,
+    current_user: dict = Depends(get_current_user),
+):
+    """Get ranked intelligence entities by composite score."""
+    rankings = intelligence_ranker.get_rankings(
+        top_n=request.top_n,
+        entity_type=request.entity_type,
+        min_score=request.min_score,
+    )
+    return {"rankings": rankings, "total": len(rankings)}
+
+
+@router.get("/rankings/agents")
+async def get_agent_rankings(
+    current_user: dict = Depends(get_current_user),
+):
+    """Get agent reliability rankings."""
+    return {
+        "agent_rankings": intelligence_ranker.get_agent_rankings(),
+        "metrics": intelligence_ranker.get_metrics(),
+    }
+
+
+@router.post("/rankings/record-outcome")
+async def record_agent_outcome(
+    agent_name: str,
+    true_positive: bool,
+    investigation_time: float,
+    current_user: dict = Depends(get_current_user),
+):
+    """Record an agent's investigation outcome for reliability tracking."""
+    intelligence_ranker.record_agent_outcome(
+        agent_name=agent_name,
+        true_positive=true_positive,
+        investigation_time=investigation_time,
+    )
+    return {"recorded": True}
