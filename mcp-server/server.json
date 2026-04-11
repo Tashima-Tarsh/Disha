@@ -1,10 +1,10 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
-  "name": "warrioraashuu-codemaster",
+  "name": "Monster-codemaster",
   "title": "Claude Code Explorer MCP",
   "description": "Explore the Claude Code CLI source — browse tools, commands, search code, and more.",
   "repository": {
-    "url": "https://github.com/codeaashu/claude-code",
+    "url": "https://github.com/Monster/claude-code",
     "source": "github",
     "subfolder": "mcp-server"
   },
@@ -13,7 +13,7 @@
     {
       "registryType": "npm",
       "registryBaseUrl": "https://registry.npmjs.org",
-      "identifier": "warrioraashuu-codemaster",
+      "identifier": "Monster-codemaster",
       "version": "1.1.0",
       "transport": {
         "type": "stdio"
