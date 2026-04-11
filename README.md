@@ -132,90 +132,7 @@ All previously stubbed or paid-API dependencies have been replaced:
 | Threat intelligence feeds | — | **Feodo Tracker**, **EmergingThreats**, **IPsum** (all free) |
 | Maps | Google Maps | **OpenStreetMap + Leaflet** (free, open-source) |
 | Charts | — | **Chart.js** (MIT) |
-
-<img src="docs/images/divider.svg" width="100%" height="4">
-
-<br>
-
-## 🚀 Quick Start
-
-<details open>
-<summary><b>💻 Option 1 — Core CLI Engine</b></summary>
-
-```bash
-curl -fsSL https://bun.sh/install | bash   # Install Bun
-bun install
-cp .env.example .env                        # Add your ANTHROPIC_API_KEY
-bun run dev
-```
-</details>
-
-<details>
-<summary><b>🧠 Option 2 — AI Intelligence Platform</b></summary>
-
-```bash
-cd ai-platform/backend
-python -m venv venv && source venv/bin/activate
-pip install -r requirements.txt
-export SECRET_KEY=$(python -c "import secrets; print(secrets.token_hex(32))")
-uvicorn app.main:app --reload --port 8000
-
-cd ../frontend
-npm install && npm run dev                  # http://localhost:3001
-```
-</details>
-
-<details>
-<summary><b>🛡️ Option 3 — Cyber Defense System</b></summary>
-
-```bash
-cd cyber-defense
-cp .env.example .env
-docker-compose up -d
-# Honeypots: ports 2222 (SSH), 8080 (HTTP), 8081 (OpenCanary)
-# Kibana dashboard: http://localhost:5601
-```
-</details>
-
-<details>
-<summary><b>⚔️ Option 4 — Historical Strategy Intelligence</b></summary>
-
-```bash
-cd historical-strategy
-pip install -r requirements.txt
-uvicorn api.main:app --port 8001 --reload   # http://localhost:8001/docs
-
-cd dashboard
-npm install && npm run dev                  # http://localhost:3002
-```
-</details>
-
-<details>
-<summary><b>🔗 Option 5 — Cyber Intelligence Pipeline</b></summary>
-
-```bash
-cd integrations/cyber-intelligence-platform
-pip install fastapi uvicorn requests python-docx
-python main.py "UPI fraud via OTP scam" google.com
-uvicorn ui.dashboard:app --port 7000        # Live dashboard
-```
-</details>
-
-<details>
-<summary><b>🐳 Option 6 — Full Stack (Docker Compose)</b></summary>
-
-```bash
-cd ai-platform/docker
-docker-compose up -d
-# Backend:  http://localhost:8000
-# Frontend: http://localhost:3001
-# Neo4j:    http://localhost:7474
-```
-</details>
-
-<img src="docs/images/divider.svg" width="100%" height="4">
-
-<br>
+---
 
 ## 🌐 Live Demo
 
@@ -227,9 +144,9 @@ The **Disha MCP Server** is deployed on Vercel and publicly accessible:
 | MCP endpoint | `/mcp` | Model Context Protocol |
 | SSE stream | `/sse` | Server-Sent Events |
 
-> **Note:** The full platform (AI backend, honeypots, historical strategy) requires Docker and cannot be hosted on Vercel's serverless platform. See [Quick Start](#-quick-start) to run everything locally, or deploy the Docker stacks on any cloud VM (Railway, Fly.io, DigitalOcean).
+> **Note:** The full platform (AI backend, honeypots, historical strategy) requires Docker and cannot be hosted on Vercel's serverless platform. Clone the repo and run the relevant Docker stack to use it locally.
 
-<br>
+---
 
 ## 🤖 Intelligence Agents
 
@@ -364,7 +281,8 @@ A new AI-powered module for **educational historical conflict analysis and strat
 
 <img src="docs/images/divider.svg" width="100%" height="4">
 
-<br>
+
+---
 
 ## 📖 Documentation
 
@@ -379,7 +297,7 @@ A new AI-powered module for **educational historical conflict analysis and strat
 | **[🧭 docs/exploration-guide.md](./docs/exploration-guide.md)** | Code navigation guide |
 | **[🤝 CONTRIBUTING.md](./CONTRIBUTING.md)** | How to contribute |
 
-<br>
+---
 
 ## 🤝 Contributing
 
@@ -389,7 +307,7 @@ A new AI-powered module for **educational historical conflict analysis and strat
 4. Update documentation for new modules
 5. Request review before merge
 
-<br>
+---
 
 ## 👥 Contributors
 
@@ -397,7 +315,7 @@ A new AI-powered module for **educational historical conflict analysis and strat
   <img src="https://contrib.rocks/image?repo=Tashima-Tarsh/Disha" alt="Contributors" />
 </a>
 
-<br>
+---
 
 ## 🏛️ License
 
