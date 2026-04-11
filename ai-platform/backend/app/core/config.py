@@ -14,7 +14,7 @@ class Settings(BaseSettings):
     API_PREFIX: str = "/api/v1"
     
     # Auth
-    SECRET_KEY: str = "change-me-in-production"
+    SECRET_KEY: str = ""  # REQUIRED: set via SECRET_KEY env var in production
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60
     

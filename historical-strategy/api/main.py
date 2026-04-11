@@ -5,6 +5,7 @@ Provides REST endpoints for conflict data, simulation, and analysis.
 
 import json
 import sys
+from contextlib import asynccontextmanager
 from pathlib import Path
 from typing import List, Optional, Dict, Any
 
@@ -20,12 +21,33 @@ from simulation.scenarios import SCENARIOS
 
 DATA_FILE = Path(__file__).parent.parent / "data" / "historical_data.json"
 
+# Global state
+conflicts_db: List[Dict[str, Any]] = []
+engine: Optional[HistoricalSimulationEngine] = None
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Load conflict data and initialise simulation engine on startup."""
+    global conflicts_db, engine
+    if DATA_FILE.exists():
+        with open(DATA_FILE) as f:
+            conflicts_db = json.load(f)
+        print(f"[API] Loaded {len(conflicts_db)} conflicts from {DATA_FILE}")
+    else:
+        print(f"[API] WARNING: Data file not found at {DATA_FILE}")
+    engine = HistoricalSimulationEngine()
+    yield
+    # Shutdown: nothing to clean up for now
+
+
 app = FastAPI(
     title="Historical Strategy Intelligence API",
     description="AI-powered analysis of historical military strategies and battle simulations",
     version="1.0.0",
     docs_url="/docs",
     redoc_url="/redoc",
+    lifespan=lifespan,
 )
 
 app.add_middleware(
@@ -35,22 +57,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-# Global state
-conflicts_db: List[Dict[str, Any]] = []
-engine: Optional[HistoricalSimulationEngine] = None
-
-
-@app.on_event("startup")
-async def startup_event():
-    global conflicts_db, engine
-    if DATA_FILE.exists():
-        with open(DATA_FILE) as f:
-            conflicts_db = json.load(f)
-        print(f"[API] Loaded {len(conflicts_db)} conflicts from {DATA_FILE}")
-    else:
-        print(f"[API] WARNING: Data file not found at {DATA_FILE}")
-    engine = HistoricalSimulationEngine()
 
 
 # ──────────────────── Pydantic Models ────────────────────
