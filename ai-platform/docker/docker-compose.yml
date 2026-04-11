@@ -43,6 +43,7 @@ services:
     environment:
       - NEXT_PUBLIC_API_URL=http://localhost:8000/api/v1
       - NEXT_PUBLIC_WS_URL=ws://localhost:8000/api/v1/ws/alerts
+      - NEXT_PUBLIC_QUANTUM_API_URL=http://quantum-physics:8002
     depends_on:
       - backend
     restart: unless-stopped
