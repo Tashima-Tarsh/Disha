@@ -12,7 +12,7 @@ import pytest
 # ---------------------------------------------------------------------------
 # Import all modules under test
 # ---------------------------------------------------------------------------
-from agent_core.config import AgentConfig, ClaudeConfig, ExecutorConfig, MemoryConfig
+from agent_core.config import AgentConfig, ClaudeConfig, ControllerConfig, ExecutorConfig, MemoryConfig
 from agent_core.types import (
     AgentState,
     LogLevel,
@@ -591,7 +591,3 @@ class TestAgent:
         plan = agent.plan("Iterate test")
         results = agent.iterate(plan)
         assert len(results) > 0
-
-
-# Need this import for ControllerConfig in test
-from agent_core.config import ControllerConfig
