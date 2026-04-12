@@ -101,7 +101,7 @@ class QualityScorer:
         stars = item.metadata.get("stars", 0)
         citations = item.metadata.get("citations", 0)
         cred_bonus = min(5, stars / 200 + citations / 20)
-        total += 25 * cred + cred_bonus
+        total += min(25, 25 * cred + cred_bonus)
 
         # 2. Content length & structure (0–25)
         length = len(text)

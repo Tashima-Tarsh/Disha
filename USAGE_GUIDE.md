@@ -1,140 +1,251 @@
-# Usage Guide for Claude
+# Disha — Usage Guide
 
 ## Table of Contents
 1. [Installation & Setup](#installation--setup)
-2. [CLI Usage with all Models](#cli-usage-with-all-models)
-3. [Web Dashboard Usage](#web-dashboard-usage)
-4. [API Endpoints](#api-endpoints)
-5. [MCP Server Integration](#mcp-server-integration)
-6. [Advanced Features](#advanced-features)
-7. [Model Selection](#model-selection)
-8. [Ensemble Voting](#ensemble-voting)
-9. [Prediction Features](#prediction-features)
-10. [Code Generation](#code-generation)
-11. [Vision Analysis](#vision-analysis)
-12. [Reasoning Pipeline](#reasoning-pipeline)
-13. [Performance Optimization](#performance-optimization)
-14. [Configuration](#configuration)
-15. [Troubleshooting](#troubleshooting)
-16. [Examples for Each Model](#examples-for-each-model)
+2. [CLI Usage](#cli-usage)
+3. [AI Intelligence Platform](#ai-intelligence-platform)
+4. [Decision Engine](#decision-engine)
+5. [Historical Strategy Module](#historical-strategy-module)
+6. [Cyber Defense System](#cyber-defense-system)
+7. [MCP Server Integration](#mcp-server-integration)
+8. [Web Dashboard](#web-dashboard)
+9. [Training AI Models](#training-ai-models)
+10. [Continuous Learning](#continuous-learning)
+11. [Sentinel Monitoring](#sentinel-monitoring)
+12. [Configuration](#configuration)
+13. [Troubleshooting](#troubleshooting)
 
 ## Installation & Setup
-To install and set up the Claude repository, follow these steps:
-1. Clone the repository:  
-   ```bash
-   git clone https://github.com/Tashima-Tarsh/claude.git
-   cd claude
-   ```  
-2. Install dependencies:  
-   ```bash
-   npm install
-   ```
-3. Set up your environment variables:  
-   Create a `.env` file in the root directory with the following template:
-   ```bash
-   # .env
-   API_KEY=your_api_key_here
-   DATABASE_URL=your_database_url_here
-   PORT=3000
-   ```
 
-## CLI Usage with all Models
-To use the command line interface (CLI) for different models:
+### Prerequisites
+
+- **Bun** 1.1+ (CLI runtime)
+- **Node.js** 18+ (MCP server, web dashboard)
+- **Python** 3.11+ (AI platform, decision engine, cyber defense)
+- **Docker** (optional, for full stack)
+
+### Clone and Install
+
 ```bash
-claude-cli --model <model_name> --input "<input_data>"
-```
-For example, to use the `modelA`:  
-```bash
-claude-cli --model modelA --input "Hello World"
+git clone https://github.com/Tashima-Tarsh/Disha.git
+cd Disha
+npm install
 ```
 
-## Web Dashboard Usage
-1. Start the server:  
-   ```bash
-   npm start
-   ```  
-2. Open your browser and navigate to `http://localhost:3000`
-3. Interact with various features using the dashboard UI.
+### Environment Variables
 
-## API Endpoints
-- **GET /api/models**: Retrieve all models.  
-- **POST /api/predict**: Make predictions using a specified model.
+Create a `.env` file in the root directory:
+
 ```bash
-curl -X POST http://localhost:3000/api/predict -H 'Content-Type: application/json' -d '{"model": "modelA", "input": "Hello"}'
+# .env
+ANTHROPIC_API_KEY=your_anthropic_key     # For Claude LLM
+OPENAI_API_KEY=your_openai_key           # For GPT-4o (optional)
+NEO4J_URI=bolt://localhost:7687          # Graph DB (optional)
+NEO4J_PASSWORD=your_password             # Graph DB (optional)
+```
+
+> **Note:** Disha works with mock providers and open-source APIs — no paid keys required for core functionality.
+
+## CLI Usage
+
+The Disha CLI is built with Bun + TypeScript + React/Ink:
+
+```bash
+# Start the CLI
+bun run src/entrypoints/cli.tsx
+
+# List available tools
+bun run src/entrypoints/cli.tsx --tools
+
+# List available commands
+bun run src/entrypoints/cli.tsx --commands
+```
+
+## AI Intelligence Platform
+
+The AI platform runs 7 specialized agents orchestrated via FastAPI:
+
+```bash
+cd ai-platform/backend
+pip install -r requirements.txt
+uvicorn app.main:app --reload --port 8000
+```
+
+### API Endpoints
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/v1/investigate` | POST | Launch multi-agent investigation |
+| `/api/v1/agents/osint` | POST | OSINT data collection |
+| `/api/v1/agents/crypto` | POST | Blockchain analysis |
+| `/api/v1/agents/detection` | POST | Anomaly detection |
+| `/api/v1/agents/graph` | POST | Knowledge graph queries |
+| `/api/v1/agents/reasoning` | POST | LLM-powered reasoning |
+| `/api/v1/multimodal/vision` | POST | Image analysis |
+| `/api/v1/multimodal/audio` | POST | Audio transcription |
+
+## Decision Engine
+
+Multi-agent reasoning with political, legal, ideological, and security analysis:
+
+```bash
+cd decision-engine
+pip install -r requirements.txt
+
+# Run with mock LLM (no model download needed)
+DISHA_MODEL_PROVIDER=mock python main_decision_engine.py
+
+# Run tests
+DISHA_MODEL_PROVIDER=mock python -m pytest tests/ -v
+```
+
+### Optional: FAISS Retrieval
+
+```bash
+pip install faiss-cpu sentence-transformers
+```
+
+### Optional: Local LLM
+
+```bash
+pip install llama-cpp-python
+export DISHA_MODEL_PROVIDER=llamacpp
+export DISHA_MODEL_PATH=/path/to/model.gguf
+```
+
+## Historical Strategy Module
+
+AI classifier and simulation engine for 32+ historical conflicts:
+
+```bash
+cd historical-strategy
+pip install -r requirements.txt
+
+# Start the API server
+uvicorn api.main:app --reload --port 8001
+
+# Train the classifier
+python model/train.py
+
+# Run a simulation
+python simulation/engine.py
+```
+
+## Cyber Defense System
+
+AI-powered honeypot stack with threat classification:
+
+```bash
+# Using Docker (recommended)
+cd cyber-defense
+docker-compose up -d
+
+# Train the threat classifier
+cd model
+pip install torch --index-url https://download.pytorch.org/whl/cpu
+python train.py
 ```
 
 ## MCP Server Integration
-To integrate with the MCP server, follow the provided documentation for setup and configuration.
 
-## Advanced Features
-Explore advanced features such as batch predictions and model training commands:
+The Model Context Protocol server exposes Disha's tools for AI assistants:
+
 ```bash
-claude-cli --model <model_name> --train --data <training_data>
+cd mcp-server
+npm install
+npm run dev    # Development mode
+npm run build  # Build for production
+npm start      # Production mode
 ```
 
-## Model Selection
-Choose the right model based on your task. Use `claude-cli --models` to list all models.
+**Live deployment:** [disha.vercel.app](https://disha.vercel.app/health)
 
-## Ensemble Voting
-To utilize ensemble voting:
+## Web Dashboard
+
+Next.js dashboard for threat intelligence visualization:
+
 ```bash
-claude-cli --ensemble --models modelA,modelB --input "<input_data>"
+cd web
+npm install
+npm run dev    # http://localhost:3000
 ```
 
-## Prediction Features
-Use the `--predict` flag to fetch predictions:
+## Training AI Models
+
+### Train All Components
+
 ```bash
-claude-cli --model <model_name> --predict --input "<input_data>"
+python scripts/train_all.py
 ```
 
-## Code Generation
-The code generation feature can be accessed through:
+### Individual Training
+
 ```bash
-claude-cli --model codeGen --input "<function_description>"
+# Reinforcement Learning (PPO)
+cd ai-platform/backend && python -m app.rl.train
+
+# Graph Neural Networks
+cd ai-platform/backend && python graph_ai/train.py
+
+# Decision Engine
+cd decision-engine && DISHA_MODEL_PROVIDER=mock python train.py
 ```
 
-## Vision Analysis
-For image analysis:
+## Continuous Learning
+
+Disha supports continuous self-improvement:
+
 ```bash
-claude-cli --model imageAnalysis --input "<image_path>"
+# Offline mode (synthetic data)
+python scripts/continuous_train.py --rounds 3 --offline
+
+# Online mode (fetches from abuse.ch, arXiv, OEIS)
+python scripts/continuous_train.py --rounds 3
+
+# Single component
+python scripts/continuous_train.py --rounds 3 --component rl
 ```
 
-## Reasoning Pipeline
-Trigger the reasoning pipeline with:
-```bash
-claude-cli --reasoning --input "<query>"
-```
+## Sentinel Monitoring
 
-## Performance Optimization
-To optimize performance:
-- Increase the instance size in the `config`.
-- Use caching strategies where applicable.
+Real-time threat monitoring and self-healing:
+
+```bash
+# Run the full sentinel system
+python scripts/sentinel/guardian.py
+
+# Run tests
+python -m pytest scripts/sentinel/test_sentinel.py -v
+```
 
 ## Configuration
-Modify your `settings.js` to adjust application settings:
-```javascript
-module.exports = {
-    apiUrl: process.env.API_URL,
-    timeout: 5000,
-};
+
+### Biome (TypeScript Linting)
+
+```bash
+npx biome check src/                         # Check
+npx biome check --write src/                  # Safe fixes
+npx biome check --write --unsafe src/         # All auto-fixes
+```
+
+### Python Linting
+
+```bash
+flake8 ai-platform/backend/ --max-line-length=120 --ignore=E501,W503,W504
+flake8 decision-engine/ --max-line-length=120 --ignore=E501,W503,W504
 ```
 
 ## Troubleshooting
-If you encounter issues:
-- Ensure all dependencies are installed.
-- Check the logs in the terminal for error messages.
-- Consult the GitHub issues page for similar problems.
 
-## Examples for Each Model
-- **Model A Example:**  
-  ```bash
-  claude-cli --model modelA --input "Sample Input for Model A"
-  ```  
-- **Model B Example:**  
-  ```bash
-  claude-cli --model modelB --input "Sample Input for Model B"
-  ```
+| Issue | Solution |
+|-------|----------|
+| `bun` command not found | Install Bun: `curl -fsSL https://bun.sh/install \| bash` |
+| Python import errors | Ensure you're in the correct subdirectory and have installed requirements |
+| PyTorch not found | Install CPU-only: `pip install torch --index-url https://download.pytorch.org/whl/cpu` |
+| Neo4j connection refused | Start Neo4j or set `NEO4J_URI` environment variable |
+| FAISS not available | Install: `pip install faiss-cpu` (optional dependency) |
+| TypeScript errors | Some SDK types are generated at build time — run `bun run build` first |
 
 ---
 
-_Note: Replace placeholders with actual data._
+> **Full documentation:** [WIKI.md](./WIKI.md) · [Architecture](./docs/architecture.md) · [LEARNING_LOG.md](./LEARNING_LOG.md)

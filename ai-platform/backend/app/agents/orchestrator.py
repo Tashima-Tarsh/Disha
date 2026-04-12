@@ -126,7 +126,7 @@ class Orchestrator:
                 elif entity["entity_type"] == "wallet" and other["entity_type"] == "wallet":
                     related = True
                     rel_type = "TRANSACTED_WITH"
-                elif entity["entity_type"] == "dns_record":
+                elif entity["entity_type"] == "dns_record" and other["entity_type"] in ["host", "domain"]:
                     related = True
                     rel_type = "RESOLVES_TO"
                 else:
