@@ -1,0 +1,4 @@
+# Disha Agent Core — Dependencies
+# Core: zero required dependencies (stdlib only)
+# Optional: Claude API integration
+anthropic>=0.39.0
