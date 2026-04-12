@@ -734,6 +734,7 @@ function _ThinkingMessage(t0) {
     message,
     addMargin
   } = t0;
+  // biome-ignore lint/correctness/useHookAtTopLevel: React Compiler output – _ThinkingMessage is a component
   const bg = useSelectedMessageBg();
   const t1 = addMargin ? 1 : 0;
   let t2;

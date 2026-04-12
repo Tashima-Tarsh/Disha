@@ -92,6 +92,77 @@ export function transition(
 // ============================================================================
 
 /**
+ * Build a static map of simple single-key normal-mode commands.
+ * Each entry maps a key to a factory that produces the execute callback.
+ */
+type NormalCommandFactory = (
+  count: number,
+  ctx: TransitionContext,
+) => () => void
+
+const NORMAL_COMMANDS: Record<string, NormalCommandFactory> = {
+  '~': (count, ctx) => () => executeToggleCase(count, ctx),
+  x: (count, ctx) => () => executeX(count, ctx),
+  J: (count, ctx) => () => executeJoin(count, ctx),
+  p: (count, ctx) => () => executePaste(true, count, ctx),
+  P: (count, ctx) => () => executePaste(false, count, ctx),
+  D: (_count, ctx) => () => executeOperatorMotion('delete', '$', 1, ctx),
+  C: (_count, ctx) => () => executeOperatorMotion('change', '$', 1, ctx),
+  Y: (count, ctx) => () => executeLineOp('yank', count, ctx),
+  '.': (_count, ctx) => () => ctx.onDotRepeat?.(),
+  u: (_count, ctx) => () => ctx.onUndo?.(),
+  o: (_count, ctx) => () => executeOpenLine('below', ctx),
+  O: (_count, ctx) => () => executeOpenLine('above', ctx),
+  i: (_count, ctx) => () => ctx.enterInsert(ctx.cursor.offset),
+  I: (_count, ctx) => () =>
+    ctx.enterInsert(ctx.cursor.firstNonBlankInLogicalLine().offset),
+  a: (_count, ctx) => () => {
+    const newOffset = ctx.cursor.isAtEnd()
+      ? ctx.cursor.offset
+      : ctx.cursor.right().offset
+    ctx.enterInsert(newOffset)
+  },
+  A: (_count, ctx) => () =>
+    ctx.enterInsert(ctx.cursor.endOfLogicalLine().offset),
+}
+
+function handleNormalInputCommand(
+  input: string,
+  count: number,
+  ctx: TransitionContext,
+): TransitionResult | null {
+  const factory = NORMAL_COMMANDS[input]
+  if (factory) return { execute: factory(count, ctx) }
+  return null
+}
+
+function handleNormalInputG(
+  count: number,
+  ctx: TransitionContext,
+): TransitionResult {
+  return {
+    execute: () => {
+      if (count === 1) {
+        ctx.setOffset(ctx.cursor.startOfLastLine().offset)
+      } else {
+        ctx.setOffset(ctx.cursor.goToLine(count).offset)
+      }
+    },
+  }
+}
+
+function handleNormalInputFind(
+  input: string,
+  count: number,
+  ctx: TransitionContext,
+): TransitionResult {
+  if (input === ';' || input === ',') {
+    return { execute: () => executeRepeatFind(input === ',', count, ctx) }
+  }
+  return { next: { type: 'find', find: input as FindType, count } }
+}
+
+/**
  * Handle input that's valid in both idle and count states.
  * Returns null if input is not recognized.
  */
@@ -103,7 +174,6 @@ function handleNormalInput(
   if (isOperatorKey(input)) {
     return { next: { type: 'operator', op: OPERATORS[input], count } }
   }
-
   if (SIMPLE_MOTIONS.has(input)) {
     return {
       execute: () => {
@@ -112,91 +182,17 @@ function handleNormalInput(
       },
     }
   }
-
-  if (FIND_KEYS.has(input)) {
-    return { next: { type: 'find', find: input as FindType, count } }
+  if (FIND_KEYS.has(input) || input === ';' || input === ',') {
+    return handleNormalInputFind(input, count, ctx)
   }
-
   if (input === 'g') return { next: { type: 'g', count } }
   if (input === 'r') return { next: { type: 'replace', count } }
   if (input === '>' || input === '<') {
     return { next: { type: 'indent', dir: input, count } }
   }
-  if (input === '~') {
-    return { execute: () => executeToggleCase(count, ctx) }
-  }
-  if (input === 'x') {
-    return { execute: () => executeX(count, ctx) }
-  }
-  if (input === 'J') {
-    return { execute: () => executeJoin(count, ctx) }
-  }
-  if (input === 'p' || input === 'P') {
-    return { execute: () => executePaste(input === 'p', count, ctx) }
-  }
-  if (input === 'D') {
-    return { execute: () => executeOperatorMotion('delete', '$', 1, ctx) }
-  }
-  if (input === 'C') {
-    return { execute: () => executeOperatorMotion('change', '$', 1, ctx) }
-  }
-  if (input === 'Y') {
-    return { execute: () => executeLineOp('yank', count, ctx) }
-  }
-  if (input === 'G') {
-    return {
-      execute: () => {
-        // count=1 means no count given, go to last line
-        // otherwise go to line N
-        if (count === 1) {
-          ctx.setOffset(ctx.cursor.startOfLastLine().offset)
-        } else {
-          ctx.setOffset(ctx.cursor.goToLine(count).offset)
-        }
-      },
-    }
-  }
-  if (input === '.') {
-    return { execute: () => ctx.onDotRepeat?.() }
-  }
-  if (input === ';' || input === ',') {
-    return { execute: () => executeRepeatFind(input === ',', count, ctx) }
-  }
-  if (input === 'u') {
-    return { execute: () => ctx.onUndo?.() }
-  }
-  if (input === 'i') {
-    return { execute: () => ctx.enterInsert(ctx.cursor.offset) }
-  }
-  if (input === 'I') {
-    return {
-      execute: () =>
-        ctx.enterInsert(ctx.cursor.firstNonBlankInLogicalLine().offset),
-    }
-  }
-  if (input === 'a') {
-    return {
-      execute: () => {
-        const newOffset = ctx.cursor.isAtEnd()
-          ? ctx.cursor.offset
-          : ctx.cursor.right().offset
-        ctx.enterInsert(newOffset)
-      },
-    }
-  }
-  if (input === 'A') {
-    return {
-      execute: () => ctx.enterInsert(ctx.cursor.endOfLogicalLine().offset),
-    }
-  }
-  if (input === 'o') {
-    return { execute: () => executeOpenLine('below', ctx) }
-  }
-  if (input === 'O') {
-    return { execute: () => executeOpenLine('above', ctx) }
-  }
+  if (input === 'G') return handleNormalInputG(count, ctx)
 
-  return null
+  return handleNormalInputCommand(input, count, ctx)
 }
 
 /**

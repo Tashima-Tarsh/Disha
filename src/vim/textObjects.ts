@@ -57,29 +57,65 @@ export function findTextObject(
   return null
 }
 
+function segmentGraphemes(
+  text: string,
+): Array<{ segment: string; index: number }> {
+  const graphemes: Array<{ segment: string; index: number }> = []
+  for (const { segment, index } of getGraphemeSegmenter().segment(text)) {
+    graphemes.push({ segment, index })
+  }
+  return graphemes
+}
+
+function findGraphemeIndex(
+  graphemes: Array<{ segment: string; index: number }>,
+  offset: number,
+  textLength: number,
+): number {
+  for (let i = 0; i < graphemes.length; i++) {
+    const g = graphemes[i]!
+    const nextStart =
+      i + 1 < graphemes.length ? graphemes[i + 1]!.index : textLength
+    if (offset >= g.index && offset < nextStart) {
+      return i
+    }
+  }
+  return graphemes.length - 1
+}
+
+function expandRange(
+  start: number,
+  end: number,
+  limit: number,
+  predicate: (idx: number) => boolean,
+): [number, number] {
+  while (start > 0 && predicate(start - 1)) start--
+  while (end < limit && predicate(end)) end++
+  return [start, end]
+}
+
+function includeAdjacentWhitespace(
+  start: number,
+  end: number,
+  limit: number,
+  isWs: (idx: number) => boolean,
+): [number, number] {
+  if (end < limit && isWs(end)) {
+    while (end < limit && isWs(end)) end++
+  } else if (start > 0 && isWs(start - 1)) {
+    while (start > 0 && isWs(start - 1)) start--
+  }
+  return [start, end]
+}
+
 function findWordObject(
   text: string,
   offset: number,
   isInner: boolean,
   isWordChar: (ch: string) => boolean,
 ): TextObjectRange {
-  // Pre-segment into graphemes for grapheme-safe iteration
-  const graphemes: Array<{ segment: string; index: number }> = []
-  for (const { segment, index } of getGraphemeSegmenter().segment(text)) {
-    graphemes.push({ segment, index })
-  }
-
-  // Find which grapheme index the offset falls in
-  let graphemeIdx = graphemes.length - 1
-  for (let i = 0; i < graphemes.length; i++) {
-    const g = graphemes[i]!
-    const nextStart =
-      i + 1 < graphemes.length ? graphemes[i + 1]!.index : text.length
-    if (offset >= g.index && offset < nextStart) {
-      graphemeIdx = i
-      break
-    }
-  }
+  const graphemes = segmentGraphemes(text)
+  const graphemeIdx = findGraphemeIndex(graphemes, offset, text.length)
 
   const graphemeAt = (idx: number): string => graphemes[idx]?.segment ?? ''
   const offsetAt = (idx: number): number =>
@@ -91,25 +127,26 @@ function findWordObject(
   let startIdx = graphemeIdx
   let endIdx = graphemeIdx
 
-  if (isWord(graphemeIdx)) {
-    while (startIdx > 0 && isWord(startIdx - 1)) startIdx--
-    while (endIdx < graphemes.length && isWord(endIdx)) endIdx++
-  } else if (isWs(graphemeIdx)) {
-    while (startIdx > 0 && isWs(startIdx - 1)) startIdx--
-    while (endIdx < graphemes.length && isWs(endIdx)) endIdx++
+  if (isWs(graphemeIdx)) {
+    ;[startIdx, endIdx] = expandRange(startIdx, endIdx, graphemes.length, isWs)
     return { start: offsetAt(startIdx), end: offsetAt(endIdx) }
-  } else if (isPunct(graphemeIdx)) {
-    while (startIdx > 0 && isPunct(startIdx - 1)) startIdx--
-    while (endIdx < graphemes.length && isPunct(endIdx)) endIdx++
   }
 
+  const classifier = isWord(graphemeIdx) ? isWord : isPunct
+  ;[startIdx, endIdx] = expandRange(
+    startIdx,
+    endIdx,
+    graphemes.length,
+    classifier,
+  )
+
   if (!isInner) {
-    // Include surrounding whitespace
-    if (endIdx < graphemes.length && isWs(endIdx)) {
-      while (endIdx < graphemes.length && isWs(endIdx)) endIdx++
-    } else if (startIdx > 0 && isWs(startIdx - 1)) {
-      while (startIdx > 0 && isWs(startIdx - 1)) startIdx--
-    }
+    ;[startIdx, endIdx] = includeAdjacentWhitespace(
+      startIdx,
+      endIdx,
+      graphemes.length,
+      isWs,
+    )
   }
 
   return { start: offsetAt(startIdx), end: offsetAt(endIdx) }
@@ -146,6 +183,40 @@ function findQuoteObject(
   return null
 }
 
+function scanBackward(
+  text: string,
+  from: number,
+  open: string,
+  close: string,
+): number {
+  let depth = 0
+  for (let i = from; i >= 0; i--) {
+    if (text[i] === close && i !== from) depth++
+    else if (text[i] === open) {
+      if (depth === 0) return i
+      depth--
+    }
+  }
+  return -1
+}
+
+function scanForward(
+  text: string,
+  from: number,
+  open: string,
+  close: string,
+): number {
+  let depth = 0
+  for (let i = from; i < text.length; i++) {
+    if (text[i] === open) depth++
+    else if (text[i] === close) {
+      if (depth === 0) return i
+      depth--
+    }
+  }
+  return -1
+}
+
 function findBracketObject(
   text: string,
   offset: number,
@@ -153,33 +224,10 @@ function findBracketObject(
   close: string,
   isInner: boolean,
 ): TextObjectRange {
-  let depth = 0
-  let start = -1
-
-  for (let i = offset; i >= 0; i--) {
-    if (text[i] === close && i !== offset) depth++
-    else if (text[i] === open) {
-      if (depth === 0) {
-        start = i
-        break
-      }
-      depth--
-    }
-  }
+  const start = scanBackward(text, offset, open, close)
   if (start === -1) return null
 
-  depth = 0
-  let end = -1
-  for (let i = start + 1; i < text.length; i++) {
-    if (text[i] === open) depth++
-    else if (text[i] === close) {
-      if (depth === 0) {
-        end = i
-        break
-      }
-      depth--
-    }
-  }
+  const end = scanForward(text, start + 1, open, close)
   if (end === -1) return null
 
   return isInner ? { start: start + 1, end } : { start, end: end + 1 }
