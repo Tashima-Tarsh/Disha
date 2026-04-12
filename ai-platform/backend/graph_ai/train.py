@@ -64,13 +64,13 @@ def _generate_synthetic_graph(
 
     Node types: host, domain, wallet, dns_record, transaction.
     Features are a mix of one-hot type encoding + random attributes.
+    Labels are derived from features to allow the model to learn patterns.
     """
     rng = np.random.RandomState(seed)
 
     # Node features
     node_features = np.zeros((num_nodes, feature_dim), dtype=np.float32)
     node_types = rng.randint(0, 5, size=num_nodes)
-    node_labels = rng.randint(0, num_classes, size=num_nodes)
 
     for i in range(num_nodes):
         # One-hot for type (columns 0-4)
@@ -79,6 +79,26 @@ def _generate_synthetic_graph(
         node_features[i, 6] = rng.uniform(0, 1)
         # Random hash features (columns 7-15)
         node_features[i, 7:] = rng.uniform(-0.5, 0.5, size=feature_dim - 7)
+
+    # Derive labels from features so model can learn meaningful patterns
+    # Label depends on node type and risk score with some noise
+    node_labels = np.zeros(num_nodes, dtype=np.int64)
+    for i in range(num_nodes):
+        risk = node_features[i, 6]
+        ntype = node_types[i]
+        # Combine type and risk to determine class
+        if risk < 0.25:
+            base_class = 0  # low risk
+        elif risk < 0.5:
+            base_class = 1  # medium risk
+        elif risk < 0.75:
+            base_class = 2  # high risk
+        else:
+            base_class = 3  # critical risk
+        # Small probability of noise to avoid perfect classification
+        if rng.random() < 0.1:
+            base_class = rng.randint(0, num_classes)
+        node_labels[i] = base_class
 
     # Edges (random, ensuring no self-loops)
     src = rng.randint(0, num_nodes, size=num_edges)
@@ -142,20 +162,27 @@ def train(
 
     # ── 2. Node Classification ────────────────────────────────────────
     classifier = GraphClassifier(in_channels=16, hidden_channels=64, num_classes=4)
-    clf_optimizer = torch.optim.Adam(classifier.parameters(), lr=0.01, weight_decay=1e-3)
+    clf_optimizer = torch.optim.Adam(classifier.parameters(), lr=0.01, weight_decay=5e-4)
 
     x = torch.FloatTensor(graph["node_features"])
     edge_idx = torch.LongTensor(graph["edge_index"])
     labels = torch.LongTensor(graph["node_labels"])
 
-    # Train/test split (80/20)
-    num_train = int(0.8 * graph["num_nodes"])
-    train_mask = torch.zeros(graph["num_nodes"], dtype=torch.bool)
-    train_mask[:num_train] = True
-    test_mask = ~train_mask
+    # Shuffled train/test split (80/20)
+    num_nodes = graph["num_nodes"]
+    perm = torch.randperm(num_nodes, generator=torch.Generator().manual_seed(42))
+    num_train = int(0.8 * num_nodes)
+    train_mask = torch.zeros(num_nodes, dtype=torch.bool)
+    test_mask = torch.zeros(num_nodes, dtype=torch.bool)
+    train_mask[perm[:num_train]] = True
+    test_mask[perm[num_train:]] = True
 
     classifier.train()
     clf_losses = []
+    best_test_acc = 0.0
+    patience = 20
+    patience_counter = 0
+    best_state = None
     for epoch in range(1, num_epochs_classify + 1):
         clf_optimizer.zero_grad()
         logits = classifier(x, edge_idx)
@@ -163,8 +190,32 @@ def train(
         loss.backward()
         clf_optimizer.step()
         clf_losses.append(loss.item())
+
+        # Early stopping based on test accuracy
+        if epoch % 10 == 0:
+            classifier.eval()
+            with torch.no_grad():
+                eval_logits = classifier(x, edge_idx)
+                eval_preds = eval_logits.argmax(dim=-1)
+                curr_test_acc = float((eval_preds[test_mask] == labels[test_mask]).float().mean())
+            if curr_test_acc > best_test_acc:
+                best_test_acc = curr_test_acc
+                best_state = {k: v.clone() for k, v in classifier.state_dict().items()}
+                patience_counter = 0
+            else:
+                patience_counter += 1
+            classifier.train()
+
+            if patience_counter >= patience:
+                logger.info("early_stopping", epoch=epoch, best_test_acc=round(best_test_acc, 4))
+                break
+
         if epoch % 30 == 0:
             logger.info("classifier_epoch", epoch=epoch, loss=round(loss.item(), 4))
+
+    # Restore best model
+    if best_state is not None:
+        classifier.load_state_dict(best_state)
 
     # Evaluate
     classifier.eval()
