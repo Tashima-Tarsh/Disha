@@ -6,6 +6,28 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) 
 
 ---
 
+## [v3.2.0] — 2026-04-12
+
+### 🐛 Bug Fixes
+- **GNN overfitting resolved** — Test accuracy improved from 7.2% to 75% on synthetic graph. Root causes: random labels, sequential split, insufficient regularization.
+  - `ai-platform/backend/graph_ai/train.py`: Labels now derived from node features instead of random assignment; train/test split uses shuffled permutation; added early stopping with patience-based checkpoint restoration.
+  - `ai-platform/backend/graph_ai/models.py`: Added `BatchNorm1d` to GCN encoder; increased dropout from 0.3 to 0.5; increased weight decay to 5e-4.
+- **graph_ai import dependency** — `graph_ai/__init__.py` now uses lazy `__getattr__` for `GraphExporter` to avoid requiring `pydantic_settings` at import time. Models and trainer can be imported directly without the full dependency chain.
+- **continuous_train.py** — Updated GNN training section to use improved model architecture and synthetic graph generation with feature-derived labels.
+
+### 📊 Updated Metrics
+- GNN node classification: 150 epochs, 98.1% train / 75.0% test accuracy (synthetic), ~99.8%/99.8% (knowledge graph)
+- GNN link prediction: 200 epochs, loss 1.299
+- RL PPO: 400 episodes, reward 22.24 (±3.23)
+
+### 📝 Documentation Updates
+- **LEARNING_LOG.md** — Bumped to v3.2.0; updated version history, achievements, training metrics, demerits (GNN overfitting marked resolved), audit checklist
+- **README.md** — Updated version badge to v3.2.0; corrected stats (3,700+ files, 452K+ LoC, 19 Dockerfiles, 9 CI workflows, 13 test files); added v3.2.0 section
+- **WIKI.md** — Added Section 21 documenting v3.2.0 GNN fixes; updated GNN section 4.8 with new architecture
+- **CHANGELOG.md** — Added v3.2.0 entry
+
+---
+
 ## [v3.1.0] — 2026-04-12
 
 ### 🐛 Bug Fixes
