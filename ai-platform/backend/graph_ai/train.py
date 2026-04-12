@@ -26,6 +26,11 @@ _BACKEND_ROOT = _SCRIPT_DIR.parent
 if str(_BACKEND_ROOT) not in sys.path:
     sys.path.insert(0, str(_BACKEND_ROOT))
 
+# Label noise rate: fraction of nodes assigned a random class instead of
+# their feature-derived class, preventing the model from achieving perfect
+# classification on the training set and encouraging generalisation.
+_LABEL_NOISE_RATE = 0.1
+
 # Import models directly to avoid __init__.py pulling in graph_exporter
 # (which depends on app.core.config / pydantic_settings at import time)
 _models_spec = importlib.util.spec_from_file_location(
@@ -96,7 +101,7 @@ def _generate_synthetic_graph(
         else:
             base_class = 3  # critical risk
         # Small probability of noise to avoid perfect classification
-        if rng.random() < 0.1:
+        if rng.random() < _LABEL_NOISE_RATE:
             base_class = rng.randint(0, num_classes)
         node_labels[i] = base_class
 
