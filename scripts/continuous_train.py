@@ -189,7 +189,11 @@ def _train_rl(
     prev_checkpoint: Path | None = None,
 ) -> dict:
     """Train RL policy on threat scenarios (incremental)."""
-    import torch
+    try:
+        import torch
+    except ImportError:
+        return {"status": "skipped", "reason": "torch_not_available"}
+
     from app.rl.environment import InvestigationEnvironment, ActionType
     from app.rl.policy import PolicyNetwork, TORCH_AVAILABLE
     from app.rl.experience_replay import ExperienceReplayBuffer
@@ -329,7 +333,10 @@ def _train_gnn(
 ) -> dict:
     """Train GNN on graph data (incremental)."""
     import importlib.util
-    import torch
+    try:
+        import torch
+    except ImportError:
+        return {"status": "skipped", "reason": "torch_not_available"}
 
     _GRAPH_DIR = BACKEND / "graph_ai"
 
@@ -573,6 +580,11 @@ def _should_promote(current: dict, previous: dict | None, component: str) -> boo
 def _promote_checkpoint(staging_dir: Path, production_dir: Path, component: str):
     """Copy staging checkpoint to production."""
     import shutil
+
+    if not staging_dir.exists():
+        logger.warning("checkpoint_staging_missing", component=component, path=str(staging_dir))
+        return
+
     production_dir.mkdir(parents=True, exist_ok=True)
 
     for item in staging_dir.iterdir():

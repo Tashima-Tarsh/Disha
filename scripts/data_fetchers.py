@@ -500,7 +500,15 @@ def fetch_oeis_sequences(count: int = 30) -> list[dict]:
 
         try:
             data = json.loads(raw)
-            for result in data.get("results", [])[:count // len(keywords)]:
+            if isinstance(data, list):
+                results = data[:count // len(keywords)]
+            elif isinstance(data, dict):
+                results = data.get("results", [])[:count // len(keywords)]
+            else:
+                continue
+            for result in results:
+                if not isinstance(result, dict):
+                    continue
                 sequences.append({
                     "id": result.get("number", 0),
                     "name": result.get("name", ""),
@@ -508,7 +516,7 @@ def fetch_oeis_sequences(count: int = 30) -> list[dict]:
                     "source": "oeis",
                     "domain": "mathematics",
                 })
-        except (json.JSONDecodeError, KeyError):
+        except (json.JSONDecodeError, KeyError, TypeError):
             continue
 
     logger.info("fetched_oeis", sequences=len(sequences))
