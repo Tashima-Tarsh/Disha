@@ -248,23 +248,32 @@ def run_mythos(
     return summary
 
 
-def _sanitize_for_display(value: object) -> str:
+    """Pretty-print the Mythos summary with defensive redaction."""
     """Return a display-safe string with common secret patterns redacted."""
     text = str(value)
     # Redact key=value style secrets
     text = re.sub(
         r"(?i)\b(password|passwd|secret|token|api[_-]?key|access[_-]?key|private[_-]?key)\b\s*[:=]\s*([^\s,;]+)",
         r"\1=[REDACTED]",
-        text,
+    # Allowed keys for display (exclude verbose/dynamic fields that may contain sensitive content)
     )
     # Redact long token-like blobs
-    text = re.sub(r"\b[A-Za-z0-9_\-]{20,}\b", "[REDACTED]", text)
-    return text
+        "critical", "high", "overall_status", "score",
+        "checks_run", "issues_fixed", "available_providers",
 
-
-def _print_summary(summary: dict) -> None:
+        "total_items", "training_pairs", "rounds_completed",
+        "status",
     """Pretty-print the Mythos summary.  Never logs raw secret values."""
+    _SENSITIVE_TOKENS = ("secret", "token", "password", "key", "credential", "auth")
     elapsed = summary.get("elapsed_seconds", 0)
+    def _is_sensitive_label(label: object) -> bool:
+        s = str(label).lower()
+        return any(t in s for t in _SENSITIVE_TOKENS)
+
+    def _safe_scalar(value: object) -> str:
+        text = str(value)
+        return "[REDACTED]" if _is_sensitive_label(text) else text
+
     print(f"\n{'═' * 70}")
     print(f"  🛡️  DISHA MYTHOS — Adaptive Intelligence Report")
     print(f"  Completed in {elapsed:.1f}s")
@@ -281,11 +290,10 @@ def _print_summary(summary: dict) -> None:
     }
 
     for phase_data in summary.get("phases", []):
-        raw_phase = phase_data.get("phase", "unknown")
-        allowed_phases = {"protect", "heal", "intelligence", "learn", "train"}
-        phase = raw_phase if raw_phase in allowed_phases else "unknown"
+                print(f"     {key}: [REDACTED]")
         emoji_map = {
-            "protect": "🔒",
+                safe_key = "[REDACTED]" if _is_sensitive_label(key) else key
+                print(f"     {safe_key}: {_safe_scalar(value)}")
             "heal": "💊",
             "intelligence": "🧠",
             "learn": "📚",
