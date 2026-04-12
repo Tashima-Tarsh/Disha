@@ -7,6 +7,7 @@ perception, reasoning, memory, action, reflection, and orchestration.
 from __future__ import annotations
 
 import enum
+import math
 import uuid
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
@@ -193,7 +194,7 @@ class SemanticNode:
     concept: str = ""
     category: str = ""
     properties: dict[str, Any] = field(default_factory=dict)
-    relations: list[tuple[str, str, str]] = field(default_factory=list)  # (relation, target_id, weight)
+    relations: list[tuple[str, str, float]] = field(default_factory=list)  # (relation, target_id, weight)
     activation: float = 0.0  # Spreading activation level
     access_count: int = 0
     last_accessed: str = field(
@@ -253,7 +254,6 @@ class QuantumState:
     @property
     def entropy(self) -> float:
         """Calculate Shannon entropy of branch probabilities."""
-        import math
         probs = [b.get("probability", 0.0) for b in self.branches]
         total = sum(probs)
         if total == 0:
