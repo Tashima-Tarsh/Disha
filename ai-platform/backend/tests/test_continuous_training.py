@@ -180,6 +180,16 @@ class TestContinuousTrainingE2E:
         assert "rl" in r
         assert "gnn" in r
         assert "decision" in r
-        assert r["rl"]["episodes_trained"] >= 100
-        assert r["gnn"]["graph_nodes"] > 0
+
+        # RL and GNN may be skipped if torch is not installed
+        if r["rl"].get("status") == "skipped":
+            assert r["rl"]["reason"] == "torch_not_available"
+        else:
+            assert r["rl"]["episodes_trained"] >= 100
+
+        if r["gnn"].get("status") == "skipped":
+            assert r["gnn"]["reason"] == "torch_not_available"
+        else:
+            assert r["gnn"]["graph_nodes"] > 0
+
         assert r["decision"]["num_scenarios"] >= 50
