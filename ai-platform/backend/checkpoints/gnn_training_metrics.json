@@ -1,16 +1,16 @@
 {
   "link_prediction": {
-    "epochs": 200,
-    "final_loss": 0.31608736515045166
+    "epochs": 300,
+    "final_loss": 1.1041622161865234
   },
   "node_classification": {
-    "epochs": 130,
-    "train_accuracy": 0.9984962344169617,
-    "test_accuracy": 0.0721442922949791
+    "epochs": 190,
+    "train_accuracy": 0.9998913407325745,
+    "test_accuracy": 0.7375624775886536
   },
   "graph_stats": {
-    "nodes": 2494,
-    "edges": 7636,
+    "nodes": 23014,
+    "edges": 84578,
     "feature_dim": 16
   }
 }
