@@ -18,7 +18,6 @@ Usage::
 
 from __future__ import annotations
 
-import hashlib
 import json
 import os
 import sys
@@ -34,7 +33,6 @@ if str(_SCRIPT_DIR) not in sys.path:
 os.environ.setdefault("DISHA_MODEL_PROVIDER", "mock")
 
 from main_decision_engine import DecisionEngine  # noqa: E402
-from utils.llm_wrapper import get_llm             # noqa: E402
 
 
 # ── Synthetic Scenario Generator ──────────────────────────────────────

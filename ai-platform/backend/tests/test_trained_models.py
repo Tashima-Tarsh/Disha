@@ -18,7 +18,8 @@ from pathlib import Path
 
 import numpy as np
 import pytest
-import torch
+
+torch = pytest.importorskip("torch", reason="PyTorch not installed — skipping trained-model tests")
 
 # ── Path setup ────────────────────────────────────────────────────────
 # The test file lives at ai-platform/backend/tests/test_trained_models.py
