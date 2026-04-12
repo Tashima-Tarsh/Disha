@@ -620,6 +620,26 @@ def main() -> None:
         sys.exit(0)
 
 
+def _sanitize_for_output(text: str) -> str:
+    """Redact obvious secret material from any text destined for console output."""
+    if not text:
+        return text
+
+    redacted = text
+    # Common key/value secret patterns
+    redacted = re.sub(
+        r"(?i)\b(password|passwd|pwd|secret|token|api[_-]?key|access[_-]?key)\b\s*[:=]\s*([^\s,;]+)",
+        r"\1=<redacted>",
+        redacted,
+    )
+    # Generic long token-like blobs
+    redacted = re.sub(r"\b[A-Za-z0-9_\-]{32,}\b", "<redacted>", redacted)
+    # Bound output size to reduce accidental bulk leakage
+    if len(redacted) > 500:
+        redacted = redacted[:500] + "...<truncated>"
+    return redacted
+
+
 def _print_report(report: GuardianReport, as_json: bool = False) -> None:
     # Build a safe summary that never includes raw evidence or secret content.
     # We construct only aggregate and redacted data here.
@@ -685,7 +705,8 @@ def _print_report(report: GuardianReport, as_json: bool = False) -> None:
         if entry.get("file"):
             loc = str(entry["file"])
             if entry.get("line"):
-                loc += f":{entry['line']}"
+    safe_lines = [_sanitize_for_output(line) for line in lines]
+    sys.stdout.write("\n".join(safe_lines))
             lines.append(f"     📍 {loc}")
         lines.append(f"     Status: {status}")
 
