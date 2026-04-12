@@ -431,6 +431,7 @@ def generate_synthetic_threats(n: int = 100, seed: int = 42) -> list[ThreatScena
             indicators = [f"http://bad-{rng.randint(100,999)}.example.com/payload-{rng.randint(1,100)}"
                          for _ in range(num_indicators)]
         else:
+            # MD5 used here for fast synthetic data generation, not for cryptographic purposes
             indicators = [hashlib.md5(f"malware-{rng.randint(0,100000)}".encode()).hexdigest()
                          for _ in range(num_indicators)]
 

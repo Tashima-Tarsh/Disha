@@ -150,9 +150,14 @@ class TestDecisionEngineTrainedModel:
             data = json.load(f)
         model = CalibrationModel.from_dict(data)
 
-        # Feature dimension must match _extract_features output
-        # (4 agents × 5 features each + 3 overall stats = 23)
-        feature_dim = len(model.weights) if model.weights is not None else 23
+        # Derive feature dimension from loaded model weights.
+        # _extract_features produces: 4 agents × 5 features + 3 overall = 23
+        # but we use the model's actual weight shape to stay in sync.
+        _NUM_AGENTS = 4
+        _FEATURES_PER_AGENT = 5
+        _OVERALL_FEATURES = 3
+        _DEFAULT_DIM = _NUM_AGENTS * _FEATURES_PER_AGENT + _OVERALL_FEATURES
+        feature_dim = len(model.weights) if model.weights is not None else _DEFAULT_DIM
         X = np.random.rand(5, feature_dim).astype(np.float32)
         preds = model.predict(X)
         assert preds.shape == (5,)

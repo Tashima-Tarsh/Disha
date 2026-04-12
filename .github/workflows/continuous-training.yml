@@ -1,7 +1,7 @@
 name: Continuous AI Training
 
 on:
-  # Run daily at 2 AM UTC
+  # Run daily at 2 AM UTC — low-traffic period for open-source data fetching
   schedule:
     - cron: "0 2 * * *"
   # Allow manual trigger

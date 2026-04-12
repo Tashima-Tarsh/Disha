@@ -56,6 +56,11 @@ logger = structlog.get_logger("continuous_train")
 class HyperparamScheduler:
     """Auto-tunes hyperparameters based on training metrics history."""
 
+    # Stagnation detection: if reward changes less than this fraction, boost LR
+    STAGNATION_THRESHOLD = 0.01
+    # Minimum denominator to avoid division by zero
+    EPSILON = 1e-8
+
     def __init__(self):
         self.history: list[dict] = []
 
@@ -74,7 +79,7 @@ class HyperparamScheduler:
         if len(self.history) >= 2:
             prev = self.history[-2].get("rl", {}).get("final_avg_reward", 0)
             curr = self.history[-1].get("rl", {}).get("final_avg_reward", 0)
-            if abs(curr - prev) < 0.01 * abs(prev + 1e-8):
+            if abs(curr - prev) < self.STAGNATION_THRESHOLD * abs(prev + self.EPSILON):
                 base["lr"] = min(base["lr"] * 1.5, 1e-3)
                 logger.info("rl_lr_increased", new_lr=base["lr"], reason="stagnation")
         return base
