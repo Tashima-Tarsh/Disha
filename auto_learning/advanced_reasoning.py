@@ -362,7 +362,7 @@ class AdvancedReasoningEngine:
         )
         # Ambiguous if top two scores are within 10% of each other
         if scores[0] == 0:
-            return True
+            return False
         diff = abs(scores[0] - scores[1]) / scores[0]
         return diff < 0.10
 

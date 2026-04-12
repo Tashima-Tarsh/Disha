@@ -206,6 +206,14 @@ class TestAmbiguityDetection:
         engine = AdvancedReasoningEngine()
         assert engine.detect_ambiguity([SolutionPath(name="a", description="", approach="")]) is False
 
+    def test_zero_scores_no_ambiguity(self):
+        engine = AdvancedReasoningEngine()
+        solutions = [
+            SolutionPath(name="a", description="", approach="", evaluation=SolutionEvaluation()),
+            SolutionPath(name="b", description="", approach="", evaluation=SolutionEvaluation()),
+        ]
+        assert engine.detect_ambiguity(solutions) is False
+
 
 # ---------------------------------------------------------------------------
 # Full reasoning pipeline tests
