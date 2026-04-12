@@ -245,7 +245,7 @@ class SemanticMemory:
         target = self._nodes.get(target_id)
         if source is None or target is None:
             return False
-        source.relations.append((relation, target_id, str(weight)))
+        source.relations.append((relation, target_id, weight))
         return True
 
     def activate(self, concept_name: str, initial_activation: float = 1.0) -> dict[str, float]:
@@ -286,8 +286,7 @@ class SemanticMemory:
             if node is None:
                 continue
 
-            for relation, target_id, weight_str in node.relations:
-                weight = float(weight_str)
+            for relation, target_id, weight in node.relations:
                 spread = current_activation * self._activation_decay * weight
                 if spread < self._activation_threshold:
                     continue
@@ -319,10 +318,10 @@ class SemanticMemory:
             return []
 
         results = []
-        for relation, target_id, weight_str in node.relations:
+        for relation, target_id, weight in node.relations:
             target = self._nodes.get(target_id)
             if target:
-                results.append((relation, target.concept, float(weight_str)))
+                results.append((relation, target.concept, weight))
 
         results.sort(key=lambda x: x[2], reverse=True)
         return results[:limit]
@@ -572,7 +571,9 @@ class CognitiveMemorySystem:
                     concept=raw["concept"],
                     category=raw.get("category", ""),
                     properties=raw.get("properties", {}),
-                    relations=[tuple(r) for r in raw.get("relations", [])],
+                    relations=[
+                        (r[0], r[1], float(r[2])) for r in raw.get("relations", [])
+                    ],
                     access_count=raw.get("access_count", 0),
                 )
                 self.semantic._nodes[node.id] = node
