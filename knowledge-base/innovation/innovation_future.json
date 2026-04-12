@@ -1,0 +1,70 @@
+{
+  "domain": "Innovation, Future Research & Space Technologies",
+  "description": "Emerging technologies, space exploration, future research directions, and innovation frontiers",
+  "space_technologies": {
+    "launch_systems": [
+      {"name": "SpaceX Starship", "type": "super heavy-lift", "payload_leo_kg": 150000, "reusable": true},
+      {"name": "SLS (Space Launch System)", "type": "super heavy-lift", "payload_leo_kg": 95000, "reusable": false},
+      {"name": "SpaceX Falcon 9", "type": "medium-lift", "payload_leo_kg": 22800, "reusable": true},
+      {"name": "Ariane 6", "type": "heavy-lift", "payload_leo_kg": 21650, "reusable": false},
+      {"name": "New Glenn (Blue Origin)", "type": "heavy-lift", "payload_leo_kg": 45000, "reusable": true}
+    ],
+    "propulsion": {
+      "chemical": ["liquid bipropellant (LOX/LH2, LOX/RP-1)", "solid rocket", "hypergolic"],
+      "electric": ["ion drive (Hall effect)", "VASIMR", "pulsed plasma"],
+      "nuclear": ["nuclear thermal (NERVA heritage)", "nuclear electric"],
+      "advanced_concepts": ["solar sail", "laser propulsion", "fusion propulsion", "antimatter drive", "Bussard ramjet", "EmDrive (disputed)"]
+    },
+    "habitats": ["ISS", "Lunar Gateway", "Mars habitats (inflatable, ice-based)", "O'Neill cylinders", "Stanford torus"],
+    "planetary_exploration": {
+      "Moon": ["Artemis program", "lunar south pole water ice", "in-situ resource utilisation"],
+      "Mars": ["Perseverance rover", "Ingenuity helicopter", "Mars Sample Return", "terraforming concepts"],
+      "asteroids": ["OSIRIS-REx", "DART mission", "asteroid mining (platinum group metals)"],
+      "outer_solar_system": ["Europa Clipper", "Dragonfly (Titan)", "Uranus orbiter (proposed)"],
+      "exoplanets": ["transit method", "radial velocity", "direct imaging", "James Webb Space Telescope", "habitable zone"]
+    }
+  },
+  "emerging_technologies": {
+    "quantum_computing": {
+      "approaches": ["superconducting qubits", "trapped ions", "topological qubits", "photonic", "neutral atoms"],
+      "companies": ["IBM", "Google", "IonQ", "Rigetti", "PsiQuantum", "Quantinuum"],
+      "milestones": ["quantum supremacy (Google 2019)", "quantum error correction", "fault-tolerant quantum computing"],
+      "applications": ["drug discovery", "optimisation", "cryptography", "materials science", "financial modelling"]
+    },
+    "artificial_general_intelligence": {
+      "approaches": ["scaling hypothesis", "neurosymbolic AI", "embodied cognition", "world models"],
+      "challenges": ["alignment", "interpretability", "reasoning", "common sense", "embodiment"],
+      "safety": ["RLHF", "constitutional AI", "interpretability research", "AI governance"]
+    },
+    "biotechnology": {
+      "gene_editing": ["CRISPR-Cas9", "base editing", "prime editing", "epigenome editing"],
+      "synthetic_biology": ["designed organisms", "metabolic engineering", "xenobiology"],
+      "longevity": ["senolytics", "telomere extension", "parabiosis", "caloric restriction mimetics"],
+      "brain_interfaces": ["Neuralink", "BCI (brain-computer interfaces)", "optogenetics", "neural dust"]
+    },
+    "energy": {
+      "fusion": ["ITER (tokamak)", "NIF (laser ignition)", "stellarator", "compact fusion (TAE, Commonwealth)"],
+      "renewables": ["perovskite solar cells", "offshore wind", "wave energy", "geothermal (enhanced)"],
+      "storage": ["solid-state batteries", "flow batteries", "green hydrogen", "gravity storage", "compressed air"],
+      "advanced_nuclear": ["small modular reactors (SMR)", "thorium molten salt", "traveling wave reactor"]
+    },
+    "materials_science": {
+      "nanomaterials": ["graphene", "carbon nanotubes", "quantum dots", "MOFs (metal-organic frameworks)"],
+      "metamaterials": ["negative refractive index", "acoustic cloaking", "programmable matter"],
+      "superconductors": ["room-temperature (research goal)", "high-Tc cuprates", "iron-based", "hydrides under pressure"],
+      "smart_materials": ["shape memory alloys", "piezoelectrics", "self-healing polymers"]
+    }
+  },
+  "future_research_frontiers": {
+    "physics": ["quantum gravity", "dark matter detection", "dark energy nature", "theory of everything", "multiverse hypothesis"],
+    "mathematics": ["P vs NP", "Riemann Hypothesis", "Navier-Stokes existence", "Hodge conjecture", "Yang-Mills existence"],
+    "biology": ["origin of life (abiogenesis)", "consciousness", "ageing reversal", "de-extinction", "synthetic ecosystems"],
+    "computing": ["post-Moore's law", "neuromorphic computing", "DNA computing", "optical computing", "quantum internet"],
+    "space": ["interstellar travel", "Dyson sphere concepts", "Kardashev scale progression", "space elevator", "warp drive physics"]
+  },
+  "innovation_methodology": {
+    "frameworks": ["design thinking", "lean startup", "agile", "TRIZ (inventive problem solving)", "stage-gate"],
+    "open_innovation": ["open source", "citizen science", "crowdfunding", "preprint servers (arXiv, bioRxiv)", "open data"],
+    "patents_ip": ["patent prosecution", "prior art", "trade secrets", "open patents", "compulsory licensing"]
+  }
+}

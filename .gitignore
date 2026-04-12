@@ -39,6 +39,14 @@ cyber-defense/*.pt
 cyber-defense/model/*.pt
 cyber-defense/honeypot/fakeapi/node_modules/
 
+# Trained model checkpoints (binary weights)
+ai-platform/backend/checkpoints/*.pt
+decision-engine/checkpoints/
+
+# Continuous training staging area
+checkpoints_staging/
+training_summary.json
+
 # Decision Engine build artifacts
 decision-engine/data/index/*.faiss
 decision-engine/data/index/*.json

@@ -39,6 +39,40 @@
 
 <br>
 
+## 📋 Learning Status — v3.0.0
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Learning_Version-v3.0.0-blue?style=flat-square" alt="Version">
+  <img src="https://img.shields.io/badge/Audit-GitHub_Code_Review_✓-brightgreen?style=flat-square" alt="Audit">
+  <img src="https://img.shields.io/badge/Date-12--04--2026-orange?style=flat-square" alt="Date">
+  <img src="https://img.shields.io/badge/Domains-8-purple?style=flat-square" alt="Domains">
+  <img src="https://img.shields.io/badge/Periodic_Table-118_Elements-red?style=flat-square" alt="Elements">
+  <img src="https://img.shields.io/badge/Status-Continuous_Learning_Active-brightgreen?style=flat-square" alt="Status">
+</p>
+
+Disha has achieved **continuous learning** across **8 knowledge domains**, verified by GitHub Code Review on **12-04-2026**:
+
+| Domain | Key Content | Items |
+|--------|------------|-------|
+| 🔬 **Physics** | Classical · Quantum · Space · Modern · Ancient | 6 knowledge files |
+| 📐 **Mathematics** | Number Theory · Algebra · Calculus · Geometry · Probability · Discrete · DiffEq · Applied | 8 branches |
+| 💻 **Computing** | Algorithms · AI/ML · Systems · Cryptography · PLs · Theory | 6 branches |
+| ⚗️ **Chemistry** | **All 118 elements** (H→Og) · Bonding · Reactions · Organic · Biochemistry | 118 elements + theory |
+| ⚖️ **Law & Politics** | Constitutions (US/UK/India/France/Germany) · Rights · Political theory · Cyber law | 5 frameworks |
+| 🛡️ **Cybersecurity** | Ethical hacking · MITRE ATT&CK · OWASP · 50+ tools · Defensive security | 6 phases |
+| 🚀 **Innovation** | Space tech · Quantum computing · AGI · Biotech · Fusion · Materials | Future research |
+| ⚔️ **Historical Strategy** | 32+ conflicts · ML classifiers · Simulation engine | Trained models |
+
+**📊 Training:** RL 400 episodes (reward 22.03) · GNN 2,494 nodes / 7,636 edges · Decision engine 4 agents
+
+> 📖 **Full audit log:** [**LEARNING_LOG.md**](./LEARNING_LOG.md) — versioned achievements, merits, demerits, continuous learning & self-healing remarks
+>
+> 🔒 **Verification:** Every learning version is audited by GitHub Code Review before promotion
+
+<img src="docs/images/divider.svg" width="100%" height="4">
+
+<br>
+
 ## ✨ What is Disha?
 
 Disha is a **six-layer AI platform** unified in a single repository:
@@ -206,10 +240,10 @@ The **Disha MCP Server** is deployed on Vercel and publicly accessible:
 | Component | Detail |
 |-----------|--------|
 | **Algorithm** | Proximal Policy Optimization (PPO) |
-| **State** | 13-dim (entities, anomalies, risk, depth, agents_used, time) |
+| **State** | 12-dim (entities, anomalies, risk, depth, agents_used, time) |
 | **Actions** | 8 (run 5 agents, increase/decrease depth, stop) |
 | **Reward** | Entity discovery (+0.1), anomaly (+0.5), risk change (×2.0), time penalty (-0.01) |
-| **Policy** | Actor-Critic MLP (13→64→64→8) with action masking |
+| **Policy** | Actor-Critic MLP (12→64→64→8) with action masking |
 | **Replay** | Prioritized experience buffer (10K transitions, α=0.6) |
 
 <br>
@@ -406,6 +440,7 @@ DISHA_MODEL_PROVIDER=mock python -m pytest tests/ -v
 | **[🔧 docs/subsystems.md](./docs/subsystems.md)** | Bridge, MCP, plugins, skills, memory |
 | **[🧭 docs/exploration-guide.md](./docs/exploration-guide.md)** | Code navigation guide |
 | **[⚖️ decision-engine/README.md](./decision-engine/README.md)** | Decision Engine setup, index building, llama-cpp usage |
+| **[📋 LEARNING_LOG.md](./LEARNING_LOG.md)** | Learning audit log — versions, achievements, merits/demerits, verification |
 ---
 
 ## 🏛️ License
