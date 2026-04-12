@@ -621,10 +621,22 @@ def main() -> None:
 
 
 def _print_report(report: GuardianReport, as_json: bool = False) -> None:
-    # Use sanitized dict (no evidence) to avoid logging sensitive data
-    sanitized = report.to_dict(include_evidence=False)
+    # Emit only a minimal summary to avoid printing sensitive scanner output.
+    safe_summary = {
+        "timestamp": report.timestamp,
+        "system_health": report.system_health,
+        "threat_counts": {
+            "critical": report.critical_count,
+            "high": report.high_count,
+            "medium": sum(1 for t in report.threats if t.level == ThreatLevel.MEDIUM),
+            "low": sum(1 for t in report.threats if t.level == ThreatLevel.LOW),
+            "info": sum(1 for t in report.threats if t.level == ThreatLevel.INFO),
+        },
+        "scans_performed": list(report.scans_performed),
+        "total_threats": len(report.threats),
+    }
     if as_json:
-        print(json.dumps(sanitized, indent=2))
+        print(json.dumps(safe_summary, indent=2))
         return
 
     health_emoji = "🟢" if report.system_health > 0.8 else "🟡" if report.system_health > 0.5 else "🔴"
