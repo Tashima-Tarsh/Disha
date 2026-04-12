@@ -235,6 +235,32 @@ The **Disha MCP Server** is deployed on Vercel and publicly accessible:
 
 <br>
 
+## 🤖 Agent Core — Autonomous Claude-Powered System
+
+The `agent-core/` module provides a modular, autonomous coding agent powered by Claude:
+
+| Module | Purpose |
+|--------|---------|
+| 🧠 **Planner** | Task decomposition using Claude (rule-based fallback) |
+| ⚡ **Executor** | Tool-based task execution with intelligent tool selection |
+| 💾 **Memory** | Scoped context store, structured logs, decision audit trail |
+| 🔧 **Tools** | Sandboxed file system, terminal, search, and analysis tools |
+| 🔄 **Controller** | Autonomous Plan → Execute → Evaluate → Iterate loop |
+| ⚙️ **Config** | Environment-based configuration with sensible defaults |
+
+```python
+from agent_core import Agent, AgentConfig
+
+agent = Agent(AgentConfig.from_env())
+state = agent.run("Refactor the authentication module")
+```
+
+**53 unit tests** · Zero required dependencies · Graceful degradation without API key
+
+See [`agent-core/README.md`](agent-core/README.md) for full documentation.
+
+<br>
+
 ## 🧠 Reinforcement Learning Engine
 
 | Component | Detail |

@@ -64,3 +64,9 @@ decision-engine/data/index/*_lines.txt
 
 # Sentinel runtime logs
 logs/sentinel/
+
+# Agent Core — Python import symlink (auto-created for tests)
+/agent_core
+
+# Agent Core — memory persistence
+.disha/
