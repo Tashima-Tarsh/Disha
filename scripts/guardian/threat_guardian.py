@@ -621,7 +621,21 @@ def main() -> None:
 
 
 def _print_report(report: GuardianReport, as_json: bool = False) -> None:
-    # Build a safe summary that never includes raw evidence.
+    # Build a safe summary that never includes raw evidence or secret content.
+    # We construct only aggregate and redacted data here.
+    safe_threats = []
+    for t in report.threats:
+        is_secret = t.category == ThreatCategory.SECRET_LEAK
+        safe_threats.append({
+            "level": str(t.level.value),
+            "category": str(t.category.value),
+            "title": "[SECRET FINDING REDACTED]" if is_secret else str(t.title),
+            "description": "[details redacted]" if is_secret else str(t.description),
+            "file": Path(t.file_path).name if (t.file_path and is_secret) else t.file_path,
+            "line": t.line_number if not is_secret else None,
+            "neutralized": t.neutralized,
+        })
+
     safe_summary = {
         "timestamp": report.timestamp,
         "system_health": report.system_health,
@@ -634,45 +648,44 @@ def _print_report(report: GuardianReport, as_json: bool = False) -> None:
         },
         "scans_performed": list(report.scans_performed),
         "total_threats": len(report.threats),
+        "threats": safe_threats,
     }
     if as_json:
-        print(json.dumps(safe_summary, indent=2))
+        # Only emit the counts, not individual threats, for JSON output
+        json_out = {k: v for k, v in safe_summary.items() if k != "threats"}
+        sys.stdout.write(json.dumps(json_out, indent=2) + "\n")
         return
 
     health_emoji = "🟢" if report.system_health > 0.8 else "🟡" if report.system_health > 0.5 else "🔴"
-    print(f"\n{'═' * 60}")
-    print(f"  {health_emoji} Disha Threat Guardian Report")
-    print(f"  System Health: {report.system_health:.0%}")
-    print(f"{'═' * 60}")
+
+    # Build entire output as a pre-sanitized buffer
+    lines: list[str] = [
+        f"\n{'═' * 60}",
+        f"  {health_emoji} Disha Threat Guardian Report",
+        f"  System Health: {report.system_health:.0%}",
+        f"{'═' * 60}",
+    ]
 
     counts = safe_summary["threat_counts"]
     for level, emoji in [("critical", "🔴"), ("high", "🟠"), ("medium", "🟡"), ("low", "🔵"), ("info", "⚪")]:
         if counts[level]:
-            print(f"  {emoji} {level.capitalize():10s} {counts[level]}")
+            lines.append(f"  {emoji} {level.capitalize():10s} {counts[level]}")
 
-    for t in report.threats:
-        neutralized = t.neutralized
-        status = "✅ NEUTRALIZED" if neutralized else "⚠️  ACTIVE"
+    for entry in safe_threats:
+        status = "✅ NEUTRALIZED" if entry["neutralized"] else "⚠️  ACTIVE"
         level_emoji = {"critical": "🔴", "high": "🟠", "medium": "🟡", "low": "🔵", "info": "⚪"}
+        lines.append(f"\n  {level_emoji.get(entry['level'], '⚪')} [{entry['level'].upper()}] {entry['title']}")
+        lines.append(f"     {entry['description']}")
+        if entry.get("file"):
+            loc = str(entry["file"])
+            if entry.get("line"):
+                loc += f":{entry['line']}"
+            lines.append(f"     📍 {loc}")
+        lines.append(f"     Status: {status}")
 
-        # Redact details for secret-related findings to avoid logging sensitive data
-        is_secret = t.category == ThreatCategory.SECRET_LEAK
-        title = "[SECRET FINDING REDACTED]" if is_secret else t.title
-        description = "[details redacted]" if is_secret else t.description
+    lines.append(f"\n{'═' * 60}\n")
 
-        print(f"\n  {level_emoji.get(t.level.value, '⚪')} [{t.level.value.upper()}] {title}")
-        print(f"     {description}")
-        if t.file_path and not is_secret:
-            loc = t.file_path
-            if t.line_number:
-                loc += f":{t.line_number}"
-            print(f"     📍 {loc}")
-        elif t.file_path and is_secret:
-            # Show only filename, not full path, for secret findings
-            print(f"     📍 {Path(t.file_path).name}")
-        print(f"     Status: {status}")
-
-    print(f"\n{'═' * 60}\n")
+    sys.stdout.write("\n".join(lines))
 
 
 if __name__ == "__main__":

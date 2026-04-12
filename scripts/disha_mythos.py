@@ -255,15 +255,25 @@ def _print_summary(summary: dict) -> None:
         s = str(label).lower()
         return any(t in s for t in _SENSITIVE_TOKENS)
 
-    def _safe_scalar(value: object) -> str:
+    def _sanitize(value: object) -> str:
+        """Return a safe string representation, redacting anything that looks sensitive."""
         text = str(value)
-        return "[REDACTED]" if _is_sensitive_label(text) else text
+        if _is_sensitive_label(text):
+            return "[REDACTED]"
+        # Truncate overly long values that might contain encoded secrets
+        if len(text) > 200:
+            return text[:197] + "..."
+        return text
 
     elapsed = summary.get("elapsed_seconds", 0)
-    print(f"\n{'═' * 70}")
-    print(f"  🛡️  DISHA MYTHOS — Adaptive Intelligence Report")
-    print(f"  Completed in {elapsed:.1f}s")
-    print(f"{'═' * 70}")
+
+    # Build the entire output as a safe buffer before writing
+    lines: list[str] = [
+        f"\n{'═' * 70}",
+        f"  🛡️  DISHA MYTHOS — Adaptive Intelligence Report",
+        f"  Completed in {elapsed:.1f}s",
+        f"{'═' * 70}",
+    ]
 
     # Allowed keys for display (excludes any potential sensitive data)
     _SAFE_KEYS = {
@@ -272,11 +282,11 @@ def _print_summary(summary: dict) -> None:
         "checks_run", "issues_fixed", "details", "available_providers",
         "total_providers", "test_response_ok", "domains_loaded",
         "total_items", "training_pairs", "domain_breakdown",
-        "rounds_completed", "metrics", "status", "error",
+        "rounds_completed", "metrics", "status",
     }
 
     for phase_data in summary.get("phases", []):
-        phase = phase_data.get("phase", "unknown")
+        phase = _sanitize(phase_data.get("phase", "unknown"))
         emoji_map = {
             "protect": "🔒",
             "heal": "💊",
@@ -285,20 +295,23 @@ def _print_summary(summary: dict) -> None:
             "train": "🏋️",
         }
         emoji = emoji_map.get(phase, "▶")
+        lines.append(f"\n  {emoji}  Phase: {phase.upper()}")
 
-        print(f"\n  {emoji}  Phase: {phase.upper()}")
         for key, value in phase_data.items():
             if key == "phase" or key not in _SAFE_KEYS:
                 continue
-            safe_key = "[REDACTED]" if _is_sensitive_label(key) else key
+            safe_key = _sanitize(key)
             if isinstance(value, dict):
-                print(f"     {safe_key}:")
+                lines.append(f"     {safe_key}:")
                 for k, v in value.items():
-                    print(f"       {_safe_scalar(k)}: {_safe_scalar(v)}")
+                    lines.append(f"       {_sanitize(k)}: {_sanitize(v)}")
             else:
-                print(f"     {safe_key}: {_safe_scalar(value)}")
+                lines.append(f"     {safe_key}: {_sanitize(value)}")
 
-    print(f"\n{'═' * 70}\n")
+    lines.append(f"\n{'═' * 70}\n")
+
+    # Write the pre-sanitized buffer
+    sys.stdout.write("\n".join(lines))
 
 
 def main() -> None:
