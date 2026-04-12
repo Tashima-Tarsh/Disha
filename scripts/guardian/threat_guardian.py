@@ -529,11 +529,14 @@ class ThreatGuardian:
         if not match:
             return False
         entry = match.group(1)
+        # Directories get trailing slash, files don't
+        _DIR_ENTRIES = {"node_modules", "__pycache__", "dist", ".next", "venv", ".venv", "build"}
+        suffix = "/" if entry in _DIR_ENTRIES else ""
         try:
             content = gitignore.read_text()
             if entry not in content:
                 with open(gitignore, "a") as f:
-                    f.write(f"\n{entry}/\n")
+                    f.write(f"\n{entry}{suffix}\n")
                 return True
         except OSError:
             pass
