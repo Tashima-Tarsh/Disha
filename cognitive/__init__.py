@@ -17,6 +17,7 @@ Usage:
 
 __version__ = "1.0.0"
 
+from .engine import CognitiveEngine
 from .types import (
     AgentMessage,
     AgentRole,
