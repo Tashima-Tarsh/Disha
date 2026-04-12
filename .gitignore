@@ -43,6 +43,10 @@ cyber-defense/honeypot/fakeapi/node_modules/
 ai-platform/backend/checkpoints/*.pt
 decision-engine/checkpoints/
 
+# Continuous training staging area
+checkpoints_staging/
+training_summary.json
+
 # Decision Engine build artifacts
 decision-engine/data/index/*.faiss
 decision-engine/data/index/*.json
