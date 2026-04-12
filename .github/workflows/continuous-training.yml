@@ -12,7 +12,7 @@ on:
         required: false
         default: "3"
       component:
-        description: "Component to train (blank = all)"
+        description: "Component to train (blank = all, knowledge = cross-domain)"
         required: false
         default: ""
       offline:
@@ -26,6 +26,8 @@ on:
     paths:
       - "scripts/continuous_train.py"
       - "scripts/data_fetchers.py"
+      - "scripts/knowledge_engine.py"
+      - "knowledge-base/**"
       - "ai-platform/backend/app/rl/train.py"
       - "ai-platform/backend/graph_ai/train.py"
       - "decision-engine/train.py"

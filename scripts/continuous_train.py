@@ -109,6 +109,76 @@ class HyperparamScheduler:
 
 
 # ═════════════════════════════════════════════════════════════════════
+# Graph merging utility
+# ═════════════════════════════════════════════════════════════════════
+
+def _merge_graphs(threat_graph, knowledge_graph: dict):
+    """Merge threat intelligence graph with knowledge graph for richer training."""
+    from data_fetchers import GraphDataset
+
+    tg_feats = threat_graph.node_features
+    tg_edges = threat_graph.edge_index
+    tg_labels = threat_graph.node_labels
+    tg_types = threat_graph.node_types
+
+    kg_feats = knowledge_graph["node_features"]
+    kg_edges = knowledge_graph["edge_index"]
+    kg_labels = knowledge_graph["node_labels"]
+    kg_types = knowledge_graph["node_types"]
+
+    # Align feature dimensions
+    tg_dim = tg_feats.shape[1]
+    kg_dim = kg_feats.shape[1]
+    if tg_dim != kg_dim:
+        target_dim = max(tg_dim, kg_dim)
+        if tg_dim < target_dim:
+            pad = np.zeros((tg_feats.shape[0], target_dim - tg_dim), dtype=np.float32)
+            tg_feats = np.concatenate([tg_feats, pad], axis=1)
+        if kg_dim < target_dim:
+            pad = np.zeros((kg_feats.shape[0], target_dim - kg_dim), dtype=np.float32)
+            kg_feats = np.concatenate([kg_feats, pad], axis=1)
+
+    offset = tg_feats.shape[0]
+
+    # Merge features
+    merged_feats = np.concatenate([tg_feats, kg_feats], axis=0)
+    merged_labels = np.concatenate([tg_labels, kg_labels], axis=0)
+    merged_types = np.concatenate([tg_types, kg_types], axis=0)
+
+    # Offset knowledge graph edges
+    if kg_edges.size > 0:
+        kg_edges_offset = kg_edges + offset
+    else:
+        kg_edges_offset = kg_edges
+
+    # Merge edges
+    if tg_edges.size > 0 and kg_edges_offset.size > 0:
+        merged_edges = np.concatenate([tg_edges, kg_edges_offset], axis=1)
+    elif tg_edges.size > 0:
+        merged_edges = tg_edges
+    else:
+        merged_edges = kg_edges_offset
+
+    logger.info("graphs_merged",
+                threat_nodes=offset,
+                knowledge_nodes=kg_feats.shape[0],
+                total_nodes=merged_feats.shape[0],
+                total_edges=merged_edges.shape[1] if merged_edges.size else 0)
+
+    return GraphDataset(
+        node_features=merged_feats,
+        edge_index=merged_edges,
+        node_labels=merged_labels,
+        node_types=merged_types,
+        metadata={
+            "threat_nodes": offset,
+            "knowledge_nodes": int(kg_feats.shape[0]),
+            "total_nodes": int(merged_feats.shape[0]),
+        },
+    )
+
+
+# ═════════════════════════════════════════════════════════════════════
 # Component trainers
 # ═════════════════════════════════════════════════════════════════════
 
@@ -529,6 +599,12 @@ def run_continuous_training(
         build_graph_from_threats,
         generate_advanced_scenarios,
     )
+    from knowledge_engine import (
+        load_all_knowledge,
+        build_knowledge_graph,
+        generate_cross_domain_scenarios,
+        generate_knowledge_rl_scenarios,
+    )
 
     scheduler = HyperparamScheduler()
     round_results: list[dict] = []
@@ -542,6 +618,13 @@ def run_continuous_training(
     prev_rl_metrics = _load_metrics(rl_prod_dir / "rl_training_metrics.json")
     prev_gnn_metrics = _load_metrics(gnn_prod_dir / "gnn_training_metrics.json")
     prev_de_metrics = _load_metrics(de_prod_dir / "decision_training_metrics.json")
+
+    # ── Load universal knowledge corpus once ──────────────────────────
+    logger.info("loading_knowledge_corpus")
+    knowledge_corpus = load_all_knowledge()
+    logger.info("knowledge_corpus_loaded",
+                total_items=len(knowledge_corpus.items),
+                domains=list(knowledge_corpus.domain_counts.keys()))
 
     for round_num in range(1, rounds + 1):
         logger.info("round_start", round=round_num, total=rounds)
@@ -558,14 +641,29 @@ def run_continuous_training(
                 logger.warning("network_fetch_empty_fallback_to_synthetic")
                 threat_scenarios = generate_synthetic_threats(n=150, seed=round_num * 42)
 
-        # Build GNN graph from threat data
-        graph_data = build_graph_from_threats(threat_scenarios)
+        # Build GNN graph from threat data + knowledge graph
+        threat_graph = build_graph_from_threats(threat_scenarios)
 
-        # Generate decision engine scenarios
+        # Build cross-domain knowledge graph and merge
+        if component is None or component in ("gnn", "knowledge"):
+            kg = build_knowledge_graph(knowledge_corpus, feature_dim=threat_graph.node_features.shape[1])
+            graph_data = _merge_graphs(threat_graph, kg)
+        else:
+            graph_data = threat_graph
+
+        # Generate decision engine scenarios (original + cross-domain)
+        de_count = scheduler.get_de_params(round_num)["num_scenarios"]
         de_scenarios = generate_advanced_scenarios(
-            n=scheduler.get_de_params(round_num)["num_scenarios"],
+            n=de_count // 2,
             seed=round_num * 17,
         )
+        # Add cross-domain knowledge scenarios
+        cross_scenarios = generate_cross_domain_scenarios(
+            knowledge_corpus,
+            n=de_count // 2,
+            seed=round_num * 23,
+        )
+        de_scenarios.extend(cross_scenarios)
 
         # ── 2. Train each component ──────────────────────────────────
         # Staging dir for this round
@@ -589,7 +687,7 @@ def run_continuous_training(
             else:
                 logger.warning("rl_not_promoted", reason="regression")
 
-        if component is None or component == "gnn":
+        if component is None or component in ("gnn", "knowledge"):
             gnn_staging = staging / "gnn"
             gnn_params = scheduler.get_gnn_params(round_num)
             gnn_metrics = _train_gnn(
@@ -607,7 +705,7 @@ def run_continuous_training(
             else:
                 logger.warning("gnn_not_promoted", reason="regression")
 
-        if component is None or component == "decision":
+        if component is None or component in ("decision", "knowledge"):
             de_staging = staging / "decision"
             de_params = scheduler.get_de_params(round_num)
             de_metrics = _train_decision_engine(
@@ -636,6 +734,9 @@ def run_continuous_training(
     summary = {
         "total_rounds": rounds,
         "rounds": round_results,
+        "knowledge_domains": list(knowledge_corpus.domain_counts.keys()),
+        "knowledge_items_total": len(knowledge_corpus.items),
+        "knowledge_domain_counts": knowledge_corpus.domain_counts,
         "final_metrics": {
             "rl": prev_rl_metrics,
             "gnn": prev_gnn_metrics,
@@ -672,7 +773,8 @@ def _load_metrics(path: Path) -> dict | None:
 def main():
     parser = argparse.ArgumentParser(description="Continuous AI Training Pipeline")
     parser.add_argument("--rounds", type=int, default=3, help="Number of training rounds")
-    parser.add_argument("--component", choices=["rl", "gnn", "decision"], help="Train specific component only")
+    parser.add_argument("--component", choices=["rl", "gnn", "decision", "knowledge"],
+                        help="Train specific component only (knowledge = cross-domain GNN+DE)")
     parser.add_argument("--offline", action="store_true", help="Use synthetic data only (no network)")
     args = parser.parse_args()
 
@@ -685,6 +787,14 @@ def main():
     print(f"\n{'='*60}")
     print("  CONTINUOUS TRAINING COMPLETE")
     print(f"{'='*60}")
+
+    # Show knowledge domains loaded
+    kd = result.get("knowledge_domains", [])
+    ki = result.get("knowledge_items_total", 0)
+    if kd:
+        print(f"\n  Knowledge domains loaded: {', '.join(kd)}")
+        print(f"  Total knowledge items:    {ki}")
+
     for r in result["rounds"]:
         print(f"\n  Round {r['round']} ({r['elapsed_seconds']}s):")
         if "rl" in r:

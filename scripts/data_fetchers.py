@@ -444,3 +444,133 @@ def generate_synthetic_threats(n: int = 100, seed: int = 42) -> list[ThreatScena
         ))
 
     return scenarios
+
+
+# ═════════════════════════════════════════════════════════════════════
+# 5. Open-Source Academic Data Fetchers
+# ═════════════════════════════════════════════════════════════════════
+
+def fetch_arxiv_metadata(category: str = "cs.AI", max_results: int = 50) -> list[dict]:
+    """Fetch recent arXiv paper metadata via Atom feed (open access, no API key).
+
+    Categories: cs.AI, cs.CR, math.CO, physics.gen-ph, quant-ph, etc.
+    """
+    url = (
+        f"http://export.arxiv.org/api/query?"
+        f"search_query=cat:{category}&start=0&max_results={max_results}"
+        f"&sortBy=submittedDate&sortOrder=descending"
+    )
+    raw = _fetch_url(url, timeout=20)
+    if not raw:
+        return []
+
+    papers = []
+    # Simple XML parsing without external dependencies
+    entries = re.findall(r"<entry>(.*?)</entry>", raw, re.DOTALL)
+    for entry in entries:
+        title_m = re.search(r"<title>(.*?)</title>", entry, re.DOTALL)
+        summary_m = re.search(r"<summary>(.*?)</summary>", entry, re.DOTALL)
+        if title_m and summary_m:
+            title = re.sub(r"\s+", " ", title_m.group(1).strip())
+            summary = re.sub(r"\s+", " ", summary_m.group(1).strip())
+            papers.append({
+                "title": title,
+                "abstract": summary[:500],
+                "category": category,
+                "source": "arxiv",
+            })
+
+    logger.info("fetched_arxiv", category=category, papers=len(papers))
+    return papers
+
+
+def fetch_oeis_sequences(count: int = 30) -> list[dict]:
+    """Fetch integer sequences from OEIS (Online Encyclopedia of Integer Sequences).
+
+    Uses the OEIS plain-text search API.
+    """
+    keywords = ["fibonacci", "prime", "catalan", "pascal", "euler", "bernoulli"]
+    sequences = []
+
+    for kw in keywords[:3]:  # Limit to avoid rate limits
+        url = f"https://oeis.org/search?q={kw}&fmt=json"
+        raw = _fetch_url(url, timeout=15)
+        if not raw:
+            continue
+
+        try:
+            data = json.loads(raw)
+            for result in data.get("results", [])[:count // len(keywords)]:
+                sequences.append({
+                    "id": result.get("number", 0),
+                    "name": result.get("name", ""),
+                    "data": result.get("data", "")[:200],
+                    "source": "oeis",
+                    "domain": "mathematics",
+                })
+        except (json.JSONDecodeError, KeyError):
+            continue
+
+    logger.info("fetched_oeis", sequences=len(sequences))
+    return sequences
+
+
+def fetch_pubchem_elements(count: int = 30) -> list[dict]:
+    """Fetch chemical element data from PubChem (open, no key needed)."""
+    elements = []
+    url = "https://pubchem.ncbi.nlm.nih.gov/rest/pug/periodictable/JSON"
+    raw = _fetch_url(url, timeout=20)
+    if not raw:
+        logger.info("fetched_pubchem", elements=0)
+        return []
+
+    try:
+        data = json.loads(raw)
+        table = data.get("Table", {}).get("Row", [])
+        for row in table[:count]:
+            cells = row.get("Cell", [])
+            if len(cells) >= 4:
+                elements.append({
+                    "atomic_number": cells[0],
+                    "symbol": cells[1],
+                    "name": cells[2],
+                    "atomic_mass": cells[3],
+                    "source": "pubchem",
+                    "domain": "chemistry",
+                })
+    except (json.JSONDecodeError, KeyError):
+        pass
+
+    logger.info("fetched_pubchem", elements=len(elements))
+    return elements
+
+
+def fetch_open_legal_data() -> list[dict]:
+    """Fetch open legal/constitutional texts from public sources."""
+    # Canonical legal knowledge (always available offline)
+    legal_items = [
+        {"text": "We the People of the United States, in Order to form a more perfect Union, establish Justice, insure domestic Tranquility, provide for the common defence, promote the general Welfare, and secure the Blessings of Liberty", "type": "preamble", "source": "us_constitution"},
+        {"text": "Congress shall make no law respecting an establishment of religion, or prohibiting the free exercise thereof; or abridging the freedom of speech, or of the press", "type": "amendment_1", "source": "us_constitution"},
+        {"text": "The right of the people to be secure in their persons, houses, papers, and effects, against unreasonable searches and seizures, shall not be violated", "type": "amendment_4", "source": "us_constitution"},
+        {"text": "No person shall be deprived of life, liberty, or property, without due process of law", "type": "amendment_5", "source": "us_constitution"},
+        {"text": "All persons born or naturalised in the United States are citizens and entitled to equal protection of the laws", "type": "amendment_14", "source": "us_constitution"},
+        {"text": "Everyone has the right to life, liberty and security of person (UDHR Article 3)", "type": "universal_declaration", "source": "un_udhr"},
+        {"text": "No one shall be subjected to torture or to cruel, inhuman or degrading treatment (UDHR Article 5)", "type": "universal_declaration", "source": "un_udhr"},
+        {"text": "Everyone has the right to freedom of opinion and expression (UDHR Article 19)", "type": "universal_declaration", "source": "un_udhr"},
+    ]
+
+    logger.info("fetched_legal", items=len(legal_items))
+    return legal_items
+
+
+def fetch_all_academic_data() -> dict[str, list[dict]]:
+    """Fetch all open-source academic data across domains."""
+    return {
+        "arxiv_ai": fetch_arxiv_metadata("cs.AI", max_results=20),
+        "arxiv_crypto": fetch_arxiv_metadata("cs.CR", max_results=20),
+        "arxiv_physics": fetch_arxiv_metadata("quant-ph", max_results=20),
+        "arxiv_math": fetch_arxiv_metadata("math.CO", max_results=20),
+        "oeis": fetch_oeis_sequences(20),
+        "pubchem": fetch_pubchem_elements(30),
+        "legal": fetch_open_legal_data(),
+    }

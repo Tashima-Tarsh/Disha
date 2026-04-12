@@ -1,0 +1,65 @@
+{
+  "domain": "Law, Constitution & Politics",
+  "description": "Legal systems, constitutional frameworks, political theory, and governance",
+  "legal_systems": {
+    "types": ["common law", "civil law", "religious law", "customary law", "mixed systems"],
+    "common_law": {"origin": "English legal tradition", "principle": "stare decisis (precedent)", "countries": ["UK", "USA", "Canada", "Australia", "India"]},
+    "civil_law": {"origin": "Roman law codified", "principle": "comprehensive legal codes", "countries": ["France", "Germany", "Japan", "Brazil", "most of continental Europe"]},
+    "international_law": {
+      "sources": ["treaties", "customary international law", "general principles", "judicial decisions", "teachings of publicists"],
+      "bodies": ["International Court of Justice", "International Criminal Court", "WTO Dispute Settlement Body"],
+      "key_treaties": ["UN Charter", "Geneva Conventions", "Vienna Convention on Law of Treaties", "Rome Statute", "Universal Declaration of Human Rights"]
+    }
+  },
+  "constitutional_frameworks": {
+    "key_constitutions": [
+      {"country": "United States", "year": 1787, "type": "written/rigid", "features": ["federalism", "separation of powers", "bill of rights", "judicial review"], "amendments": 27},
+      {"country": "United Kingdom", "type": "unwritten/flexible", "features": ["parliamentary sovereignty", "rule of law", "constitutional conventions", "no single document"]},
+      {"country": "India", "year": 1950, "type": "written/quasi-rigid", "features": ["fundamental rights", "directive principles", "federal with unitary bias", "secular", "longest written constitution"], "articles": 448, "amendments": 106},
+      {"country": "France", "year": 1958, "type": "written/semi-rigid", "features": ["semi-presidential system", "constitutional council", "laïcité"]},
+      {"country": "Germany", "year": 1949, "type": "written/rigid", "features": ["Basic Law", "federal system", "constitutional court", "eternity clause"]}
+    ],
+    "fundamental_rights": [
+      "right to life and liberty",
+      "freedom of speech and expression",
+      "freedom of religion",
+      "right to equality before law",
+      "right against exploitation",
+      "right to privacy",
+      "right to education",
+      "right to constitutional remedies",
+      "due process of law",
+      "right to a fair trial"
+    ],
+    "separation_of_powers": {
+      "legislature": "makes laws (parliament/congress)",
+      "executive": "enforces laws (president/PM/cabinet)",
+      "judiciary": "interprets laws (courts)",
+      "checks_and_balances": "each branch limits the others"
+    }
+  },
+  "political_theory": {
+    "ideologies": [
+      {"name": "Liberalism", "key_thinkers": ["Locke", "Mill", "Rawls"], "principles": ["individual rights", "rule of law", "consent of governed", "free markets"]},
+      {"name": "Conservatism", "key_thinkers": ["Burke", "Oakeshott"], "principles": ["tradition", "organic society", "gradual change", "property rights"]},
+      {"name": "Socialism", "key_thinkers": ["Marx", "Engels", "Luxemburg"], "principles": ["collective ownership", "equality", "workers' control"]},
+      {"name": "Social Democracy", "key_thinkers": ["Bernstein", "Keynes"], "principles": ["welfare state", "regulated capitalism", "universal services"]},
+      {"name": "Anarchism", "key_thinkers": ["Bakunin", "Kropotkin", "Proudhon"], "principles": ["abolition of state", "mutual aid", "voluntary association"]},
+      {"name": "Fascism", "key_thinkers": ["Mussolini", "Gentile"], "principles": ["ultranationalism", "totalitarianism", "corporatism"]},
+      {"name": "Feminism", "key_thinkers": ["Wollstonecraft", "de Beauvoir", "hooks"], "principles": ["gender equality", "patriarchy critique", "intersectionality"]},
+      {"name": "Environmentalism", "key_thinkers": ["Carson", "Leopold", "Naess"], "principles": ["ecological sustainability", "intergenerational justice"]}
+    ],
+    "governance_models": ["democracy (direct/representative)", "monarchy (absolute/constitutional)", "oligarchy", "theocracy", "authoritarian", "federal vs unitary", "presidential vs parliamentary"],
+    "key_concepts": ["sovereignty", "legitimacy", "social contract", "civil society", "human rights", "rule of law", "justice (distributive/retributive/restorative)"]
+  },
+  "international_relations": {
+    "theories": ["realism", "liberalism", "constructivism", "Marxism", "feminism in IR"],
+    "institutions": ["United Nations", "NATO", "European Union", "African Union", "ASEAN", "BRICS", "G7/G20", "WTO", "IMF", "World Bank"],
+    "key_concepts": ["balance of power", "deterrence", "collective security", "soft power", "hard power", "diplomacy", "sanctions", "peacekeeping"]
+  },
+  "cyber_law": {
+    "frameworks": ["GDPR (EU)", "CCPA (California)", "IT Act 2000 (India)", "CFAA (USA)", "Budapest Convention on Cybercrime"],
+    "key_issues": ["data privacy", "surveillance", "digital sovereignty", "AI regulation", "content moderation", "cryptocurrency regulation", "right to be forgotten"],
+    "emerging": ["AI liability", "algorithmic accountability", "autonomous weapons regulation", "space law", "digital human rights"]
+  }
+}
