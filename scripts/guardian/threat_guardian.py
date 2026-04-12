@@ -621,7 +621,7 @@ def main() -> None:
 
 
 def _print_report(report: GuardianReport, as_json: bool = False) -> None:
-    # Emit only a minimal summary to avoid printing sensitive scanner output.
+    # Build a safe summary that never includes raw evidence.
     safe_summary = {
         "timestamp": report.timestamp,
         "system_health": report.system_health,
@@ -645,33 +645,31 @@ def _print_report(report: GuardianReport, as_json: bool = False) -> None:
     print(f"  System Health: {report.system_health:.0%}")
     print(f"{'═' * 60}")
 
-    counts = sanitized["threat_counts"]
+    counts = safe_summary["threat_counts"]
     for level, emoji in [("critical", "🔴"), ("high", "🟠"), ("medium", "🟡"), ("low", "🔵"), ("info", "⚪")]:
         if counts[level]:
-            print(f"  {emoji} {level.capitalize():10s} [REDACTED]")
+            print(f"  {emoji} {level.capitalize():10s} {counts[level]}")
 
-    for entry in sanitized["threats"]:
-        neutralized = entry.get("neutralized", False)
+    for t in report.threats:
+        neutralized = t.neutralized
         status = "✅ NEUTRALIZED" if neutralized else "⚠️  ACTIVE"
         level_emoji = {"critical": "🔴", "high": "🟠", "medium": "🟡", "low": "🔵", "info": "⚪"}
 
-        # Redact potentially sensitive scanner-derived text from secret findings.
-        is_secret_finding = entry.get("category") == ThreatCategory.SECRET.value
-            # Avoid exposing full filesystem paths in output; show only filename.
-            safe_loc = Path(str(entry["file"])).name or "<redacted>"
-        display_description = (
-                safe_loc += f":{entry['line']}"
-            print(f"     📍 {safe_loc}")
-            else entry.get("description", "")
-        )
+        # Redact details for secret-related findings to avoid logging sensitive data
+        is_secret = t.category == ThreatCategory.SECRET_LEAK
+        title = "[SECRET FINDING REDACTED]" if is_secret else t.title
+        description = "[details redacted]" if is_secret else t.description
 
-        print(f"\n  {level_emoji.get(entry['level'], '⚪')} [{entry['level'].upper()}] {display_title}")
-        print(f"     {display_description}")
-        if entry.get("file"):
-            loc = "[redacted]" if is_secret_finding else entry["file"]
-            if entry.get("line"):
-                loc += f":{entry['line']}"
+        print(f"\n  {level_emoji.get(t.level.value, '⚪')} [{t.level.value.upper()}] {title}")
+        print(f"     {description}")
+        if t.file_path and not is_secret:
+            loc = t.file_path
+            if t.line_number:
+                loc += f":{t.line_number}"
             print(f"     📍 {loc}")
+        elif t.file_path and is_secret:
+            # Show only filename, not full path, for secret findings
+            print(f"     📍 {Path(t.file_path).name}")
         print(f"     Status: {status}")
 
     print(f"\n{'═' * 60}\n")
