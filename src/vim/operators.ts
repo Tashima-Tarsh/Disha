@@ -426,6 +426,36 @@ function getLineStartOffset(lines: string[], lineIndex: number): number {
   return lines.slice(0, lineIndex).join('\n').length + (lineIndex > 0 ? 1 : 0)
 }
 
+/** Compute the 'to' offset for cw/cW (change-word) motions. */
+function changeWordEnd(cursor: Cursor, motion: string, count: number): number {
+  let wordCursor = cursor
+  for (let i = 0; i < count - 1; i++) {
+    wordCursor =
+      motion === 'w' ? wordCursor.nextVimWord() : wordCursor.nextWORD()
+  }
+  const wordEnd =
+    motion === 'w' ? wordCursor.endOfVimWord() : wordCursor.endOfWORD()
+  return cursor.measuredText.nextOffset(wordEnd.offset)
+}
+
+/** Adjust from/to for linewise motions to encompass full lines. */
+function adjustForLinewise(
+  text: string,
+  from: number,
+  to: number,
+): { from: number; to: number } {
+  const nextNewline = text.indexOf('\n', to)
+  if (nextNewline === -1) {
+    to = text.length
+    if (from > 0 && text[from - 1] === '\n') {
+      from -= 1
+    }
+  } else {
+    to = nextNewline + 1
+  }
+  return { from, to }
+}
+
 function getOperatorRange(
   cursor: Cursor,
   target: Cursor,
@@ -437,37 +467,15 @@ function getOperatorRange(
   let to = Math.max(cursor.offset, target.offset)
   let linewise = false
 
-  // Special case: cw/cW changes to end of word, not start of next word
   if (op === 'change' && (motion === 'w' || motion === 'W')) {
-    // For cw with count, move forward (count-1) words, then find end of that word
-    let wordCursor = cursor
-    for (let i = 0; i < count - 1; i++) {
-      wordCursor =
-        motion === 'w' ? wordCursor.nextVimWord() : wordCursor.nextWORD()
-    }
-    const wordEnd =
-      motion === 'w' ? wordCursor.endOfVimWord() : wordCursor.endOfWORD()
-    to = cursor.measuredText.nextOffset(wordEnd.offset)
+    to = changeWordEnd(cursor, motion, count)
   } else if (isLinewiseMotion(motion)) {
-    // Linewise motions extend to include entire lines
     linewise = true
-    const text = cursor.text
-    const nextNewline = text.indexOf('\n', to)
-    if (nextNewline === -1) {
-      // Deleting to end of file - include the preceding newline if exists
-      to = text.length
-      if (from > 0 && text[from - 1] === '\n') {
-        from -= 1
-      }
-    } else {
-      to = nextNewline + 1
-    }
+    ;({ from, to } = adjustForLinewise(cursor.text, from, to))
   } else if (isInclusiveMotion(motion) && cursor.offset <= target.offset) {
     to = cursor.measuredText.nextOffset(to)
   }
 
-  // Word motions can land inside an [Image #N] chip; extend the range to
-  // cover the whole chip so dw/cw/yw never leave a partial placeholder.
   from = cursor.snapOutOfImageRef(from, 'start')
   to = cursor.snapOutOfImageRef(to, 'end')
 
