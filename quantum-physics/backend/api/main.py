@@ -20,6 +20,8 @@ from engines.physics_classifier import PhysicsClassifier  # noqa: E402
 from engines.space_engine import SpaceEngine  # noqa: E402
 from engines.suppressed_physics import SuppressedPhysicsEngine  # noqa: E402
 from engines.unified_field import UnifiedFieldEngine  # noqa: E402
+from engines.gravity_engine import GravityEngine  # noqa: E402
+from engines.grafify import Grafify  # noqa: E402
 
 logger = logging.getLogger(__name__)
 
@@ -46,6 +48,8 @@ _classifier = PhysicsClassifier()
 _space = SpaceEngine()
 _suppressed = SuppressedPhysicsEngine()
 _unified = UnifiedFieldEngine()
+_gravity = GravityEngine()
+_grafify = Grafify()
 
 
 # ── Request/Response Models ───────────────────────────────────────────────────
@@ -82,6 +86,107 @@ class UnificationRequest(BaseModel):
     energy_scale_gev: float = 100.0
 
 
+class GravityForceRequest(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    m1: float
+    m2: float
+    r: float
+
+
+class SurfaceGravityRequest(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    body: str | None = None
+    mass: float | None = None
+    radius: float | None = None
+
+
+class EscapeVelocityRequest(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    body: str | None = None
+    mass: float | None = None
+    radius: float | None = None
+
+
+class OrbitalVelocityRequest(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    central_mass: float
+    orbital_radius: float
+
+
+class TimeDilationRequest(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    mass: float
+    radius: float
+
+
+class TidalForceRequest(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    mass: float
+    distance: float
+    separation: float
+
+
+class RocheLimitRequest(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    primary_mass: float
+    primary_radius: float
+    secondary_density: float
+
+
+class LensingRequest(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    mass: float
+    closest_approach: float
+
+
+class NBodyRequest(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    bodies: List[dict]
+    dt: float = 3600.0
+    steps: int = 100
+
+
+class ForceVsDistanceRequest(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    m1: float
+    m2: float
+    r_min: float
+    r_max: float
+    num_points: int = 50
+
+
+class PotentialHeatmapRequest(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    mass: float
+    grid_size: int = 30
+    extent_m: float = 1e7
+
+
+class TimeDilationCurveRequest(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    mass: float
+    r_min: float
+    r_max: float
+    num_points: int = 50
+
+
+class TidalProfileRequest(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    mass: float
+    separation: float
+    r_min: float
+    r_max: float
+    num_points: int = 50
+
+
+class LensingRingRequest(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    mass: float
+    r_min: float
+    r_max: float
+    num_points: int = 40
+
+
 # ── Endpoints ─────────────────────────────────────────────────────────────────
 
 @app.get("/")
@@ -108,6 +213,27 @@ async def health_check() -> dict:
             "/api/unified/forces",
             "/api/unified/history",
             "/api/unified/model",
+            "/api/gravity/force",
+            "/api/gravity/surface",
+            "/api/gravity/escape-velocity",
+            "/api/gravity/orbital-velocity",
+            "/api/gravity/time-dilation",
+            "/api/gravity/tidal",
+            "/api/gravity/roche-limit",
+            "/api/gravity/lensing",
+            "/api/gravity/nbody",
+            "/api/gravity/bodies",
+            "/api/gravity/body/{body}",
+            "/api/gravity/potential-field",
+            "/api/grafify/force-vs-distance",
+            "/api/grafify/gravity-comparison",
+            "/api/grafify/escape-velocity-comparison",
+            "/api/grafify/trajectory",
+            "/api/grafify/velocity",
+            "/api/grafify/potential-heatmap",
+            "/api/grafify/time-dilation",
+            "/api/grafify/tidal-profile",
+            "/api/grafify/lensing-ring",
         ],
     }
 
@@ -281,6 +407,307 @@ async def model_unification(req: UnificationRequest) -> dict:
         if req.energy_scale_gev <= 0:
             raise HTTPException(status_code=400, detail="energy_scale_gev must be positive")
         return _unified.model_unification(req.energy_scale_gev)
+    except HTTPException:
+        raise
+    except Exception:
+        logger.exception("Internal error")
+        raise HTTPException(status_code=500, detail="Internal server error")
+
+
+# ── Gravity Endpoints ─────────────────────────────────────────────────────────
+
+@app.post("/api/gravity/force")
+async def gravity_force(req: GravityForceRequest) -> dict:
+    try:
+        result = _gravity.gravitational_force(req.m1, req.m2, req.r)
+        if "error" in result:
+            raise HTTPException(status_code=400, detail=result["error"])
+        return result
+    except HTTPException:
+        raise
+    except Exception:
+        logger.exception("Internal error")
+        raise HTTPException(status_code=500, detail="Internal server error")
+
+
+@app.post("/api/gravity/surface")
+async def gravity_surface(req: SurfaceGravityRequest) -> dict:
+    try:
+        result = _gravity.surface_gravity(
+            body=req.body, mass=req.mass, radius=req.radius,
+        )
+        if "error" in result:
+            raise HTTPException(status_code=400, detail=result["error"])
+        return result
+    except HTTPException:
+        raise
+    except Exception:
+        logger.exception("Internal error")
+        raise HTTPException(status_code=500, detail="Internal server error")
+
+
+@app.post("/api/gravity/escape-velocity")
+async def gravity_escape_velocity(req: EscapeVelocityRequest) -> dict:
+    try:
+        result = _gravity.escape_velocity(
+            body=req.body, mass=req.mass, radius=req.radius,
+        )
+        if "error" in result:
+            raise HTTPException(status_code=400, detail=result["error"])
+        return result
+    except HTTPException:
+        raise
+    except Exception:
+        logger.exception("Internal error")
+        raise HTTPException(status_code=500, detail="Internal server error")
+
+
+@app.post("/api/gravity/orbital-velocity")
+async def gravity_orbital_velocity(req: OrbitalVelocityRequest) -> dict:
+    try:
+        result = _gravity.orbital_velocity(req.central_mass, req.orbital_radius)
+        if "error" in result:
+            raise HTTPException(status_code=400, detail=result["error"])
+        return result
+    except HTTPException:
+        raise
+    except Exception:
+        logger.exception("Internal error")
+        raise HTTPException(status_code=500, detail="Internal server error")
+
+
+@app.post("/api/gravity/time-dilation")
+async def gravity_time_dilation(req: TimeDilationRequest) -> dict:
+    try:
+        result = _gravity.gravitational_time_dilation(req.mass, req.radius)
+        if "error" in result:
+            raise HTTPException(status_code=400, detail=result["error"])
+        return result
+    except HTTPException:
+        raise
+    except Exception:
+        logger.exception("Internal error")
+        raise HTTPException(status_code=500, detail="Internal server error")
+
+
+@app.post("/api/gravity/tidal")
+async def gravity_tidal(req: TidalForceRequest) -> dict:
+    try:
+        result = _gravity.tidal_force(req.mass, req.distance, req.separation)
+        if "error" in result:
+            raise HTTPException(status_code=400, detail=result["error"])
+        return result
+    except HTTPException:
+        raise
+    except Exception:
+        logger.exception("Internal error")
+        raise HTTPException(status_code=500, detail="Internal server error")
+
+
+@app.post("/api/gravity/roche-limit")
+async def gravity_roche_limit(req: RocheLimitRequest) -> dict:
+    try:
+        result = _gravity.roche_limit(
+            req.primary_mass, req.primary_radius, req.secondary_density,
+        )
+        if "error" in result:
+            raise HTTPException(status_code=400, detail=result["error"])
+        return result
+    except HTTPException:
+        raise
+    except Exception:
+        logger.exception("Internal error")
+        raise HTTPException(status_code=500, detail="Internal server error")
+
+
+@app.post("/api/gravity/lensing")
+async def gravity_lensing(req: LensingRequest) -> dict:
+    try:
+        result = _gravity.gravitational_lensing(req.mass, req.closest_approach)
+        if "error" in result:
+            raise HTTPException(status_code=400, detail=result["error"])
+        return result
+    except HTTPException:
+        raise
+    except Exception:
+        logger.exception("Internal error")
+        raise HTTPException(status_code=500, detail="Internal server error")
+
+
+@app.post("/api/gravity/nbody")
+async def gravity_nbody(req: NBodyRequest) -> dict:
+    try:
+        result = _gravity.nbody_simulate(req.bodies, req.dt, req.steps)
+        if "error" in result:
+            raise HTTPException(status_code=400, detail=result["error"])
+        return result
+    except HTTPException:
+        raise
+    except Exception:
+        logger.exception("Internal error")
+        raise HTTPException(status_code=500, detail="Internal server error")
+
+
+@app.get("/api/gravity/bodies")
+async def gravity_list_bodies() -> dict:
+    try:
+        return {"bodies": _gravity.list_bodies()}
+    except Exception:
+        logger.exception("Internal error")
+        raise HTTPException(status_code=500, detail="Internal server error")
+
+
+@app.get("/api/gravity/body/{body}")
+async def gravity_body_info(body: str) -> dict:
+    try:
+        result = _gravity.get_body_info(body)
+        if "error" in result:
+            raise HTTPException(status_code=404, detail=result["error"])
+        return result
+    except HTTPException:
+        raise
+    except Exception:
+        logger.exception("Internal error")
+        raise HTTPException(status_code=500, detail="Internal server error")
+
+
+@app.post("/api/gravity/potential-field")
+async def gravity_potential_field(req: PotentialHeatmapRequest) -> dict:
+    try:
+        result = _gravity.gravitational_potential_field(
+            req.mass, req.grid_size, req.extent_m,
+        )
+        if "error" in result:
+            raise HTTPException(status_code=400, detail=result["error"])
+        return result
+    except HTTPException:
+        raise
+    except Exception:
+        logger.exception("Internal error")
+        raise HTTPException(status_code=500, detail="Internal server error")
+
+
+# ── Grafify Endpoints ─────────────────────────────────────────────────────────
+
+@app.post("/api/grafify/force-vs-distance")
+async def grafify_force_vs_distance(req: ForceVsDistanceRequest) -> dict:
+    try:
+        result = _grafify.force_vs_distance(
+            req.m1, req.m2, req.r_min, req.r_max, req.num_points,
+        )
+        if "error" in result:
+            raise HTTPException(status_code=400, detail=result["error"])
+        return result
+    except HTTPException:
+        raise
+    except Exception:
+        logger.exception("Internal error")
+        raise HTTPException(status_code=500, detail="Internal server error")
+
+
+@app.get("/api/grafify/gravity-comparison")
+async def grafify_gravity_comparison() -> dict:
+    try:
+        return _grafify.gravity_comparison()
+    except Exception:
+        logger.exception("Internal error")
+        raise HTTPException(status_code=500, detail="Internal server error")
+
+
+@app.get("/api/grafify/escape-velocity-comparison")
+async def grafify_escape_velocity_comparison() -> dict:
+    try:
+        return _grafify.escape_velocity_comparison()
+    except Exception:
+        logger.exception("Internal error")
+        raise HTTPException(status_code=500, detail="Internal server error")
+
+
+@app.post("/api/grafify/trajectory")
+async def grafify_trajectory(req: NBodyRequest) -> dict:
+    try:
+        sim = _gravity.nbody_simulate(req.bodies, req.dt, req.steps)
+        if "error" in sim:
+            raise HTTPException(status_code=400, detail=sim["error"])
+        return _grafify.trajectory_plot(sim["trajectories"])
+    except HTTPException:
+        raise
+    except Exception:
+        logger.exception("Internal error")
+        raise HTTPException(status_code=500, detail="Internal server error")
+
+
+@app.post("/api/grafify/velocity")
+async def grafify_velocity(req: NBodyRequest) -> dict:
+    try:
+        sim = _gravity.nbody_simulate(req.bodies, req.dt, req.steps)
+        if "error" in sim:
+            raise HTTPException(status_code=400, detail=sim["error"])
+        return _grafify.velocity_over_time(sim["trajectories"])
+    except HTTPException:
+        raise
+    except Exception:
+        logger.exception("Internal error")
+        raise HTTPException(status_code=500, detail="Internal server error")
+
+
+@app.post("/api/grafify/potential-heatmap")
+async def grafify_potential_heatmap(req: PotentialHeatmapRequest) -> dict:
+    try:
+        result = _grafify.potential_heatmap(
+            req.mass, req.grid_size, req.extent_m,
+        )
+        if "error" in result:
+            raise HTTPException(status_code=400, detail=result["error"])
+        return result
+    except HTTPException:
+        raise
+    except Exception:
+        logger.exception("Internal error")
+        raise HTTPException(status_code=500, detail="Internal server error")
+
+
+@app.post("/api/grafify/time-dilation")
+async def grafify_time_dilation(req: TimeDilationCurveRequest) -> dict:
+    try:
+        result = _grafify.time_dilation_curve(
+            req.mass, req.r_min, req.r_max, req.num_points,
+        )
+        if "error" in result:
+            raise HTTPException(status_code=400, detail=result["error"])
+        return result
+    except HTTPException:
+        raise
+    except Exception:
+        logger.exception("Internal error")
+        raise HTTPException(status_code=500, detail="Internal server error")
+
+
+@app.post("/api/grafify/tidal-profile")
+async def grafify_tidal_profile(req: TidalProfileRequest) -> dict:
+    try:
+        result = _grafify.tidal_force_profile(
+            req.mass, req.separation, req.r_min, req.r_max, req.num_points,
+        )
+        if "error" in result:
+            raise HTTPException(status_code=400, detail=result["error"])
+        return result
+    except HTTPException:
+        raise
+    except Exception:
+        logger.exception("Internal error")
+        raise HTTPException(status_code=500, detail="Internal server error")
+
+
+@app.post("/api/grafify/lensing-ring")
+async def grafify_lensing_ring(req: LensingRingRequest) -> dict:
+    try:
+        result = _grafify.lensing_ring(
+            req.mass, req.r_min, req.r_max, req.num_points,
+        )
+        if "error" in result:
+            raise HTTPException(status_code=400, detail=result["error"])
+        return result
     except HTTPException:
         raise
     except Exception:
