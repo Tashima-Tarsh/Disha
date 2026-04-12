@@ -183,6 +183,7 @@ class TimeStepper:
         # For RK4 (p=4): grow ~ 1/(p+1) = 0.2, shrink ~ 1/p = 0.25
         grow_exponent = 0.2
         shrink_exponent = 0.25
+        y_half = self.state  # initialise for the (impossible) empty-loop case
 
         for _ in range(50):  # retry limit
             # Full step
@@ -228,7 +229,7 @@ class TimeStepper:
 
         logger.warning("Adaptive stepper did not converge; accepting last result")
         self.time += dt
-        return y_half, dt  # type: ignore[possibly-undefined]
+        return y_half, dt
 
     # ------------------------------------------------------------------
     # Multi-step runs

@@ -34,7 +34,7 @@ class ChargedParticle:
     """A point-mass carrying an electric charge.
 
     This class deliberately mirrors
-    :class:`~ai_system.physics_engine.classical.mechanics.PhysicsObject` so
+    :class:`~physics_engine.classical.mechanics.PhysicsObject` so
     it can be used stand-alone or composed with it.
 
     Parameters
