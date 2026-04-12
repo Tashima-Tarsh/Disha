@@ -648,7 +648,7 @@ def _print_report(report: GuardianReport, as_json: bool = False) -> None:
     counts = sanitized["threat_counts"]
     for level, emoji in [("critical", "🔴"), ("high", "🟠"), ("medium", "🟡"), ("low", "🔵"), ("info", "⚪")]:
         if counts[level]:
-            print(f"  {emoji} {level.capitalize():10s} {counts[level]}")
+            print(f"  {emoji} {level.capitalize():10s} [REDACTED]")
 
     for entry in sanitized["threats"]:
         neutralized = entry.get("neutralized", False)
