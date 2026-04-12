@@ -96,7 +96,7 @@ services:
   # -------------------------------------------------------------------------- #
 
   database:
-    image: mysql:latest
+    image: mysql:8.0
     networks:
       - osint_collector
     environment:

@@ -1,4 +1,4 @@
-FROM python:3.8
+FROM python:3.8-slim
 
 # Set the working directory inside the container
 WORKDIR /app/collection
@@ -6,5 +6,9 @@ WORKDIR /app/collection
 COPY ./requirements.txt ./requirements.txt
 # Install the Python packages listed in requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
+
+RUN adduser --disabled-password --gecos '' appuser
+USER appuser
+
 # Command to run when the container starts
 CMD ["python", "-u", "main.py"]
