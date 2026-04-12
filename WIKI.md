@@ -75,6 +75,7 @@
 - [17. Repository Value & Market Analysis](#17-repository-value--market-analysis)
 - [18. National Deployment Analysis — India](#18-national-deployment-analysis--india)
 - [19. Learning Audit & Verification (v3.0.0 — 12-04-2026)](#19-learning-audit--verification-v300--12-04-2026)
+- [20. v3.1.0 — Comprehensive Review & Bug Fixes (12-04-2026)](#20-v310--comprehensive-review--bug-fixes-12-04-2026)
 ---
 
 </details>
@@ -1820,8 +1821,113 @@ This is a **self-healing system**: training failures recover via synthetic fallb
 | v1.0.0 | 2025-Q1 | Manual | Core CLI, 7 agents, OSINT pipeline |
 | v2.0.0 | 2025-Q2 | Manual | Quantum physics, decision framework, open-source APIs |
 | **v3.0.0-learning** | **12-04-2026** | **GitHub Code Review ✓** | **Universal knowledge (118 elements, 8 domains), cross-domain training, continuous learning** |
+| **v3.1.0** | **12-04-2026** | **GitHub Code Review ✓** | **Full repo audit, bug fixes, config corrections, documentation overhaul** |
 
 <img src="docs/images/divider.svg" width="100%" height="4">
+
+---
+
+## 20. v3.1.0 — Comprehensive Review & Bug Fixes (12-04-2026)
+
+> **Version:** v3.1.0 | **Date:** 12-04-2026 | **Scope:** Full repository audit, bug fixes, configuration corrections, documentation updates
+
+### 20.1 Repository Audit Summary
+
+A complete review of the Disha repository was performed covering:
+
+| Category | Count | Status |
+|----------|-------|--------|
+| Source files audited | 2,477 | ✅ Clean |
+| CI/CD workflows | 9 | ✅ Configured |
+| Test files | 22 | ✅ Covering all modules |
+| Dockerfiles | 13 | ✅ Multi-stage builds |
+| Merge conflicts found | 0 | ✅ Clean |
+| Circular imports found | 0 | ✅ Clean |
+
+### 20.2 Bug Fixes
+
+#### Bug 1: Orchestrator DNS Relationship Logic
+
+**File:** `ai-platform/backend/app/agents/orchestrator.py` (line 129)
+
+**Problem:** The `_build_relationships()` method created `RESOLVES_TO` edges from DNS records to ANY entity type (wallets, hosts, domains, etc.), producing spurious relationships in the knowledge graph.
+
+**Before:**
+```python
+elif entity["entity_type"] == "dns_record":
+    related = True
+    rel_type = "RESOLVES_TO"
+```
+
+**After:**
+```python
+elif entity["entity_type"] == "dns_record" and other["entity_type"] in ["host", "domain"]:
+    related = True
+    rel_type = "RESOLVES_TO"
+```
+
+**Impact:** Prevents false positive edges in the entity knowledge graph, improving investigation accuracy.
+
+#### Bug 2: Quality Score Overflow
+
+**File:** `auto_learning/learning_controller.py` (line 104)
+
+**Problem:** The source credibility section (documented as 0–25 points) could return up to 30 points because `cred_bonus` (0–5) was added uncapped on top of `25 * cred` (0–25).
+
+**Before:**
+```python
+total += 25 * cred + cred_bonus
+```
+
+**After:**
+```python
+total += min(25, 25 * cred + cred_bonus)
+```
+
+**Impact:** Quality scores now correctly stay within the 0–100 total range as documented.
+
+### 20.3 Configuration Corrections
+
+All configuration files were updated to reflect the correct Disha project identity:
+
+| File | Field | Before (incorrect) | After (correct) |
+|------|-------|---------------------|------------------|
+| `server.json` | name | `monster-codemaster` | `disha-mcp` |
+| `server.json` | repository.url | `github.com/Monster/claude-code` | `github.com/Tashima-Tarsh/Disha` |
+| `mcp-server/server.json` | name | `monster-codemaster` | `disha-mcp` |
+| `mcp-server/server.json` | repository.url | `github.com/Monster/claude-code` | `github.com/Tashima-Tarsh/Disha` |
+| `mcp-server/package.json` | name | `monster-codemaster` | `disha-mcp` |
+| `mcp-server/package.json` | mcpName | `io.github.monster/monster-codemaster` | `io.github.tashima-tarsh/disha-mcp` |
+| `mcp-server/package.json` | repository.url | `github.com/Monster/claude-code.git` | `github.com/Tashima-Tarsh/Disha.git` |
+| `mcp-server/package.json` | author | `Monster` | `Tashima-Tarsh` |
+| `mcp-server/package.json` | homepage | `github.com/Monster/claude-code#readme` | `github.com/Tashima-Tarsh/Disha#readme` |
+| `mcp-server/package.json` | bugs.url | `github.com/Monster/claude-code/issues` | `github.com/Tashima-Tarsh/Disha/issues` |
+
+### 20.4 Documentation Updates
+
+| Document | Change |
+|----------|--------|
+| **CONTRIBUTING.md** | Fixed clone URL, added Python/Bun prerequisites, module setup instructions |
+| **USAGE_GUIDE.md** | Complete rewrite: now accurately documents all Disha subsystems (CLI, AI Platform, Decision Engine, Historical Strategy, Cyber Defense, MCP Server, Training, Continuous Learning, Sentinel) |
+| **CHANGELOG.md** | Replaced 3-line stub with comprehensive version history from v0.1.0 to v3.1.0 |
+| **README.md** | Updated to v3.1.0, added review section documenting all fixes |
+| **WIKI.md** | Added Section 20 with full v3.1.0 audit documentation |
+
+### 20.5 Model Connection Verification
+
+All AI model interconnections were verified:
+
+| Model System | Connection | Status |
+|-------------|------------|--------|
+| RL Environment (12-dim) → PPO Policy (12→64→64→8) | Dimension match | ✅ Verified |
+| GNN Encoder → Link Predictor → Graph Classifier | Architecture chain | ✅ Verified |
+| BaseAgent → OSINT/Crypto/Detection/Graph/Reasoning | Inheritance | ✅ Verified |
+| Orchestrator → All 7 agents → Relationship builder | Orchestration flow | ✅ Verified |
+| Vision Agent ↔ Audio Agent → Fusion | Cross-modal pipeline | ✅ Verified |
+| Decision Engine → 4 agents → Consensus voting | Multi-agent flow | ✅ Verified |
+| Knowledge Engine → 8 domains → Cross-domain graph | Knowledge pipeline | ✅ Verified |
+| Continuous Training → RL + GNN + Decision Engine | Training loop | ✅ Verified |
+| Sentinel → Threat Monitor + Model Orchestrator + Guardian | Monitoring chain | ✅ Verified |
 
 <p align="center">
   <b>Disha Wiki</b> — Complete Technical Documentation
