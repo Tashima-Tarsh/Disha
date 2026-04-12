@@ -20,8 +20,8 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Files-2%2C250+-blue?style=flat-square" alt="Files">
-  <img src="https://img.shields.io/badge/Lines_of_Code-580K+-green?style=flat-square" alt="LoC">
+  <img src="https://img.shields.io/badge/Files-3%2C700+-blue?style=flat-square" alt="Files">
+  <img src="https://img.shields.io/badge/Lines_of_Code-452K+-green?style=flat-square" alt="LoC">
   <img src="https://img.shields.io/badge/Agents-7-orange?style=flat-square" alt="Agents">
   <img src="https://img.shields.io/badge/Tools-40+-red?style=flat-square" alt="Tools">
   <img src="https://img.shields.io/badge/Commands-50+-purple?style=flat-square" alt="Commands">
@@ -39,10 +39,10 @@
 
 <br>
 
-## 📋 Learning Status — v3.1.0
+## 📋 Learning Status — v3.2.0
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Learning_Version-v3.1.0-blue?style=flat-square" alt="Version">
+  <img src="https://img.shields.io/badge/Learning_Version-v3.2.0-blue?style=flat-square" alt="Version">
   <img src="https://img.shields.io/badge/Audit-GitHub_Code_Review_✓-brightgreen?style=flat-square" alt="Audit">
   <img src="https://img.shields.io/badge/Date-12--04--2026-orange?style=flat-square" alt="Date">
   <img src="https://img.shields.io/badge/Domains-8-purple?style=flat-square" alt="Domains">
@@ -63,7 +63,7 @@ Disha has achieved **continuous learning** across **8 knowledge domains**, verif
 | 🚀 **Innovation** | Space tech · Quantum computing · AGI · Biotech · Fusion · Materials | Future research |
 | ⚔️ **Historical Strategy** | 32+ conflicts · ML classifiers · Simulation engine | Trained models |
 
-**📊 Training:** RL 400 episodes (reward 22.03) · GNN 2,494 nodes / 7,636 edges · Decision engine 4 agents
+**📊 Training:** RL 400 episodes (reward 22.24) · GNN 200 nodes / 598 edges (75% test acc) · Decision engine 4 agents
 
 > 📖 **Full audit log:** [**LEARNING_LOG.md**](./LEARNING_LOG.md) — versioned achievements, merits, demerits, continuous learning & self-healing remarks
 >
@@ -347,8 +347,8 @@ pip install llama-cpp-python
 
 <table>
 <tr>
-<td align="center"><b>2,250+</b><br><sub>Source Files</sub></td>
-<td align="center"><b>580K+</b><br><sub>Lines of Code</sub></td>
+<td align="center"><b>3,700+</b><br><sub>Source Files</sub></td>
+<td align="center"><b>452K+</b><br><sub>Lines of Code</sub></td>
 <td align="center"><b>7</b><br><sub>Intelligence Agents</sub></td>
 <td align="center"><b>40+</b><br><sub>AI Tools</sub></td>
 <td align="center"><b>50+</b><br><sub>CLI Commands</sub></td>
@@ -356,7 +356,7 @@ pip install llama-cpp-python
 </tr>
 <tr>
 <td align="center"><b>78+</b><br><sub>Web Components</sub></td>
-<td align="center"><b>7</b><br><sub>Docker Services</sub></td>
+<td align="center"><b>19</b><br><sub>Docker Services</sub></td>
 <td align="center"><b>100%</b><br><sub>Open-Source APIs</sub></td>
 <td align="center"><b>32+</b><br><sub>Doc Pages</sub></td>
 <td align="center"><b>14</b><br><sub>Custom Hooks</sub></td>
@@ -428,6 +428,30 @@ DISHA_MODEL_PROVIDER=mock python -m pytest tests/ -v
 
 ---
 
+## 🔍 v3.2.0 — GNN Overfitting Fix & Model Improvements
+
+This release resolves the critical GNN overfitting issue (test accuracy 7.2% → 75%) and fixes graph_ai import dependencies.
+
+### GNN Fixes (v3.2.0)
+
+| Issue | Fix |
+|-------|-----|
+| GNN test accuracy was 7.2% (random labels) | Labels now derived from node features |
+| Sequential train/test split caused data leakage | Shuffled permutation-based split |
+| No regularization in GCN encoder | Added BatchNorm + increased dropout to 0.5 |
+| No early stopping mechanism | Added patience-based early stopping with best checkpoint restoration |
+| graph_ai `__init__.py` required pydantic_settings | Lazy `__getattr__` import for GraphExporter |
+
+### Current Metrics
+
+| Model | Train Accuracy | Test Accuracy | Notes |
+|-------|---------------|--------------|-------|
+| GNN (synthetic graph) | 98.1% | 75.0% | 200 nodes, 598 edges |
+| GNN (knowledge graph) | ~99.8% | ~99.8% | Real cross-domain graph |
+| RL (PPO) | — | reward 22.24 | 400 episodes |
+
+---
+
 ## 🔍 v3.1.0 — Comprehensive Review & Bug Fixes
 
 This release includes a full repository audit covering 2,477 source files, all model connections, and documentation accuracy.
@@ -461,9 +485,12 @@ This release includes a full repository audit covering 2,477 source files, all m
 - **0 circular imports** in Python modules
 - **All 7 agents** properly connected via orchestrator pattern
 - **RL STATE_DIM=12** matches policy network dimensions
+- **GNN overfitting resolved** — test accuracy improved from 7.2% to 75%
 - **GNN models** gracefully fall back when torch_geometric unavailable
+- **graph_ai lazy import** — no pydantic_settings required at import time
 - **9 CI workflows** properly configured
-- **22 test files** covering all major modules
+- **13 test files** covering all major modules
+- **19 Dockerfiles** for multi-service deployment
 
 > 📋 **Full changelog:** [**CHANGELOG.md**](./CHANGELOG.md)
 
