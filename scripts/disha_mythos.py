@@ -255,10 +255,30 @@ def _print_summary(summary: dict) -> None:
         s = str(label).lower()
         return any(t in s for t in _SENSITIVE_TOKENS)
 
+    def _looks_like_secret_value(text: str) -> bool:
+        s = text.strip()
+        if not s:
+            return False
+        # Common credential/token formats
+        if s.startswith("ghp_") or s.startswith("github_pat_"):
+            return True
+        if s.startswith("AKIA") and len(s) == 20:
+            return True
+        if s.count(".") == 2 and len(s) > 40:
+            # likely JWT-like token
+            return True
+        # Long hex / base64-like strings are often secrets
+        if len(s) >= 32 and all(c in "0123456789abcdefABCDEF" for c in s):
+            return True
+        b64_chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=_-"
+        if len(s) >= 40 and all(c in b64_chars for c in s):
+            return True
+        return False
+
     def _sanitize(value: object) -> str:
         """Return a safe string representation, redacting anything that looks sensitive."""
         text = str(value)
-        if _is_sensitive_label(text):
+        if _is_sensitive_label(text) or _looks_like_secret_value(text):
             return "[REDACTED]"
         # Truncate overly long values that might contain encoded secrets
         if len(text) > 200:
@@ -286,7 +306,9 @@ def _print_summary(summary: dict) -> None:
     }
 
     for phase_data in summary.get("phases", []):
-        phase = _sanitize(phase_data.get("phase", "unknown"))
+        raw_phase = str(phase_data.get("phase", "unknown")).lower()
+        allowed_phases = {"protect", "heal", "intelligence", "learn", "train"}
+        phase = raw_phase if raw_phase in allowed_phases else "unknown"
         emoji_map = {
             "protect": "🔒",
             "heal": "💊",
