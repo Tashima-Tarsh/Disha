@@ -53,3 +53,6 @@ decision-engine/data/index/*.json
 decision-engine/data/index/*_clauses.txt
 decision-engine/data/index/*_lines.txt
 !decision-engine/data/index/.gitkeep
+
+# Sentinel runtime logs
+logs/sentinel/
