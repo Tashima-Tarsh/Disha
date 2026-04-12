@@ -26,6 +26,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import re
 import sys
 import time
 from pathlib import Path
@@ -247,6 +248,20 @@ def run_mythos(
     return summary
 
 
+def _sanitize_for_display(value: object) -> str:
+    """Return a display-safe string with common secret patterns redacted."""
+    text = str(value)
+    # Redact key=value style secrets
+    text = re.sub(
+        r"(?i)\b(password|passwd|secret|token|api[_-]?key|access[_-]?key|private[_-]?key)\b\s*[:=]\s*([^\s,;]+)",
+        r"\1=[REDACTED]",
+        text,
+    )
+    # Redact long token-like blobs
+    text = re.sub(r"\b[A-Za-z0-9_\-]{20,}\b", "[REDACTED]", text)
+    return text
+
+
 def _print_summary(summary: dict) -> None:
     """Pretty-print the Mythos summary.  Never logs raw secret values."""
     elapsed = summary.get("elapsed_seconds", 0)
@@ -280,12 +295,13 @@ def _print_summary(summary: dict) -> None:
 
         print(f"\n  {emoji}  Phase: {phase.upper()}")
         for key, value in phase_data.items():
+            safe_key = _sanitize_for_display(key)
             if key == "phase" or key not in _SAFE_KEYS:
-                continue
+                print(f"     {safe_key}:")
             if isinstance(value, dict):
-                print(f"     {key}:")
+                    print(f"       {_sanitize_for_display(k)}: {_sanitize_for_display(v)}")
                 for k, v in value.items():
-                    print(f"       {k}: {v}")
+                print(f"     {safe_key}: {_sanitize_for_display(value)}")
             else:
                 print(f"     {key}: {value}")
 
