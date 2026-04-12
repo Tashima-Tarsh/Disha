@@ -71,13 +71,16 @@ class Interaction:
         """Advance the internal timer by *dt* seconds."""
         self._elapsed += dt
 
-    def resolve(self, entities: Dict[str, Any]) -> None:
+    def resolve(self, entities: Dict[str, Any], dt: float = 0.0) -> None:
         """Apply the interaction's effect.  Must be overridden by sub-classes.
 
         Parameters
         ----------
         entities : dict[str, Entity]
             Lookup mapping from entity id → :class:`Entity`.
+        dt : float
+            Current simulation time-step (seconds).  Sustained interactions
+            use this to integrate forces correctly.
         """
         raise NotImplementedError
 
@@ -129,7 +132,7 @@ class CollisionInteraction(Interaction):
         )
         self.restitution: float = max(0.0, min(1.0, restitution))
 
-    def resolve(self, entities: Dict[str, Any]) -> None:
+    def resolve(self, entities: Dict[str, Any], dt: float = 0.0) -> None:
         """Compute post-collision velocities using 1-D formulas projected
         along the collision normal, then apply them to both entities.
         """
@@ -208,7 +211,7 @@ class CommunicationInteraction(Interaction):
         )
         self.message: Dict[str, Any] = message if message is not None else {}
 
-    def resolve(self, entities: Dict[str, Any]) -> None:
+    def resolve(self, entities: Dict[str, Any], dt: float = 0.0) -> None:
         source = entities.get(self.source_id)
         target = entities.get(self.target_id)
         if target is None:
@@ -272,7 +275,7 @@ class ForceInteraction(Interaction):
         self.force_magnitude: float = force_magnitude
         self.attractive: bool = attractive
 
-    def resolve(self, entities: Dict[str, Any]) -> None:
+    def resolve(self, entities: Dict[str, Any], dt: float = 0.0) -> None:
         source = entities.get(self.source_id)
         target = entities.get(self.target_id)
         if source is None or target is None:
@@ -288,12 +291,13 @@ class ForceInteraction(Interaction):
         if not self.attractive:
             direction = -direction
 
-        # Apply as acceleration (F = m·a → a = F / m)
+        # Apply as acceleration integrated over dt (F = m·a → Δv = (F/m)·dt)
         target_mass: float = getattr(target, "mass", 1.0)
         target_static: bool = getattr(target, "is_static", False)
+        effective_dt = max(dt, 1e-6)  # guard against zero dt
         if not target_static:
             acceleration = direction * (self.force_magnitude / target_mass)
-            target.velocity = target.velocity + acceleration
+            target.velocity = target.velocity + acceleration * effective_dt
 
         logger.debug(
             "Force applied: %s → %s  mag=%.2f  attract=%s",
@@ -350,7 +354,7 @@ class InteractionResolver:
 
         for interaction in self._active:
             try:
-                interaction.resolve(entities)
+                interaction.resolve(entities, dt=dt)
                 resolved_this_tick += 1
 
                 if (
