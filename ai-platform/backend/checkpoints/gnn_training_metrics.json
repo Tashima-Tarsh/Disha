@@ -1,0 +1,39 @@
+{
+  "link_prediction": {
+    "epochs": 200,
+    "final_loss": 1.2475899457931519,
+    "sample_predictions": [
+      {
+        "source": 10,
+        "target": 50,
+        "probability": 0.5181908011436462
+      },
+      {
+        "source": 100,
+        "target": 150,
+        "probability": 0.4631044864654541
+      },
+      {
+        "source": 2,
+        "target": 3,
+        "probability": 0.3201546370983124
+      },
+      {
+        "source": 0,
+        "target": 1,
+        "probability": 0.14420650899410248
+      }
+    ]
+  },
+  "node_classification": {
+    "epochs": 150,
+    "final_loss": 0.27637380361557007,
+    "train_accuracy": 0.987500011920929,
+    "test_accuracy": 0.30000001192092896
+  },
+  "graph_stats": {
+    "nodes": 200,
+    "edges": 597,
+    "feature_dim": 16
+  }
+}

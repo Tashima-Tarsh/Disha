@@ -66,7 +66,7 @@ class InvestigationEnvironment:
     which intelligence-gathering action to take next.
     """
 
-    STATE_DIM = 13  # Matches State.to_vector() output
+    STATE_DIM = 12  # Matches State.to_vector() output
     ACTION_DIM = len(ActionType)
     MAX_STEPS = 20
 

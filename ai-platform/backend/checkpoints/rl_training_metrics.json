@@ -1,0 +1,16 @@
+{
+  "episodes_trained": 500,
+  "final_avg_reward": 16.485226501332797,
+  "total_updates": 25,
+  "replay_buffer_size": 6690,
+  "reward_metrics": {
+    "total_episodes": 500,
+    "avg_reward": 1.6330046436167753,
+    "reward_std": 0.9402692762803612,
+    "baseline": 1.6330046436167753,
+    "true_positive_rate": 0.0,
+    "false_positive_rate": 0.0,
+    "total_feedback": 0,
+    "avg_user_rating": null
+  }
+}
