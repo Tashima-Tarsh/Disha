@@ -772,7 +772,11 @@ def generate_cross_domain_scenarios(
             concept1=c1, concept2=c2,
         )
 
-        # Quality based on cross-domain complexity
+        # Quality from cross-domain complexity:
+        # beta(α, β) where α increases with complexity for higher-quality scenarios.
+        # α = 4 + complexity*0.5: baseline of 4 shifts right with more placeholders
+        # β = 3: keeps the mode around 0.6 for moderate complexity
+        # Clipped to [0.1, 0.95] to avoid extreme scores that can't be calibrated.
         complexity = 2 + (1 if d1 != d2 else 0) + len(item1.concepts[:3]) * 0.1
         gt_quality = float(np.clip(rng.beta(4 + complexity * 0.5, 3), 0.1, 0.95))
 

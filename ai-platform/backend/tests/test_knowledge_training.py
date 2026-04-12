@@ -60,6 +60,20 @@ class TestKnowledgeLoading:
         chem_items = [i for i in corpus.items if i.domain == "chemistry" and "Element:" in i.topic]
         assert len(chem_items) == 118, f"Expected 118 elements, got {len(chem_items)}"
 
+    def test_chemistry_element_range(self):
+        """Verify H (Z=1) through Og (Z=118) are all present."""
+        from knowledge_engine import load_all_knowledge
+
+        corpus = load_all_knowledge()
+        chem_items = [i for i in corpus.items if i.domain == "chemistry" and "Element:" in i.topic]
+        symbols = {c.split("(")[1].rstrip(")") for c in [i.topic.split("Element: ")[1] for i in chem_items]}
+        assert "H" in symbols, "Hydrogen missing"
+        assert "He" in symbols, "Helium missing"
+        assert "Fe" in symbols, "Iron missing"
+        assert "Au" in symbols, "Gold missing"
+        assert "U" in symbols, "Uranium missing"
+        assert "Og" in symbols, "Oganesson missing"
+
     def test_physics_has_items(self):
         from knowledge_engine import load_all_knowledge
 
