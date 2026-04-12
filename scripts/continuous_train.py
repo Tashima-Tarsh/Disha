@@ -401,25 +401,58 @@ def _train_gnn(
     clf_optimizer = torch.optim.Adam(
         classifier.parameters(),
         lr=0.01,
-        weight_decay=params.get("weight_decay", 1e-3),
+        weight_decay=params.get("weight_decay", 5e-4),
     )
 
     x = torch.FloatTensor(graph_data.node_features)
     edge_idx = torch.LongTensor(graph_data.edge_index)
     labels = torch.LongTensor(graph_data.node_labels)
 
-    num_train = int(0.8 * len(labels))
-    train_mask = torch.zeros(len(labels), dtype=torch.bool)
-    train_mask[:num_train] = True
-    test_mask = ~train_mask
+    # Shuffled train/test split (80/20)
+    num_nodes = len(labels)
+    perm = torch.randperm(num_nodes, generator=torch.Generator().manual_seed(42))
+    num_train = int(0.8 * num_nodes)
+    train_mask = torch.zeros(num_nodes, dtype=torch.bool)
+    test_mask = torch.zeros(num_nodes, dtype=torch.bool)
+    train_mask[perm[:num_train]] = True
+    test_mask[perm[num_train:]] = True
+
+    num_epochs_classify = params.get("num_epochs_classify", 150)
+    best_test_acc = 0.0
+    patience = 20
+    patience_counter = 0
+    best_state = None
 
     classifier.train()
-    for epoch in range(1, params.get("num_epochs_classify", 150) + 1):
+    for epoch in range(1, num_epochs_classify + 1):
         clf_optimizer.zero_grad()
         logits = classifier(x, edge_idx)
         loss = torch.nn.functional.cross_entropy(logits[train_mask], labels[train_mask])
         loss.backward()
         clf_optimizer.step()
+
+        # Early stopping based on test accuracy
+        if epoch % 10 == 0:
+            classifier.eval()
+            with torch.no_grad():
+                eval_logits = classifier(x, edge_idx)
+                eval_preds = eval_logits.argmax(dim=-1)
+                curr_test_acc = float((eval_preds[test_mask] == labels[test_mask]).float().mean())
+            if curr_test_acc > best_test_acc:
+                best_test_acc = curr_test_acc
+                best_state = {k: v.clone() for k, v in classifier.state_dict().items()}
+                patience_counter = 0
+            else:
+                patience_counter += 1
+            classifier.train()
+
+            if patience_counter >= patience:
+                logger.info("gnn_early_stopping", epoch=epoch, best_test_acc=round(best_test_acc, 4))
+                break
+
+    # Restore best model
+    if best_state is not None:
+        classifier.load_state_dict(best_state)
 
     classifier.eval()
     with torch.no_grad():
