@@ -642,10 +642,20 @@ def _print_report(report: GuardianReport, as_json: bool = False) -> None:
         neutralized = entry.get("neutralized", False)
         status = "✅ NEUTRALIZED" if neutralized else "⚠️  ACTIVE"
         level_emoji = {"critical": "🔴", "high": "🟠", "medium": "🟡", "low": "🔵", "info": "⚪"}
-        print(f"\n  {level_emoji.get(entry['level'], '⚪')} [{entry['level'].upper()}] {entry['title']}")
-        print(f"     {entry['description']}")
+
+        # Redact potentially sensitive scanner-derived text from secret findings.
+        is_secret_finding = entry.get("category") == ThreatCategory.SECRET.value
+        display_title = "Potential secret detected" if is_secret_finding else entry.get("title", "Threat detected")
+        display_description = (
+            "Details redacted to avoid exposing sensitive data."
+            if is_secret_finding
+            else entry.get("description", "")
+        )
+
+        print(f"\n  {level_emoji.get(entry['level'], '⚪')} [{entry['level'].upper()}] {display_title}")
+        print(f"     {display_description}")
         if entry.get("file"):
-            loc = entry["file"]
+            loc = "[redacted]" if is_secret_finding else entry["file"]
             if entry.get("line"):
                 loc += f":{entry['line']}"
             print(f"     📍 {loc}")
