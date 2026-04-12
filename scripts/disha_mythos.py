@@ -266,7 +266,9 @@ def _print_summary(summary: dict) -> None:
     }
 
     for phase_data in summary.get("phases", []):
-        phase = phase_data.get("phase", "unknown")
+        raw_phase = phase_data.get("phase", "unknown")
+        allowed_phases = {"protect", "heal", "intelligence", "learn", "train"}
+        phase = raw_phase if raw_phase in allowed_phases else "unknown"
         emoji_map = {
             "protect": "🔒",
             "heal": "💊",
