@@ -112,9 +112,13 @@ class ExperienceReplayBuffer:
 
         # Prioritized sampling
         priorities = np.array([t.priority ** self.alpha for t in self.buffer])
-        probs = priorities / priorities.sum()
+        total = priorities.sum()
+        if total == 0:
+            # All priorities are zero — fall back to uniform sampling
+            return random.sample(list(self.buffer), batch_size)
+        probs = priorities / total
 
-        indices = np.random.choice(len(self.buffer), size=batch_size, p=probs, replace=False)
+        indices = np.random.choice(len(self.buffer), size=batch_size, p=probs, replace=True)
         return [self.buffer[i] for i in indices]
 
     def get_batch_arrays(self, batch_size: int = 32) -> Optional[dict]:

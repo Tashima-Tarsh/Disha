@@ -10,6 +10,12 @@ import sys
 import numpy as np
 from pathlib import Path
 
+# Configure logging so messages are visible when running as a script
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+)
+
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 

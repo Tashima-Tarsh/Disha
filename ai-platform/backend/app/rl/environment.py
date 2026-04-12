@@ -163,8 +163,8 @@ class InvestigationEnvironment:
     def get_valid_actions(self) -> list:
         """Return list of valid action indices in current state."""
         valid = list(range(self.ACTION_DIM))
-        if self.state.investigation_depth >= 5:
+        if self.state.investigation_depth >= 5 and ActionType.INCREASE_DEPTH in valid:
             valid.remove(ActionType.INCREASE_DEPTH)
-        if self.state.investigation_depth <= 1:
+        if self.state.investigation_depth <= 1 and ActionType.DECREASE_DEPTH in valid:
             valid.remove(ActionType.DECREASE_DEPTH)
         return valid
