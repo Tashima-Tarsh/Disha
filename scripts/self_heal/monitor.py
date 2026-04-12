@@ -452,6 +452,8 @@ class SelfHealingMonitor:
     def _fix_config_issues(self, check: HealthCheck) -> bool:
         """Fix configuration consistency issues."""
         issues = check.details.get("issues", [])
+        # Entries that are directories (get trailing slash) vs files
+        _DIR_ENTRIES = {"node_modules", "__pycache__", "dist", ".next", "venv", ".venv", "build"}
         fixed_any = False
         for issue in issues:
             if ".gitignore missing:" in issue:
@@ -460,8 +462,9 @@ class SelfHealingMonitor:
                 if gitignore.exists():
                     content = gitignore.read_text()
                     if entry not in content:
+                        suffix = "/" if entry in _DIR_ENTRIES else ""
                         with open(gitignore, "a") as f:
-                            f.write(f"\n{entry}/\n")
+                            f.write(f"\n{entry}{suffix}\n")
                         fixed_any = True
         return fixed_any
 

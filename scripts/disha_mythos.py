@@ -248,11 +248,22 @@ def run_mythos(
 
 
 def _print_summary(summary: dict) -> None:
-    """Pretty-print the Mythos summary."""
+    """Pretty-print the Mythos summary.  Never logs raw secret values."""
+    elapsed = summary.get("elapsed_seconds", 0)
     print(f"\n{'═' * 70}")
     print(f"  🛡️  DISHA MYTHOS — Adaptive Intelligence Report")
-    print(f"  Completed in {summary['elapsed_seconds']:.1f}s")
+    print(f"  Completed in {elapsed:.1f}s")
     print(f"{'═' * 70}")
+
+    # Allowed keys for display (excludes any potential sensitive data)
+    _SAFE_KEYS = {
+        "phase", "system_health", "threats_found", "threats_neutralized",
+        "critical", "high", "scans", "overall_status", "score",
+        "checks_run", "issues_fixed", "details", "available_providers",
+        "total_providers", "test_response_ok", "domains_loaded",
+        "total_items", "training_pairs", "domain_breakdown",
+        "rounds_completed", "metrics", "status", "error",
+    }
 
     for phase_data in summary.get("phases", []):
         phase = phase_data.get("phase", "unknown")
@@ -267,7 +278,7 @@ def _print_summary(summary: dict) -> None:
 
         print(f"\n  {emoji}  Phase: {phase.upper()}")
         for key, value in phase_data.items():
-            if key == "phase":
+            if key == "phase" or key not in _SAFE_KEYS:
                 continue
             if isinstance(value, dict):
                 print(f"     {key}:")

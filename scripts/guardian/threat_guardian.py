@@ -89,7 +89,22 @@ class GuardianReport:
     def high_count(self) -> int:
         return sum(1 for t in self.threats if t.level == ThreatLevel.HIGH)
 
-    def to_dict(self) -> dict[str, Any]:
+    def to_dict(self, include_evidence: bool = False) -> dict[str, Any]:
+        threats_list = []
+        for t in self.threats:
+            entry: dict[str, Any] = {
+                "category": t.category.value,
+                "level": t.level.value,
+                "title": t.title,
+                "description": t.description,
+                "file": t.file_path,
+                "line": t.line_number,
+                "auto_fixable": t.auto_fixable,
+                "neutralized": t.neutralized,
+            }
+            if include_evidence and t.evidence:
+                entry["evidence"] = t.evidence
+            threats_list.append(entry)
         return {
             "timestamp": self.timestamp,
             "system_health": self.system_health,
@@ -101,19 +116,7 @@ class GuardianReport:
                 "info": sum(1 for t in self.threats if t.level == ThreatLevel.INFO),
             },
             "scans_performed": self.scans_performed,
-            "threats": [
-                {
-                    "category": t.category.value,
-                    "level": t.level.value,
-                    "title": t.title,
-                    "description": t.description,
-                    "file": t.file_path,
-                    "line": t.line_number,
-                    "auto_fixable": t.auto_fixable,
-                    "neutralized": t.neutralized,
-                }
-                for t in self.threats
-            ],
+            "threats": threats_list,
         }
 
 
@@ -615,8 +618,10 @@ def main() -> None:
 
 
 def _print_report(report: GuardianReport, as_json: bool = False) -> None:
+    # Use sanitized dict (no evidence) to avoid logging sensitive data
+    sanitized = report.to_dict(include_evidence=False)
     if as_json:
-        print(json.dumps(report.to_dict(), indent=2))
+        print(json.dumps(sanitized, indent=2))
         return
 
     health_emoji = "🟢" if report.system_health > 0.8 else "🟡" if report.system_health > 0.5 else "🔴"
@@ -625,30 +630,22 @@ def _print_report(report: GuardianReport, as_json: bool = False) -> None:
     print(f"  System Health: {report.system_health:.0%}")
     print(f"{'═' * 60}")
 
-    counts = report.to_dict()["threat_counts"]
-    if counts["critical"]:
-        print(f"  🔴 Critical: {counts['critical']}")
-    if counts["high"]:
-        print(f"  🟠 High:     {counts['high']}")
-    if counts["medium"]:
-        print(f"  🟡 Medium:   {counts['medium']}")
-    if counts["low"]:
-        print(f"  🔵 Low:      {counts['low']}")
-    if counts["info"]:
-        print(f"  ⚪ Info:     {counts['info']}")
+    counts = sanitized["threat_counts"]
+    for level, emoji in [("critical", "🔴"), ("high", "🟠"), ("medium", "🟡"), ("low", "🔵"), ("info", "⚪")]:
+        if counts[level]:
+            print(f"  {emoji} {level.capitalize():10s} {counts[level]}")
 
-    for t in report.threats:
-        status = "✅ NEUTRALIZED" if t.neutralized else "⚠️  ACTIVE"
+    for entry in sanitized["threats"]:
+        neutralized = entry.get("neutralized", False)
+        status = "✅ NEUTRALIZED" if neutralized else "⚠️  ACTIVE"
         level_emoji = {"critical": "🔴", "high": "🟠", "medium": "🟡", "low": "🔵", "info": "⚪"}
-        print(f"\n  {level_emoji.get(t.level.value, '⚪')} [{t.level.value.upper()}] {t.title}")
-        print(f"     {t.description}")
-        if t.file_path:
-            loc = t.file_path
-            if t.line_number:
-                loc += f":{t.line_number}"
+        print(f"\n  {level_emoji.get(entry['level'], '⚪')} [{entry['level'].upper()}] {entry['title']}")
+        print(f"     {entry['description']}")
+        if entry.get("file"):
+            loc = entry["file"]
+            if entry.get("line"):
+                loc += f":{entry['line']}"
             print(f"     📍 {loc}")
-        if t.remediation:
-            print(f"     💡 {t.remediation}")
         print(f"     Status: {status}")
 
     print(f"\n{'═' * 60}\n")
