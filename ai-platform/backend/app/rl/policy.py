@@ -120,12 +120,8 @@ class PolicyNetwork:
         valid_actions: Optional[list] = None,
     ) -> tuple:
         """Fallback heuristic policy when PyTorch is unavailable."""
-copilot/create-decision-engine-mock
         agents_used = state[5:10] if len(state) >= 12 else [0] * 5
         _ = int(state[10] * 20) if len(state) >= 12 else 0
-=======
-        agents_used = state[5:10] if len(state) >= 13 else [0] * 5
-main
 
         # Simple strategy: run each agent in order, then stop
         for i in range(5):
