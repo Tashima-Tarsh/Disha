@@ -705,14 +705,14 @@ def _print_report(report: GuardianReport, as_json: bool = False) -> None:
         if entry.get("file"):
             loc = str(entry["file"])
             if entry.get("line"):
-    safe_lines = [_sanitize_for_output(line) for line in lines]
-    sys.stdout.write("\n".join(safe_lines))
+                loc += f":{entry['line']}"
             lines.append(f"     📍 {loc}")
         lines.append(f"     Status: {status}")
 
     lines.append(f"\n{'═' * 60}\n")
 
-    sys.stdout.write("\n".join(lines))
+    safe_lines = [_sanitize_for_output(line) for line in lines]
+    sys.stdout.write("\n".join(safe_lines))
 
 
 if __name__ == "__main__":
