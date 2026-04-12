@@ -651,9 +651,15 @@ def _print_report(report: GuardianReport, as_json: bool = False) -> None:
         "threats": safe_threats,
     }
     if as_json:
-        # Only emit the counts, not individual threats, for JSON output
-        json_out = {k: v for k, v in safe_summary.items() if k != "threats"}
-        sys.stdout.write(json.dumps(json_out, indent=2) + "\n")
+        # Emit only a strict allowlist of aggregate fields for JSON output.
+        # Avoid serializing any structure derived from per-threat content.
+        json_safe_out = {
+            "timestamp": report.timestamp,
+            "system_health": report.system_health,
+            "threat_counts": safe_summary["threat_counts"],
+            "total_threats": safe_summary["total_threats"],
+        }
+        sys.stdout.write(json.dumps(json_safe_out, indent=2) + "\n")
         return
 
     health_emoji = "🟢" if report.system_health > 0.8 else "🟡" if report.system_health > 0.5 else "🔴"
