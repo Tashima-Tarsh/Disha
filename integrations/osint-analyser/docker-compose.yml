@@ -114,7 +114,7 @@ services:
   # -------------------------------------------------------------------------- #
 
   rabbitmq:
-    image: "rabbitmq:3-management-alpine"
+    image: "rabbitmq:3.13-management-alpine"
     networks:
       - osint_collector
     healthcheck:
