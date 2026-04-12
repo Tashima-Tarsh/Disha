@@ -1,0 +1,115 @@
+{
+  "domain": "Computing & Computer Science",
+  "description": "Theory of computation, algorithms, programming, AI, and systems",
+  "branches": [
+    {
+      "id": "theory_of_computation",
+      "name": "Theory of Computation",
+      "models": [
+        {"name": "Turing Machine", "description": "Universal model of computation with infinite tape", "year": 1936},
+        {"name": "Lambda Calculus", "description": "Formal system for function abstraction/application", "year": 1936},
+        {"name": "Finite Automata", "description": "DFA/NFA for regular languages"},
+        {"name": "Pushdown Automata", "description": "Automata with stack for context-free languages"},
+        {"name": "Cellular Automata", "description": "Grid-based computation (Conway, Wolfram)"}
+      ],
+      "complexity_classes": ["P", "NP", "NP-complete", "NP-hard", "PSPACE", "EXPTIME", "BQP", "BPP"],
+      "open_problems": ["P vs NP", "NP vs co-NP"],
+      "key_theorems": ["Church-Turing thesis", "Rice's theorem", "Cook-Levin theorem (SAT is NP-complete)", "Halting problem undecidability"]
+    },
+    {
+      "id": "algorithms",
+      "name": "Algorithms & Data Structures",
+      "sorting": [
+        {"name": "QuickSort", "avg": "O(n log n)", "worst": "O(n²)", "space": "O(log n)"},
+        {"name": "MergeSort", "avg": "O(n log n)", "worst": "O(n log n)", "space": "O(n)"},
+        {"name": "HeapSort", "avg": "O(n log n)", "worst": "O(n log n)", "space": "O(1)"},
+        {"name": "TimSort", "avg": "O(n log n)", "worst": "O(n log n)", "space": "O(n)"}
+      ],
+      "data_structures": [
+        {"name": "Array", "access": "O(1)", "insert": "O(n)", "search": "O(n)"},
+        {"name": "Hash Table", "access": "O(1) avg", "insert": "O(1) avg", "search": "O(1) avg"},
+        {"name": "BST", "access": "O(log n)", "insert": "O(log n)", "search": "O(log n)"},
+        {"name": "B-Tree", "access": "O(log n)", "insert": "O(log n)", "description": "Self-balancing tree for databases"},
+        {"name": "Red-Black Tree", "access": "O(log n)", "insert": "O(log n)", "description": "Self-balancing BST"},
+        {"name": "Trie", "insert": "O(m)", "search": "O(m)", "description": "Prefix tree for strings"},
+        {"name": "Graph", "types": ["adjacency list", "adjacency matrix", "edge list"]}
+      ],
+      "paradigms": ["divide and conquer", "dynamic programming", "greedy", "backtracking", "branch and bound", "randomised"]
+    },
+    {
+      "id": "programming_languages",
+      "name": "Programming Languages",
+      "paradigms": ["imperative", "functional", "object-oriented", "logic", "concurrent", "declarative"],
+      "type_systems": ["static vs dynamic", "strong vs weak", "type inference", "dependent types", "linear types"],
+      "major_languages": [
+        {"name": "Python", "paradigm": "multi-paradigm", "typing": "dynamic, strong", "year": 1991},
+        {"name": "JavaScript/TypeScript", "paradigm": "multi-paradigm", "typing": "dynamic/static", "year": 1995},
+        {"name": "Rust", "paradigm": "multi-paradigm", "typing": "static, strong", "year": 2015, "feature": "ownership system"},
+        {"name": "C/C++", "paradigm": "imperative/OOP", "typing": "static, weak", "year": 1972},
+        {"name": "Haskell", "paradigm": "purely functional", "typing": "static, strong", "year": 1990},
+        {"name": "Go", "paradigm": "imperative/concurrent", "typing": "static, strong", "year": 2009},
+        {"name": "Java", "paradigm": "OOP", "typing": "static, strong", "year": 1995},
+        {"name": "Lisp/Scheme", "paradigm": "functional", "typing": "dynamic", "year": 1958}
+      ]
+    },
+    {
+      "id": "ai_ml",
+      "name": "Artificial Intelligence & Machine Learning",
+      "sub_fields": [
+        {
+          "name": "Supervised Learning",
+          "algorithms": ["linear regression", "logistic regression", "SVM", "decision trees", "random forest", "gradient boosting", "neural networks"],
+          "evaluation": ["accuracy", "precision", "recall", "F1", "AUC-ROC", "cross-validation"]
+        },
+        {
+          "name": "Unsupervised Learning",
+          "algorithms": ["k-means", "DBSCAN", "hierarchical clustering", "PCA", "t-SNE", "autoencoders", "GMM"]
+        },
+        {
+          "name": "Deep Learning",
+          "architectures": ["MLP", "CNN", "RNN/LSTM/GRU", "Transformer", "GAN", "VAE", "diffusion models"],
+          "techniques": ["backpropagation", "batch normalisation", "dropout", "attention mechanism", "residual connections"]
+        },
+        {
+          "name": "Reinforcement Learning",
+          "algorithms": ["Q-learning", "SARSA", "DQN", "PPO", "A3C", "SAC", "MCTS"],
+          "concepts": ["MDP", "policy", "value function", "exploration vs exploitation", "reward shaping"]
+        },
+        {
+          "name": "Natural Language Processing",
+          "techniques": ["tokenisation", "word embeddings", "attention", "transformer models", "BERT", "GPT", "RAG"]
+        }
+      ]
+    },
+    {
+      "id": "systems",
+      "name": "Computer Systems",
+      "operating_systems": ["process management", "memory management", "file systems", "scheduling", "virtualisation", "containers"],
+      "networking": {
+        "layers": ["physical", "data link", "network", "transport", "application"],
+        "protocols": ["TCP/IP", "UDP", "HTTP/HTTPS", "DNS", "BGP", "TLS", "WebSocket"],
+        "concepts": ["routing", "NAT", "firewall", "load balancing", "CDN"]
+      },
+      "databases": {
+        "relational": ["SQL", "ACID properties", "normalisation", "indexing", "joins", "transactions"],
+        "nosql": ["key-value (Redis)", "document (MongoDB)", "column-family (Cassandra)", "graph (Neo4j)"],
+        "concepts": ["CAP theorem", "eventual consistency", "sharding", "replication"]
+      },
+      "distributed_systems": ["consensus (Raft, Paxos)", "MapReduce", "microservices", "message queues", "blockchain"]
+    },
+    {
+      "id": "cybersecurity_computing",
+      "name": "Cybersecurity & Cryptography",
+      "cryptography": {
+        "symmetric": ["AES", "ChaCha20", "DES (deprecated)", "Blowfish"],
+        "asymmetric": ["RSA", "ECDSA", "Diffie-Hellman", "ElGamal", "lattice-based (post-quantum)"],
+        "hash_functions": ["SHA-256", "SHA-3", "BLAKE3"],
+        "protocols": ["TLS 1.3", "SSH", "PGP", "Signal protocol"],
+        "post_quantum": ["CRYSTALS-Kyber", "CRYSTALS-Dilithium", "SPHINCS+", "NTRU"]
+      },
+      "offensive_security": ["penetration testing", "social engineering", "exploit development", "fuzzing", "red teaming"],
+      "defensive_security": ["SIEM", "IDS/IPS", "honeypots", "zero trust", "SOAR", "threat hunting"],
+      "tools": ["nmap", "Wireshark", "Metasploit", "Burp Suite", "OWASP ZAP", "Ghidra", "Volatility"]
+    }
+  ]
+}

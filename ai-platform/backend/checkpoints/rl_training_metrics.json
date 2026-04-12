@@ -1,0 +1,7 @@
+{
+  "episodes_trained": 400,
+  "final_avg_reward": 22.030681553078406,
+  "reward_std": 3.176908230105499,
+  "replay_buffer_size": 7981,
+  "data_source_scenarios": 150
+}

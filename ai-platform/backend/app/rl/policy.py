@@ -29,7 +29,7 @@ class PolicyNetwork:
 
     def __init__(
         self,
-        state_dim: int = 13,
+        state_dim: int = 12,
         action_dim: int = 8,
         hidden_dim: int = 64,
         lr: float = 3e-4,
@@ -120,7 +120,8 @@ class PolicyNetwork:
         valid_actions: Optional[list] = None,
     ) -> tuple:
         """Fallback heuristic policy when PyTorch is unavailable."""
-        agents_used = state[5:10] if len(state) >= 13 else [0] * 5
+        agents_used = state[5:10] if len(state) >= 12 else [0] * 5
+        _ = int(state[10] * 20) if len(state) >= 12 else 0
 
         # Simple strategy: run each agent in order, then stop
         for i in range(5):

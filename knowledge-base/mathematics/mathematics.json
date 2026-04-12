@@ -1,0 +1,123 @@
+{
+  "domain": "Mathematics",
+  "description": "Pure and applied mathematics from fundamentals to advanced research frontiers",
+  "branches": [
+    {
+      "id": "arithmetic",
+      "name": "Arithmetic & Number Theory",
+      "fundamentals": ["natural numbers", "integers", "rationals", "reals", "complex numbers"],
+      "key_theorems": [
+        "Fundamental Theorem of Arithmetic: every integer > 1 is a unique product of primes",
+        "Euclid's theorem: there are infinitely many primes",
+        "Fermat's Last Theorem: xⁿ + yⁿ = zⁿ has no integer solutions for n > 2",
+        "Prime Number Theorem: π(x) ~ x/ln(x)",
+        "Quadratic Reciprocity (Gauss)"
+      ],
+      "open_problems": ["Riemann Hypothesis", "Goldbach Conjecture", "Twin Prime Conjecture"],
+      "concepts": ["divisibility", "modular arithmetic", "prime factorisation", "GCD/LCM", "Diophantine equations"]
+    },
+    {
+      "id": "algebra",
+      "name": "Algebra",
+      "sub_branches": ["elementary algebra", "linear algebra", "abstract algebra", "commutative algebra"],
+      "key_structures": [
+        {"name": "Group", "definition": "(G, ·) with closure, associativity, identity, inverses", "examples": ["symmetric group Sₙ", "cyclic group Zₙ", "general linear group GL(n,F)"]},
+        {"name": "Ring", "definition": "(R, +, ·) with abelian group under +, monoid under ·, distributive", "examples": ["integers Z", "polynomial ring F[x]", "matrix ring Mₙ(F)"]},
+        {"name": "Field", "definition": "Commutative ring where every nonzero element has multiplicative inverse", "examples": ["rationals Q", "reals R", "complex numbers C", "finite fields GF(pⁿ)"]},
+        {"name": "Vector Space", "definition": "Module over a field with scalar multiplication", "examples": ["Rⁿ", "function spaces", "polynomial spaces"]}
+      ],
+      "key_theorems": [
+        "Fundamental Theorem of Algebra: every non-constant polynomial in C[x] has a root",
+        "Cayley-Hamilton Theorem",
+        "Jordan Normal Form",
+        "Spectral Theorem for symmetric matrices",
+        "Galois Theory: field extensions and group theory connect polynomial solvability"
+      ],
+      "linear_algebra_core": {
+        "operations": ["matrix multiplication", "determinant", "eigenvalues", "SVD", "QR decomposition", "LU decomposition"],
+        "spaces": ["null space", "column space", "row space", "eigenspace"],
+        "applications": ["least squares", "PCA", "page rank", "quantum mechanics", "computer graphics"]
+      }
+    },
+    {
+      "id": "calculus_analysis",
+      "name": "Calculus & Real Analysis",
+      "key_concepts": ["limits", "continuity", "differentiation", "integration", "sequences", "series"],
+      "fundamental_theorems": [
+        "Fundamental Theorem of Calculus: ∫ₐᵇ f(x)dx = F(b) - F(a)",
+        "Mean Value Theorem: f'(c) = (f(b)-f(a))/(b-a)",
+        "Taylor's Theorem: f(x) = Σ f⁽ⁿ⁾(a)(x-a)ⁿ/n!",
+        "Weierstrass Approximation Theorem",
+        "Bolzano-Weierstrass Theorem"
+      ],
+      "integration_techniques": ["substitution", "parts", "partial fractions", "trigonometric", "numerical (Simpson, Gauss)"],
+      "multivariable": ["partial derivatives", "gradient", "divergence", "curl", "Stokes' theorem", "Green's theorem", "Gauss' divergence theorem"],
+      "measure_theory": ["Lebesgue measure", "Lebesgue integral", "σ-algebras", "Lp spaces", "Fubini's theorem"]
+    },
+    {
+      "id": "geometry",
+      "name": "Geometry & Topology",
+      "sub_branches": ["Euclidean", "non-Euclidean", "differential", "algebraic", "topology"],
+      "euclidean": {
+        "axioms": ["Euclid's five postulates"],
+        "key_results": ["Pythagorean theorem", "law of cosines", "Euler's polyhedron formula: V-E+F=2"]
+      },
+      "non_euclidean": ["hyperbolic geometry (Lobachevsky)", "elliptic geometry (Riemann)", "projective geometry"],
+      "differential_geometry": ["manifolds", "curvature", "geodesics", "Riemannian metrics", "Gauss-Bonnet theorem"],
+      "topology": ["homeomorphism", "fundamental group", "homology", "cohomology", "Poincaré conjecture (proved by Perelman)"],
+      "algebraic_geometry": ["varieties", "schemes", "sheaves", "Grothendieck", "Weil conjectures"]
+    },
+    {
+      "id": "probability_statistics",
+      "name": "Probability & Statistics",
+      "axioms": ["Kolmogorov axioms: P(Ω)=1, P(A)≥0, countable additivity"],
+      "distributions": [
+        {"name": "Normal/Gaussian", "pdf": "f(x) = (1/σ√2π)e^(-(x-μ)²/2σ²)", "params": ["μ (mean)", "σ (std dev)"]},
+        {"name": "Poisson", "pmf": "P(X=k) = λᵏe⁻λ/k!", "params": ["λ (rate)"]},
+        {"name": "Binomial", "pmf": "P(X=k) = C(n,k)pᵏ(1-p)ⁿ⁻ᵏ", "params": ["n (trials)", "p (probability)"]},
+        {"name": "Exponential", "pdf": "f(x) = λe⁻λˣ", "params": ["λ (rate)"]},
+        {"name": "Uniform", "pdf": "f(x) = 1/(b-a)", "params": ["a (min)", "b (max)"]}
+      ],
+      "key_theorems": [
+        "Law of Large Numbers",
+        "Central Limit Theorem",
+        "Bayes' Theorem: P(A|B) = P(B|A)P(A)/P(B)",
+        "Chebyshev's inequality",
+        "Markov's inequality"
+      ],
+      "statistical_methods": ["hypothesis testing", "confidence intervals", "regression", "ANOVA", "chi-squared test", "maximum likelihood", "Bayesian inference"]
+    },
+    {
+      "id": "discrete_math",
+      "name": "Discrete Mathematics",
+      "topics": ["combinatorics", "graph theory", "logic", "set theory", "automata theory"],
+      "graph_theory": {
+        "key_concepts": ["adjacency", "degree", "paths", "cycles", "trees", "planarity", "coloring"],
+        "key_theorems": ["Euler's formula", "Four Color Theorem", "Kuratowski's theorem", "Hall's marriage theorem"],
+        "algorithms": ["Dijkstra", "Bellman-Ford", "Floyd-Warshall", "Kruskal", "Prim", "BFS", "DFS"]
+      },
+      "combinatorics": {
+        "counting": ["permutations: P(n,r)=n!/(n-r)!", "combinations: C(n,r)=n!/(r!(n-r)!)", "stars and bars"],
+        "principles": ["pigeonhole principle", "inclusion-exclusion", "Burnside's lemma"],
+        "generating_functions": ["ordinary", "exponential", "Catalan numbers", "Fibonacci recurrence"]
+      },
+      "logic": ["propositional logic", "predicate logic", "Gödel's incompleteness theorems", "decidability", "computability"]
+    },
+    {
+      "id": "differential_equations",
+      "name": "Differential Equations",
+      "ode_types": ["separable", "linear first-order", "exact", "Bernoulli", "Cauchy-Euler", "systems of ODEs"],
+      "pde_types": ["heat equation", "wave equation", "Laplace equation", "Navier-Stokes", "Schrödinger equation"],
+      "solution_methods": ["separation of variables", "Fourier series", "Laplace transform", "Green's functions", "numerical methods (Euler, RK4)"],
+      "applications": ["population dynamics", "circuit analysis", "fluid mechanics", "quantum mechanics", "financial models"]
+    },
+    {
+      "id": "applied_math",
+      "name": "Applied Mathematics",
+      "optimisation": ["linear programming (simplex)", "convex optimisation", "gradient descent", "genetic algorithms", "simulated annealing"],
+      "numerical_methods": ["root finding (Newton, bisection)", "interpolation", "quadrature", "finite elements", "Monte Carlo"],
+      "dynamical_systems": ["chaos theory", "Lyapunov exponents", "strange attractors", "bifurcation theory", "Lorenz system"],
+      "information_theory": ["Shannon entropy H = -Σp log p", "mutual information", "channel capacity", "Huffman coding", "Kolmogorov complexity"]
+    }
+  ]
+}
