@@ -147,6 +147,11 @@ const INLINE_ADMIN_HTML = `<!DOCTYPE html>
 
   <script>
     const msg = document.getElementById('msg');
+    function esc(s) {
+      const d = document.createElement('div');
+      d.textContent = s;
+      return d.innerHTML;
+    }
     function fmt(ms) {
       if (ms < 60000) return Math.round(ms/1000) + 's';
       if (ms < 3600000) return Math.round(ms/60000) + 'm';
@@ -160,18 +165,18 @@ const INLINE_ADMIN_HTML = `<!DOCTYPE html>
       const ub = document.getElementById('users-body');
       ub.innerHTML = users.length === 0 ? '<tr><td colspan="4">No connected users</td></tr>' :
         users.map(u => \`<tr>
-          <td><code>\${u.id}</code></td>
-          <td>\${u.email || u.name || '—'}</td>
-          <td><span class="badge">\${u.sessionCount}</span></td>
-          <td>\${new Date(u.firstSeenAt).toLocaleTimeString()}</td>
+          <td><code>\${esc(u.id)}</code></td>
+          <td>\${esc(u.email || u.name || '—')}</td>
+          <td><span class="badge">\${esc(String(u.sessionCount))}</span></td>
+          <td>\${esc(new Date(u.firstSeenAt).toLocaleTimeString())}</td>
         </tr>\`).join('');
       const sb = document.getElementById('sessions-body');
       sb.innerHTML = sessions.length === 0 ? '<tr><td colspan="4">No active sessions</td></tr>' :
         sessions.map(s => \`<tr>
-          <td><code>\${s.id.slice(0,8)}…</code></td>
-          <td><code>\${s.userId}</code></td>
-          <td>\${fmt(s.ageMs)}</td>
-          <td><button class="kill" onclick="kill('\${s.id}')">Kill</button></td>
+          <td><code>\${esc(s.id.slice(0,8))}…</code></td>
+          <td><code>\${esc(s.userId)}</code></td>
+          <td>\${esc(fmt(s.ageMs))}</td>
+          <td><button class="kill" onclick="kill('\${esc(s.id)}')">Kill</button></td>
         </tr>\`).join('');
     }
     async function kill(id) {
