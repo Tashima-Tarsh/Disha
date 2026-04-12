@@ -95,7 +95,6 @@ class PolicyNetwork:
 
         with torch.no_grad():
             probs = self.actor(state_tensor).squeeze()
-            _ = self.critic(state_tensor).squeeze()
 
         # Mask invalid actions
         if valid_actions is not None:
@@ -122,7 +121,6 @@ class PolicyNetwork:
     ) -> tuple:
         """Fallback heuristic policy when PyTorch is unavailable."""
         agents_used = state[5:10] if len(state) >= 13 else [0] * 5
-        _ = int(state[11] * 20) if len(state) >= 13 else 0
 
         # Simple strategy: run each agent in order, then stop
         for i in range(5):

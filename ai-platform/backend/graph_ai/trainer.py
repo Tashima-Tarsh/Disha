@@ -60,8 +60,13 @@ class GNNTrainer:
             pos_pred = self.link_predictor(z[src], z[dst])
             pos_loss = -torch.log(pos_pred + 1e-15).mean()
 
-            # Negative sampling
+            # Negative sampling — ensure negatives differ from actual destinations
             neg_dst = torch.randint(0, x.size(0), (src.size(0),))
+            # Re-sample any negative that accidentally equals the true destination
+            collisions = neg_dst == dst
+            while collisions.any():
+                neg_dst[collisions] = torch.randint(0, x.size(0), (collisions.sum(),))
+                collisions = neg_dst == dst
             neg_pred = self.link_predictor(z[src], z[neg_dst])
             neg_loss = -torch.log(1 - neg_pred + 1e-15).mean()
 
