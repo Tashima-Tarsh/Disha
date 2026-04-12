@@ -47,9 +47,16 @@ decision-engine/checkpoints/
 checkpoints_staging/
 training_summary.json
 
+# Disha Mythos generated reports
+guardian_report.json
+health_report.json
+mythos_report.json
+
 # Decision Engine build artifacts
 decision-engine/data/index/*.faiss
 decision-engine/data/index/*.json
 decision-engine/data/index/*_clauses.txt
 decision-engine/data/index/*_lines.txt
 !decision-engine/data/index/.gitkeep
+
+.next/
