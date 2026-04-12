@@ -63,7 +63,7 @@ _FILLS = {
     "threat": ["terrorism", "espionage", "sabotage", "insurgency", "radicalisation"],
     "freedom": ["movement", "expression", "assembly", "press", "religion"],
     "crisis": ["a pandemic", "armed conflict", "civil unrest", "natural disaster", "economic collapse"],
-    "country": ["Country A", "Country B", "Country C", "Country D"],
+    "country": ["a neighbouring state", "a strategic partner", "an allied nation", "a regional power"],
     "issue": ["trade", "nuclear policy", "maritime rights", "climate action"],
     "technology": ["facial recognition", "autonomous drones", "AI surveillance", "quantum computing"],
     "purpose": ["border security", "law enforcement", "intelligence gathering", "disaster response"],

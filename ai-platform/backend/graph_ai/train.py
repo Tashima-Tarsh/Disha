@@ -125,11 +125,12 @@ def train(
     )
     logger.info("link_prediction_trained", final_loss=link_metrics["final_loss"])
 
-    # Test link predictions on some pairs
-    candidates = [(0, 1), (2, 3), (10, 50), (100, 150)]
+    # Test link predictions on some pairs (relative to graph size)
+    n = graph["num_nodes"]
+    candidates = [(0, 1), (2, 3), (n // 20, n // 4), (n // 2, int(n * 0.75))]
     valid_candidates = [
         (s, d) for s, d in candidates
-        if s < graph["num_nodes"] and d < graph["num_nodes"]
+        if s < n and d < n
     ]
     predictions = trainer.predict_links(
         graph["node_features"], graph["edge_index"], valid_candidates,
@@ -141,7 +142,7 @@ def train(
 
     # ── 2. Node Classification ────────────────────────────────────────
     classifier = GraphClassifier(in_channels=16, hidden_channels=64, num_classes=4)
-    clf_optimizer = torch.optim.Adam(classifier.parameters(), lr=0.01)
+    clf_optimizer = torch.optim.Adam(classifier.parameters(), lr=0.01, weight_decay=1e-3)
 
     x = torch.FloatTensor(graph["node_features"])
     edge_idx = torch.LongTensor(graph["edge_index"])

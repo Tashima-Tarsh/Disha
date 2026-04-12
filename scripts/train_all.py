@@ -60,7 +60,8 @@ def main():
     if not args.skip_rl:
         ok = _run(
             "RL Environment — PPO Training",
-            [sys.executable, "-m", "app.rl.train"],
+            [sys.executable, "-c",
+             f"from app.rl.train import train; train(num_episodes={args.rl_episodes})"],
             cwd=str(REPO_ROOT / "ai-platform" / "backend"),
         )
         results["rl"] = "trained" if ok else "failed"
@@ -72,7 +73,8 @@ def main():
     if not args.skip_gnn:
         ok = _run(
             "Graph Neural Network — GCN + Link Prediction + Classifier",
-            [sys.executable, "graph_ai/train.py"],
+            [sys.executable, "-c",
+             f"from graph_ai.train import train; train(num_epochs_link={args.gnn_epochs})"],
             cwd=str(REPO_ROOT / "ai-platform" / "backend"),
         )
         results["gnn"] = "trained" if ok else "failed"
@@ -84,7 +86,8 @@ def main():
     if not args.skip_decision:
         ok = _run(
             "Decision Engine — Calibration Training",
-            [sys.executable, "train.py"],
+            [sys.executable, "-c",
+             f"from train import train; train(num_scenarios={args.de_scenarios})"],
             cwd=str(REPO_ROOT / "decision-engine"),
             env_extra={"DISHA_MODEL_PROVIDER": "mock"},
         )

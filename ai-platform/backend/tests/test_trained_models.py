@@ -144,14 +144,16 @@ class TestDecisionEngineTrainedModel:
 
     def test_load_and_predict(self):
         sys.path.insert(0, str(_DECISION))
-        from train import CalibrationModel
+        from train import CalibrationModel, _extract_features
 
         with open(self.CKPT_DIR / "calibration_model.json") as f:
             data = json.load(f)
         model = CalibrationModel.from_dict(data)
 
-        # Create a fake feature vector (23 features)
-        X = np.random.rand(5, 23).astype(np.float32)
+        # Feature dimension must match _extract_features output
+        # (4 agents × 5 features each + 3 overall stats = 23)
+        feature_dim = len(model.weights) if model.weights is not None else 23
+        X = np.random.rand(5, feature_dim).astype(np.float32)
         preds = model.predict(X)
         assert preds.shape == (5,)
         assert all(0 <= p <= 1 for p in preds)
