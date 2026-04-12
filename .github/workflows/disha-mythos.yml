@@ -1,0 +1,143 @@
+name: Disha Mythos — Adaptive Protection & Learning
+
+on:
+  # Run daily at 3 AM UTC (after continuous training at 2 AM)
+  schedule:
+    - cron: "0 3 * * *"
+  # Run on every push to main
+  push:
+    branches: [main]
+  # Run on PRs
+  pull_request:
+    branches: [main]
+  # Manual trigger
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "Mode: protect, learn, train, all"
+        required: false
+        default: "protect"
+      train_rounds:
+        description: "Training rounds (if train/all mode)"
+        required: false
+        default: "1"
+
+permissions:
+  contents: write
+  security-events: read
+
+jobs:
+  # ── Phase 1: Threat Guardian ────────────────────────────────────────
+  threat-scan:
+    name: "🔒 Threat Guardian Scan"
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install structlog numpy
+
+      - name: Run Threat Guardian
+        run: |
+          python scripts/guardian/threat_guardian.py --scan --neutralize --json > guardian_report.json
+          cat guardian_report.json
+        continue-on-error: true
+
+      - name: Upload threat report
+        uses: actions/upload-artifact@v4
+        with:
+          name: threat-report-${{ github.run_number }}
+          path: guardian_report.json
+          retention-days: 30
+
+  # ── Phase 2: Self-Healing Monitor ──────────────────────────────────
+  health-check:
+    name: "💊 Self-Healing Monitor"
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install structlog numpy
+
+      - name: Run Health Monitor
+        run: |
+          python scripts/self_heal/monitor.py --fix --json > health_report.json
+          cat health_report.json
+        continue-on-error: true
+
+      - name: Upload health report
+        uses: actions/upload-artifact@v4
+        with:
+          name: health-report-${{ github.run_number }}
+          path: health_report.json
+          retention-days: 30
+
+  # ── Phase 3: Full Mythos Pipeline (on schedule/manual only) ────────
+  mythos-full:
+    name: "🛡️ Disha Mythos Full Pipeline"
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    needs: [threat-scan, health-check]
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          pip install torch --index-url https://download.pytorch.org/whl/cpu
+          pip install numpy structlog pytest
+
+      - name: Run Disha Mythos
+        env:
+          DISHA_MODEL_PROVIDER: mock
+        run: |
+          MODE="${{ github.event.inputs.mode || 'protect' }}"
+          ROUNDS="${{ github.event.inputs.train_rounds || '1' }}"
+
+          if [ "$MODE" = "all" ]; then
+            python scripts/disha_mythos.py --all --train-rounds "$ROUNDS" --offline --json
+          elif [ "$MODE" = "train" ]; then
+            python scripts/disha_mythos.py --train --train-rounds "$ROUNDS" --offline --json
+          elif [ "$MODE" = "learn" ]; then
+            python scripts/disha_mythos.py --learn --json
+          else
+            python scripts/disha_mythos.py --protect --json
+          fi
+
+      - name: Upload Mythos report
+        uses: actions/upload-artifact@v4
+        with:
+          name: mythos-report-${{ github.run_number }}
+          path: mythos_report.json
+          retention-days: 30
+
+      - name: Commit any auto-fixes
+        if: github.event_name == 'schedule'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "chore: disha-mythos auto-heal [run #${{ github.run_number }}]"
+            git push
+          fi
