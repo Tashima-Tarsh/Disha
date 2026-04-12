@@ -657,27 +657,34 @@ def _print_report(report: GuardianReport, as_json: bool = False) -> None:
         })
 
     safe_summary = {
-        "timestamp": report.timestamp,
-        "system_health": report.system_health,
+        "timestamp": float(report.timestamp),
+        "system_health": float(report.system_health),
         "threat_counts": {
-            "critical": report.critical_count,
-            "high": report.high_count,
-            "medium": sum(1 for t in report.threats if t.level == ThreatLevel.MEDIUM),
-            "low": sum(1 for t in report.threats if t.level == ThreatLevel.LOW),
-            "info": sum(1 for t in report.threats if t.level == ThreatLevel.INFO),
+            "critical": int(report.critical_count),
+            "high": int(report.high_count),
+            "medium": int(sum(1 for t in report.threats if t.level == ThreatLevel.MEDIUM)),
+            "low": int(sum(1 for t in report.threats if t.level == ThreatLevel.LOW)),
+            "info": int(sum(1 for t in report.threats if t.level == ThreatLevel.INFO)),
         },
-        "scans_performed": list(report.scans_performed),
-        "total_threats": len(report.threats),
+        "scans_performed": [str(s) for s in report.scans_performed],
+        "total_threats": int(len(report.threats)),
         "threats": safe_threats,
     }
     if as_json:
         # Emit only a strict allowlist of aggregate fields for JSON output.
-        # Avoid serializing any structure derived from per-threat content.
+        # All values are explicitly cast to numeric types to ensure no
+        # sensitive strings can flow through.
         json_safe_out = {
-            "timestamp": report.timestamp,
-            "system_health": report.system_health,
-            "threat_counts": safe_summary["threat_counts"],
-            "total_threats": safe_summary["total_threats"],
+            "timestamp": float(report.timestamp),
+            "system_health": float(report.system_health),
+            "threat_counts": {
+                "critical": int(report.critical_count),
+                "high": int(report.high_count),
+                "medium": int(sum(1 for t in report.threats if t.level == ThreatLevel.MEDIUM)),
+                "low": int(sum(1 for t in report.threats if t.level == ThreatLevel.LOW)),
+                "info": int(sum(1 for t in report.threats if t.level == ThreatLevel.INFO)),
+            },
+            "total_threats": int(len(report.threats)),
         }
         sys.stdout.write(json.dumps(json_safe_out, indent=2) + "\n")
         return
