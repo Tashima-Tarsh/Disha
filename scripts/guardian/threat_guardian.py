@@ -645,10 +645,11 @@ def _print_report(report: GuardianReport, as_json: bool = False) -> None:
 
         # Redact potentially sensitive scanner-derived text from secret findings.
         is_secret_finding = entry.get("category") == ThreatCategory.SECRET.value
-        display_title = "Potential secret detected" if is_secret_finding else entry.get("title", "Threat detected")
+            # Avoid exposing full filesystem paths in output; show only filename.
+            safe_loc = Path(str(entry["file"])).name or "<redacted>"
         display_description = (
-            "Details redacted to avoid exposing sensitive data."
-            if is_secret_finding
+                safe_loc += f":{entry['line']}"
+            print(f"     📍 {safe_loc}")
             else entry.get("description", "")
         )
 
