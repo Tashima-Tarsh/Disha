@@ -9,12 +9,12 @@ services:
     ports:
       - "8000:8000"
     environment:
-      - DEBUG=true
-      - SECRET_KEY=${SECRET_KEY:-change-me-in-production}
-      - POSTGRES_URL=postgresql://postgres:postgres@postgres:5432/intelligence_db
+      - DEBUG=${DEBUG:-false}
+      - SECRET_KEY=${SECRET_KEY:?SECRET_KEY must be set}
+      - POSTGRES_URL=postgresql://postgres:${POSTGRES_PASSWORD:-postgres}@postgres:5432/intelligence_db
       - NEO4J_URI=bolt://neo4j:7687
       - NEO4J_USER=neo4j
-      - NEO4J_PASSWORD=${NEO4J_PASSWORD:-password}
+      - NEO4J_PASSWORD=${NEO4J_PASSWORD:?NEO4J_PASSWORD must be set}
       - CHROMA_HOST=chromadb
       - CHROMA_PORT=8000
       - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
@@ -56,7 +56,7 @@ services:
     environment:
       POSTGRES_DB: intelligence_db
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD must be set}
     ports:
       - "5432:5432"
     volumes:
@@ -74,7 +74,7 @@ services:
   neo4j:
     image: neo4j:5-community
     environment:
-      NEO4J_AUTH: neo4j/${NEO4J_PASSWORD:-password}
+      NEO4J_AUTH: neo4j/${NEO4J_PASSWORD:?NEO4J_PASSWORD must be set}
       NEO4J_PLUGINS: '["apoc"]'
     ports:
       - "7474:7474"
@@ -82,7 +82,7 @@ services:
     volumes:
       - neo4j_data:/data
     healthcheck:
-      test: ["CMD-SHELL", "cypher-shell -u neo4j -p ${NEO4J_PASSWORD:-password} 'RETURN 1' || exit 1"]
+      test: ["CMD-SHELL", "cypher-shell -u neo4j -p ${NEO4J_PASSWORD} 'RETURN 1' || exit 1"]
       interval: 10s
       timeout: 10s
       retries: 5
@@ -92,7 +92,7 @@ services:
 
   # ─── ChromaDB Vector Store ─────────────────────
   chromadb:
-    image: chromadb/chroma:latest
+    image: chromadb/chroma:0.5.0
     ports:
       - "8001:8000"
     volumes:
@@ -128,7 +128,7 @@ services:
       - intelligence-net
 
   quantum-physics:
-    image: quantum-physics-backend:latest
+    image: quantum-physics-backend:1.0.0
     build:
       context: ../../quantum-physics/backend
       dockerfile: Dockerfile

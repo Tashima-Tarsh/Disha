@@ -431,8 +431,8 @@ def generate_synthetic_threats(n: int = 100, seed: int = 42) -> list[ThreatScena
             indicators = [f"http://bad-{rng.randint(100,999)}.example.com/payload-{rng.randint(1,100)}"
                          for _ in range(num_indicators)]
         else:
-            # MD5 used here for fast synthetic data generation, not for cryptographic purposes
-            indicators = [hashlib.md5(f"malware-{rng.randint(0,100000)}".encode()).hexdigest()
+            # SHA-256 used for synthetic data generation (not for cryptographic purposes)
+            indicators = [hashlib.sha256(f"malware-{rng.randint(0,100000)}".encode()).hexdigest()
                          for _ in range(num_indicators)]
 
         scenarios.append(ThreatScenario(
@@ -456,7 +456,7 @@ def fetch_arxiv_metadata(category: str = "cs.AI", max_results: int = 50) -> list
     Categories: cs.AI, cs.CR, math.CO, physics.gen-ph, quant-ph, etc.
     """
     url = (
-        f"http://export.arxiv.org/api/query?"
+        f"https://export.arxiv.org/api/query?"
         f"search_query=cat:{category}&start=0&max_results={max_results}"
         f"&sortBy=submittedDate&sortOrder=descending"
     )

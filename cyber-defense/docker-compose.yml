@@ -104,12 +104,14 @@ services:
   # Fail2ban (IP Blocking Enforcement)
   # ---------------------------------------------------------------------------
   fail2ban:
-    image: crazymax/fail2ban:latest
+    image: crazymax/fail2ban:1.1.0
     volumes:
       - ./logs:/data/input:ro
       - ./honeypot/fail2ban/config:/data/config:ro
     restart: always
-    privileged: true
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
     network_mode: "host"
     mem_limit: 128m
 
@@ -121,7 +123,8 @@ services:
     environment:
       - discovery.type=single-node
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
-      - xpack.security.enabled=false
+      - xpack.security.enabled=true
+      - xpack.security.transport.ssl.enabled=false
     ports:
       - "${ELASTIC_PORT:-9200}:9200"
     volumes:

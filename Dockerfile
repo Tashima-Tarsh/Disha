@@ -40,6 +40,9 @@ COPY --from=builder /app/dist/cli.mjs /app/cli.mjs
 # Make it executable
 RUN chmod +x /app/cli.mjs
 
+RUN addgroup -S appuser && adduser -S appuser -G appuser
+USER appuser
+
 ENTRYPOINT ["bun", "/app/cli.mjs"]
 
 

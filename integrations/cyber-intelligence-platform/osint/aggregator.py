@@ -66,7 +66,7 @@ def ip_lookup(ip: str) -> dict:
         return result
     try:
         resp = _SESSION.get(
-            f"http://ip-api.com/json/{ip}",
+            f"https://ip-api.com/json/{ip}",
             params={
                 "fields": "status,message,country,countryCode,regionName,"
                           "city,zip,isp,org,as,query"

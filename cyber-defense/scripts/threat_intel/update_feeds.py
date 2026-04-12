@@ -66,7 +66,7 @@ def enrich_ip(ip: str) -> dict:
     """Enrich an IP with geo-location and ASN data using ip-api.com."""
     try:
         resp = requests.get(
-            f"http://ip-api.com/json/{ip}",
+            f"https://ip-api.com/json/{ip}",
             params={"fields": "status,country,regionName,city,isp,org,as,query"},
             timeout=10,
         )

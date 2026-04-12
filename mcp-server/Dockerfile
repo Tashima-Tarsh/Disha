@@ -23,6 +23,9 @@ ENV NODE_ENV=production
 ENV CLAUDE_CODE_SRC_ROOT=/app/src
 ENV PORT=3000
 
+RUN addgroup -S appuser && adduser -S appuser -G appuser
+USER appuser
+
 EXPOSE 3000
 
 WORKDIR /app/mcp-server
