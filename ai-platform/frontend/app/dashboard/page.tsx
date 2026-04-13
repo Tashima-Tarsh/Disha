@@ -11,6 +11,7 @@ import ClusterPanel from "@/components/cluster/ClusterPanel";
 import RankingPanel from "@/components/ranking/RankingPanel";
 import RLMetricsPanel from "@/components/rl/RLMetricsPanel";
 import QuantumPhysicsPanel from "@/components/quantum/QuantumPhysicsPanel";
+import { CognitiveLoop } from "@/components/cognitive/CognitiveLoop";
 import { useWebSocket } from "@/hooks/useWebSocket";
 import { useApi } from "@/hooks/useApi";
 import type { Alert, Investigation } from "@/lib/types";
@@ -25,6 +26,7 @@ const TAB_META: Record<string, { label: string; color: string }> = {
   rankings:    { label: "Intel Rankings",     color: "var(--neon-yellow)" },
   rl:          { label: "RL Neural Engine",   color: "var(--neon-green)"  },
   quantum:     { label: "Quantum Physics",    color: "#7c3aed"            },
+  cognitive:   { label: "Cognitive Loop",     color: "#6366f1"            },
 };
 
 export default function Dashboard() {
@@ -183,6 +185,12 @@ export default function Dashboard() {
               <QuantumPhysicsPanel />
             </div>
           )}
+
+          {activeTab === "cognitive" && (
+            <div className="animate-fade-in-up">
+              <CognitiveLoop sessionId="dashboard-default" />
+            </div>
+          )}
         </main>
       </div>
     </div>
@@ -193,6 +201,7 @@ export default function Dashboard() {
 function SystemStatusMini() {
   const services = [
     { name: "FastAPI Backend",    status: "online",  latency: "12ms"  },
+    { name: "DISHA-MIND Engine",  status: "online",  latency: "—"     },
     { name: "Neo4j Graph DB",     status: "online",  latency: "8ms"   },
     { name: "ChromaDB Vector",    status: "online",  latency: "5ms"   },
     { name: "Kafka Stream",       status: "online",  latency: "3ms"   },
