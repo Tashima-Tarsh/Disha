@@ -70,3 +70,6 @@ logs/sentinel/
 
 # Agent Core — memory persistence
 .disha/
+
+# Claude Code internal state
+.claude/
