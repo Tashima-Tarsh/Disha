@@ -114,6 +114,20 @@ const tabs = [
     ),
     color: "#7c3aed",
   },
+  {
+    id: "cognitive",
+    label: "Cognitive Loop",
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-4 h-4">
+        <path d="M12 2a7 7 0 017 7c0 2.5-1.3 4.7-3.3 6L15 17H9l-.7-2C6.3 13.7 5 11.5 5 9a7 7 0 017-7z" />
+        <path d="M9 17v1a3 3 0 006 0v-1" />
+        <line x1="9" y1="13" x2="9.01" y2="13" />
+        <line x1="12" y1="13" x2="12.01" y2="13" />
+        <line x1="15" y1="13" x2="15.01" y2="13" />
+      </svg>
+    ),
+    color: "#6366f1",
+  },
 ];
 
 export default function Sidebar({ activeTab, onTabChange, alertCount = 0 }: SidebarProps) {

@@ -44,7 +44,7 @@ jobs:
 
       - name: Install lightweight dependencies
         run: |
-          pip install fastapi uvicorn pydantic pydantic-settings httpx pytest pytest-asyncio \
+          pip install fastapi uvicorn pydantic pydantic-settings httpx pytest pytest-asyncio pytest-cov \
             python-jose[cryptography] passlib[bcrypt] python-multipart python-dotenv structlog \
             numpy pandas networkx
 
