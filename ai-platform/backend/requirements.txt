@@ -16,7 +16,7 @@ sqlalchemy==2.0.35
 alembic==1.13.0
 kafka-python==2.0.2
 pyspark==3.5.2
-torch>=2.6.0,!=2.6.0
+torch>=2.6.1
 torch-geometric==2.5.0
 pyod==2.0.0
 sentence-transformers==3.0.0

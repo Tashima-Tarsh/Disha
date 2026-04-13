@@ -35,6 +35,10 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: continuous-training-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   continuous-train:
     name: Continuous Training Pipeline
