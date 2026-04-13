@@ -54,7 +54,7 @@ jobs:
       - name: Install dependencies
         run: |
           pip install torch --index-url https://download.pytorch.org/whl/cpu
-          pip install scikit-learn numpy requests
+          pip install scikit-learn numpy requests pytest
 
       - name: Run tests
         run: |

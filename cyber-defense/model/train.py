@@ -9,7 +9,6 @@ DEFENSIVE SIMULATION ONLY - For blue team research and training.
 
 import json
 import os
-import sys
 
 import torch
 import torch.nn as nn

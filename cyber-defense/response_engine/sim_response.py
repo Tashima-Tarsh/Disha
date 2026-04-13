@@ -92,13 +92,13 @@ class DecoyFilesystem(SimulatedResponse):
     }
 
     def serve_file(self, attacker_ip: str, filepath: str) -> dict:
-        content = self.DECOY_FILES.get(filepath, "File not found")
         return self._log_action(
             "decoy_filesystem",
             {
                 "attacker_ip": attacker_ip,
                 "requested_file": filepath,
                 "served_decoy": filepath in self.DECOY_FILES,
+                "content": self.DECOY_FILES.get(filepath, "File not found"),
             },
         )
 
