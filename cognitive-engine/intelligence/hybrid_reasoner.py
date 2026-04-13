@@ -349,7 +349,7 @@ class HybridReasoner:
             f"Evidence collected: {len(query_words)} query words, "
             f"{len(entity_words)} entities, {len(memory_words)} memory fragments",
             f"Dominant themes: {[w for w, _ in dominant_words[:3]] or ['none']}",
-            f"Occam's razor applied: selecting minimal hypothesis",
+            "Occam's razor applied: selecting minimal hypothesis",
             f"Abductive conclusion: {hypothesis[:100]}...",
         ]
 

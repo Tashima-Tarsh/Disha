@@ -3,7 +3,7 @@
 from fastapi import APIRouter, Depends, Query, WebSocket, WebSocketDisconnect, HTTPException, status
 
 from app.agents.orchestrator import Orchestrator
-from app.core.security import get_current_user, create_access_token, hash_password, verify_password
+from app.core.security import get_current_user, create_access_token, decode_token, hash_password, verify_password
 from app.models.schemas import (
     InvestigationRequest,
     MultiInvestigationRequest,

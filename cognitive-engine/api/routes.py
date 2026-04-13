@@ -146,12 +146,12 @@ async def _stream_cognitive_cycle(ws: WebSocket, raw_input: str, session_id: str
     state = CognitiveState(session_id=session_id, turn=turn, raw_input=raw_input)
 
     stage_map = {
-        "perceive":    ("perceiving",    _engine._perceive),
-        "attend":      ("attending",     _engine._attend),
-        "reason":      ("reasoning",     _engine._reason),
-        "deliberate":  ("deliberating",  _engine._deliberate),
-        "act":         ("acting",        _engine._act),
-        "reflect":     ("reflecting",    _engine._reflect),
+        "perceive": ("perceiving", _engine._perceive),
+        "attend": ("attending", _engine._attend),
+        "reason": ("reasoning", _engine._reason),
+        "deliberate": ("deliberating", _engine._deliberate),
+        "act": ("acting", _engine._act),
+        "reflect": ("reflecting", _engine._reflect),
         "consolidate": ("consolidating", _engine._consolidate),
     }
 

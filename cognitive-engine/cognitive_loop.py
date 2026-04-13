@@ -15,12 +15,9 @@ work whose result the next stage reads as its primary input.
 
 from __future__ import annotations
 
-import asyncio
 import time
 import uuid
 from dataclasses import dataclass, field
-from pathlib import Path
-from typing import Any
 
 import structlog
 
@@ -136,13 +133,13 @@ class CognitiveEngine:
         log.info("cognitive_cycle_start", input_preview=raw_input[:80])
 
         stages = [
-            ("perceive",     self._perceive),
-            ("attend",       self._attend),
-            ("reason",       self._reason),
-            ("deliberate",   self._deliberate),
-            ("act",          self._act),
-            ("reflect",      self._reflect),
-            ("consolidate",  self._consolidate),
+            ("perceive", self._perceive),
+            ("attend", self._attend),
+            ("reason", self._reason),
+            ("deliberate", self._deliberate),
+            ("act", self._act),
+            ("reflect", self._reflect),
+            ("consolidate", self._consolidate),
         ]
 
         for stage_name, stage_fn in stages:
