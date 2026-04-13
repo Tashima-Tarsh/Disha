@@ -1,21 +1,21 @@
-name: AI Platform CI
+name: Cognitive Engine CI
 
 on:
   push:
     branches: [main]
     paths:
-      - 'ai-platform/**'
+      - 'cognitive-engine/**'
   pull_request:
     branches: [main]
     paths:
-      - 'ai-platform/**'
+      - 'cognitive-engine/**'
 
 permissions:
   contents: read
 
 jobs:
-  lint-python:
-    name: Lint Python (AI Platform)
+  lint:
+    name: Lint Python (Cognitive Engine)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -28,11 +28,11 @@ jobs:
       - name: Install flake8
         run: pip install flake8
 
-      - name: Lint backend
-        run: flake8 ai-platform/backend/app/ --max-line-length=120 --ignore=E501,W503,W504
+      - name: Lint
+        run: flake8 cognitive-engine/ --max-line-length=120 --ignore=E501,W503,W504
 
-  test-python:
-    name: Test Python (AI Platform)
+  test:
+    name: Unit Tests (Cognitive Engine)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -42,16 +42,17 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Install lightweight dependencies
+      - name: Install dependencies
         run: |
-          pip install fastapi uvicorn pydantic pydantic-settings httpx pytest pytest-asyncio pytest-cov \
-            python-jose[cryptography] passlib[bcrypt] python-multipart python-dotenv structlog \
-            numpy pandas networkx
+          pip install pytest pytest-asyncio pytest-cov
+          pip install -r cognitive-engine/requirements.txt
 
       - name: Run tests with coverage
         run: |
-          cd ai-platform/backend
+          cd cognitive-engine
           python -m pytest tests/ -v --tb=short \
-            --cov=app \
+            --cov=cognitive_engine \
             --cov-report=term-missing \
-            --cov-fail-under=60
+            --cov-fail-under=70
+        env:
+          DISHA_MODEL_PROVIDER: mock

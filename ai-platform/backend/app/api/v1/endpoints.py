@@ -1,6 +1,6 @@
 """API v1 endpoints for the AI Intelligence Platform."""
 
-from fastapi import APIRouter, Depends, WebSocket, WebSocketDisconnect, HTTPException, status
+from fastapi import APIRouter, Depends, Query, WebSocket, WebSocketDisconnect, HTTPException, status
 
 from app.agents.orchestrator import Orchestrator
 from app.core.security import get_current_user, create_access_token, hash_password, verify_password
@@ -197,8 +197,8 @@ async def get_alerts(
 
 @router.get("/context")
 async def get_context(
-    query: str,
-    limit: int = 5,
+    query: str = Query(..., min_length=1, max_length=500),
+    limit: int = Query(5, ge=1, le=20),
     current_user: dict = Depends(get_current_user),
 ):
     """Retrieve relevant context from vector memory."""
@@ -211,13 +211,25 @@ async def get_context(
 
 
 @router.websocket("/ws/alerts")
-async def websocket_alerts(websocket: WebSocket):
-    """WebSocket endpoint for real-time alerts."""
+async def websocket_alerts(websocket: WebSocket, token: str | None = None):
+    """WebSocket endpoint for real-time alerts.
+
+    Requires a valid JWT passed as ?token=<bearer_token> query parameter,
+    since WebSocket clients cannot send Authorization headers.
+    """
+    if not token:
+        await websocket.close(code=4001, reason="Missing authentication token")
+        return
+    try:
+        decode_token(token)
+    except Exception:
+        await websocket.close(code=4003, reason="Invalid or expired token")
+        return
+
     await connection_manager.connect(websocket)
     try:
         while True:
             data = await websocket.receive_text()
-            # Echo back acknowledgment
             await websocket.send_json({"type": "ack", "message": data})
     except WebSocketDisconnect:
         connection_manager.disconnect(websocket)

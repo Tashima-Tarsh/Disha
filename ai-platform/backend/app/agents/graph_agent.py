@@ -56,55 +56,71 @@ class GraphAgent(BaseAgent):
         }
 
     async def _store_entities(self, entities: list[dict[str, Any]]) -> int:
-        """Store entities as nodes in Neo4j."""
+        """Store entities as nodes in Neo4j using a single UNWIND batch.
+
+        Previous implementation issued one MERGE per entity (N+1 round-trips).
+        UNWIND sends the entire list in one query, reducing latency by ~N×.
+        """
+        if not entities:
+            return 0
         try:
             driver = self._get_driver()
-            count = 0
+            rows = [
+                {
+                    "id": e["id"],
+                    "label": e.get("label", ""),
+                    "entity_type": e.get("entity_type", "unknown"),
+                    "risk_score": float(e.get("risk_score", 0.0)),
+                    "properties": str(e.get("properties", {})),
+                }
+                for e in entities
+            ]
             with driver.session() as session:
-                for entity in entities:
-                    session.run(
-                        """
-                        MERGE (e:Entity {id: $id})
-                        SET e.label = $label,
-                            e.entity_type = $entity_type,
-                            e.risk_score = $risk_score,
-                            e.properties = $properties
-                        """,
-                        id=entity["id"],
-                        label=entity.get("label", ""),
-                        entity_type=entity.get("entity_type", "unknown"),
-                        risk_score=entity.get("risk_score", 0.0),
-                        properties=str(entity.get("properties", {})),
-                    )
-                    count += 1
-            return count
+                session.run(
+                    """
+                    UNWIND $rows AS row
+                    MERGE (e:Entity {id: row.id})
+                    SET e.label        = row.label,
+                        e.entity_type  = row.entity_type,
+                        e.risk_score   = row.risk_score,
+                        e.properties   = row.properties
+                    """,
+                    rows=rows,
+                )
+            return len(rows)
         except Exception as e:
             self.logger.error("store_entities_failed", error=str(e))
             return 0
 
     async def _store_relationships(self, relationships: list[dict[str, Any]]) -> int:
-        """Store relationships as edges in Neo4j."""
+        """Store relationships as edges in Neo4j using a single UNWIND batch."""
+        if not relationships:
+            return 0
         try:
             driver = self._get_driver()
-            count = 0
+            rows = [
+                {
+                    "source_id": r["source_id"],
+                    "target_id": r["target_id"],
+                    "rel_type": r.get("relationship_type", "RELATED_TO"),
+                    "confidence": float(r.get("confidence", 1.0)),
+                    "properties": str(r.get("properties", {})),
+                }
+                for r in relationships
+            ]
             with driver.session() as session:
-                for rel in relationships:
-                    session.run(
-                        """
-                        MATCH (a:Entity {id: $source_id})
-                        MATCH (b:Entity {id: $target_id})
-                        MERGE (a)-[r:RELATED_TO {type: $rel_type}]->(b)
-                        SET r.confidence = $confidence,
-                            r.properties = $properties
-                        """,
-                        source_id=rel["source_id"],
-                        target_id=rel["target_id"],
-                        rel_type=rel.get("relationship_type", "RELATED_TO"),
-                        confidence=rel.get("confidence", 1.0),
-                        properties=str(rel.get("properties", {})),
-                    )
-                    count += 1
-            return count
+                session.run(
+                    """
+                    UNWIND $rows AS row
+                    MATCH (a:Entity {id: row.source_id})
+                    MATCH (b:Entity {id: row.target_id})
+                    MERGE (a)-[r:RELATED_TO {type: row.rel_type}]->(b)
+                    SET r.confidence = row.confidence,
+                        r.properties = row.properties
+                    """,
+                    rows=rows,
+                )
+            return len(rows)
         except Exception as e:
             self.logger.error("store_relationships_failed", error=str(e))
             return 0

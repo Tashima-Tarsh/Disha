@@ -1,5 +1,6 @@
 """ChromaDB vector store for semantic memory and context retrieval."""
 
+import asyncio
 from typing import Any
 
 import structlog
@@ -38,16 +39,22 @@ class VectorStore:
         metadatas: list[dict[str, Any]] | None = None,
         ids: list[str] | None = None,
     ) -> bool:
-        """Store documents with embeddings in the vector store."""
+        """Store documents with embeddings in the vector store.
+
+        ChromaDB's HTTP client is synchronous; we offload to a thread pool
+        so the async event loop is never blocked.
+        """
         try:
             collection = self._get_collection()
             if ids is None:
                 import uuid
                 ids = [str(uuid.uuid4()) for _ in documents]
 
-            collection.add(
+            _metas = metadatas or [{}] * len(documents)
+            await asyncio.to_thread(
+                collection.add,
                 documents=documents,
-                metadatas=metadatas or [{}] * len(documents),
+                metadatas=_metas,
                 ids=ids,
             )
             logger.info("documents_stored", count=len(documents), collection=self.collection_name)
@@ -62,7 +69,11 @@ class VectorStore:
         n_results: int = 5,
         where: dict[str, Any] | None = None,
     ) -> list[dict[str, Any]]:
-        """Query the vector store for similar documents."""
+        """Query the vector store for similar documents.
+
+        Offloaded to a thread pool — ChromaDB's sync HTTP client must not
+        run on the event loop thread.
+        """
         try:
             collection = self._get_collection()
             params: dict[str, Any] = {
@@ -72,7 +83,7 @@ class VectorStore:
             if where:
                 params["where"] = where
 
-            results = collection.query(**params)
+            results = await asyncio.to_thread(collection.query, **params)
 
             documents = []
             for i in range(len(results["ids"][0])):
