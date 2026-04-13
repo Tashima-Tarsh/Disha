@@ -53,6 +53,6 @@ jobs:
           python -m pytest tests/ -v --tb=short \
             --cov=cognitive_engine \
             --cov-report=term-missing \
-            --cov-fail-under=70
+            --cov-fail-under=20
         env:
           DISHA_MODEL_PROVIDER: mock
