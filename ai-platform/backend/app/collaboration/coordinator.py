@@ -74,6 +74,9 @@ class ClusterCoordinator:
             if capability in node.capabilities and node.status != "offline"
         ]
 
+    ITERATION_THRESHOLD = 0.4   # re-run if consensus agreement falls below this
+    MAX_ITERATIONS = 3          # cap iterations to prevent infinite loops
+
     async def collaborative_investigate(
         self,
         target: str,
@@ -85,11 +88,12 @@ class ClusterCoordinator:
 
         Flow:
         1. Coordinator broadcasts task to all agents
-        2. Agents claim subtasks based on capabilities
-        3. Agents execute and share results
-        4. Review phase: agents critique each other
-        5. Consensus: agents vote on final assessment
-        6. Iterate if needed
+        2. Agents execute in parallel
+        3. Peer review: agents score each other's results
+        4. Consensus: confidence-weighted vote on risk assessment
+        5. If consensus is too low, iterate with dissenting agents
+           re-running with additional context from the first round
+        6. Compile final result
         """
         conversation = self.router.create_conversation(topic=target)
         context = context or {}
@@ -109,14 +113,53 @@ class ClusterCoordinator:
         self.router.send(task_msg)
         conversation.add_message(task_msg)
 
-        # Phase 2: Parallel execution by all capable agents
+        # Phase 2: Parallel execution
         results = await self._parallel_execute(target, context)
 
-        # Phase 3: Share results for peer review
+        # Phase 3: Peer review
         review_results = await self._peer_review(results, conversation)
 
-        # Phase 4: Consensus building
+        # Phase 4: Consensus + iterative refinement
         consensus = self._build_consensus(results, review_results)
+        iteration = 0
+
+        while (
+            not consensus.get("consensus_reached", False)
+            and consensus.get("agreement_score", 1.0) < self.ITERATION_THRESHOLD
+            and iteration < self.MAX_ITERATIONS
+        ):
+            iteration += 1
+            logger.info(
+                "consensus_below_threshold_iterating",
+                target=target,
+                iteration=iteration,
+                agreement=round(consensus.get("agreement_score", 0), 3),
+            )
+
+            # Identify low-confidence agents and re-run them with shared context
+            low_conf_agents = self._identify_dissenting_agents(results, review_results)
+            if not low_conf_agents:
+                break
+
+            enriched_context = {
+                **context,
+                "prior_round": iteration,
+                "peer_findings": {
+                    name: res.get("entities", [])[:5]
+                    for name, res in results.items()
+                    if isinstance(res, dict) and name not in low_conf_agents
+                },
+            }
+
+            # Re-run only the dissenting agents
+            refined = await self._selective_execute(low_conf_agents, target, enriched_context)
+            results.update(refined)
+
+            # Rebuild consensus with updated results
+            review_results = await self._peer_review(results, conversation)
+            consensus = self._build_consensus(results, review_results)
+
+        consensus["iterations"] = iteration
 
         # Phase 5: Compile final result
         final_result = self._compile_results(
@@ -129,11 +172,68 @@ class ClusterCoordinator:
             "collaborative_investigation_complete",
             target=target,
             agents_involved=len(results),
+            iterations=iteration,
             consensus_score=consensus.get("score", 0),
+            agreement=consensus.get("agreement_score", 0),
             risk_score=final_result.get("risk_score", 0),
         )
 
         return final_result
+
+    def _identify_dissenting_agents(self, results: dict, reviews: dict) -> list[str]:
+        """Return names of agents whose results received the lowest peer review scores."""
+        avg_scores: dict[str, list[float]] = {}
+        for reviewer_reviews in reviews.values():
+            for name, score in reviewer_reviews.items():
+                avg_scores.setdefault(name, []).append(score)
+
+        scored = {
+            name: sum(scores) / len(scores)
+            for name, scores in avg_scores.items()
+            if scores
+        }
+        if not scored:
+            return []
+
+        # Return the bottom 50% of agents by peer-review score
+        sorted_agents = sorted(scored, key=scored.get)
+        cutoff = max(1, len(sorted_agents) // 2)
+        return sorted_agents[:cutoff]
+
+    async def _selective_execute(
+        self, agent_names: list[str], target: str, context: dict
+    ) -> dict:
+        """Re-run a specific subset of agents."""
+        selected = [(name, node) for name, node in self.nodes.items() if name in agent_names]
+        if not selected:
+            return {}
+
+        results = {}
+
+        async def run_agent(name, node):
+            start = time.time()
+            try:
+                result = await node.agent.run(target, context)
+                node.tasks_completed += 1
+                node.total_time += time.time() - start
+                node.last_active = time.time()
+                return name, result
+            except Exception as e:
+                logger.error("selective_agent_execution_failed", agent=name, error=str(e))
+                return name, {"error": str(e), "status": "failed"}
+
+        agent_results = await asyncio.gather(
+            *[run_agent(name, node) for name, node in selected],
+            return_exceptions=True,
+        )
+
+        for item in agent_results:
+            if isinstance(item, Exception):
+                continue
+            name, result = item
+            results[name] = result
+
+        return results
 
     async def _parallel_execute(self, target: str, context: dict) -> dict:
         """Execute all available agents in parallel."""
