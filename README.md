@@ -2,7 +2,7 @@
   <img src="docs/images/banner.svg" alt="DISHA AGI Platform" width="100%">
 </p>
 
-<h1 align="center">DISHA — दिशा</h1>
+<h1 align="center">DISHA </h1>
 
 <p align="center">
   <em>"Direction" in Sanskrit — A self-evolving, multi-agent AGI platform for intelligence, cognitive reasoning, defense, and discovery.</em>
