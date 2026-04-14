@@ -71,5 +71,6 @@ logs/sentinel/
 # Agent Core — memory persistence
 .disha/
 
-# Claude Code internal state
-.claude/
+# Claude Code — ignore internal state but track project config
+.claude/worktrees/
+.claude/projects/
