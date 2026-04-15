@@ -1,7 +1,8 @@
-from typing import Any, Dict, List
+from typing import Any, Dict
 import structlog
 
 logger = structlog.get_logger(__name__)
+
 
 class JudicialService:
     """
@@ -16,7 +17,7 @@ class JudicialService:
             "Assam": {
                 "backlog_count": 250000,
                 "avg_disposal_time_days": 1200,
-                "legal_oversight_intensity": 0.85, # High oversight (Project SETU focused)
+                "legal_oversight_intensity": 0.85,  # High oversight (Project SETU focused)
                 "critical_cases": 12
             },
             "Mumbai": {
@@ -43,11 +44,11 @@ class JudicialService:
             "legal_oversight_intensity": 0.5,
             "critical_cases": 5
         })
-        
+
         # High backlog and high oversight lead to a higher urgency score
         normalized_backlog = min(1.0, metrics["backlog_count"] / 1000000.0)
         urgency_score = (normalized_backlog * 0.4) + (metrics["legal_oversight_intensity"] * 0.6)
-        
+
         return {
             "region": region,
             "urgency_score": urgency_score,
@@ -64,5 +65,5 @@ class JudicialService:
         base_score = gov_data["urgency_score"]
         if "Bridge" in asset_name or "Sea Link" in asset_name:
             base_score = min(1.0, base_score * 1.1)
-            
+
         return base_score

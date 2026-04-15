@@ -6,6 +6,7 @@ from app.core.security import decode_token
 router = APIRouter()
 logger = structlog.get_logger(__name__)
 
+
 @router.websocket("/ws")
 async def websocket_osint_stream(
     websocket: WebSocket,
@@ -19,7 +20,7 @@ async def websocket_osint_stream(
     if not token:
         await websocket.close(code=4001, reason="Missing authentication token")
         return
-    
+
     try:
         # Validate session
         decode_token(token)
@@ -29,7 +30,7 @@ async def websocket_osint_stream(
 
     await connection_manager.connect(websocket)
     logger.info("osint_stream_connected", client_host=websocket.client.host)
-    
+
     try:
         while True:
             # Keep-alive loop
@@ -37,6 +38,7 @@ async def websocket_osint_stream(
     except WebSocketDisconnect:
         connection_manager.disconnect(websocket)
         logger.info("osint_stream_disconnected", client_host=websocket.client.host)
+
 
 @router.get("/status")
 async def get_stream_status():

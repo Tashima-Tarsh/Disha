@@ -74,6 +74,12 @@
     }
   },
   "files": {
-    "includes": ["**", "!node_modules", "!dist", "!**/*.d.ts"]
+    "includes": ["**", "!node_modules", "!dist", "!**/*.d.ts", "!src/server/web/public/**"],
+    "maxSize": 5242880
+  },
+  "vcs": {
+    "enabled": true,
+    "clientKind": "git",
+    "useIgnoreFile": true
   }
 }

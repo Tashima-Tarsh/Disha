@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from app.api.v1.routers import auth, investigate, multimodal, rl, ranking, websockets, osint_stream, physics
+from app.api.v1.routers import auth, investigate, multimodal, rl, ranking, osint_stream, physics
 from app.models.schemas import HealthResponse
 from app.core.config import get_settings
 

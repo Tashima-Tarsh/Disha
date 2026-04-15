@@ -122,6 +122,7 @@ class HealthResponse(BaseModel):
 
 # --- Multimodal Analysis ---
 
+
 class VisionAnalysisRequest(BaseModel):
     """Request for vision-based analysis."""
     target: str = Field(..., description="Image URL or identifier")
@@ -150,6 +151,7 @@ class MultimodalRequest(BaseModel):
 
 # --- Collaborative Investigation ---
 
+
 class CollaborativeRequest(BaseModel):
     """Request for multi-agent collaborative investigation."""
     target: str = Field(..., description="Target to investigate")
@@ -158,6 +160,7 @@ class CollaborativeRequest(BaseModel):
 
 
 # --- RL Feedback ---
+
 
 class FeedbackRequest(BaseModel):
     """User feedback on investigation results."""
@@ -168,6 +171,7 @@ class FeedbackRequest(BaseModel):
 
 
 # --- Intelligence Ranking ---
+
 
 class RankingRequest(BaseModel):
     """Request for intelligence rankings."""

@@ -1,9 +1,11 @@
+from typing import Any, Dict
 from fastapi import APIRouter, Depends, HTTPException
-from typing import Any, Dict, List
 from app.api.deps import get_current_user
 from app.agents.physics_agent import PhysicsAgent
 
+
 router = APIRouter()
+
 
 @router.post("/simulate")
 async def run_molecular_simulation(
@@ -21,6 +23,7 @@ async def run_molecular_simulation(
         return results
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Simulation failed: {str(e)}")
+
 
 @router.get("/materials")
 async def get_supported_materials(current_user: Dict = Depends(get_current_user)):

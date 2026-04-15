@@ -1,15 +1,14 @@
 import asyncio
-import json
 import random
 import time
 from datetime import datetime
-from typing import Any
 
 import structlog
 from app.core.config import get_settings
 from app.services.streaming.kafka_service import KafkaProducer
 
 logger = structlog.get_logger(__name__)
+
 
 class OSINTFeedEmitter:
     """
@@ -35,15 +34,15 @@ class OSINTFeedEmitter:
         """Start the emitter loop."""
         self.running = True
         logger.info("osint_emitter_started", simulation=self.settings.OSINT_STREAM_SIMULATION_ENABLED)
-        
+
         while self.running:
             try:
                 if self.settings.OSINT_STREAM_SIMULATION_ENABLED:
                     await self._emit_simulated_event()
                 else:
                     # In production, this would poll real APIs
-                    await self._emit_simulated_event() 
-                
+                    await self._emit_simulated_event()
+
                 # Randomized interval between 5 to 15 seconds for realism
                 await asyncio.sleep(random.uniform(5, 15))
             except Exception as e:
@@ -75,7 +74,7 @@ class OSINTFeedEmitter:
             event,
             key=event["type"]
         )
-        
+
         if success:
             logger.debug("osint_event_emitted", event_id=event["event_id"], type=event["type"])
         else:

@@ -8,10 +8,11 @@ from app.services.ni.global_intelligence_service import GlobalIntelligenceServic
 
 logger = structlog.get_logger(__name__)
 
+
 class GrowthAgent(BaseAgent):
     """
     DISHA Sovereign Growth Agent.
-    Optimizes national resource allocation by correlating Infrastructure, 
+    Optimizes national resource allocation by correlating Infrastructure,
     Climate, and Judicial intelligence layers.
     """
 
@@ -32,17 +33,17 @@ class GrowthAgent(BaseAgent):
         options = options or {}
         # If target is a comma-separated list of assets, analyze them all
         targets = [t.strip() for t in target.split(",")]
-        
+
         priorities = []
         for t in targets:
             priority = await self._analyze_asset_priority(t, options)
             priorities.append(priority)
-            
+
         # Sort by RFPI Index (descending)
         priorities.sort(key=lambda x: x["rfpi_index"], reverse=True)
-        
+
         global_summary = await self.global_service.get_global_pulse_summary()
-        
+
         return {
             "mission": "SOVEREIGN GROWTH ANALYTICS (SYNCHRONIZED)",
             "targets_analyzed": len(targets),
@@ -60,25 +61,25 @@ class GrowthAgent(BaseAgent):
         asset_details = await self.infra_service.get_asset_details(asset_name)
         if not asset_details:
             return {"asset": asset_name, "rfpi_index": 0.0, "status": "unknown"}
-            
+
         region = asset_details["location"]
-        
+
         # 2. Judicial Urgency (NYAYA)
         legal_urgency = await self.judicial_service.get_legal_priority_index(asset_name, region)
-        
+
         # 3. Climate Threat (VARUNA)
         # Mock weather risk factor (would be dynamic from DISHA live feeds)
         weather_risk = 0.8 if region == "Assam" or region == "Mumbai" else 0.3
-        
+
         # 4. Global Volatility Multiplier (GVM) - v5.5 Sync
         global_modifier = await self.global_service.get_growth_modifier()
-        
+
         # 5. RFPI Calculation
         # Weights: 40% Physical, 40% Judicial, 20% Climate
         physical_risk = 0.9 if "Tezpur" in asset_name else 0.5
         base_index = (physical_risk * 0.4) + (legal_urgency * 0.4) + (weather_risk * 0.2)
         rfpi_index = min(1.0, base_index * global_modifier)
-        
+
         return {
             "asset": asset_name,
             "region": region,

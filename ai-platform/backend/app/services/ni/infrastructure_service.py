@@ -3,6 +3,7 @@ import structlog
 
 logger = structlog.get_logger(__name__)
 
+
 class InfrastructureService:
     """
     Project SETU - Infrastructure Resilience Service.
@@ -19,7 +20,7 @@ class InfrastructureService:
                 "type": "Steel Truss",
                 "material": "iron",
                 "design_load_kn": 5000,
-                "critical_strain_threshold": 0.02, # 2% atomic displacement
+                "critical_strain_threshold": 0.02,  # 2% atomic displacement
                 "status": "operational"
             },
             "Bandra-Worli Sea Link": {
@@ -55,15 +56,15 @@ class InfrastructureService:
         asset = await self.get_asset_details(asset_name)
         if not asset:
             return [0.0, 0.0, 0.0]
-        
+
         # Wind Pressure (P) = 0.613 * v^2 (where v is in m/s)
         v_ms = wind_speed_kmh / 3.6
         pressure = 0.613 * (v_ms**2)
-        
+
         # We scale this to our MD force units (approximate)
         # Increased scaling for v5.3 demonstration to highlight risk escalation
-        force_magnitude = (pressure / 1000.0) * 1.5 
-        
+        force_magnitude = (pressure / 1000.0) * 1.5
+
         # Directional force (e.g., wind pushing in the X direction)
         return [force_magnitude, 0.0, 0.0]
 
@@ -75,17 +76,17 @@ class InfrastructureService:
         asset = await self.get_asset_details(asset_name)
         if not asset:
             return {"status": "unknown", "risk_score": 0.0}
-            
+
         # Extract energy-based strain (approximation for v5.3)
         ke = md_diagnostic.get("ke", 0.0)
         total_e = md_diagnostic.get("total_energy", 1.0)
-        
+
         # Relative Kinetic Stress (KE/TotalE) is a proxy for internal agitation/stress
         stress_ratio = ke / abs(total_e) if total_e != 0 else 0
-        threshold = asset["critical_strain_threshold"] * 10.0 # Scaling for energy units
-        
+        threshold = asset["critical_strain_threshold"] * 10.0  # Scaling for energy units
+
         risk_score = min(1.0, stress_ratio / threshold)
-        
+
         return {
             "asset_id": asset["id"],
             "failure_probability": risk_score,

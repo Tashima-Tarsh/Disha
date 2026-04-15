@@ -20,16 +20,16 @@ async def lifespan(app: FastAPI):
     # DISHA v5.1 Real-time OSINT Feeds
     from app.services.streaming.osint_emitter import OSINTFeedEmitter
     from app.services.streaming.osint_processor import OSINTStreamProcessor
-    
+
     emitter = OSINTFeedEmitter()
     processor = OSINTStreamProcessor()
-    
+
     # Start background workers
     emitter_task = asyncio.create_task(emitter.start())
     processor_task = asyncio.create_task(processor.start())
-    
+
     yield
-    
+
     # Shutdown logic
     await emitter.stop()
     await processor.stop()

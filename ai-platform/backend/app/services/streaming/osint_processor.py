@@ -6,6 +6,7 @@ from app.api.deps import get_connection_manager
 
 logger = structlog.get_logger(__name__)
 
+
 class OSINTStreamProcessor:
     """
     Real-time OSINT Stream Processor.
@@ -25,14 +26,14 @@ class OSINTStreamProcessor:
         """Start the consumer and processor loop."""
         self.running = True
         logger.info("osint_processor_started")
-        
+
         while self.running:
             try:
                 # We use the consume method from KafkaConsumer
                 # It accepts a handler function.
                 await self.consumer.consume(
                     handler=self.process_event,
-                    max_messages=10 # Process in small batches for responsiveness
+                    max_messages=10  # Process in small batches for responsiveness
                 )
                 # Small sleep to prevent tight loop if no messages
                 await asyncio.sleep(1)
@@ -52,11 +53,11 @@ class OSINTStreamProcessor:
         This is where enrichment (e.g. sentiment, entity enrichment) happens.
         """
         event_id = event.get("event_id", "unknown")
-        
+
         # Enrichment: Calculate urgency based on severity
         severity = event.get("severity", "LOW")
         event["urgency"] = 100 if severity == "CRITICAL" else 75 if severity == "HIGH" else 50 if severity == "MEDIUM" else 25
-        
+
         # Tagging for UI pulses
         event["ui_display_type"] = "PULSE_ALERT" if severity in ["CRITICAL", "HIGH"] else "NEWS_FEED"
 
@@ -66,7 +67,7 @@ class OSINTStreamProcessor:
             "type": "osint_pulse",
             "data": event
         }
-        
+
         try:
             await self.connection_manager.broadcast_json(broadcast_msg)
             logger.debug("osint_event_processed_and_broadcast", event_id=event_id)

@@ -5,6 +5,7 @@ from app.services.physics.md_engine import MDEngine
 
 logger = structlog.get_logger(__name__)
 
+
 class PhysicsAgent(BaseAgent):
     """
     DISHA Physics Agent.
@@ -30,17 +31,17 @@ class PhysicsAgent(BaseAgent):
         """
         options = options or {}
         material = target.lower()
-        
+
         # Check if we have material properties
         params = self.material_db.get(material, self.material_db["argon"])
-        
+
         # Extract simulation parameters from options
         timesteps = options.get("timesteps", 500)
         n_atoms = options.get("n_atoms", 128)
         temperature = options.get("temperature", 1.0)
-        
+
         logger.info("physics_simulation_starting", material=material, atoms=n_atoms, temp=temperature)
-        
+
         # Run simulation
         simulation_data = await self.engine.simulate(
             n_atoms=n_atoms,
@@ -48,11 +49,11 @@ class PhysicsAgent(BaseAgent):
             target_temp=temperature,
             material_params=params
         )
-        
+
         # Perform stability analysis based on results
         drift = self._calculate_energy_drift(simulation_data["diagnostics"])
         stability_score = max(0.0, 1.0 - drift)
-        
+
         return {
             "material": params["name"],
             "simulation_results": simulation_data,
@@ -68,17 +69,17 @@ class PhysicsAgent(BaseAgent):
         """Calculate the normalized energy drift to assess simulation stability."""
         if not diagnostics:
             return 1.0
-        
+
         total_energies = [d["total_energy"] for d in diagnostics]
         if len(total_energies) < 2:
             return 0.0
-            
+
         initial = total_energies[0]
         final = total_energies[-1]
-        
+
         if initial == 0:
             return 0.0
-            
+
         return abs((final - initial) / initial)
 
     def _get_atomic_entities(self, simulation_data: Dict) -> List[Dict]:
