@@ -2,16 +2,16 @@
   <img src="docs/images/banner_v5.png" alt="DISHA v5.0.0 — Elite AGI Platform" width="100%">
 </p>
 
-# DISHA v5.0.0
+# DISHA v5.5.0
 
 <p align="center">
   <strong>"Direction" — The Autonomous Cognitive Operating System for the AGI Era.</strong>
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Version-v5.0.0--Elite-7c3aed?style=for-the-badge&logo=rocket" alt="Version">
+  <img src="https://img.shields.io/badge/Version-v5.5.0--Sovereign-7c3aed?style=for-the-badge&logo=rocket" alt="Version">
   <img src="https://img.shields.io/badge/Architecture-7--Layer_Cognitive-0ea5e9?style=for-the-badge&logo=blueprint" alt="Architecture">
-  <img src="https://img.shields.io/badge/Intelligence-Multi--Agent_Consensus-22c55e?style=for-the-badge&logo=brain" alt="Intelligence">
+  <img src="https://img.shields.io/badge/Intelligence-Sovereign_Growth-22c55e?style=for-the-badge&logo=brain" alt="Intelligence">
 </p>
 
 <p align="center">
@@ -30,7 +30,7 @@
 
 DISHA is a world-class **Autonomous Cognitive Platform** built to transcend standard LLM wrappers. It implements a sophisticated 7-stage cognitive loop that allows AI to perceive, deliberate, and reflect with biological elegance. 
 
-At its core, DISHA is a **"Digital Soul"** for your infrastructure—capable of autonomous threat hunting, cross-domain knowledge synthesis, and strategic decision-making through a consensus of expert agents.
+At its core, DISHA is a **"Digital Soul"** for your infrastructure—capable of autonomous threat hunting, **molecular-level structural simulation**, and **Sovereign budget optimization** through a consensus of expert agents.
 
 ### 🧠 The 7-Stage Cognitive Loop
 
@@ -62,9 +62,10 @@ graph LR
 
 In an era of increasing digital noise and complex threats, DISHA provides **Direction**. 
 - **Autonomy:** Operates independently in a self-healing loop.
-- **Precision:** Uses GNNs and RL to optimize investigation strategies.
-- **Elite Performance:** Built on Bun + Python 3.13 for ultra-low latency intelligence.
-- **Trust:** Transparent deliberation where dissenting views are preserved, not discarded.
+- **Scientific Rigor:** High-fidelity Multi-Physics coupling for predictive resilience.
+- **Precision:** Uses GNNs, RL, and MD engines to optimize investigation strategies.
+- **Elite Performance:** Built on Bun + Python 3.13 + PyTorch for ultra-low latency intelligence.
+- **Sovereign Growth:** Correlates domestic priorities with global market volatility.
 
 ---
 
@@ -79,6 +80,8 @@ DISHA is a masterclass in modern system architecture:
 | **Frontend** | [Next.js 16](https://nextjs.org) | Luxury React Framework |
 | **Styling** | [Tailwind CSS](https://tailwindcss.com) | Modern Utility Design |
 | **Databases** | [Neo4j](https://neo4j.com) + [ChromaDB](https://trychroma.com) | Graph + Vector Memory |
+| **Streaming** | [Apache Kafka](https://kafka.apache.org/) | Real-time OSINT intelligence pulses |
+| **Physics Core** | [PyTorch](https://pytorch.org/) | Vectorized Molecular Dynamics simulation |
 | **Protocols** | [MCP](https://modelcontextprotocol.io) | Universal Tool Integration |
 
 ---
@@ -134,9 +137,11 @@ DISHA is built with a **Zero Trust** philosophy:
 
 ## 🗺️ Roadmap v5.x
 
-- [ ] **v5.1:** Real-time Kafka streaming for live OSINT feeds.
-- [ ] **v5.2:** Advanced molecular dynamics simulation in the Physics layer.
-- [ ] **v5.3:** Multi-language (i18n) support for global deployment.
+- [x] **v5.1:** Real-time Kafka streaming for live OSINT feeds.
+- [x] **v5.2:** Advanced molecular dynamics simulation in the Physics layer.
+- [x] **v5.3:** Multi-Physics coupling (VARUNA x SETU) for infrastructure.
+- [x] **v5.4:** Sovereign Growth Analytics and Judicial Intelligence (NYAYA).
+- [x] **v5.5:** Global Intelligence Synchronization (GVM Modifier).
 - [ ] **v6.0:** Full decentralized AGI distribution (Peer-to-Peer reasoning).
 
 ---

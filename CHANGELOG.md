@@ -6,6 +6,21 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) 
 
 ---
 
+## [v5.5.0] — 2026-04-16
+
+### 🚀 The Sovereign Evolution
+- **Real-time Intelligence (v5.1)** — Implemented high-fidelity Kafka OSINT streams for live global monitoring.
+- **Physics Layer (v5.2)** — Developed a PyTorch-accelerated Molecular Dynamics engine (`MDEngine`) for structural simulation.
+- **Multi-Physics Coupling (v5.3)** — Established the scientific handshake between Project VARUNA (Weather) and Project SETU (Infrastructure).
+- **Sovereign Growth Analytics (v5.4)** — Introduced Project NYAYA (Judicial Intelligence) and the Resilience Funding Priority Index (RFPI).
+- **Global Synchronization (v5.5)** — Implemented the Global Volatility Multiplier (GVM) to correlate domestic priorities with international market and geopolitical pulses.
+
+### 🏛️ Governance & Operations
+- **Strategic NIA Synthesis** — Empowered the National Intelligence Agent to provide cross-domain governance recommendations.
+- **Unified Services Architecture** — Integrated Judicial, Infrastructure, and Global Intelligence registries as first-class citizens.
+
+---
+
 ## [v5.0.0] — 2026-04-16
 
 ### 🚀 Major Overhaul
