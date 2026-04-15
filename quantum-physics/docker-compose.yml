@@ -1,0 +1,36 @@
+version: "3.9"
+services:
+  quantum-backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "8002:8002"
+    environment:
+      - NASA_API_KEY=${NASA_API_KEY:-DEMO_KEY}
+      - DEBUG=${DEBUG:-false}
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8002/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+    restart: unless-stopped
+
+  quantum-frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3003:3003"
+    environment:
+      - NEXT_PUBLIC_QUANTUM_API_URL=http://localhost:8002
+    depends_on:
+      - quantum-backend
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3003/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    restart: unless-stopped

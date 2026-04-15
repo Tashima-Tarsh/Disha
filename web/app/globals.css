@@ -1,0 +1,178 @@
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
+
+/* =====================================================
+   DESIGN TOKENS — CSS Custom Properties
+   Dark theme is default; add .light to <html> for light
+   ===================================================== */
+@layer base {
+  :root {
+    /* DISHA ELITE — LUXURY PALETTE */
+    --color-bg-primary: #05070a;
+    --color-bg-secondary: #0a0d14;
+    --color-bg-elevated: rgba(15, 20, 30, 0.4);
+
+    /* Typography: Pearl & Aurora */
+    --color-text-primary: #f8fafc;
+    --color-text-secondary: #94a3b8;
+    --color-text-muted: #475569;
+
+    /* Accents: Aurora Blue, Royal Purple, Sunset Gold */
+    --color-accent: #4f46e5;
+    --color-accent-hover: #6366f1;
+    --color-accent-active: #4338ca;
+    --color-accent-foreground: #ffffff;
+
+    --brand-aurora: #4f46e5;
+    --brand-royal: #7c3aed;
+    --brand-sunset: #f97316;
+    --brand-gold: #fbbf24;
+
+    /* Borders: Ultra-thin luxury glass */
+    --color-border: rgba(255, 255, 255, 0.08);
+    --color-border-hover: rgba(255, 255, 255, 0.15);
+
+    /* Status: Refined */
+    --color-success: #10b981;
+    --color-success-bg: rgba(16, 185, 129, 0.1);
+    --color-warning: #f59e0b;
+    --color-warning-bg: rgba(245, 158, 11, 0.1);
+    --color-error: #ef4444;
+    --color-error-bg: rgba(239, 68, 68, 0.1);
+    --color-info: #3b82f6;
+    --color-info-bg: rgba(59, 130, 246, 0.1);
+
+    /* Shadcn/Tailwind Compat */
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 226.3 70.6% 58.8%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 226.3 70.6% 58.8%;
+    --radius: 1rem;
+  }
+}
+
+/* =====================================================
+   LUXURY UI UTILITIES
+   ===================================================== */
+
+.glass-elite {
+  background: rgba(15, 20, 30, 0.4);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+}
+
+.aurora-mesh {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: -1;
+  background: radial-gradient(circle at 0% 0%, rgba(79, 70, 229, 0.15) 0%, transparent 50%),
+              radial-gradient(circle at 100% 100%, rgba(124, 58, 237, 0.15) 0%, transparent 50%),
+              radial-gradient(circle at 50% 50%, rgba(249, 115, 22, 0.05) 0%, transparent 50%);
+  filter: blur(80px);
+  opacity: 0.8;
+  animation: aurora-float 20s ease-in-out infinite alternate;
+}
+
+@keyframes aurora-float {
+  0% { transform: scale(1) translate(0, 0); }
+  50% { transform: scale(1.1) translate(20px, -20px); }
+  100% { transform: scale(1) translate(-20px, 20px); }
+}
+
+.text-gradient-pearl {
+  background: linear-gradient(to bottom, #ffffff 0%, #cbd5e1 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.glow-soft-blue {
+  box-shadow: 0 0 30px rgba(79, 70, 229, 0.2);
+}
+
+.glow-soft-orange {
+  box-shadow: 0 0 30px rgba(249, 115, 22, 0.2);
+}
+
+/* =====================================================
+   HOLOGRAPHIC & GLITCH UTILITIES
+   ===================================================== */
+
+.holographic-noise {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 9999;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  opacity: 0.05;
+}
+
+.scanlines {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 9998;
+  pointer-events: none;
+  background: linear-gradient(
+    to bottom,
+    transparent 50%,
+    rgba(0, 243, 255, 0.02) 50%
+  );
+  background-size: 100% 4px;
+}
+
+@keyframes glitch {
+  0% { transform: translate(0); }
+  20% { transform: translate(-2px, 2px); }
+  40% { transform: translate(-2px, -2px); }
+  60% { transform: translate(2px, 2px); }
+  80% { transform: translate(2px, -2px); }
+  100% { transform: translate(0); }
+}
+
+.glitch-hover:hover {
+  animation: glitch 0.3s cubic-bezier(.25,.46,.45,.94) both infinite;
+}
+
+.chromatic-aberration {
+  text-shadow: 2px 0 rgba(255, 0, 0, 0.5), -2px 0 rgba(0, 255, 255, 0.5);
+}
+
+.crt-flicker {
+  animation: flicker 0.15s infinite;
+}
+
+@keyframes flicker {
+  0% { opacity: 0.97; }
+  50% { opacity: 1; }
+  100% { opacity: 0.98; }
+}
+
+.hologram-gradient {
+  background: linear-gradient(135deg, rgba(0, 243, 255, 0.1) 0%, rgba(138, 43, 226, 0.1) 100%);
+}

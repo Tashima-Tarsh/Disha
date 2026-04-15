@@ -1,0 +1,23 @@
+# Disha Auto-Learning Bot — dependencies
+#
+# Core (always required)
+# ──────────────────────
+# (no mandatory deps — all modules have graceful fallbacks)
+
+# RAG + FAISS pipeline (optional)
+# ──────────────────────────────
+# faiss-cpu>=1.7
+# sentence-transformers>=2.2
+# numpy>=1.24
+
+# LLaMA fine-tuning (optional)
+# ────────────────────────────
+# torch>=2.0
+# transformers>=4.35
+# peft>=0.7
+# datasets>=2.14
+# bitsandbytes>=0.41         # QLoRA 4-bit quantisation
+
+# Testing
+# ───────
+pytest>=7.0

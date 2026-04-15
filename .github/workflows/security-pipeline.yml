@@ -1,0 +1,76 @@
+name: DISHA Security Pipeline
+# Section 2 of the Cyber Defense Suite Blueprint (Week 1)
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  secret-scan:
+    name: Secret Scanning
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Gitleaks
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  sast-python:
+    name: Python SAST (Bandit)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install Bandit
+        run: pip install bandit
+      - name: Run Bandit
+        run: bandit -r ai-platform/backend cyber-defense -f json -o bandit-results.json || true
+      - name: Upload Bandit Results
+        uses: actions/upload-artifact@v4
+        with:
+          name: bandit-results
+          path: bandit-results.json
+
+  dependency-scan:
+    name: Dependency Vulnerability Audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install dependencies
+        run: |
+          pip install safety
+      - name: Run Safety
+        run: safety check -r ai-platform/backend/requirements.txt --json > safety-results.json || true
+      - name: Upload Safety Results
+        uses: actions/upload-artifact@v4
+        with:
+          name: safety-results
+          path: safety-results.json
+
+  sbom-generation:
+    name: SBOM Generation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Generate SBOM (CycloneDX)
+        uses: CycloneDX/gh-python-generate-sbom@v2
+        with:
+          path: ai-platform/backend/requirements.txt
+          output-format: json
+      - name: Upload SBOM
+        uses: actions/upload-artifact@v4
+        with:
+          name: sbom
+          path: bom.json

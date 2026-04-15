@@ -1,0 +1,39 @@
+from fastapi import APIRouter, Depends, WebSocket, WebSocketDisconnect
+from app.core.security import get_current_user, decode_token
+from app.api.deps import get_alert_manager, get_connection_manager
+
+router = APIRouter()
+
+@router.get("/alerts")
+async def get_alerts(
+    limit: int = 50,
+    level: str | None = None,
+    current_user: dict = Depends(get_current_user),
+    alert_manager = Depends(get_alert_manager)
+):
+    """Get recent alerts."""
+    return {"alerts": alert_manager.get_alerts(limit=limit, level=level)}
+
+@router.websocket("/ws/alerts")
+async def websocket_alerts(
+    websocket: WebSocket,
+    token: str | None = None,
+    connection_manager = Depends(get_connection_manager)
+):
+    """WebSocket endpoint for real-time alerts."""
+    if not token:
+        await websocket.close(code=4001, reason="Missing authentication token")
+        return
+    try:
+        decode_token(token)
+    except Exception:
+        await websocket.close(code=4003, reason="Invalid or expired token")
+        return
+
+    await connection_manager.connect(websocket)
+    try:
+        while True:
+            data = await websocket.receive_text()
+            await websocket.send_json({"type": "ack", "message": data})
+    except WebSocketDisconnect:
+        connection_manager.disconnect(websocket)

@@ -1,0 +1,90 @@
+{
+  "domain": "Quantum Physics",
+  "description": "Modern quantum mechanics, quantum information, and quantum computing",
+  "topics": [
+    {
+      "id": "qubits",
+      "name": "Qubits",
+      "description": "Quantum bits exist in superposition of |0⟩ and |1⟩ states",
+      "key_equations": ["|ψ⟩ = α|0⟩ + β|1⟩", "|α|² + |β|² = 1"],
+      "concepts": ["superposition", "Bloch sphere", "computational basis", "measurement collapse"],
+      "gates": ["X", "Y", "Z", "H", "CNOT", "T", "S"]
+    },
+    {
+      "id": "entanglement",
+      "name": "Quantum Entanglement",
+      "description": "Non-local correlations between quantum particles cannot be explained classically",
+      "key_equations": ["|Φ+⟩ = (|00⟩ + |11⟩)/√2", "Bell inequality: |E(a,b) - E(a,b')| + E(a',b) + E(a',b') ≤ 2"],
+      "concepts": ["Bell states", "EPR paradox", "non-locality", "quantum teleportation", "Bell inequality violation"],
+      "experimental_confirmations": ["Aspect experiment 1982", "Loophole-free Bell tests 2015"]
+    },
+    {
+      "id": "quantum_algorithms",
+      "name": "Quantum Algorithms",
+      "description": "Algorithms that exploit quantum mechanics for computational speedup",
+      "algorithms": [
+        {
+          "name": "Shor's Algorithm",
+          "speedup": "Exponential over classical for integer factoring",
+          "complexity": "O((log N)³)",
+          "application": "Breaks RSA encryption"
+        },
+        {
+          "name": "Grover's Algorithm",
+          "speedup": "Quadratic over classical for unstructured search",
+          "complexity": "O(√N)",
+          "application": "Database search, cryptanalysis"
+        },
+        {
+          "name": "VQE (Variational Quantum Eigensolver)",
+          "speedup": "Hybrid quantum-classical for chemistry simulation",
+          "complexity": "Problem-dependent",
+          "application": "Molecular simulation, drug discovery"
+        },
+        {
+          "name": "QAOA (Quantum Approximate Optimization Algorithm)",
+          "speedup": "Approximate solutions to NP problems",
+          "complexity": "O(p·n) circuit depth",
+          "application": "Combinatorial optimization"
+        },
+        {
+          "name": "HHL Algorithm",
+          "speedup": "Exponential for sparse linear systems",
+          "complexity": "O(log N)",
+          "application": "Machine learning, fluid simulation"
+        }
+      ]
+    },
+    {
+      "id": "quantum_cryptography",
+      "name": "Quantum Key Distribution (QKD)",
+      "description": "Provably secure key distribution using quantum mechanics",
+      "protocols": [
+        {"name": "BB84", "year": 1984, "description": "First QKD protocol using 4 quantum states"},
+        {"name": "E91", "year": 1991, "description": "Entanglement-based QKD by Artur Ekert"},
+        {"name": "B92", "year": 1992, "description": "Simplified 2-state QKD protocol"}
+      ],
+      "concepts": ["quantum no-cloning theorem", "eavesdropping detection", "one-time pad", "quantum channel"]
+    },
+    {
+      "id": "quantum_error_correction",
+      "name": "Quantum Error Correction",
+      "description": "Protecting quantum information from decoherence and noise",
+      "codes": ["Shor 9-qubit code", "Steane 7-qubit code", "Surface code", "Toric code"],
+      "concepts": ["decoherence", "fault-tolerant quantum computing", "logical qubits", "syndrome measurement"]
+    },
+    {
+      "id": "quantum_hardware",
+      "name": "Quantum Hardware Platforms",
+      "description": "Physical implementations of quantum computers",
+      "platforms": [
+        {"name": "Superconducting qubits", "leaders": ["IBM", "Google"], "coherence_time_us": 100},
+        {"name": "Trapped ions", "leaders": ["IonQ", "Honeywell"], "coherence_time_us": 1000000},
+        {"name": "Photonic qubits", "leaders": ["PsiQuantum", "Xanadu"], "coherence_time_us": -1},
+        {"name": "Topological qubits", "leaders": ["Microsoft"], "coherence_time_us": -1},
+        {"name": "Neutral atoms", "leaders": ["Atom Computing", "QuEra"], "coherence_time_us": 10000}
+      ]
+    }
+  ],
+  "keywords": ["qubit", "superposition", "entanglement", "quantum", "Shor", "Grover", "QKD", "decoherence", "circuit"]
+}

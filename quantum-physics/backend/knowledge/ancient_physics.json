@@ -1,0 +1,79 @@
+{
+  "domain": "Ancient & Traditional Physics",
+  "description": "Pre-scientific and traditional models of the natural world",
+  "traditions": [
+    {
+      "id": "greek_atomism",
+      "name": "Greek Atomism",
+      "year": -440,
+      "culture": "Greek",
+      "description": "Matter consists of indivisible atoms in an infinite void; precursor to atomic theory",
+      "contributors": ["Democritus", "Leucippus", "Epicurus"],
+      "concepts": ["atoms", "void", "determinism", "material monism"],
+      "modern_parallel": "quantum_field_theory"
+    },
+    {
+      "id": "aristotelian_physics",
+      "name": "Aristotelian Physics",
+      "year": -350,
+      "culture": "Greek",
+      "description": "Four elements (earth, water, fire, air) plus aether; natural place and motion",
+      "contributors": ["Aristotle"],
+      "concepts": ["four elements", "aether", "natural motion", "violent motion", "potentiality and actuality"],
+      "modern_parallel": "classical_mechanics"
+    },
+    {
+      "id": "vedic_physics",
+      "name": "Vedic / Hindu Cosmology",
+      "year": -1500,
+      "culture": "Indian",
+      "description": "Pancha Bhuta (5 elements); Vaisheshika atomic theory; cyclic cosmology of Yugas",
+      "contributors": ["Kanada (Vaisheshika)", "Aryabhata", "Brahmagupta"],
+      "concepts": ["pancha bhuta", "paramanu (atoms)", "akasha (space/aether)", "prana (life energy)", "yugas (time cycles)"],
+      "modern_parallel": "quantum_mechanics"
+    },
+    {
+      "id": "chinese_wuxing",
+      "name": "Chinese Five Elements (Wuxing)",
+      "year": -400,
+      "culture": "Chinese",
+      "description": "Five phases (wood, fire, earth, metal, water) and their dynamic interactions",
+      "contributors": ["Zou Yan", "Traditional Taoist scholars"],
+      "concepts": ["five phases", "yin-yang", "qi (vital energy)", "generating cycle", "overcoming cycle"],
+      "modern_parallel": "thermodynamics"
+    },
+    {
+      "id": "islamic_optics",
+      "name": "Islamic Optics and Mechanics",
+      "year": 1000,
+      "culture": "Islamic Golden Age",
+      "description": "First scientific theory of light and vision; early mechanics",
+      "contributors": ["Ibn al-Haytham (Alhazen)", "Al-Biruni", "Ibn Rushd"],
+      "concepts": ["intromission theory of light", "camera obscura", "refraction", "scientific method"],
+      "modern_parallel": "wave_optics"
+    },
+    {
+      "id": "egyptian_cosmology",
+      "name": "Egyptian Cosmology",
+      "year": -3000,
+      "culture": "Egyptian",
+      "description": "Cosmological framework with primordial waters (Nun), creation forces, and celestial mechanics",
+      "contributors": ["Ancient Egyptian priests and astronomers"],
+      "concepts": ["Nun (primordial ocean)", "Ma'at (cosmic order)", "celestial cycles", "sacred geometry"],
+      "modern_parallel": "cosmology"
+    },
+    {
+      "id": "mayan_astronomy",
+      "name": "Mayan Astronomy",
+      "year": -200,
+      "culture": "Mesoamerican",
+      "description": "Highly accurate astronomical observations, calendrical systems, Venus cycles",
+      "contributors": ["Mayan astronomers"],
+      "concepts": ["Long Count calendar", "Venus cycle", "eclipse prediction", "zenith passages"],
+      "modern_parallel": "celestial_mechanics"
+    }
+  ],
+  "timeline_start": -3000,
+  "timeline_end": 1500,
+  "keywords": ["ancient", "traditional", "Aristotle", "Vedic", "atomism", "elements", "aether", "cosmology"]
+}

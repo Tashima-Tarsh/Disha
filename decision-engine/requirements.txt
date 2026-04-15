@@ -1,0 +1,9 @@
+# Core (always required)
+pytest>=7.0
+
+# Optional — FAISS retriever (uncomment or install separately)
+# faiss-cpu>=1.7
+# sentence-transformers>=2.2
+
+# Optional — local LLM via llama-cpp-python (uncomment or install separately)
+# llama-cpp-python>=0.2

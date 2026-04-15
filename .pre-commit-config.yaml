@@ -1,0 +1,44 @@
+# DISHA Sentinel — Repo Security Pipeline
+# Section 2 of the Cyber Defense Suite Blueprint
+
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-added-large-files
+      - id: check-json
+      - id: check-merge-conflict
+
+  - repo: https://github.com/PyCQA/bandit
+    rev: 1.7.9
+    hooks:
+      - id: bandit
+        args: ["-r", "ai-platform/backend", "cyber-defense"]
+        description: "SAST scanning for Python backend and security modules"
+
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.18.4
+    hooks:
+      - id: gitleaks
+        description: "Detect secrets and credentials leaks in the repository"
+
+  - repo: https://github.com/biomejs/pre-commit
+    rev: v0.4.0
+    hooks:
+      - id: biome-check
+        args: ["--write"]
+        files: ^web/
+        description: "Lint and format web dashboard using Biome"
+
+  - repo: local
+    hooks:
+      - id: sentinel-dependency-audit
+        name: Sentinel Dependency Audit
+        entry: .venv/Scripts/python -m app.services.automation.dependency_audit
+        language: system
+        files: ^ai-platform/backend/requirements\.txt$
+        pass_filenames: false
+        description: "Automatically run the Sentinel vulnerability scanner on requirement changes"

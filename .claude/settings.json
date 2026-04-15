@@ -1,0 +1,69 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(git pull:*)",
+      "Bash(git fetch:*)",
+      "Bash(git status:*)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)",
+      "Bash(git branch:*)",
+      "Bash(git checkout:*)",
+      "Bash(git merge:*)",
+      "Bash(git stash:*)",
+      "Bash(git reset:*)",
+      "Bash(git rev-parse:*)",
+      "Bash(git worktree:*)",
+      "Bash(python*)",
+      "Bash(pip*)",
+      "Bash(pytest*)",
+      "Bash(flake8*)",
+      "Bash(bun*)",
+      "Bash(npm*)",
+      "Bash(node*)",
+      "Bash(npx*)",
+      "Bash(cd *)",
+      "Bash(ls*)",
+      "Bash(mkdir*)",
+      "Bash(cp*)",
+      "Bash(mv*)",
+      "Bash(rm*)",
+      "Bash(cat*)",
+      "Bash(echo*)",
+      "Bash(which*)",
+      "Bash(docker*)",
+      "Bash(curl*)",
+      "Bash(jq*)",
+      "Bash(wc*)",
+      "Bash(find*)",
+      "Bash(head*)",
+      "Bash(tail*)",
+      "Bash(grep*)",
+      "Bash(sed*)",
+      "Bash(awk*)",
+      "Bash(chmod*)",
+      "Bash(touch*)",
+      "mcp__github__*"
+    ],
+    "deny": []
+  },
+  "hooks": {
+    "Stop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/stop-hook-git-check.sh"
+          }
+        ]
+      }
+    ]
+  },
+  "env": {
+    "DISHA_MODEL_PROVIDER": "mock",
+    "APP_ENV": "development"
+  }
+}

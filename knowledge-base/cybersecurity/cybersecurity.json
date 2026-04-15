@@ -1,0 +1,79 @@
+{
+  "domain": "Cybersecurity & Ethical Hacking",
+  "description": "Comprehensive cybersecurity knowledge: offensive/defensive security, tools, frameworks, and methodologies",
+  "ethical_hacking": {
+    "methodology": [
+      {"phase": 1, "name": "Reconnaissance", "passive": ["OSINT", "whois", "DNS enumeration", "Google dorking", "Shodan"], "active": ["port scanning", "service detection", "ping sweep"]},
+      {"phase": 2, "name": "Scanning & Enumeration", "tools": ["nmap", "Nessus", "OpenVAS", "Nikto", "dirb/gobuster"], "techniques": ["TCP/UDP scanning", "OS fingerprinting", "banner grabbing"]},
+      {"phase": 3, "name": "Vulnerability Analysis", "tools": ["Nessus", "Qualys", "Burp Suite", "OWASP ZAP"], "databases": ["CVE", "NVD", "Exploit-DB", "MITRE ATT&CK"]},
+      {"phase": 4, "name": "Exploitation", "tools": ["Metasploit", "sqlmap", "BeEF", "Cobalt Strike (commercial)"], "techniques": ["buffer overflow", "SQL injection", "XSS", "RCE", "privilege escalation"]},
+      {"phase": 5, "name": "Post-Exploitation", "tools": ["Mimikatz", "BloodHound", "Rubeus", "WinPEAS/LinPEAS"], "techniques": ["lateral movement", "persistence", "data exfiltration", "credential harvesting"]},
+      {"phase": 6, "name": "Reporting", "components": ["executive summary", "technical findings", "risk ratings", "remediation recommendations"]}
+    ],
+    "certifications": ["CEH", "OSCP", "OSCE", "GPEN", "GXPN", "CRTO", "eCPPT"],
+    "legal_frameworks": ["Computer Fraud and Abuse Act (CFAA)", "UK Computer Misuse Act", "EU NIS Directive", "responsible disclosure policies", "bug bounty programs"]
+  },
+  "attack_frameworks": {
+    "mitre_attack": {
+      "tactics": ["initial access", "execution", "persistence", "privilege escalation", "defense evasion", "credential access", "discovery", "lateral movement", "collection", "exfiltration", "command and control", "impact"],
+      "technique_count": "600+",
+      "matrices": ["Enterprise", "Mobile", "ICS"]
+    },
+    "owasp_top_10": [
+      "A01: Broken Access Control",
+      "A02: Cryptographic Failures",
+      "A03: Injection",
+      "A04: Insecure Design",
+      "A05: Security Misconfiguration",
+      "A06: Vulnerable and Outdated Components",
+      "A07: Identification and Authentication Failures",
+      "A08: Software and Data Integrity Failures",
+      "A09: Security Logging and Monitoring Failures",
+      "A10: Server-Side Request Forgery (SSRF)"
+    ],
+    "cyber_kill_chain": ["reconnaissance", "weaponisation", "delivery", "exploitation", "installation", "command & control", "actions on objectives"]
+  },
+  "hacking_tools_categories": {
+    "network": {
+      "scanning": ["nmap", "masscan", "Angry IP Scanner"],
+      "sniffing": ["Wireshark", "tcpdump", "Ettercap"],
+      "wireless": ["Aircrack-ng", "Kismet", "Wifite", "Reaver"],
+      "exploitation": ["Metasploit", "Armitage", "Empire"]
+    },
+    "web": {
+      "proxy": ["Burp Suite", "OWASP ZAP", "mitmproxy"],
+      "fuzzing": ["ffuf", "wfuzz", "AFL"],
+      "scanning": ["Nikto", "WPScan", "Nuclei", "sqlmap"]
+    },
+    "password": {
+      "cracking": ["John the Ripper", "Hashcat", "Hydra", "Medusa"],
+      "hash_types": ["MD5", "SHA-1", "SHA-256", "NTLM", "bcrypt", "Argon2"]
+    },
+    "forensics": {
+      "disk": ["Autopsy", "Sleuth Kit", "FTK"],
+      "memory": ["Volatility", "Rekall", "AVML"],
+      "network": ["NetworkMiner", "Zeek/Bro", "Suricata"],
+      "malware": ["Ghidra", "IDA Pro", "Cuckoo Sandbox", "YARA"]
+    },
+    "osint": ["Maltego", "theHarvester", "SpiderFoot", "Recon-ng", "Shodan", "Censys"]
+  },
+  "defensive_security": {
+    "frameworks": ["NIST Cybersecurity Framework", "ISO 27001", "CIS Controls", "SOC 2"],
+    "technologies": {
+      "network": ["firewall", "IDS/IPS (Snort, Suricata)", "WAF", "VPN", "network segmentation", "zero trust"],
+      "endpoint": ["EDR", "antivirus", "application whitelisting", "DLP", "full disk encryption"],
+      "identity": ["MFA", "SSO", "PAM", "IAM", "FIDO2/WebAuthn"],
+      "monitoring": ["SIEM (Splunk, ELK, QRadar)", "SOAR", "threat intelligence platforms", "honeypots"]
+    },
+    "incident_response": {
+      "phases": ["preparation", "identification", "containment", "eradication", "recovery", "lessons learned"],
+      "frameworks": ["NIST SP 800-61", "SANS IR process", "PICERL"]
+    }
+  },
+  "cryptography_applied": {
+    "symmetric": {"algorithms": ["AES-256-GCM", "ChaCha20-Poly1305"], "use": "bulk data encryption"},
+    "asymmetric": {"algorithms": ["RSA-4096", "ECDSA (P-256, Ed25519)"], "use": "key exchange, digital signatures"},
+    "post_quantum": {"algorithms": ["CRYSTALS-Kyber", "CRYSTALS-Dilithium", "SPHINCS+"], "standard": "NIST PQC"},
+    "blockchain": ["proof of work", "proof of stake", "smart contracts", "zero-knowledge proofs"]
+  }
+}

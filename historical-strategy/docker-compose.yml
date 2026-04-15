@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.api
+    container_name: historical-strategy-api
+    ports:
+      - "8001:8001"
+    volumes:
+      - .:/app
+    working_dir: /app
+    command: uvicorn api.main:app --host 0.0.0.0 --port 8001 --reload
+    environment:
+      - PYTHONPATH=/app
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8001/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  dashboard:
+    build:
+      context: ./dashboard
+      dockerfile: ../docker/Dockerfile.dashboard
+    container_name: historical-strategy-dashboard
+    ports:
+      - "3002:3002"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://api:8001
+      - NODE_ENV=production
+    depends_on:
+      - api
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3002/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+networks:
+  default:
+    name: historical-strategy-net

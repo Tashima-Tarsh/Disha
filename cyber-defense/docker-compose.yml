@@ -1,0 +1,179 @@
+version: "3.8"
+
+# =============================================================================
+# Disha Virtual Cyber Defense System - Docker Compose
+# DEFENSIVE SIMULATION ONLY - No offensive actions
+# =============================================================================
+
+services:
+  # ---------------------------------------------------------------------------
+  # SSH Honeypot (Cowrie)
+  # ---------------------------------------------------------------------------
+  cowrie:
+    build: ./honeypot/cowrie
+    ports:
+      - "${COWRIE_SSH_PORT:-2222}:2222"
+    volumes:
+      - ./logs/cowrie:/cowrie/log
+    environment:
+      - COWRIE_USER=${COWRIE_USER:-cowrie}
+    restart: always
+    networks: [honeynet]
+    security_opt:
+      - no-new-privileges:true
+    read_only: true
+    tmpfs:
+      - /tmp:mode=1777
+    mem_limit: 256m
+    cpus: 0.5
+
+  # ---------------------------------------------------------------------------
+  # Multi-protocol Honeypot (Dionaea)
+  # ---------------------------------------------------------------------------
+  dionaea:
+    build: ./honeypot/dionaea
+    ports:
+      - "${DIONAEA_HTTP_PORT:-8080}:80"
+      - "${DIONAEA_SMB_PORT:-445}:445"
+      - "${DIONAEA_MYSQL_PORT:-3306}:3306"
+    volumes:
+      - ./logs/dionaea:/dionaea/log
+    restart: always
+    networks: [honeynet]
+    security_opt:
+      - no-new-privileges:true
+    mem_limit: 256m
+    cpus: 0.5
+
+  # ---------------------------------------------------------------------------
+  # Multi-service Honeypot (OpenCanary)
+  # https://github.com/thinkst/opencanary
+  # Simulates: HTTP, FTP, Git, Redis
+  # ---------------------------------------------------------------------------
+  opencanary:
+    build: ./honeypot/opencanary
+    ports:
+      - "${OPENCANARY_HTTP_PORT:-8081}:8080"
+      - "${OPENCANARY_FTP_PORT:-2121}:21"
+      - "${OPENCANARY_GIT_PORT:-9418}:9418"
+      - "${OPENCANARY_REDIS_PORT:-6379}:6379"
+    volumes:
+      - ./logs/opencanary:/var/log/opencanary
+    restart: always
+    networks: [honeynet]
+    security_opt:
+      - no-new-privileges:true
+    mem_limit: 256m
+    cpus: 0.5
+
+  # ---------------------------------------------------------------------------
+  # AI Detection Engine
+  # ---------------------------------------------------------------------------
+  model-engine:
+    build: ./model
+    volumes:
+      - ./logs:/logs:ro
+      - ./model:/model
+    environment:
+      - MODEL_PATH=${MODEL_PATH:-/model/attack_classifier.pt}
+      - LOG_DIR=/logs
+    depends_on:
+      - cowrie
+      - dionaea
+      - opencanary
+    networks: [honeynet]
+    mem_limit: 1g
+    cpus: 1.0
+
+  # ---------------------------------------------------------------------------
+  # Simulated Response Engine
+  # ---------------------------------------------------------------------------
+  response-engine:
+    build: ./response_engine
+    volumes:
+      - ./logs:/logs:ro
+    depends_on:
+      - model-engine
+    networks: [honeynet]
+    security_opt:
+      - no-new-privileges:true
+    mem_limit: 128m
+    cpus: 0.5
+
+  # ---------------------------------------------------------------------------
+  # Fail2ban (IP Blocking Enforcement)
+  # ---------------------------------------------------------------------------
+  fail2ban:
+    image: crazymax/fail2ban:1.1.0
+    volumes:
+      - ./logs:/data/input:ro
+      - ./honeypot/fail2ban/config:/data/config:ro
+    restart: always
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+    network_mode: "host"
+    mem_limit: 128m
+
+  # ---------------------------------------------------------------------------
+  # ELK Stack (Monitoring & Dashboard)
+  # ---------------------------------------------------------------------------
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.17.9
+    environment:
+      - discovery.type=single-node
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - xpack.security.enabled=true
+      - xpack.security.transport.ssl.enabled=false
+    ports:
+      - "${ELASTIC_PORT:-9200}:9200"
+    volumes:
+      - es-data:/usr/share/elasticsearch/data
+    restart: always
+    networks: [honeynet]
+    mem_limit: 1g
+
+  logstash:
+    image: docker.elastic.co/logstash/logstash:7.17.9
+    volumes:
+      - ./dashboard/logstash.conf:/usr/share/logstash/pipeline/logstash.conf:ro
+      - ./logs:/var/log/honeypot:ro
+    ports:
+      - "${LOGSTASH_PORT:-5044}:5044"
+    depends_on:
+      - elasticsearch
+    restart: always
+    networks: [honeynet]
+    mem_limit: 512m
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:7.17.9
+    ports:
+      - "${KIBANA_PORT:-5601}:5601"
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+    depends_on:
+      - elasticsearch
+    restart: always
+    networks: [honeynet]
+    mem_limit: 512m
+
+  # ---------------------------------------------------------------------------
+  # Threat Intelligence Feed Updater
+  # ---------------------------------------------------------------------------
+  threat-intel:
+    build: ./scripts/threat_intel
+    volumes:
+      - ./logs:/logs
+    restart: "no"
+    networks: [honeynet]
+    mem_limit: 128m
+
+networks:
+  honeynet:
+    driver: bridge
+    internal: false
+
+volumes:
+  es-data:
+    driver: local

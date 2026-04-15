@@ -1,0 +1,106 @@
+name: Continuous AI Training
+
+on:
+  # Run daily at 2 AM UTC — low-traffic period for open-source data fetching
+  schedule:
+    - cron: "0 2 * * *"
+  # Allow manual trigger
+  workflow_dispatch:
+    inputs:
+      rounds:
+        description: "Number of training rounds"
+        required: false
+        default: "3"
+      component:
+        description: "Component to train (blank = all, knowledge = cross-domain)"
+        required: false
+        default: ""
+      offline:
+        description: "Use synthetic data only"
+        required: false
+        type: boolean
+        default: false
+  # Also run on pushes to training scripts
+  push:
+    branches: [main]
+    paths:
+      - "scripts/continuous_train.py"
+      - "scripts/data_fetchers.py"
+      - "scripts/knowledge_engine.py"
+      - "knowledge-base/**"
+      - "ai-platform/backend/app/rl/train.py"
+      - "ai-platform/backend/graph_ai/train.py"
+      - "decision-engine/train.py"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: continuous-training-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  continuous-train:
+    name: Continuous Training Pipeline
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          pip install torch --index-url https://download.pytorch.org/whl/cpu
+          pip install numpy structlog pytest
+
+      - name: Run continuous training
+        env:
+          DISHA_MODEL_PROVIDER: mock
+        run: |
+          ROUNDS="${{ github.event.inputs.rounds || '3' }}"
+          COMPONENT="${{ github.event.inputs.component || '' }}"
+          OFFLINE="${{ github.event.inputs.offline || 'false' }}"
+
+          CMD="python scripts/continuous_train.py --rounds $ROUNDS"
+          if [ -n "$COMPONENT" ]; then
+            CMD="$CMD --component $COMPONENT"
+          fi
+          if [ "$OFFLINE" = "true" ]; then
+            CMD="$CMD --offline"
+          fi
+
+          echo "Running: $CMD"
+          $CMD
+
+      - name: Validate trained models
+        env:
+          DISHA_MODEL_PROVIDER: mock
+        run: |
+          python -m pytest ai-platform/backend/tests/test_trained_models.py -v --tb=short
+
+      - name: Upload training metrics
+        uses: actions/upload-artifact@v4
+        with:
+          name: training-metrics-${{ github.run_number }}
+          path: |
+            ai-platform/backend/checkpoints/*_metrics.json
+            decision-engine/checkpoints/*_metrics.json
+            training_summary.json
+          retention-days: 30
+
+      - name: Commit updated checkpoints
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add ai-platform/backend/checkpoints/*.json decision-engine/checkpoints/ training_summary.json || true
+          if git diff --staged --quiet; then
+            echo "No metric changes to commit"
+          else
+            git commit -m "chore: update training metrics [continuous-train #${{ github.run_number }}]"
+            git push
+          fi

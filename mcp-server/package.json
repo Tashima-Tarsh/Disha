@@ -1,0 +1,37 @@
+{
+  "name": "disha-mcp",
+  "version": "1.2.0",
+  "mcpName": "io.github.tashima-tarsh/disha-mcp",
+  "description": "MCP server for exploring the Disha AGI platform source code. STDIO, HTTP, and SSE transports.",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Tashima-Tarsh/Disha.git"
+  },
+  "author": "Tashima-Tarsh",
+  "homepage": "https://github.com/Tashima-Tarsh/Disha#readme",
+  "bugs": {
+    "url": "https://github.com/Tashima-Tarsh/Disha/issues"
+  },
+  "type": "module",
+  "main": "dist/index.js",
+  "bin": {
+    "disha-mcp": "dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "start:http": "node dist/http.js",
+    "dev": "npx tsx src/index.ts",
+    "dev:watch": "npx tsx --watch src/index.ts"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "express": "^5.2.1"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.6",
+    "@types/node": "^25.6.0",
+    "tsx": "^4.21.0",
+    "typescript": "^6.0.2"
+  }
+}

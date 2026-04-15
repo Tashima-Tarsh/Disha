@@ -1,0 +1,42 @@
+name: Decision Engine CI
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'decision-engine/**'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'decision-engine/**'
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Tests (Decision Engine — mock provider)
+    runs-on: ubuntu-latest
+    env:
+      DISHA_MODEL_PROVIDER: mock
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          pip install -r decision-engine/requirements.txt
+
+      - name: Lint
+        run: |
+          pip install flake8
+          flake8 decision-engine/ --max-line-length=120 --ignore=E501,W503,W504
+
+      - name: Run tests
+        run: |
+          cd decision-engine
+          python -m pytest tests/ -v --tb=short

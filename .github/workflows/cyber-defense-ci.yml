@@ -1,0 +1,93 @@
+name: Cyber Defense CI
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'cyber-defense/**'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'cyber-defense/**'
+
+permissions:
+  contents: read
+
+jobs:
+  lint-python:
+    name: Lint Python
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          pip install flake8
+          pip install torch --index-url https://download.pytorch.org/whl/cpu
+          pip install scikit-learn numpy requests
+
+      - name: Lint model engine
+        run: flake8 cyber-defense/model/ --max-line-length=120 --ignore=E501
+
+      - name: Lint response engine
+        run: flake8 cyber-defense/response_engine/ --max-line-length=120 --ignore=E501
+
+      - name: Lint threat intel
+        run: flake8 cyber-defense/scripts/threat_intel/ --max-line-length=120 --ignore=E501
+
+  test-python:
+    name: Test Python Components
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          pip install torch --index-url https://download.pytorch.org/whl/cpu
+          pip install scikit-learn numpy requests pytest
+
+      - name: Run tests
+        run: |
+          cd cyber-defense
+          python -m pytest test/ -v
+
+  validate-configs:
+    name: Validate Configurations
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate docker-compose
+        run: |
+          cd cyber-defense
+          if docker compose version >/dev/null 2>&1; then
+            docker compose config --quiet
+          elif docker-compose version >/dev/null 2>&1; then
+            docker-compose config --quiet
+          else
+            echo "Docker Compose not available — skipping config validation"
+          fi
+
+      - name: Validate JSON logs
+        run: |
+          python3 -c "
+          import json, glob
+          for f in glob.glob('cyber-defense/logs/**/*.json', recursive=True):
+              with open(f) as fh:
+                  for i, line in enumerate(fh, 1):
+                      line = line.strip()
+                      if not line: continue
+                      json.loads(line)
+              print(f'  OK: {f}')
+          print('All JSON logs valid.')
+          "
