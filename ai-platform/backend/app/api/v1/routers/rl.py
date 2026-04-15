@@ -3,16 +3,15 @@ from app.core.security import get_current_user
 from app.models.schemas import FeedbackRequest
 from app.rl.reward import InvestigationFeedback
 from app.api.deps import get_reward_computer, get_policy_network, get_prompt_optimizer
-import math
 
 router = APIRouter()
 
 @router.post("/feedback")
 async def submit_feedback(
     request: FeedbackRequest,
-    current_user: dict = Depends(get_current_user),
-    reward_computer = Depends(get_reward_computer),
-    policy_network = Depends(get_policy_network)
+    current_user: dict=Depends(get_current_user),
+    reward_computer=Depends(get_reward_computer),
+    policy_network=Depends(get_policy_network)
 ):
     """Submit feedback on an investigation for RL training."""
     feedback = InvestigationFeedback(
@@ -36,9 +35,9 @@ async def submit_feedback(
 
 @router.get("/rl/metrics")
 async def rl_metrics(
-    current_user: dict = Depends(get_current_user),
-    reward_computer = Depends(get_reward_computer),
-    prompt_optimizer = Depends(get_prompt_optimizer)
+    current_user: dict=Depends(get_current_user),
+    reward_computer=Depends(get_reward_computer),
+    prompt_optimizer=Depends(get_prompt_optimizer)
 ):
     """Get RL system metrics including reward tracking and policy status."""
     return {
@@ -48,8 +47,8 @@ async def rl_metrics(
 
 @router.post("/rl/evolve-prompts")
 async def evolve_prompts(
-    current_user: dict = Depends(get_current_user),
-    prompt_optimizer = Depends(get_prompt_optimizer)
+    current_user: dict=Depends(get_current_user),
+    prompt_optimizer=Depends(get_prompt_optimizer)
 ):
     """Trigger one generation of prompt evolution."""
     prompt_optimizer.evolve()

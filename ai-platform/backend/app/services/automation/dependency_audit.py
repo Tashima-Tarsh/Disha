@@ -2,7 +2,7 @@
 
 import structlog
 from typing import Any
-from pathlib import Path
+
 
 logger = structlog.get_logger(__name__)
 
@@ -16,15 +16,15 @@ class DependencyAudit:
     async def run_scan(self) -> dict[str, Any]:
         """Perform a scan of the repository's dependencies."""
         self.logger.info("audit_started", path=self.requirements_path)
-        
+
         try:
             # 1. Parse requirements
             packages = self._parse_requirements()
-            
+
             # 2. Check for vulnerable versions (Simplified for Sentinel demonstration)
             # In production, this would call 'safety' or 'auditwheel'
             vulnerabilities = self._check_vulnerabilities(packages)
-            
+
             # 3. Generate summary
             severity = "low"
             if any(v["level"] == "critical" for v in vulnerabilities):
@@ -33,7 +33,7 @@ class DependencyAudit:
                 severity = "high"
 
             self.logger.info("audit_completed", vulnerable_count=len(vulnerabilities), severity=severity)
-            
+
             return {
                 "status": "success",
                 "packages_scanned": len(packages),
@@ -68,7 +68,7 @@ class DependencyAudit:
     def _check_vulnerabilities(self, packages: list[dict[str, str]]) -> list[dict[str, Any]]:
         """Check for known insecure versions of critical packages."""
         vulnerabilities = []
-        
+
         # Example vulnerable patterns (Mock-up for Sentinel mission)
         threat_patterns = {
             "fastapi": {"min_safe": "0.100.0", "level": "high", "id": "SN-001"},
@@ -89,14 +89,14 @@ class DependencyAudit:
                         "threat_id": threat_patterns[name]["id"],
                         "description": f"Vulnerable version of {pkg['name']} detected. Risk of RCE or DoS."
                     })
-        
+
         return vulnerabilities
 
     def _generate_remediation(self, vulnerabilities: list[dict[str, Any]]) -> str:
         """Generate a patch priority summary."""
         if not vulnerabilities:
             return "No immediate security patches required for current dependencies."
-        
+
         steps = ["Fix critical vulnerabilities by updating packages:"]
         for v in vulnerabilities:
             steps.append(f"- Update {v['package']} from {v['installed']} to >= {v['required']}")

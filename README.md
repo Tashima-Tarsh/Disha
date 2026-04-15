@@ -1,217 +1,110 @@
 <p align="center">
-  <img src="docs/images/banner.svg" alt="DISHA AGI Platform" width="100%">
+  <img src="docs/images/banner_v5.png" alt="DISHA v5.0.0 — Elite AGI Platform" width="100%">
 </p>
 
-<h1 align="center">DISHA </h1>
+# DISHA v5.0.0
 
 <p align="center">
-  <em>"Direction" in Sanskrit — A self-evolving, multi-agent AGI platform for intelligence, cognitive reasoning, defense, and discovery.</em>
-</p>
-
-<p align="center">
-  <a href="./WIKI.md#getting-started"><img src="https://img.shields.io/badge/Get_Started-0f0f0f?style=for-the-badge&logo=rocket&logoColor=white" alt="Get Started"></a>
-  <a href="./WIKI.md"><img src="https://img.shields.io/badge/Wiki-6366f1?style=for-the-badge&logo=gitbook&logoColor=white" alt="Wiki"></a>
-  <a href="./CONTRIBUTING.md"><img src="https://img.shields.io/badge/Contribute-22c55e?style=for-the-badge&logo=github&logoColor=white" alt="Contribute"></a>
-  <a href="./USAGE_GUIDE.md"><img src="https://img.shields.io/badge/Usage_Guide-f59e0b?style=for-the-badge&logo=readthedocs&logoColor=white" alt="Usage Guide"></a>
-  <a href="./CHANGELOG.md"><img src="https://img.shields.io/badge/Changelog-ef4444?style=for-the-badge&logo=git&logoColor=white" alt="Changelog"></a>
+  <strong>"Direction" — The Autonomous Cognitive Operating System for the AGI Era.</strong>
 </p>
 
 <p align="center">
-  <a href="https://github.com/Tashima-Tarsh/Disha/stargazers"><img src="https://img.shields.io/github/stars/Tashima-Tarsh/Disha?style=flat-square&color=yellow" alt="Stars"></a>
-  <a href="https://github.com/Tashima-Tarsh/Disha/network/members"><img src="https://img.shields.io/github/forks/Tashima-Tarsh/Disha?style=flat-square&color=blue" alt="Forks"></a>
-  <a href="https://github.com/Tashima-Tarsh/Disha/commits/main"><img src="https://img.shields.io/github/last-commit/Tashima-Tarsh/Disha?style=flat-square&color=purple" alt="Last Commit"></a>
-  <a href="https://github.com/Tashima-Tarsh/Disha/actions/workflows/ci.yml"><img src="https://github.com/Tashima-Tarsh/Disha/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
-  <a href="https://github.com/Tashima-Tarsh/Disha/actions/workflows/cognitive-engine-ci.yml"><img src="https://github.com/Tashima-Tarsh/Disha/actions/workflows/cognitive-engine-ci.yml/badge.svg" alt="Cognitive Engine CI"></a>
-  <a href="https://github.com/Tashima-Tarsh/Disha/actions/workflows/ai-platform-ci.yml"><img src="https://github.com/Tashima-Tarsh/Disha/actions/workflows/ai-platform-ci.yml/badge.svg" alt="AI Platform CI"></a>
+  <img src="https://img.shields.io/badge/Version-v5.0.0--Elite-7c3aed?style=for-the-badge&logo=rocket" alt="Version">
+  <img src="https://img.shields.io/badge/Architecture-7--Layer_Cognitive-0ea5e9?style=for-the-badge&logo=blueprint" alt="Architecture">
+  <img src="https://img.shields.io/badge/Intelligence-Multi--Agent_Consensus-22c55e?style=for-the-badge&logo=brain" alt="Intelligence">
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Version-v4.0.0-6366f1?style=flat-square" alt="Version">
-  <img src="https://img.shields.io/badge/Files-3%2C700+-0ea5e9?style=flat-square" alt="Files">
-  <img src="https://img.shields.io/badge/Lines_of_Code-452K+-22c55e?style=flat-square" alt="LoC">
-  <img src="https://img.shields.io/badge/Cognitive_Stages-7-8b5cf6?style=flat-square" alt="Cognitive Stages">
-  <img src="https://img.shields.io/badge/AI_Agents-7-f59e0b?style=flat-square" alt="Agents">
-  <img src="https://img.shields.io/badge/Tools-40+-ef4444?style=flat-square" alt="Tools">
-  <img src="https://img.shields.io/badge/Knowledge_Domains-8-14b8a6?style=flat-square" alt="Domains">
-  <img src="https://img.shields.io/badge/CI_Pipelines-10-ec4899?style=flat-square" alt="CI Pipelines">
+  <a href="#what-is-disha">Overview</a> •
+  <a href="#why-disha-matters">Mission</a> •
+  <a href="#core-features">Features</a> •
+  <a href="#tech-stack">Tech Stack</a> •
+  <a href="#installation">Setup</a> •
+  <a href="#architecture">Architecture</a> •
+  <a href="#security">Security</a>
 </p>
-
-<br>
 
 ---
 
-## What is DISHA?
+## 🌌 What is DISHA?
 
-DISHA is a production-grade **AGI platform** built from first principles — combining a 7-layer intelligent architecture, real-time multi-agent reasoning, 3-layer memory, quantum-inspired decision making, and a full-stack observability dashboard.
+DISHA is a world-class **Autonomous Cognitive Platform** built to transcend standard LLM wrappers. It implements a sophisticated 7-stage cognitive loop that allows AI to perceive, deliberate, and reflect with biological elegance. 
 
-It is not a wrapper around a single LLM. It is a **cognitive system** designed to perceive, reason, deliberate, act, reflect, and learn — autonomously, in a loop.
+At its core, DISHA is a **"Digital Soul"** for your infrastructure—capable of autonomous threat hunting, cross-domain knowledge synthesis, and strategic decision-making through a consensus of expert agents.
 
+### 🧠 The 7-Stage Cognitive Loop
+
+Unlike linear AI, DISHA processes information in a self-healing cycle:
+
+```mermaid
+graph LR
+    A[Perceive] --> B[Attend]
+    B --> C[Reason]
+    C --> D[Deliberate]
+    D --> E[Act]
+    E --> F[Reflect]
+    F --> G[Consolidate]
+    G --> A
+    style D fill:#7c3aed,stroke:#fff,stroke-width:2px
 ```
-Input → Perceive → Attend → Reason → Deliberate → Act → Reflect → Consolidate → Output
-                              ↑                                          |
-                              └──────────── Memory & Learning ──────────┘
-```
+
+1. **Perceive:** Real-time intent and entity extraction.
+2. **Attend:** Retrieval from 3-layer persistent memory (Episodic, Semantic, Working).
+3. **Reason:** Multi-perspective hypothesis generation.
+4. **Deliberate:** Multi-agent consensus voting (Planner + Executor + Critic).
+5. **Act:** Confidence-gated execution or clarification.
+6. **Reflect:** Metacognitive analysis and quality scoring.
+7. **Consolidate:** Knowledge graph updates and long-term memory formation.
 
 ---
 
-## Architecture Overview
+## ⚡ Why DISHA Matters
 
-DISHA is organized into **7 layers**, each independently deployable and CI-tested.
+In an era of increasing digital noise and complex threats, DISHA provides **Direction**. 
+- **Autonomy:** Operates independently in a self-healing loop.
+- **Precision:** Uses GNNs and RL to optimize investigation strategies.
+- **Elite Performance:** Built on Bun + Python 3.13 for ultra-low latency intelligence.
+- **Trust:** Transparent deliberation where dissenting views are preserved, not discarded.
+
+---
+
+## 🛠️ Tech Stack
+
+DISHA is a masterclass in modern system architecture:
+
+| Component | Technology | Role |
+|-----------|------------|------|
+| **Core Runtime** | [Bun](https://bun.sh/) | High-performance JS/TS engine |
+| **Intelligence** | [Python 3.13](https://python.org) | Advanced ML/AI processing |
+| **Frontend** | [Next.js 16](https://nextjs.org) | Luxury React Framework |
+| **Styling** | [Tailwind CSS](https://tailwindcss.com) | Modern Utility Design |
+| **Databases** | [Neo4j](https://neo4j.com) + [ChromaDB](https://trychroma.com) | Graph + Vector Memory |
+| **Protocols** | [MCP](https://modelcontextprotocol.io) | Universal Tool Integration |
+
+---
+
+## 🏗️ 7-Layer Architecture
 
 | Layer | Module | Purpose |
 |-------|--------|---------|
-| 1 | `src/` | Core CLI Engine (TypeScript + Bun + React/Ink) |
-| 2 | `ai-platform/` | Multi-Agent Intelligence Platform (FastAPI + Next.js) |
-| 3 | `cognitive-engine/` | DISHA-MIND: 7-Stage Cognitive Loop |
-| 4 | `decision-engine/` | 4-Agent Reasoning Framework |
-| 5 | `cyber-defense/` | Honeypot Network + ML Threat Detection |
-| 6 | `quantum-physics/` | Quantum Circuit Simulator + Physics Engines |
-| 7 | `historical-strategy/` | AI Military & Strategic Intelligence |
+| **1** | `src/` | **CLI Core:** High-performance terminal interface. |
+| **2** | `ai-platform/` | **Global Brain:** Multi-agent backend & orchestrator. |
+| **3** | `cognitive-engine/` | **Reasoning Core:** DISHA-MIND 7-stage loop. |
+| **4** | `decision-engine/` | **Strategic Framework:** Multi-perspective decision making. |
+| **5** | `cyber-defense/` | **Sentinel Shield:** ML-powered threat neutralization. |
+| **6** | `quantum-physics/` | **Quantum Edge:** Advanced physics & circuit simulations. |
+| **7** | `historical-strategy/` | **Strategy Engine:** Military & Geopolitical AI analysis. |
 
 ---
 
-## Layer 3 — DISHA-MIND Cognitive Engine
-
-The cognitive engine is the intelligence core of DISHA. It processes every input through 7 stages, maintaining persistent memory across sessions.
-
-### 7-Stage Cognitive Loop
-
-```
-Stage 1  PERCEIVE      Intent classification, entity extraction, uncertainty estimation
-Stage 2  ATTEND        3-layer memory retrieval, working memory decay management
-Stage 3  REASON        Parallel deductive / inductive / abductive hypothesis generation
-Stage 4  DELIBERATE    Multi-agent consensus (Planner + Executor + Critic) + dissent preservation
-Stage 5  ACT           Confidence-gated action selection or clarification request
-Stage 6  REFLECT       Quality scoring, metacognitive analysis, learning trigger detection
-Stage 7  CONSOLIDATE   Episodic storage, concept extraction, semantic graph update
-```
-
-### 3-Layer Memory Architecture
-
-| Layer | Type | Capacity | Persistence |
-|-------|------|----------|-------------|
-| Working | Volatile attention buffer | 8 slots | In-process |
-| Episodic | Time-stamped event log | Unlimited | JSON on disk |
-| Semantic | Concept relationship graph | Unlimited | JSON on disk |
-
-### Multi-Agent Deliberation
-
-Three independent agents reason in parallel:
-
-- **Planner** — Strategic recommendation
-- **Executor** — Tactical recommendation
-- **Critic** — Challenge and dissent
-
-Consensus is computed by confidence-weighted voting. Dissenting views are **preserved**, not discarded — they surface in the reflection stage and influence learning.
-
-Iterative consensus: if inter-agent agreement < 0.4, bottom-50% agents re-deliberate (up to 3 rounds).
-
----
-
-## Layer 2 — AI Intelligence Platform
-
-### Backend (FastAPI)
-
-| Component | Description |
-|-----------|-------------|
-| Orchestrator | 5-phase investigation pipeline |
-| OSINT Agent | Passive DNS, IP intel, threat feeds |
-| Crypto Agent | Blockchain address analysis |
-| Detection Agent | Anomaly detection from entities |
-| Graph Agent | Neo4j knowledge graph (UNWIND batch) |
-| Reasoning Agent | LLM-based chain-of-thought analysis |
-| Vision Agent | GPT-4o / LLaVA image analysis |
-| Audio Agent | Whisper transcription + analysis |
-| RL Engine | PPO (12-dim state, 8 actions, prioritized replay) |
-| GNN | GCN encoder + link predictor + graph classifier |
-| Vector Store | ChromaDB (async, non-blocking) |
-| Ranking | PageRank + temporal decay |
-| Prompt Optimizer | Evolutionary optimization |
-
-### Frontend (Next.js + Tailwind)
-
-14 visualization panels including:
-- Real-time alerts feed (4 severity levels)
-- Knowledge graph canvas
-- RL training metrics
-- Quantum physics interface
-- Geographic threat map
-- **Cognitive Loop visualizer** — live 7-stage pipeline with working memory bars, hypothesis panel, agent deliberations, reflection quality gauge
-
----
-
-## Layer 1 — Core CLI Engine
-
-Built with TypeScript, Bun, and React/Ink for terminal rendering.
-
-- **40+ tools** — file I/O, bash execution, web search, LSP, MCP, agent spawning
-- **100+ commands** — git, code review, configuration, model management
-- **Model Context Protocol (MCP)** — server with STDIO/HTTP/SSE transports
-- **IDE bridge** — VS Code and JetBrains integration
-- **OpenTelemetry** — traces, metrics, logs out of the box
-
----
-
-## Security Hardening (v4.0.0)
-
-| Issue | Fix |
-|-------|-----|
-| WebSocket unauthenticated | JWT validation via `?token=` query param; closes with 4001/4003 on failure |
-| Empty SECRET_KEY signed valid JWTs | `field_validator` auto-generates secure 32-byte key in dev; enforces explicit setting in production |
-| Hardcoded CORS origins | `CORS_ORIGINS` env var with `get_cors_origins()` method |
-| Blocking async event loop | ChromaDB calls wrapped in `asyncio.to_thread()` |
-| N+1 Neo4j writes | Single `UNWIND $rows` batch query replaces per-entity MERGE loop |
-| `/context` no input validation | `Query(min_length=1, max_length=500, ge=1, le=20)` guards |
-
----
-
-## CI/CD
-
-10 GitHub Actions pipelines, all green:
-
-| Pipeline | Trigger | Checks |
-|----------|---------|--------|
-| `ci.yml` | push/PR to main | Biome lint + Bun tests |
-| `cognitive-engine-ci.yml` | `cognitive-engine/**` | flake8 + pytest (≥20% coverage) |
-| `ai-platform-ci.yml` | `ai-platform/**` | flake8 + pytest |
-| `decision-engine-ci.yml` | `decision-engine/**` | flake8 + pytest |
-| `cyber-defense-ci.yml` | `cyber-defense/**` | flake8 + pytest |
-| `sentinel-ci.yml` | `scripts/sentinel/**` | flake8 + pytest |
-| `codeql.yml` | Scheduled | SAST (TypeScript + Python) |
-| `continuous-training.yml` | Daily 2 AM UTC | RL + GNN + Decision Engine training |
-| `disha-mythos.yml` | Scheduled | Learning agent execution |
-| `modules-ci.yml` | push to main | Module-level testing |
-
----
-
-## Knowledge Base
-
-8 domains, continuously expanding:
-
-| Domain | Coverage |
-|--------|----------|
-| Physics | Quantum mechanics, relativity, unified field theory |
-| Mathematics | Number theory, calculus, probability, discrete math |
-| Computing | Algorithms, systems, CS fundamentals |
-| Chemistry | All 118 elements of the periodic table |
-| Law & Politics | Constitutional law, case law, legal frameworks |
-| Cybersecurity | Threat taxonomy, OSINT, defense patterns |
-| Innovation | Emerging tech, future systems |
-| Historical Strategy | 32+ military conflicts, scenario simulation |
-
----
-
-## Quick Start
+## 🚀 Installation
 
 ### Prerequisites
+- **Bun** ≥ 1.1.0
+- **Python** ≥ 3.11
+- **Docker** + **Docker Compose**
 
-- Bun ≥ 1.1.0
-- Python ≥ 3.11
-- Docker + Docker Compose
-- Node.js ≥ 18 (for frontend)
-
-### CLI
-
+### Quick Start
 ```bash
 git clone https://github.com/Tashima-Tarsh/Disha.git
 cd Disha
@@ -220,80 +113,44 @@ bun run build
 ./dist/cli.mjs
 ```
 
-### AI Platform (Full Stack)
-
+### Full Ecosystem Launch
 ```bash
 cd ai-platform/docker
 docker compose up -d
 ```
-
-Services start at:
-- Frontend: `http://localhost:3000`
-- Backend API: `http://localhost:8000`
-- Cognitive Engine: `http://localhost:8001`
-- Neo4j: `http://localhost:7474`
-- ChromaDB: `http://localhost:8002`
-
-### Cognitive Engine (Standalone)
-
-```bash
-cd cognitive-engine
-pip install -r requirements.txt
-python -m pytest tests/ -v
-```
-
-```python
-from cognitive_engine import CognitiveEngine
-
-engine = CognitiveEngine()
-state = await engine.process("Analyze domain evil.io for threats", session_id="s1")
-print(state.action)
-```
+Access the Premium Dashboard at `http://localhost:3000`.
 
 ---
 
-## Project Stats
+## 🛡️ Security
 
-| Metric | Count |
-|--------|-------|
-| Files | 3,700+ |
-| Lines of Code | 452,000+ |
-| Python Modules | 80+ |
-| TypeScript/TSX Files | 100+ |
-| AI Agents | 7 |
-| Cognitive Stages | 7 |
-| Memory Layers | 3 |
-| API Endpoints | 49+ |
-| Tools | 40+ |
-| Commands | 100+ |
-| CI Pipelines | 10 |
-| Dockerfiles | 19 |
-| Knowledge Domains | 8 |
-| Test Files | 13+ |
-| Historical Scenarios | 32+ |
+DISHA is built with a **Zero Trust** philosophy:
+- **Sentinel Monitoring:** Real-time health and integrity checks.
+- **Agent Isolation:** Each intelligence agent operates in a restricted context.
+- **JWT Hardening:** Secure token-based authentication for all WebSockets.
+- **SAST/DAST:** Continuous security scanning via CodeQL.
 
 ---
 
-## About the Creator
+## 🗺️ Roadmap v5.x
 
-**Tashima Tarsh** — AGI researcher, full-stack engineer, and system architect. DISHA is an independent research project exploring cognitive architectures, multi-agent systems, and autonomous intelligence.
-
-- GitHub: [@Tashima-Tarsh](https://github.com/Tashima-Tarsh)
+- [ ] **v5.1:** Real-time Kafka streaming for live OSINT feeds.
+- [ ] **v5.2:** Advanced molecular dynamics simulation in the Physics layer.
+- [ ] **v5.3:** Multi-language (i18n) support for global deployment.
+- [ ] **v6.0:** Full decentralized AGI distribution (Peer-to-Peer reasoning).
 
 ---
 
-## Links
+## 🤝 Contributing
 
-| Resource | Link |
-|----------|------|
-| Wiki | [WIKI.md](./WIKI.md) |
-| Changelog | [CHANGELOG.md](./CHANGELOG.md) |
-| Contributing | [CONTRIBUTING.md](./CONTRIBUTING.md) |
-| Usage Guide | [USAGE_GUIDE.md](./USAGE_GUIDE.md) |
-| Issues | [GitHub Issues](https://github.com/Tashima-Tarsh/Disha/issues) |
+We welcome elite researchers and engineers. See [CONTRIBUTING.md](./CONTRIBUTING.md) for guidelines.
+
+## 📄 License
+
+DISHA is licensed under the Apache 2.0 License. See [LICENSE](./LICENSE) for details.
 
 ---
 
 <p align="center">
-  <sub>DISHA — दिशा — Direction. Built with intention.</sub>
+  <sub>DISHA — दिशा — Direction. Designed for the Future.</sub>
 </p>

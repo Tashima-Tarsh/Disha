@@ -14,6 +14,7 @@ from app.agents.reasoning_agent import ReasoningAgent
 from app.agents.legal_agent import LegalAgent
 from app.agents.education_agent import EducationAgent
 from app.agents.sentinel_agent import SentinelAgent
+from app.agents.national_intelligence_agent import NationalIntelligenceAgent
 
 logger = structlog.get_logger(__name__)
 
@@ -30,6 +31,7 @@ class Orchestrator:
         self.legal_agent = LegalAgent()
         self.education_agent = EducationAgent()
         self.sentinel_agent = SentinelAgent()
+        self.ni_agent = NationalIntelligenceAgent()
         self.logger = logger.bind(component="orchestrator")
 
     async def investigate(
@@ -111,6 +113,9 @@ class Orchestrator:
 
         if investigation_type in ("sentinel", "full"):
             tasks["sentinel"] = self.sentinel_agent.run(target, options)
+
+        if investigation_type in ("ni", "full"):
+            tasks["ni"] = self.ni_agent.run(target, options)
 
         if not tasks:
             tasks["osint"] = self.osint_agent.run(target, options)

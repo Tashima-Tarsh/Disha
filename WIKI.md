@@ -1,20 +1,18 @@
 <p align="center">
-  <img src="docs/images/wiki-banner.svg" alt="Disha Wiki" width="100%">
+  <img src="docs/images/banner_v5.png" alt="DISHA v5.0.0 Wiki" width="100%">
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Sections-21-blue?style=flat-square" alt="Sections">
-  <img src="https://img.shields.io/badge/Systems-6-green?style=flat-square" alt="Systems">
-  <img src="https://img.shields.io/badge/API_Endpoints-49+-orange?style=flat-square" alt="Endpoints">
-  <img src="https://img.shields.io/badge/Components-143-purple?style=flat-square" alt="Components">
-  <img src="https://img.shields.io/badge/Hooks-14-red?style=flat-square" alt="Hooks">
+  <img src="https://img.shields.io/badge/Release-v5.0.0--Elite-7c3aed?style=flat-square" alt="Release">
+  <img src="https://img.shields.io/badge/Design-Luxury_Minimalism-0ea5e9?style=flat-square" alt="Design">
+  <img src="https://img.shields.io/badge/Intelligence-Autonomous_MIND-22c55e?style=flat-square" alt="Intelligence">
 </p>
 
 ---
 
-# 📖 DISHA — Complete Project Wiki
+# 📖 DISHA v5.0.0 — The Complete Wiki
 
-> **Disha** (दिशा) — *"Direction"* in Sanskrit. A self-learning, multi-agent AGI platform that combines a production-grade AI coding assistant with a distributed threat intelligence system featuring reinforcement learning, multimodal analysis, and autonomous agent collaboration.
+> **DISHA** (Direction) is the world's first **Autonomous Cognitive Operating System**. This wiki serves as the definitive reference for the 7-layer AGI architecture, multi-agent coordination protocols, and domain-specific intelligence modules.
 
 ---
 

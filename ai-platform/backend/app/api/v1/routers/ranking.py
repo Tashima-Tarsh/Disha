@@ -5,6 +5,7 @@ from app.api.deps import get_intelligence_ranker, get_cluster_coordinator
 
 router = APIRouter()
 
+
 def _register_cluster_agents(cluster_coordinator):
     """Register all available agents in the cluster coordinator."""
     from app.agents.osint_agent import OSINTAgent
@@ -25,9 +26,9 @@ def _register_cluster_agents(cluster_coordinator):
 @router.post("/investigate/collaborative")
 async def collaborative_investigate(
     request: CollaborativeRequest,
-    current_user: dict = Depends(get_current_user),
-    cluster_coordinator = Depends(get_cluster_coordinator),
-    intelligence_ranker = Depends(get_intelligence_ranker)
+    current_user: dict=Depends(get_current_user),
+    cluster_coordinator=Depends(get_cluster_coordinator),
+    intelligence_ranker=Depends(get_intelligence_ranker)
 ):
     """Run a multi-agent collaborative investigation with peer review and consensus."""
     if not cluster_coordinator.nodes:
@@ -44,8 +45,8 @@ async def collaborative_investigate(
 
 @router.get("/cluster/status")
 async def cluster_status(
-    current_user: dict = Depends(get_current_user),
-    cluster_coordinator = Depends(get_cluster_coordinator)
+    current_user: dict=Depends(get_current_user),
+    cluster_coordinator=Depends(get_cluster_coordinator)
 ):
     """Get the status of the distributed agent cluster."""
     if not cluster_coordinator.nodes:
@@ -55,8 +56,8 @@ async def cluster_status(
 @router.post("/rankings/entities")
 async def get_entity_rankings(
     request: RankingRequest,
-    current_user: dict = Depends(get_current_user),
-    intelligence_ranker = Depends(get_intelligence_ranker)
+    current_user: dict=Depends(get_current_user),
+    intelligence_ranker=Depends(get_intelligence_ranker)
 ):
     """Get ranked intelligence entities by composite score."""
     rankings = intelligence_ranker.get_rankings(
@@ -68,8 +69,8 @@ async def get_entity_rankings(
 
 @router.get("/rankings/agents")
 async def get_agent_rankings(
-    current_user: dict = Depends(get_current_user),
-    intelligence_ranker = Depends(get_intelligence_ranker)
+    current_user: dict=Depends(get_current_user),
+    intelligence_ranker=Depends(get_intelligence_ranker)
 ):
     """Get agent reliability rankings."""
     return {
@@ -82,8 +83,8 @@ async def record_agent_outcome(
     agent_name: str,
     true_positive: bool,
     investigation_time: float,
-    current_user: dict = Depends(get_current_user),
-    intelligence_ranker = Depends(get_intelligence_ranker)
+    current_user: dict=Depends(get_current_user),
+    intelligence_ranker=Depends(get_intelligence_ranker)
 ):
     """Record an agent's investigation outcome for reliability tracking."""
     intelligence_ranker.record_agent_outcome(

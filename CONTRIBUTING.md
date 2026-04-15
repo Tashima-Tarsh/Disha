@@ -1,59 +1,61 @@
-### Prerequisites
+# Contributing to DISHA v5.0.0
 
-- **Bun** 1.1+ (CLI runtime)
-- **Node.js** 18+ (MCP server)
-- **Python** 3.11+ (AI platform, decision engine, cyber defense)
-- **Git**
+First off, thank you for considering contributing to DISHA! It's people like you that make DISHA an elite tool for the AGI community.
+
+## 🌟 Code of Conduct
+
+By participating in this project, you agree to abide by our [Code of Conduct](./CODE_OF_CONDUCT.md).
+
+## 🚀 Getting Started
+
+### Prerequisites
+- **Bun** ≥ 1.1.0 (Primary runtime)
+- **Python** ≥ 3.13 (AI & ML modules)
+- **Node.js** ≥ 20 (Compatibility)
+- **Docker** (For full ecosystem testing)
 
 ### Setup
+1. Fork the repository
+2. Clone your fork: `git clone https://github.com/Tashima-Tarsh/Disha.git`
+3. Install dependencies: `bun install`
+4. Create a new branch: `git checkout -b feature/your-feature-name`
 
+## 🛠️ Development Workflow
+
+### CLI Core (TypeScript)
+The core engine is located in `src/`. We use **Biome** for linting and formatting.
 ```bash
-git clone https://github.com/Tashima-Tarsh/Disha.git
-cd Disha
+bun run lint      # Check for issues
+bun run format    # Auto-format code
+bun run build     # Build the CLI bundle
 ```
 
-### MCP Server Development
-
+### AI Platforms (Python)
+Each platform has its own `requirements.txt`.
 ```bash
-cd mcp-server
-npm install
-npm run dev    # Run with tsx (no build step)
-npm run build  # Compile to dist/
+# Example: AI Platform
+cd ai-platform/backend
+pip install -r requirements.txt
+python -m pytest tests/
 ```
 
-### Linting & Type Checking
+## 📐 Coding Standards
 
-```bash
-# From the repo root — checks the src/
-npm run lint        # Biome lint
-npm run typecheck   # TypeScript type check
-```
+- **TypeScript:** Strict mode, ES Modules, descriptive naming.
+- **Python:** PEP 8, 120 char line limit, docstrings for all public classes/methods.
+- **CSS:** Tailwind CSS utility-first approach with semantic HSL tokens.
 
-### Python Modules
+## 📬 Pull Request Process
 
-```bash
-# AI Platform
-cd ai-platform/backend && pip install -r requirements.txt
+1. Ensure your code passes all linting and tests.
+2. Update the README or documentation if you've added new features.
+3. Submit the PR with a clear description of the "What" and the "Why".
+4. One of the maintainers (Tashima Tarsh) will review your PR within 48 hours.
 
-# Decision Engine (mock mode — no LLM needed)
-cd decision-engine && pip install -r requirements.txt
-DISHA_MODEL_PROVIDER=mock python -m pytest tests/ -v
+## 💎 Reporting Bugs & Suggestions
 
-# Cyber Defense
-cd cyber-defense && pip install torch --index-url https://download.pytorch.org/whl/cpu
-```
+Please use [GitHub Issues](https://github.com/Tashima-Tarsh/Disha/issues) to report bugs or suggest new features. For security-related reports, please see our [Security Policy](./SECURITY.md).
 
-## Code Style
+---
 
-For any new code (MCP server, tooling, scripts):
-
-- TypeScript with strict mode
-- ES modules
-- 2-space indentation (tabs for `src/` to match Biome config)
-- Descriptive variable names, minimal comments
-- Python: PEP 8, max line length 120, flake8 for linting
-
-
-## Questions?
-
-Open an issue at https://github.com/Tashima-Tarsh/Disha/issues
+<sub>Dedicated to the evolution of digital thought.</sub>

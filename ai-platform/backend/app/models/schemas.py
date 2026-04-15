@@ -13,6 +13,7 @@ class InvestigationType(str, Enum):
     LEGAL = "legal"
     EDUCATION = "education"
     SENTINEL = "sentinel"
+    NI = "ni"
     THREAT = "threat"
     FULL = "full"
 

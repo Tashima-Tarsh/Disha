@@ -6,6 +6,7 @@ from datetime import datetime, timezone
 
 logger = structlog.get_logger(__name__)
 
+
 class LearningLoop:
     """Foundational service for capturing feedback and improving intelligence over time."""
 
@@ -13,15 +14,15 @@ class LearningLoop:
         self.logger = logger.bind(service="learning_loop")
 
     async def log_search_relevance(
-        self, 
-        query: str, 
-        results_count: int, 
+        self,
+        query: str,
+        results_count: int,
         avg_distance: float,
         user_id: str | None = None
     ) -> None:
         """Log search performance metadata to detect 'Knowledge Gaps'."""
         is_knowledge_gap = results_count == 0 or avg_distance > 0.8
-        
+
         log_data = {
             "query": query,
             "results_count": results_count,

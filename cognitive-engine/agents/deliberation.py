@@ -232,7 +232,7 @@ class AgentDeliberator:
         if state.context.get("uncertainty_level", 0) > 0.6:
             concerns.append("high_uncertainty_may_affect_plan_execution")
 
-        plan_text = " → ".join(f"Step {i+1}: {s}" for i, s in enumerate(steps))
+        plan_text = " → ".join(f"Step {i + 1}: {s}" for i, s in enumerate(steps))
         recommendation = f"Execute {len(steps)}-step plan: {plan_text}"
 
         return {

@@ -34,7 +34,12 @@ class GCNEncoder(nn.Module):
 
     def forward(self, x: torch.Tensor, edge_index: torch.Tensor | None = None) -> torch.Tensor:
         """Forward pass through GCN layers."""
-        if self._use_geometric and edge_index is not None:
+        if self._use_geometric:
+            if edge_index is None:
+                # Default to self-loops if no edges provided
+                num_nodes = x.size(0)
+                edge_index = torch.arange(num_nodes, device=x.device).unsqueeze(0).repeat(2, 1)
+            
             x = self.conv1(x, edge_index)
             x = self.bn1(x)
             x = F.relu(x)

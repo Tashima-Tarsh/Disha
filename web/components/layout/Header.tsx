@@ -22,14 +22,14 @@ export function Header() {
   const nextTheme = theme === "dark" ? "light" : theme === "light" ? "system" : "dark";
 
   return (
-    <header className="flex items-center justify-between px-8 py-5 h-20 glass-elite border-b border-white/5 z-10 relative">
+    <header className="flex items-center justify-between px-8 py-5 h-20 bg-card/40 backdrop-blur-xl border-b border-white/5 z-10 relative">
       <div className="flex items-center gap-6">
         <div className="flex flex-col">
-          <span className="text-[10px] font-display tracking-[0.4em] text-pearl/40 uppercase mb-0.5 ml-0.5">
-            Omnigravity
+          <span className="text-[10px] font-display tracking-[0.4em] text-primary uppercase mb-0.5 ml-0.5">
+            DISHA v5.0
           </span>
           <h1 className="text-sm font-display tracking-[0.2em] font-medium text-white uppercase">
-            Command Center
+            Cognitive Hub
           </h1>
         </div>
       </div>

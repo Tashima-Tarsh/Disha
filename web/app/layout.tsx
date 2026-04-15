@@ -37,10 +37,20 @@ const plusJakartaSans = Plus_Jakarta_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "DISHA ELITE — The Future of Intelligence",
-  description: "DISHA ELITE — A world-class, billion-dollar cognitive AGI platform designed for the top 1% elite organizations.",
-  icons: {
-    icon: "/favicon.ico",
+  title: "DISHA v5.0.0 | The Autonomous Cognitive Operating System",
+  description: "DISHA is an elite AGI platform integrating multi-agent reasoning, cognitive loops, and domain-specific intelligence (Cyber, Quantum, Strategy). Built for the future of digital defense.",
+  keywords: ["AGI", "Cognitive AI", "Cyber Defense", "Security Operations", "Quantum Computing", "Autonomous Intelligence"],
+  openGraph: {
+    title: "DISHA v5.0.0 | Autonomous Cognitive AGI",
+    description: "The world-class 7-layer AGI platform for intelligence and defense.",
+    images: ["/docs/images/banner_v5.png"],
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "DISHA v5.0.0 | AGI Ecosystem",
+    description: "Empowering the top 1% organizations with cognitive decision systems.",
+    images: ["/docs/images/banner_v5.png"],
   },
 };
 
@@ -53,9 +63,9 @@ export default function RootLayout({
 
   return (
     <html lang="en" className="dark h-full w-full overflow-hidden" suppressHydrationWarning>
-      <body className={`${inter.variable} ${jetbrainsMono.variable} ${outfit.variable} ${plusJakartaSans.variable} font-sans antialiased bg-midnight text-pearl selection:bg-aurora/30 h-full w-full overflow-hidden relative`}>
-        {/* DISHA ELITE — AURORA MESH CORE */}
-        <div className="aurora-mesh pointer-events-none" />
+      <body className={`${inter.variable} ${jetbrainsMono.variable} ${outfit.variable} ${plusJakartaSans.variable} font-sans antialiased bg-background text-foreground h-full w-full overflow-hidden relative selection:bg-primary/30`}>
+        {/* DISHA v5.0.0 — QUANTUM CORE BASE */}
+        <div className="quantum-grid fixed inset-0 pointer-events-none opacity-20" />
         
         <div className="relative z-10 h-full w-full overflow-hidden">
           <JarvisProvider>

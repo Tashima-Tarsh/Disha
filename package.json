@@ -1,7 +1,7 @@
 {
   "name": "@tashima-tarsh/disha",
-  "version": "0.1.0",
-  "description": "A smart security system that observes, analyzes, and neutralizes digital threats using adaptive AI and behavioral intelligence.",
+  "version": "5.0.0",
+  "description": "An elite autonomous AGI platform for cognitive defense, strategic reasoning, and digital intelligence.",
   "license": "UNLICENSED",
   "private": true,
   "type": "module",
@@ -29,7 +29,7 @@
     "dev:mcp": "cd mcp-server && npm run dev"
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.87.0",
+    "@anthropic-ai/sdk": "^0.89.0",
     "@commander-js/extra-typings": "^14.0.0",
     "@growthbook/growthbook": "^1.6.5",
     "@modelcontextprotocol/sdk": "^1.29.0",
@@ -51,7 +51,7 @@
     "chokidar": "^5.0.0",
     "cli-boxes": "^4.0.1",
     "code-excerpt": "^4.0.0",
-    "diff": "^8.0.4",
+    "diff": "^9.0.0",
     "execa": "^9.6.1",
     "figures": "^6.1.0",
     "fuse.js": "^7.3.0",
@@ -72,7 +72,7 @@
     "supports-hyperlinks": "^4.4.0",
     "tree-kill": "^1.2.2",
     "type-fest": "^5.5.0",
-    "undici": "^8.0.2",
+    "undici": "^8.1.0",
     "usehooks-ts": "^3.1.1",
     "wrap-ansi": "^10.0.0",
     "ws": "^8.20.0",
@@ -80,7 +80,7 @@
     "zod": "^4.3.6"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.4.11",
+    "@biomejs/biome": "^2.4.12",
     "@types/diff": "^8.0.0",
     "@types/lodash-es": "^4.17.12",
     "@types/node": "^25.6.0",

@@ -17,19 +17,19 @@ export function EliteHero({ onStart }: { onStart: () => void }) {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5, duration: 1 }}
-            className="text-[10px] uppercase font-display tracking-[0.6em] text-aurora/60"
+            className="text-[10px] uppercase font-display tracking-[0.6em] text-primary/80"
           >
-            Elite Cognitive Architecture
+            v5.0.0 Global Platform
           </motion.span>
           
           <motion.h2
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.7, duration: 1 }}
-            className="text-5xl md:text-7xl font-display tracking-tight text-gradient-pearl font-light"
+            className="text-5xl md:text-8xl font-display tracking-tight text-gradient font-light"
           >
-            The Future of <br />
-            <span className="font-medium">Intelligent Thought</span>
+            Evolve Your <br />
+            <span className="font-medium italic">Digital Soul</span>
           </motion.h2>
         </div>
 
@@ -37,32 +37,32 @@ export function EliteHero({ onStart }: { onStart: () => void }) {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 1, duration: 1.5 }}
-          className="text-pearl/40 font-sans text-lg max-w-2xl mx-auto leading-relaxed"
+          className="text-foreground/60 font-sans text-xl max-w-2xl mx-auto leading-relaxed"
         >
-          Welcome to the world-class cognitive ecosystem. DISHA ELITE leverages next-generation multi-agent intelligence to solve the most complex challenges with unparalleled precision and elegance.
+          DISHA is more than intelligence. It is the architectural foundation for a world where AI perceives, deliberates, and learns with the elegance of biological thought.
         </motion.p>
 
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 1.5, duration: 1 }}
-          className="flex items-center justify-center space-x-6"
+          className="flex items-center justify-center space-x-6 pt-8"
         >
           <motion.button
             onClick={onStart}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className="px-10 py-5 rounded-full bg-white text-midnight font-display text-sm tracking-widest uppercase font-bold shadow-[0_0_40px_rgba(255,255,255,0.2)] transition-all hover:shadow-[0_0_60px_rgba(255,255,255,0.4)]"
+            className="btn-premium"
           >
-            Initialize Uplink
+            Launch Core Ecosystem
           </motion.button>
         </motion.div>
       </motion.div>
 
-      {/* Atmospheric Accents */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full pointer-events-none opacity-20">
-         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-aurora/10 rounded-full blur-[160px]" />
-         <div className="absolute top-1/4 left-1/3 w-[400px] h-[400px] bg-royal/10 rounded-full blur-[120px]" />
+      {/* Quantum Accents */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full pointer-events-none opacity-30 px-24">
+         <div className="absolute top-[15%] left-[10%] w-[300px] h-[300px] bg-primary/20 rounded-full blur-[100px] animate-pulse" />
+         <div className="absolute bottom-[20%] right-[15%] w-[400px] h-[400px] bg-accent/10 rounded-full blur-[120px] animate-pulse" />
       </div>
     </div>
   );

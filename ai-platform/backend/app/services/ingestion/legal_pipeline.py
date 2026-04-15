@@ -1,11 +1,10 @@
 """Legal Knowledge Ingestion Pipeline - Fetches and processes legal documents."""
 
-import asyncio
 import uuid
 from typing import Any
-import httpx
 import structlog
 from app.services.memory.vector_store import VectorStore
+
 
 logger = structlog.get_logger(__name__)
 
@@ -19,23 +18,23 @@ class LegalPipeline:
     async def run(self, source_url: str | None = None) -> dict[str, Any]:
         """Run the full ingestion cycle."""
         self.logger.info("ingestion_started", source=source_url or "Official GoI Portals")
-        
+
         # Step 1: Fetch source
         # In a real scenario, this would involve scraping legislative.gov.in
         # For this execution, we'll implement a robust parser for a mock constitutional dataset
         # to demonstrate the metadata tagging logic.
         raw_data = await self._fetch_constitutional_data(source_url)
-        
+
         # Step 2: Parse and Chunk
         chunks = self._chunk_data(raw_data)
-        
+
         # Step 3: Embed and Store
         success = await self.vector_store.store(
             documents=[c["content"] for c in chunks],
             metadatas=[c["metadata"] for c in chunks],
             ids=[str(uuid.uuid4()) for _ in chunks]
         )
-        
+
         self.logger.info("ingestion_completed", success=success, chunk_count=len(chunks))
         return {"status": "success" if success else "failed", "chunks": len(chunks)}
 
@@ -65,11 +64,11 @@ class LegalPipeline:
                 "topic": "Fundamental Rights"
             },
             {
-                 "article": "21",
-                 "title": "Protection of life and personal liberty",
-                 "text": "No person shall be deprived of his life or personal liberty except according to procedure established by law.",
-                 "part": "Part III",
-                 "topic": "Fundamental Rights"
+                "article": "21",
+                "title": "Protection of life and personal liberty",
+                "text": "No person shall be deprived of his life or personal liberty except according to procedure established by law.",
+                "part": "Part III",
+                "topic": "Fundamental Rights"
             }
         ]
 

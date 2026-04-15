@@ -8,8 +8,8 @@ router = APIRouter()
 async def get_alerts(
     limit: int = 50,
     level: str | None = None,
-    current_user: dict = Depends(get_current_user),
-    alert_manager = Depends(get_alert_manager)
+    current_user: dict=Depends(get_current_user),
+    alert_manager=Depends(get_alert_manager)
 ):
     """Get recent alerts."""
     return {"alerts": alert_manager.get_alerts(limit=limit, level=level)}
@@ -18,7 +18,7 @@ async def get_alerts(
 async def websocket_alerts(
     websocket: WebSocket,
     token: str | None = None,
-    connection_manager = Depends(get_connection_manager)
+    connection_manager=Depends(get_connection_manager)
 ):
     """WebSocket endpoint for real-time alerts."""
     if not token:
