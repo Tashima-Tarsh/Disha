@@ -43,6 +43,8 @@ class Settings(BaseSettings):
     KAFKA_BOOTSTRAP_SERVERS: str = "localhost:9092"
     KAFKA_TOPIC_EVENTS: str = "intelligence-events"
     KAFKA_TOPIC_ALERTS: str = "intelligence-alerts"
+    KAFKA_TOPIC_OSINT_STREAM: str = "osint-intelligence-stream"
+    OSINT_STREAM_SIMULATION_ENABLED: bool = True
 
     # LLM
     LLM_MODEL: str = "gpt-4"

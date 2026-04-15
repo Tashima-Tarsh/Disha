@@ -1,5 +1,6 @@
 """FastAPI application entry point for the AI Intelligence Platform."""
 
+import asyncio
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
@@ -15,7 +16,25 @@ async def lifespan(app: FastAPI):
     """Application lifespan manager."""
     settings = get_settings()
     setup_logging(debug=settings.DEBUG)
+
+    # DISHA v5.1 Real-time OSINT Feeds
+    from app.services.streaming.osint_emitter import OSINTFeedEmitter
+    from app.services.streaming.osint_processor import OSINTStreamProcessor
+    
+    emitter = OSINTFeedEmitter()
+    processor = OSINTStreamProcessor()
+    
+    # Start background workers
+    emitter_task = asyncio.create_task(emitter.start())
+    processor_task = asyncio.create_task(processor.start())
+    
     yield
+    
+    # Shutdown logic
+    await emitter.stop()
+    await processor.stop()
+    emitter_task.cancel()
+    processor_task.cancel()
 
 
 def create_app() -> FastAPI:

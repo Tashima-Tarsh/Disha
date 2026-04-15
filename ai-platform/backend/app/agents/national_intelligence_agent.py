@@ -4,6 +4,10 @@ from typing import Any
 import structlog
 from app.agents.base_agent import BaseAgent
 from app.core.config import get_settings
+from app.services.ni.disaster_service import DisasterService
+from app.services.ni.infrastructure_service import InfrastructureService
+from app.services.physics.md_engine import MDEngine
+from app.agents.growth_agent import GrowthAgent
 
 logger = structlog.get_logger(__name__)
 
@@ -37,6 +41,12 @@ class NationalIntelligenceAgent(BaseAgent):
 
         # In this phase, we delegate to specific project logic.
         # Project VARUNA (Disaster Response) is our primary pilot.
+        
+        # v5.4 Sovereign Growth Mission
+        if project == "growth":
+            growth_agent = GrowthAgent()
+            growth_results = await growth_agent.run(target, options)
+            options["growth_analysis"] = growth_results
 
         prompt = self._build_ni_prompt(target, project, options)
         analysis = await self._generate_analysis(prompt)
@@ -45,8 +55,44 @@ class NationalIntelligenceAgent(BaseAgent):
             "target": target,
             "project": project.upper(),
             "ni_analysis": analysis,
+            "coupled_physics": coupled_results,
             "is_national_intelligence": True,
             "mission": f"PROJECT {project.upper()}"
+        }
+
+    async def _perform_multi_physics_analysis(self, target: str, options: dict[str, Any]) -> dict[str, Any]:
+        """Handshake between VARUNA (Environment) and SETU (Physics)."""
+        disaster_service = DisasterService()
+        infra_service = InfrastructureService()
+        physics_engine = MDEngine()
+        
+        # 1. Fetch environmental conditions (Real-time or simulated wind speed)
+        wind_speed = options.get("wind_speed_kmh", 180.0) # Default to Cyclone speed
+        
+        # 2. Get Bridge structural data
+        asset_details = await infra_service.get_asset_details(target)
+        if not asset_details:
+            return {"status": "asset_not_found"}
+
+        # 3. Map Wind Load to Physics Force Vector
+        load_vector = await infra_service.calculate_environmental_load_force(target, wind_speed)
+        
+        # 4. Run Molecular Dynamics Stress Simulation
+        # We simulate the material response under the wind load
+        simulation = await physics_engine.simulate(
+            n_atoms=128,
+            timesteps=300,
+            external_stress=load_vector,
+            material_params={"epsilon": 4.5, "sigma": 0.8, "mass": 55.8} # Iron/Steel
+        )
+        
+        # 5. Evaluate Predictive Failure
+        failure_analysis = await infra_service.evaluate_failure_risk(target, simulation.get("diagnostics", [])[-1] if simulation.get("diagnostics") else {})
+        
+        return {
+            "environmental_load": f"{wind_speed} km/h Wind",
+            "structural_response": simulation.get("status"),
+            "failure_prediction": failure_analysis
         }
 
     def _build_ni_prompt(self, target: str, project: str, options: dict[str, Any]) -> str:
@@ -65,6 +111,10 @@ Analyze the following signals for the mission: PROJECT {project.upper()} ({targe
 ### User Request / Context:
 - Target: {target}
 - Input Data: {options.get('signals', 'Standard NDAP/OGD metrics')}
+- **Multi-Physics Coupling (SETU x VARUNA)**: {options.get('coupled_physics', 'No active simulation')}
+- **Sovereign Growth Metrics (RFPI)**: {options.get('growth_analysis', 'Strategic priority metrics')}
+- **Global Intelligence Sync (GVM)**: {options.get('growth_analysis', {}).get('global_context', 'Synchronized International Pulses')}
+- **Real-time Intelligence Pulse**: {options.get('stream_context', 'Active Live Intelligence Stream')}
 - Objective: Provide actionable, privacy-preserving insights for Indian authorities.
 
 ### Required Analysis Structure:
@@ -72,6 +122,8 @@ Analyze the following signals for the mission: PROJECT {project.upper()} ({targe
 2. **Key Intelligence Signals**: [Critical indicators from public data sources]
 3. **AI-Driven Recommendations**: [Specific steps for decision-makers]
 4. **Resilience Impact**: [How this helps India's long-term safety/governance]
+5. **Live Stream Correlation**: [Correlate findings with active real-time pulses]
+6. **Global Synchronization Analysis**: [Explain how international market volatility or geopolitical tension is currently shifting domestic priorities]
 
 Maintain a respectful, authoritative, and mission-focused tone. Highlight "Sovereign Growth" and "Public Well-being."
 """
