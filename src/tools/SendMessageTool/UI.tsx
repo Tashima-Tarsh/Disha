@@ -13,9 +13,9 @@ export function renderToolUseMessage(input: Partial<Input>): React.ReactNode {
   return null;
 }
 export function renderToolResultMessage(content: SendMessageToolOutput | string, _progressMessages: unknown, {
-  verbose
+  _verbose
 }: {
-  verbose: boolean;
+  _verbose: boolean;
 }): React.ReactNode {
   const result: SendMessageToolOutput = typeof content === 'string' ? jsonParse(content) : content;
   if ('routing' in result && result.routing) {

@@ -318,8 +318,7 @@ export function LogSelector(t0) {
   }
   React.useEffect(t17, t18);
   const _searchableTextByLog = new Map(logs.map(_temp));
-  let _t19;
-  _t19 = null;
+  const _t19 = null;
   let t20;
   if ($[19] !== logs) {
     t20 = getUniqueTags(logs);

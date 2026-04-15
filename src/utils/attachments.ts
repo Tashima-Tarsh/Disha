@@ -3471,7 +3471,7 @@ async function getAsyncHookResponseAttachments(): Promise<Attachment[]> {
       hookName,
       hookEvent,
       toolName,
-      pluginId,
+      _pluginId,
       stdout,
       stderr,
       exitCode,

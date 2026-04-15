@@ -1897,7 +1897,7 @@ function walkVariableAssignment(
       return {
         kind: 'too-complex',
         reason:
-          'PS4 value outside safe charset — only ${VAR} refs and [A-Za-z0-9 _+:.=/[]-] allowed',
+          `PS4 value outside safe charset — only \${VAR} refs and [A-Za-z0-9 _+:.=/[]-] allowed`,
         nodeType: 'variable_assignment',
       }
     }

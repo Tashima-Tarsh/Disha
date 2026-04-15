@@ -1702,7 +1702,7 @@ export function getPipelineSegments(
  */
 export function isNullRedirectionTarget(target: string): boolean {
   const t = target.trim().toLowerCase()
-  return t === '$null' || t === '${null}'
+  return t === '$null' || t === `\${null}`
 }
 
 /**
