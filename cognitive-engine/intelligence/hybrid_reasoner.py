@@ -191,10 +191,11 @@ class HybridReasoner:
         rule_coverage = best_match_count / max(max_possible, 1)
         confidence = 0.45 + (rule_coverage * 0.45)
 
-        # Boost confidence if context contains supporting episodic/semantic data
-        if context.get("episodic_memories"):
+        # Boost confidence if context contains supporting episodic/semantic data.
+        # Keys match what cognitive_loop.py passes: "episodes" and "concepts".
+        if context.get("episodes"):
             confidence = min(confidence + 0.05, 0.99)
-        if context.get("semantic_facts"):
+        if context.get("concepts"):
             confidence = min(confidence + 0.05, 0.99)
 
         # Build chain of thought
@@ -207,9 +208,9 @@ class HybridReasoner:
 
         # Collect evidence from context
         evidence: list[str] = []
-        for ep in context.get("episodic_memories", [])[:2]:
+        for ep in context.get("episodes", [])[:2]:
             evidence.append(f"Past episode: {ep.get('what', '')[:80]}")
-        for sf in context.get("semantic_facts", [])[:2]:
+        for sf in context.get("concepts", [])[:2]:
             evidence.append(f"Known fact: {sf.get('definition', '')[:80]}")
 
         return {
@@ -238,9 +239,10 @@ class HybridReasoner:
             if pattern.search(query):
                 matched_patterns.append(label)
 
-        # Check for patterns in context working memory items
+        # Check for patterns in recent episodes (working_memory is not passed;
+        # episodes are the closest equivalent available in this context dict).
         context_text = " ".join(
-            str(item.get("content", "")) for item in context.get("working_memory", [])
+            str(item.get("what", item.get("content", ""))) for item in context.get("episodes", [])
         )
         for pattern, label in _INDUCTIVE_PATTERNS:
             if pattern.search(context_text) and label not in matched_patterns:
@@ -311,7 +313,7 @@ class HybridReasoner:
                 entity_words.append(str(ent).lower())
 
         memory_words: list[str] = []
-        for ep in context.get("episodic_memories", [])[:3]:
+        for ep in context.get("episodes", [])[:3]:
             memory_words += ep.get("what", "").lower().split()[:5]
 
         all_evidence = query_words + entity_words + memory_words

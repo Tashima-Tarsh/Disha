@@ -212,11 +212,14 @@ class AgentDeliberator:
         intent = state.intent or "default"
         steps = _STRATEGIC_TEMPLATES.get(intent, _STRATEGIC_TEMPLATES["default"])
 
-        # Adjust confidence based on how well the intent was classified
+        # Adjust confidence based on how well the intent was classified.
+        # CognitiveState.uncertainty ranges 0 (certain) → 1 (uncertain), so
+        # intent_confidence ≈ 1 - uncertainty.
+        intent_confidence = 1.0 - state.uncertainty
         base_confidence = 0.75
-        if state.context.get("intent_confidence", 0.0) > 0.8:
+        if intent_confidence > 0.8:
             base_confidence = 0.85
-        elif state.context.get("intent_confidence", 0.0) < 0.4:
+        elif intent_confidence < 0.4:
             base_confidence = 0.55
 
         # Factor in hypothesis quality
@@ -229,7 +232,7 @@ class AgentDeliberator:
         concerns: list[str] = []
         if len(steps) > 4:
             concerns.append("multi_step_plan_may_require_clarification")
-        if state.context.get("uncertainty_level", 0) > 0.6:
+        if state.uncertainty > 0.6:
             concerns.append("high_uncertainty_may_affect_plan_execution")
 
         plan_text = " → ".join(f"Step {i+1}: {s}" for i, s in enumerate(steps))
@@ -338,7 +341,7 @@ class AgentDeliberator:
             confidence_penalty += 0.05
             quality_signals.append("empty_working_memory")
 
-        if state.context.get("entities"):
+        if state.entities:
             quality_signals.append("entities_extracted")
         else:
             quality_signals.append("no_entities_detected")

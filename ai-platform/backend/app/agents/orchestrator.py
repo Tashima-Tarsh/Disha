@@ -75,8 +75,8 @@ class Orchestrator:
         )
         agent_results["reasoning"] = reasoning_result
 
-        # Phase 5: Compile results
-        result = self._compile_results(investigation_id, target, investigation_type, agent_results)
+        # Phase 5: Compile results (pass pre-computed relationships to avoid recomputing O(n²))
+        result = self._compile_results(investigation_id, target, investigation_type, agent_results, relationships)
 
         self.logger.info(
             "investigation_completed",
@@ -148,6 +148,7 @@ class Orchestrator:
         target: str,
         investigation_type: str,
         agent_results: dict[str, Any],
+        relationships: list[dict[str, Any]] | None = None,
     ) -> dict[str, Any]:
         """Compile all agent results into a final investigation report."""
         all_entities = []
@@ -176,7 +177,7 @@ class Orchestrator:
             "investigation_type": investigation_type,
             "status": "completed",
             "entities": all_entities,
-            "relationships": self._build_relationships(all_entities),
+            "relationships": relationships if relationships is not None else self._build_relationships(all_entities),
             "anomalies": all_anomalies,
             "risk_score": overall_risk,
             "summary": summary,

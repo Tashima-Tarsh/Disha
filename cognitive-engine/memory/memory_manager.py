@@ -215,28 +215,19 @@ class MemoryManager:
                     }
                 )
 
-            # Use asyncio.get_event_loop to schedule the coroutine
-            # (promote_to_semantic is called from synchronous context in consolidate phase)
+            # promote_to_semantic is always called from async context (_consolidate),
+            # so there is always a running event loop. Use ensure_future to schedule
+            # the coroutine without blocking. asyncio.get_event_loop() is deprecated
+            # in Python 3.10+ and loop.run_until_complete() deadlocks inside a running loop.
             try:
-                loop = asyncio.get_event_loop()
-                if loop.is_running():
-                    asyncio.ensure_future(
-                        self.semantic.learn(
-                            concept=concept,
-                            definition=definition,
-                            relationships=relations,
-                            source=f"episodic:{ep.get('episode_id', 'unknown')}",
-                        )
+                asyncio.ensure_future(
+                    self.semantic.learn(
+                        concept=concept,
+                        definition=definition,
+                        relationships=relations,
+                        source=f"episodic:{ep.get('episode_id', 'unknown')}",
                     )
-                else:
-                    loop.run_until_complete(
-                        self.semantic.learn(
-                            concept=concept,
-                            definition=definition,
-                            relationships=relations,
-                            source=f"episodic:{ep.get('episode_id', 'unknown')}",
-                        )
-                    )
+                )
                 promoted += 1
             except Exception as exc:
                 log.warning("memory_manager.promote_failed", error=str(exc), concept=concept)
