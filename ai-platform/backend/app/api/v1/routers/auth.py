@@ -4,8 +4,10 @@ from app.models.schemas import AuthRequest, AuthResponse
 
 router = APIRouter()
 
+
 # Simple in-memory user store for demo (replace with database in production)
 _demo_users: dict[str, dict[str, str]] = {}
+
 
 @router.post("/auth/register", response_model=AuthResponse)
 async def register(request: AuthRequest):
@@ -22,6 +24,7 @@ async def register(request: AuthRequest):
 
     token = create_access_token({"sub": user_id, "email": request.email})
     return AuthResponse(access_token=token, user_id=user_id)
+
 
 @router.post("/auth/login", response_model=AuthResponse)
 async def login(request: AuthRequest):

@@ -5,13 +5,14 @@ from app.api.deps import get_orchestrator, get_vector_store, get_alert_manager, 
 
 router = APIRouter()
 
+
 @router.post("/investigate")
 async def investigate(
     request: InvestigationRequest,
     current_user: dict = Depends(get_current_user),
-    orchestrator = Depends(get_orchestrator),
-    vector_store = Depends(get_vector_store),
-    alert_manager = Depends(get_alert_manager)
+    orchestrator=Depends(get_orchestrator),
+    vector_store=Depends(get_vector_store),
+    alert_manager=Depends(get_alert_manager)
 ):
     """Run an intelligence investigation on a target."""
     result = await orchestrator.investigate(
@@ -36,11 +37,12 @@ async def investigate(
     await alert_manager.create_alerts_from_investigation(result)
     return result
 
+
 @router.post("/multi-investigate")
 async def multi_investigate(
     request: MultiInvestigationRequest,
     current_user: dict = Depends(get_current_user),
-    orchestrator = Depends(get_orchestrator)
+    orchestrator=Depends(get_orchestrator)
 ):
     """Run investigations on multiple targets."""
     results = await orchestrator.multi_investigate(
@@ -51,11 +53,12 @@ async def multi_investigate(
     )
     return {"investigations": results, "count": len(results)}
 
+
 @router.post("/graph-insights", response_model=GraphInsightResponse)
 async def graph_insights(
     request: GraphInsightRequest,
     current_user: dict = Depends(get_current_user),
-    knowledge_graph = Depends(get_knowledge_graph)
+    knowledge_graph=Depends(get_knowledge_graph)
 ):
     """Get graph-based intelligence insights."""
     if request.insight_type == "centrality":
@@ -76,12 +79,13 @@ async def graph_insights(
 
     return GraphInsightResponse(insight_type=request.insight_type, results=[])
 
+
 @router.get("/context")
 async def get_context(
     query: str = Query(..., min_length=1, max_length=500),
     limit: int = Query(5, ge=1, le=20),
     current_user: dict = Depends(get_current_user),
-    vector_store = Depends(get_vector_store)
+    vector_store=Depends(get_vector_store)
 ):
     """Retrieve relevant context from vector memory."""
     results = await vector_store.get_context(

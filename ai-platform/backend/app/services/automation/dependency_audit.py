@@ -6,6 +6,7 @@ from typing import Any
 
 logger = structlog.get_logger(__name__)
 
+
 class DependencyAudit:
     """Service to scan for insecure dependencies and supply-chain threats."""
 

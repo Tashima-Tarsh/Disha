@@ -7,6 +7,7 @@ from app.core.config import get_settings
 
 logger = structlog.get_logger(__name__)
 
+
 class SentinelAgent(BaseAgent):
     """Defensive cybersecurity agent focusing on threat detection, containment, and recovery."""
 
@@ -37,7 +38,7 @@ class SentinelAgent(BaseAgent):
 
         # In a real scenario, this agent would correlate events from the SecurityMiddleware
         # and anomalies from the DetectionAgent.
-        
+
         prompt = self._build_sentinel_prompt(target, signals, context)
         incident_report = await self._generate_report(prompt)
 
@@ -51,7 +52,7 @@ class SentinelAgent(BaseAgent):
     def _build_sentinel_prompt(self, target: str, signals: list[Any], context: str) -> str:
         """Build the defensive-only Sentinel prompt."""
         return f"""
-You are DISHA Sentinel, an elite defensive cybersecurity AI. 
+You are DISHA Sentinel, an elite defensive cybersecurity AI.
 Your mission is to analyze security signals for {target} and provide a high-confidence defensive remediation plan.
 
 ### Rules:

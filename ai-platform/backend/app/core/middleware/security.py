@@ -8,6 +8,7 @@ from starlette.middleware.base import BaseHTTPMiddleware
 
 logger = structlog.get_logger(__name__)
 
+
 class SentinelSecurityMiddleware(BaseHTTPMiddleware):
     """Middleware to monitor authentication events and API integrity."""
 

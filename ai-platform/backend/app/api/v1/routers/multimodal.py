@@ -5,10 +5,11 @@ from app.api.deps import get_vision_agent, get_audio_agent, get_multimodal_fusio
 
 router = APIRouter()
 
+
 @router.post("/analyze/vision")
 async def analyze_vision(
     request: VisionAnalysisRequest,
-    current_user: dict=Depends(get_current_user),
+    current_user: dict = Depends(get_current_user),
     vision_agent=Depends(get_vision_agent)
 ):
     """Analyze an image for threat intelligence."""
@@ -18,10 +19,11 @@ async def analyze_vision(
     }
     return await vision_agent.run(request.target, context)
 
+
 @router.post("/analyze/audio")
 async def analyze_audio(
     request: AudioAnalysisRequest,
-    current_user: dict=Depends(get_current_user),
+    current_user: dict = Depends(get_current_user),
     audio_agent=Depends(get_audio_agent)
 ):
     """Analyze audio for threat intelligence."""
@@ -32,10 +34,11 @@ async def analyze_audio(
     }
     return await audio_agent.run(request.target, context)
 
+
 @router.post("/analyze/multimodal")
 async def analyze_multimodal(
     request: MultimodalRequest,
-    current_user: dict=Depends(get_current_user),
+    current_user: dict = Depends(get_current_user),
     orchestrator=Depends(get_orchestrator),
     vision_agent=Depends(get_vision_agent),
     audio_agent=Depends(get_audio_agent),

@@ -7,6 +7,7 @@ from app.core.config import get_settings
 
 logger = structlog.get_logger(__name__)
 
+
 class NationalIntelligenceAgent(BaseAgent):
     """Orchestrator for National Intelligence missions (Disaster, Legal, Safety, Infrastructure)."""
 
@@ -32,8 +33,8 @@ class NationalIntelligenceAgent(BaseAgent):
     async def execute(self, target: str, options: dict[str, Any] | None = None) -> dict[str, Any]:
         """Synthesize national intelligence signals across multiple domains."""
         options = options or {}
-        project = options.get("project", "general") # varuna, marg-safe, nyaya, setu, raksha
-        
+        project = options.get("project", "general")  # varuna, marg-safe, nyaya, setu, raksha
+
         # In this phase, we delegate to specific project logic.
         # Project VARUNA (Disaster Response) is our primary pilot.
 

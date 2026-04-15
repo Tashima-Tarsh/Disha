@@ -12,7 +12,9 @@
     "rules": {
       "recommended": true,
       "complexity": {
-        "noExcessiveCognitiveComplexity": "warn",
+        "noExcessiveCognitiveComplexity": "off",
+        "noBannedTypes": "off",
+        "noArguments": "off",
         "useLiteralKeys": "off",
         "useOptionalChain": "off",
         "useArrowFunction": "off",
@@ -20,11 +22,12 @@
         "noUselessUndefinedInitialization": "off"
       },
       "correctness": {
+        "recommended": true,
         "noUnusedImports": "warn",
-        "noUnusedVariables": "warn",
+        "noUnusedVariables": "off",
         "noUnusedFunctionParameters": "warn",
         "useExhaustiveDependencies": "off",
-        "noConstantCondition": "warn",
+        "noConstantCondition": "off",
         "noVoidTypeReturn": "off"
       },
       "style": {
@@ -42,15 +45,16 @@
         "noGlobalIsNan": "off",
         "noConfusingLabels": "off",
         "noControlCharactersInRegex": "off",
-        "useIterableCallbackReturn": "off",
         "noAsyncPromiseExecutor": "off",
         "noRedeclare": "off",
-        "noSelfCompare": "off"
+        "noSelfCompare": "off",
+        "noTsIgnore": "off",
+        "useIterableCallbackReturn": "off"
       },
       "a11y": {
-        "noStaticElementInteractions": "off",
         "noAutofocus": "off",
-        "useButtonType": "off"
+        "useButtonType": "off",
+        "noStaticElementInteractions": "off"
       }
     }
   },

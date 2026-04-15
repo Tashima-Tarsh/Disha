@@ -9,6 +9,7 @@ from app.core.config import get_settings
 
 logger = structlog.get_logger(__name__)
 
+
 class LegalAgent(BaseAgent):
     """Agent for constitutional research, citation-backed answers, and legal analysis."""
 
@@ -27,7 +28,7 @@ class LegalAgent(BaseAgent):
             from langchain_openai import ChatOpenAI
             self._llm = ChatOpenAI(
                 model=self.settings.LLM_MODEL,
-                temperature=0.0, # High precision for legal
+                temperature=0.0,  # High precision for legal
                 api_key=self.settings.OPENAI_API_KEY,
             )
         return self._llm
@@ -40,7 +41,7 @@ class LegalAgent(BaseAgent):
 
         # Step 1: Semantic Search in Constitutional Knowledge Base
         provisions = await self.vector_store.query(query, n_results=n_results)
-        
+
         # Step 2: Contextual Analysis
         if not provisions:
             return {

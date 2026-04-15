@@ -6,10 +6,11 @@ from app.api.deps import get_reward_computer, get_policy_network, get_prompt_opt
 
 router = APIRouter()
 
+
 @router.post("/feedback")
 async def submit_feedback(
     request: FeedbackRequest,
-    current_user: dict=Depends(get_current_user),
+    current_user: dict = Depends(get_current_user),
     reward_computer=Depends(get_reward_computer),
     policy_network=Depends(get_policy_network)
 ):
@@ -33,9 +34,10 @@ async def submit_feedback(
         "policy_update": update_metrics,
     }
 
+
 @router.get("/rl/metrics")
 async def rl_metrics(
-    current_user: dict=Depends(get_current_user),
+    current_user: dict = Depends(get_current_user),
     reward_computer=Depends(get_reward_computer),
     prompt_optimizer=Depends(get_prompt_optimizer)
 ):
@@ -45,9 +47,10 @@ async def rl_metrics(
         "prompt_metrics": prompt_optimizer.get_metrics(),
     }
 
+
 @router.post("/rl/evolve-prompts")
 async def evolve_prompts(
-    current_user: dict=Depends(get_current_user),
+    current_user: dict = Depends(get_current_user),
     prompt_optimizer=Depends(get_prompt_optimizer)
 ):
     """Trigger one generation of prompt evolution."""

@@ -7,6 +7,7 @@ from datetime import datetime, timezone
 
 logger = structlog.get_logger(__name__)
 
+
 class DisasterService:
     """Service to integrate NDMA CAP alerts and perform predictive disaster analysis."""
 
@@ -32,7 +33,7 @@ class DisasterService:
             "source": "SACHET",
             "status": "active"
         }
-        
+
         # Return mock alert for pilot demonstration
         return [mock_alert]
 

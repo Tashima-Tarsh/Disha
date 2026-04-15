@@ -8,6 +8,7 @@ from app.services.memory.vector_store import VectorStore
 
 logger = structlog.get_logger(__name__)
 
+
 class LegalPipeline:
     """Pipeline for ingesting the Constitution of India and other legal texts."""
 

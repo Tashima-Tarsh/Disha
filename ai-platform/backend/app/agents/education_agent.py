@@ -9,6 +9,7 @@ from app.core.config import get_settings
 
 logger = structlog.get_logger(__name__)
 
+
 class EducationAgent(BaseAgent):
     """Agent for cognitive tutoring, exam preparation, and conceptual explanations."""
 
@@ -27,7 +28,7 @@ class EducationAgent(BaseAgent):
             from langchain_openai import ChatOpenAI
             self._llm = ChatOpenAI(
                 model=self.settings.LLM_MODEL,
-                temperature=0.7, # Slightly higher for creative teaching
+                temperature=0.7,  # Slightly higher for creative teaching
                 api_key=self.settings.OPENAI_API_KEY,
             )
         return self._llm
@@ -35,7 +36,7 @@ class EducationAgent(BaseAgent):
     async def execute(self, target: str, options: dict[str, Any] | None = None) -> dict[str, Any]:
         """Provide tutoring or conceptual explanations for a target topic."""
         options = options or {}
-        mode = options.get("mode", "teaching") # teaching, exam_prep, summary
+        mode = options.get("mode", "teaching")  # teaching, exam_prep, summary
         query = target
 
         # Step 1: Check educational knowledge base for specific context
@@ -61,7 +62,7 @@ class EducationAgent(BaseAgent):
             "exam_prep": "Focus on key facts, potential questions, and memorization tips.",
             "summary": "Provide a concise, high-level overview of the main points."
         }
-        
+
         return f"""
 You are the DISHA Education Tutor, an intelligent and encouraging academic coach.
 Your goal is to help the user master: {query}
@@ -72,7 +73,7 @@ Context from Knowledge Base:
 {context if context else 'General academic knowledge base.'}
 
 ### Instructions:
-1. Use clear, engaging language. 
+1. Use clear, engaging language.
 2. Use analogies to explain complex parts.
 3. Conclude with 3 'Concept Check' questions to test the user's understanding.
 4. If context is provided, prioritize it for the lesson.
