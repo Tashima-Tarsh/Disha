@@ -78,3 +78,5 @@ logs/sentinel/
 venv/
 .venv/
 .virtualenv/
+# IDE files
+.vscode/
