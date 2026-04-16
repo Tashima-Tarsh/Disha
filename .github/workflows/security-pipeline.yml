@@ -67,11 +67,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Generate SBOM (CycloneDX)
-        uses: CycloneDX/gh-python-generate-sbom@v2
+      - name: Set up Python
+        uses: actions/setup-python@v5
         with:
-          path: disha/services/ai-platform/backend/requirements.txt
-          output-format: json
+          python-version: "3.11"
+      - name: Install Dependencies
+        run: pip install cyclonedx-bom
+      - name: Generate SBOM (CycloneDX)
+        run: cyclonedx-py requirements disha/services/ai-platform/backend/requirements.txt -o bom.json
       - name: Upload SBOM
         uses: actions/upload-artifact@v4
         with:

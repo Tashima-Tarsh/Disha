@@ -37,6 +37,8 @@ jobs:
           flake8 disha/ai/core/decision-engine/ --max-line-length=120 --ignore=E501,W503,W504
 
       - name: Run tests
+        env:
+          PYTHONPATH: ${{ github.workspace }}
         run: |
           cd disha/ai/core/decision-engine
           python -m pytest tests/ -v --tb=short

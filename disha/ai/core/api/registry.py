@@ -50,7 +50,7 @@ class LlamaCppProvider(BaseLLMProvider):
     def generate(self, prompt: str, max_tokens: int = 256) -> str:
         if self._llm is None:
             return MockProvider().generate(prompt, max_tokens)
-        
+
         output = self._llm(
             prompt,
             max_tokens=max_tokens,
@@ -78,7 +78,7 @@ class AnthropicProvider(BaseLLMProvider):
     def generate(self, prompt: str, max_tokens: int = 1024) -> str:
         if self._client is None:
             return MockProvider().generate(prompt, max_tokens)
-        
+
         message = self._client.messages.create(
             max_tokens=max_tokens,
             messages=[{"role": "user", "content": prompt}],
@@ -103,10 +103,10 @@ class ModelRegistry:
         provider_name = (
             name or os.getenv("DISHA_MODEL_PROVIDER", "mock")
         ).lower()
-        
+
         if provider_name not in cls._providers:
             return cls._providers["mock"](**kwargs)
-            
+
         return cls._providers[provider_name](**kwargs)
 
     @classmethod

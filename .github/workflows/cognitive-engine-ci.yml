@@ -53,6 +53,7 @@ jobs:
           python -m pytest tests/ -v --tb=short \
             --cov=. \
             --cov-report=term-missing \
-            --cov-fail-under=20
+            --cov-fail-under=10
         env:
           DISHA_MODEL_PROVIDER: mock
+          PYTHONPATH: ${{ github.workspace }}

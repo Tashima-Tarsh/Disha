@@ -72,7 +72,8 @@
         "useAnchorContent": "off"
       },
       "performance": {
-        "noAccumulatingSpread": "off"
+        "noAccumulatingSpread": "off",
+        "noImgElement": "off"
       },
       "security": {
         "noDangerouslySetInnerHtml": "off"

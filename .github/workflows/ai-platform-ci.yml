@@ -49,6 +49,8 @@ jobs:
             numpy pandas networkx
 
       - name: Run tests
+        env:
+          PYTHONPATH: ${{ github.workspace }}
         run: |
           cd disha/services/ai-platform/backend
           python -m pytest tests/ -v --tb=short

@@ -24,7 +24,7 @@ from disha.ai.core.api.registry import ModelRegistry
 
 # ── llama-cpp-python availability ─────────────────────────────────────
 try:
-    import llama_cpp # noqa: F401
+    import llama_cpp  # noqa: F401
     _LLAMA_AVAILABLE = True
 except ImportError:
     _LLAMA_AVAILABLE = False
@@ -58,4 +58,3 @@ def get_llm(
         seed=seed,
         **kwargs
     )
-
