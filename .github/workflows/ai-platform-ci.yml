@@ -4,11 +4,11 @@ on:
   push:
     branches: [main]
     paths:
-      - 'ai-platform/**'
+      - 'disha/services/ai-platform/**'
   pull_request:
     branches: [main]
     paths:
-      - 'ai-platform/**'
+      - 'disha/services/ai-platform/**'
 
 permissions:
   contents: read
@@ -29,7 +29,7 @@ jobs:
         run: pip install flake8
 
       - name: Lint backend
-        run: flake8 ai-platform/backend/app/ --max-line-length=120 --ignore=E501,W503,W504
+        run: flake8 disha/services/ai-platform/backend/app/ --max-line-length=120 --ignore=E501,W503,W504
 
   test-python:
     name: Test Python (AI Platform)
@@ -50,5 +50,5 @@ jobs:
 
       - name: Run tests
         run: |
-          cd ai-platform/backend
+          cd disha/services/ai-platform/backend
           python -m pytest tests/ -v --tb=short

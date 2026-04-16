@@ -4,8 +4,8 @@ on:
   push:
     branches: [main]
     paths:
-      - 'scripts/sentinel/**'
-      - 'integrations/cyber-intelligence-platform/alerts/**'
+      - 'disha/legacy-root-src/scripts/sentinel/**'
+      - 'disha/services/integrations/cyber-intelligence-platform/alerts/**'
   pull_request:
     branches: [main]
     paths:
@@ -31,10 +31,9 @@ jobs:
         run: pip install flake8
 
       - name: Lint sentinel
-        run: flake8 scripts/sentinel/ --max-line-length=120 --ignore=E501,W503,W504
-
+        run: flake8 disha/legacy-root-src/scripts/sentinel/ --max-line-length=120 --ignore=E501,W503,W504
       - name: Lint alert engine
-        run: flake8 integrations/cyber-intelligence-platform/alerts/ --max-line-length=120 --ignore=E501,W503,W504
+        run: flake8 disha/services/integrations/cyber-intelligence-platform/alerts/ --max-line-length=120 --ignore=E501,W503,W504
 
   test-sentinel:
     name: Test Sentinel
@@ -51,4 +50,4 @@ jobs:
         run: pip install pytest
 
       - name: Run sentinel tests
-        run: python -m pytest scripts/sentinel/test_sentinel.py -v --tb=short
+        run: python -m pytest disha/legacy-root-src/scripts/sentinel/test_sentinel.py -v --tb=short

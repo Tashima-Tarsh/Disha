@@ -32,7 +32,7 @@ jobs:
       - name: Install Bandit
         run: pip install bandit
       - name: Run Bandit
-        run: bandit -r ai-platform/backend cyber-defense -f json -o bandit-results.json || true
+        run: bandit -r disha/services/ai-platform/backend disha/services/cyber -f json -o bandit-results.json || true
       - name: Upload Bandit Results
         uses: actions/upload-artifact@v4
         with:
@@ -52,7 +52,7 @@ jobs:
         run: |
           pip install safety
       - name: Run Safety
-        run: safety check -r ai-platform/backend/requirements.txt --json > safety-results.json || true
+        run: safety check -r disha/services/ai-platform/backend/requirements.txt --json > safety-results.json || true
       - name: Upload Safety Results
         uses: actions/upload-artifact@v4
         with:
@@ -67,7 +67,7 @@ jobs:
       - name: Generate SBOM (CycloneDX)
         uses: CycloneDX/gh-python-generate-sbom@v2
         with:
-          path: ai-platform/backend/requirements.txt
+          path: disha/services/ai-platform/backend/requirements.txt
           output-format: json
       - name: Upload SBOM
         uses: actions/upload-artifact@v4

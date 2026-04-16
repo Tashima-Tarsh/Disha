@@ -4,11 +4,11 @@ on:
   push:
     branches: [main]
     paths:
-      - 'cognitive-engine/**'
+      - 'disha/ai/core/**'
   pull_request:
     branches: [main]
     paths:
-      - 'cognitive-engine/**'
+      - 'disha/ai/core/**'
 
 permissions:
   contents: read
@@ -29,7 +29,7 @@ jobs:
         run: pip install flake8
 
       - name: Lint
-        run: flake8 cognitive-engine/ --max-line-length=120 --ignore=E501,W503,W504
+        run: flake8 disha/ai/core/ --max-line-length=120 --ignore=E501,W503,W504
 
   test:
     name: Unit Tests (Cognitive Engine)
@@ -45,13 +45,13 @@ jobs:
       - name: Install dependencies
         run: |
           pip install pytest pytest-asyncio pytest-cov
-          pip install -r cognitive-engine/requirements.txt
+          pip install -r disha/ai/core/requirements.txt
 
       - name: Run tests with coverage
         run: |
-          cd cognitive-engine
+          cd disha/ai/core
           python -m pytest tests/ -v --tb=short \
-            --cov=cognitive_engine \
+            --cov=. \
             --cov-report=term-missing \
             --cov-fail-under=20
         env:

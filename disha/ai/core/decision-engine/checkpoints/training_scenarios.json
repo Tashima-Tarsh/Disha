@@ -1,0 +1,2402 @@
+[
+  {
+    "text": "Evaluate the cybersecurity posture of transportation after a supply-chain compromise targeting water treatment facilities.",
+    "ground_truth_quality": 0.5729205622294328,
+    "complexity": 3,
+    "id": 0
+  },
+  {
+    "text": "Should parliament impose sanctions on a major trading partner following a massive data breach?",
+    "ground_truth_quality": 0.7324196574929174,
+    "complexity": 3,
+    "id": 1
+  },
+  {
+    "text": "Assess the constitutional validity of mass surveillance during civil unrest.",
+    "ground_truth_quality": 0.6886981024832055,
+    "complexity": 2,
+    "id": 2
+  },
+  {
+    "text": "Analyse the geopolitical implications of a nuclear-armed neighbour developing space-based weapons.",
+    "ground_truth_quality": 0.5406783418366711,
+    "complexity": 2,
+    "id": 3
+  },
+  {
+    "text": "Evaluate whether facial recognition bans violates due process under international law.",
+    "ground_truth_quality": 0.6262766787328249,
+    "complexity": 2,
+    "id": 4
+  },
+  {
+    "text": "Should intelligence agencies use deepfake detection to counter radicalisation in Eastern Europe?",
+    "ground_truth_quality": 0.7505341453683737,
+    "complexity": 3,
+    "id": 5
+  },
+  {
+    "text": "Assess the strategic impact of an assassination attempt on regional stability in Central Africa.",
+    "ground_truth_quality": 0.8694959494291122,
+    "complexity": 2,
+    "id": 6
+  },
+  {
+    "text": "Evaluate the proportionality of joint exercises to ransomware attack by a state-backed APT group.",
+    "ground_truth_quality": 0.6522940550393126,
+    "complexity": 3,
+    "id": 7
+  },
+  {
+    "text": "Should the cybersecurity agency share classified human intelligence with an international organisation regarding military movements?",
+    "ground_truth_quality": 0.624971914642177,
+    "complexity": 4,
+    "id": 8
+  },
+  {
+    "text": "Analyse the legal framework for mass surveillance in the context of the Nuclear Non-Proliferation Treaty.",
+    "ground_truth_quality": 0.6080050432160793,
+    "complexity": 2,
+    "id": 9
+  },
+  {
+    "text": "Evaluate the ethical implications of deploying behavioural analytics for disaster response.",
+    "ground_truth_quality": 0.64852626079817,
+    "complexity": 2,
+    "id": 10
+  },
+  {
+    "text": "Assess the risk of nuclear proliferation escalation following a massive data breach in the Middle East.",
+    "ground_truth_quality": 0.7674619497319102,
+    "complexity": 3,
+    "id": 11
+  },
+  {
+    "text": "Should the UN Security Council authorise pre-emptive joint exercises against a terrorist organisation?",
+    "ground_truth_quality": 0.6811418264978883,
+    "complexity": 3,
+    "id": 12
+  },
+  {
+    "text": "Evaluate the effectiveness of bulk data collection in countering state-sponsored espionage.",
+    "ground_truth_quality": 0.6589774588044672,
+    "complexity": 2,
+    "id": 13
+  },
+  {
+    "text": "Analyse the diplomatic fallout of a cyber-espionage revelation between a non-aligned state and a private-sector partner.",
+    "ground_truth_quality": 0.7947564563085234,
+    "complexity": 3,
+    "id": 14
+  },
+  {
+    "text": "Evaluate the cybersecurity posture of telecommunications after a watering-hole attack targeting election systems.",
+    "ground_truth_quality": 0.7320560529160239,
+    "complexity": 3,
+    "id": 15
+  },
+  {
+    "text": "Should NATO impose sanctions on a major trading partner following a nuclear test?",
+    "ground_truth_quality": 0.8634259809512754,
+    "complexity": 3,
+    "id": 16
+  },
+  {
+    "text": "Assess the constitutional validity of forced decryption during civil unrest.",
+    "ground_truth_quality": 0.8087189629797316,
+    "complexity": 2,
+    "id": 17
+  },
+  {
+    "text": "Analyse the geopolitical implications of a non-aligned state developing hypersonic missiles.",
+    "ground_truth_quality": 0.6285816890685078,
+    "complexity": 2,
+    "id": 18
+  },
+  {
+    "text": "Evaluate whether facial recognition bans violates the right to life under international law.",
+    "ground_truth_quality": 0.5429123251215134,
+    "complexity": 2,
+    "id": 19
+  },
+  {
+    "text": "Should intelligence agencies use predictive policing to counter nuclear proliferation in the Middle East?",
+    "ground_truth_quality": 0.4319359636372275,
+    "complexity": 3,
+    "id": 20
+  },
+  {
+    "text": "Assess the strategic impact of a nuclear test on regional stability in the Middle East.",
+    "ground_truth_quality": 0.7778063898547669,
+    "complexity": 2,
+    "id": 21
+  },
+  {
+    "text": "Evaluate the proportionality of covert operations to supply-chain compromise by a terrorist organisation.",
+    "ground_truth_quality": 0.8642722047671221,
+    "complexity": 3,
+    "id": 22
+  },
+  {
+    "text": "Should NATO share classified satellite imagery with a Five Eyes partner regarding military movements?",
+    "ground_truth_quality": 0.812644865479058,
+    "complexity": 4,
+    "id": 23
+  },
+  {
+    "text": "Analyse the legal framework for mass surveillance in the context of the Geneva Conventions.",
+    "ground_truth_quality": 0.8311756294442423,
+    "complexity": 2,
+    "id": 24
+  },
+  {
+    "text": "Evaluate the ethical implications of deploying predictive policing for pandemic control.",
+    "ground_truth_quality": 0.7438954692170587,
+    "complexity": 2,
+    "id": 25
+  },
+  {
+    "text": "Assess the risk of nuclear proliferation escalation following a nuclear test in South Asia.",
+    "ground_truth_quality": 0.64760953799425,
+    "complexity": 3,
+    "id": 26
+  },
+  {
+    "text": "Should the national security council authorise pre-emptive military deployment against a state-backed APT group?",
+    "ground_truth_quality": 0.4872485779507995,
+    "complexity": 3,
+    "id": 27
+  },
+  {
+    "text": "Evaluate the effectiveness of AI-assisted judicial decisions in countering state-sponsored espionage.",
+    "ground_truth_quality": 0.8085861122486904,
+    "complexity": 2,
+    "id": 28
+  },
+  {
+    "text": "Analyse the diplomatic fallout of a failed coup between a non-aligned state and an international organisation.",
+    "ground_truth_quality": 0.5459468466512144,
+    "complexity": 3,
+    "id": 29
+  },
+  {
+    "text": "Evaluate the cybersecurity posture of healthcare after a insider threat targeting banking infrastructure.",
+    "ground_truth_quality": 0.929668456871031,
+    "complexity": 3,
+    "id": 30
+  },
+  {
+    "text": "Should parliament impose sanctions on a non-aligned state following a territorial incursion?",
+    "ground_truth_quality": 0.6632135078339337,
+    "complexity": 3,
+    "id": 31
+  },
+  {
+    "text": "Assess the constitutional validity of preventive detention during a terrorism wave.",
+    "ground_truth_quality": 0.6785043518733505,
+    "complexity": 2,
+    "id": 32
+  },
+  {
+    "text": "Analyse the geopolitical implications of a nuclear-armed neighbour developing AI-powered weapons.",
+    "ground_truth_quality": 0.8450056922062333,
+    "complexity": 2,
+    "id": 33
+  },
+  {
+    "text": "Evaluate whether social media monitoring violates digital sovereignty under international law.",
+    "ground_truth_quality": 0.5623055637664909,
+    "complexity": 2,
+    "id": 34
+  },
+  {
+    "text": "Should intelligence agencies use behavioural analytics to counter disinformation in Central Africa?",
+    "ground_truth_quality": 0.8277543782624425,
+    "complexity": 3,
+    "id": 35
+  },
+  {
+    "text": "Assess the strategic impact of a failed coup on regional stability in Central Africa.",
+    "ground_truth_quality": 0.5268555580049812,
+    "complexity": 2,
+    "id": 36
+  },
+  {
+    "text": "Evaluate the proportionality of economic blockade to DDoS campaign by an insider threat network.",
+    "ground_truth_quality": 0.7709598879395023,
+    "complexity": 3,
+    "id": 37
+  },
+  {
+    "text": "Should parliament share classified financial intelligence with a strategic competitor regarding military movements?",
+    "ground_truth_quality": 0.6909860002105779,
+    "complexity": 4,
+    "id": 38
+  },
+  {
+    "text": "Analyse the legal framework for emergency censorship in the context of the Geneva Conventions.",
+    "ground_truth_quality": 0.8493631658445637,
+    "complexity": 2,
+    "id": 39
+  },
+  {
+    "text": "Evaluate the ethical implications of deploying AI surveillance for counter-terrorism.",
+    "ground_truth_quality": 0.4985580348804967,
+    "complexity": 2,
+    "id": 40
+  },
+  {
+    "text": "Assess the risk of cyber terrorism escalation following a failed coup in Eastern Europe.",
+    "ground_truth_quality": 0.6360967757729586,
+    "complexity": 3,
+    "id": 41
+  },
+  {
+    "text": "Should parliament authorise pre-emptive covert operations against a transnational crime syndicate?",
+    "ground_truth_quality": 0.5688342791709984,
+    "complexity": 3,
+    "id": 42
+  },
+  {
+    "text": "Evaluate the effectiveness of bulk data collection in countering disinformation.",
+    "ground_truth_quality": 0.5945505704852025,
+    "complexity": 2,
+    "id": 43
+  },
+  {
+    "text": "Analyse the diplomatic fallout of a nuclear test between a failing state and a strategic competitor.",
+    "ground_truth_quality": 0.8550996791548293,
+    "complexity": 3,
+    "id": 44
+  },
+  {
+    "text": "Evaluate the cybersecurity posture of telecommunications after a DDoS campaign targeting satellite networks.",
+    "ground_truth_quality": 0.593824179037282,
+    "complexity": 3,
+    "id": 45
+  },
+  {
+    "text": "Should NATO impose sanctions on a failing state following a failed coup?",
+    "ground_truth_quality": 0.42029050217776687,
+    "complexity": 3,
+    "id": 46
+  },
+  {
+    "text": "Assess the constitutional validity of biometric registration during economic collapse.",
+    "ground_truth_quality": 0.8068370716890745,
+    "complexity": 2,
+    "id": 47
+  },
+  {
+    "text": "Analyse the geopolitical implications of a nuclear-armed neighbour developing AI-powered weapons.",
+    "ground_truth_quality": 0.4894246408068678,
+    "complexity": 2,
+    "id": 48
+  },
+  {
+    "text": "Evaluate whether social media monitoring violates due process under international law.",
+    "ground_truth_quality": 0.8646121957928276,
+    "complexity": 2,
+    "id": 49
+  },
+  {
+    "text": "Should intelligence agencies use behavioural analytics to counter disinformation in the Middle East?",
+    "ground_truth_quality": 0.793883320919226,
+    "complexity": 3,
+    "id": 50
+  },
+  {
+    "text": "Assess the strategic impact of a propaganda campaign on regional stability in Eastern Europe.",
+    "ground_truth_quality": 0.7859165424081789,
+    "complexity": 2,
+    "id": 51
+  },
+  {
+    "text": "Evaluate the proportionality of economic blockade to ransomware attack by a terrorist organisation.",
+    "ground_truth_quality": 0.7256754586808762,
+    "complexity": 3,
+    "id": 52
+  },
+  {
+    "text": "Should the cybersecurity agency share classified financial intelligence with an international organisation regarding election interference?",
+    "ground_truth_quality": 0.6721534313408555,
+    "complexity": 4,
+    "id": 53
+  },
+  {
+    "text": "Analyse the legal framework for internet shutdowns in the context of the Geneva Conventions.",
+    "ground_truth_quality": 0.6560263307313218,
+    "complexity": 2,
+    "id": 54
+  },
+  {
+    "text": "Evaluate the ethical implications of deploying quantum decryption for disaster response.",
+    "ground_truth_quality": 0.5831747884617271,
+    "complexity": 2,
+    "id": 55
+  },
+  {
+    "text": "Assess the risk of nuclear proliferation escalation following a border skirmish in Eastern Europe.",
+    "ground_truth_quality": 0.4172684788033175,
+    "complexity": 3,
+    "id": 56
+  },
+  {
+    "text": "Should the UN Security Council authorise pre-emptive economic blockade against an insider threat network?",
+    "ground_truth_quality": 0.8562844765792451,
+    "complexity": 3,
+    "id": 57
+  },
+  {
+    "text": "Evaluate the effectiveness of autonomous weapon deployment in countering nuclear proliferation.",
+    "ground_truth_quality": 0.784690910674511,
+    "complexity": 2,
+    "id": 58
+  },
+  {
+    "text": "Analyse the diplomatic fallout of a failed coup between a rival superpower and a private-sector partner.",
+    "ground_truth_quality": 0.4744104237664862,
+    "complexity": 3,
+    "id": 59
+  },
+  {
+    "text": "Evaluate the cybersecurity posture of critical infrastructure after a ransomware attack targeting military communications.",
+    "ground_truth_quality": 0.6167461044285625,
+    "complexity": 3,
+    "id": 60
+  },
+  {
+    "text": "Should the national security council impose sanctions on a nuclear-armed neighbour following a cyber-espionage revelation?",
+    "ground_truth_quality": 0.47592808137463954,
+    "complexity": 3,
+    "id": 61
+  },
+  {
+    "text": "Assess the constitutional validity of emergency censorship during economic collapse.",
+    "ground_truth_quality": 0.7253716582463465,
+    "complexity": 2,
+    "id": 62
+  },
+  {
+    "text": "Analyse the geopolitical implications of a rival superpower developing hypersonic missiles.",
+    "ground_truth_quality": 0.5531348076318363,
+    "complexity": 2,
+    "id": 63
+  },
+  {
+    "text": "Evaluate whether AI-assisted judicial decisions violates the right to life under international law.",
+    "ground_truth_quality": 0.6057906893101143,
+    "complexity": 2,
+    "id": 64
+  },
+  {
+    "text": "Should intelligence agencies use predictive policing to counter radicalisation in the Middle East?",
+    "ground_truth_quality": 0.8643102025469224,
+    "complexity": 3,
+    "id": 65
+  },
+  {
+    "text": "Assess the strategic impact of a massive data breach on regional stability in the Indo-Pacific.",
+    "ground_truth_quality": 0.39448889191768527,
+    "complexity": 2,
+    "id": 66
+  },
+  {
+    "text": "Evaluate the proportionality of military deployment to advanced persistent threat by a terrorist organisation.",
+    "ground_truth_quality": 0.5159835110482581,
+    "complexity": 3,
+    "id": 67
+  },
+  {
+    "text": "Should the national security council share classified financial intelligence with a strategic competitor regarding cyber operations?",
+    "ground_truth_quality": 0.6892831535982257,
+    "complexity": 4,
+    "id": 68
+  },
+  {
+    "text": "Analyse the legal framework for biometric registration in the context of the Wassenaar Arrangement.",
+    "ground_truth_quality": 0.5277415470348016,
+    "complexity": 2,
+    "id": 69
+  },
+  {
+    "text": "Evaluate the ethical implications of deploying deepfake detection for disaster response.",
+    "ground_truth_quality": 0.6943949569454405,
+    "complexity": 2,
+    "id": 70
+  },
+  {
+    "text": "Assess the risk of state-sponsored espionage escalation following an assassination attempt in the Indo-Pacific.",
+    "ground_truth_quality": 0.6892928072718867,
+    "complexity": 3,
+    "id": 71
+  },
+  {
+    "text": "Should the national security council authorise pre-emptive joint exercises against an insider threat network?",
+    "ground_truth_quality": 0.5995448162218722,
+    "complexity": 3,
+    "id": 72
+  },
+  {
+    "text": "Evaluate the effectiveness of facial recognition bans in countering radicalisation.",
+    "ground_truth_quality": 0.7615650166610098,
+    "complexity": 2,
+    "id": 73
+  },
+  {
+    "text": "Analyse the diplomatic fallout of a cyber-espionage revelation between a major trading partner and a private-sector partner.",
+    "ground_truth_quality": 0.619185701938708,
+    "complexity": 3,
+    "id": 74
+  },
+  {
+    "text": "Evaluate the cybersecurity posture of government networks after a DDoS campaign targeting military communications.",
+    "ground_truth_quality": 0.322714270223839,
+    "complexity": 3,
+    "id": 75
+  },
+  {
+    "text": "Should the UN Security Council impose sanctions on a major trading partner following a propaganda campaign?",
+    "ground_truth_quality": 0.44867828386076,
+    "complexity": 3,
+    "id": 76
+  },
+  {
+    "text": "Assess the constitutional validity of preventive detention during civil unrest.",
+    "ground_truth_quality": 0.5951065023009237,
+    "complexity": 2,
+    "id": 77
+  },
+  {
+    "text": "Analyse the geopolitical implications of a rival superpower developing space-based weapons.",
+    "ground_truth_quality": 0.36327534197200706,
+    "complexity": 2,
+    "id": 78
+  },
+  {
+    "text": "Evaluate whether facial recognition bans violates the right to life under international law.",
+    "ground_truth_quality": 0.8426234646763182,
+    "complexity": 2,
+    "id": 79
+  },
+  {
+    "text": "Should intelligence agencies use AI surveillance to counter hybrid warfare in the Indo-Pacific?",
+    "ground_truth_quality": 0.7265396775328243,
+    "complexity": 3,
+    "id": 80
+  },
+  {
+    "text": "Assess the strategic impact of a nuclear test on regional stability in Eastern Europe.",
+    "ground_truth_quality": 0.6752925772109739,
+    "complexity": 2,
+    "id": 81
+  },
+  {
+    "text": "Evaluate the proportionality of economic blockade to advanced persistent threat by a transnational crime syndicate.",
+    "ground_truth_quality": 0.5614100474888802,
+    "complexity": 3,
+    "id": 82
+  },
+  {
+    "text": "Should the intelligence directorate share classified human intelligence with a Five Eyes partner regarding terrorism financing?",
+    "ground_truth_quality": 0.5090889667340008,
+    "complexity": 4,
+    "id": 83
+  },
+  {
+    "text": "Analyse the legal framework for emergency censorship in the context of the Wassenaar Arrangement.",
+    "ground_truth_quality": 0.4999361811678148,
+    "complexity": 2,
+    "id": 84
+  },
+  {
+    "text": "Evaluate the ethical implications of deploying AI surveillance for counter-terrorism.",
+    "ground_truth_quality": 0.38546813865006396,
+    "complexity": 2,
+    "id": 85
+  },
+  {
+    "text": "Assess the risk of disinformation escalation following a nuclear test in Central Africa.",
+    "ground_truth_quality": 0.5935478442955866,
+    "complexity": 3,
+    "id": 86
+  },
+  {
+    "text": "Should NATO authorise pre-emptive cyber retaliation against a transnational crime syndicate?",
+    "ground_truth_quality": 0.8506273522928627,
+    "complexity": 3,
+    "id": 87
+  },
+  {
+    "text": "Evaluate the effectiveness of mandatory encryption backdoors in countering radicalisation.",
+    "ground_truth_quality": 0.4980416052296459,
+    "complexity": 2,
+    "id": 88
+  },
+  {
+    "text": "Analyse the diplomatic fallout of a territorial incursion between a major trading partner and a regional ally.",
+    "ground_truth_quality": 0.7375902736005544,
+    "complexity": 3,
+    "id": 89
+  },
+  {
+    "text": "Evaluate the cybersecurity posture of government networks after a watering-hole attack targeting military communications.",
+    "ground_truth_quality": 0.6423973538174717,
+    "complexity": 3,
+    "id": 90
+  },
+  {
+    "text": "Should the national security council impose sanctions on a failing state following a cyber-espionage revelation?",
+    "ground_truth_quality": 0.7667983023452586,
+    "complexity": 3,
+    "id": 91
+  },
+  {
+    "text": "Assess the constitutional validity of biometric registration during economic collapse.",
+    "ground_truth_quality": 0.5988782239419136,
+    "complexity": 2,
+    "id": 92
+  },
+  {
+    "text": "Analyse the geopolitical implications of a major trading partner developing hypersonic missiles.",
+    "ground_truth_quality": 0.6176763935745353,
+    "complexity": 2,
+    "id": 93
+  },
+  {
+    "text": "Evaluate whether AI-assisted judicial decisions violates the right to life under international law.",
+    "ground_truth_quality": 0.7893787950232526,
+    "complexity": 2,
+    "id": 94
+  },
+  {
+    "text": "Should intelligence agencies use predictive policing to counter cyber terrorism in South Asia?",
+    "ground_truth_quality": 0.9313810446704364,
+    "complexity": 3,
+    "id": 95
+  },
+  {
+    "text": "Assess the strategic impact of a failed coup on regional stability in Eastern Europe.",
+    "ground_truth_quality": 0.5677375190541544,
+    "complexity": 2,
+    "id": 96
+  },
+  {
+    "text": "Evaluate the proportionality of military deployment to watering-hole attack by a state-backed APT group.",
+    "ground_truth_quality": 0.8214700380434111,
+    "complexity": 3,
+    "id": 97
+  },
+  {
+    "text": "Should the UN Security Council share classified financial intelligence with a Five Eyes partner regarding military movements?",
+    "ground_truth_quality": 0.36798006561110935,
+    "complexity": 4,
+    "id": 98
+  },
+  {
+    "text": "Analyse the legal framework for preventive detention in the context of the Budapest Convention.",
+    "ground_truth_quality": 0.48009927043265466,
+    "complexity": 2,
+    "id": 99
+  },
+  {
+    "text": "Evaluate the ethical implications of deploying autonomous drones for military intelligence.",
+    "ground_truth_quality": 0.8506183287755947,
+    "complexity": 2,
+    "id": 100
+  },
+  {
+    "text": "Assess the risk of disinformation escalation following a failed coup in Central Africa.",
+    "ground_truth_quality": 0.5073362974362793,
+    "complexity": 3,
+    "id": 101
+  },
+  {
+    "text": "Should the cybersecurity agency authorise pre-emptive diplomatic sanctions against an insider threat network?",
+    "ground_truth_quality": 0.6290810560272814,
+    "complexity": 3,
+    "id": 102
+  },
+  {
+    "text": "Evaluate the effectiveness of AI-assisted judicial decisions in countering state-sponsored espionage.",
+    "ground_truth_quality": 0.2689662655968577,
+    "complexity": 2,
+    "id": 103
+  },
+  {
+    "text": "Analyse the diplomatic fallout of a massive data breach between a non-aligned state and a strategic competitor.",
+    "ground_truth_quality": 0.5563385583582664,
+    "complexity": 3,
+    "id": 104
+  },
+  {
+    "text": "Evaluate the cybersecurity posture of healthcare after a zero-day exploitation targeting satellite networks.",
+    "ground_truth_quality": 0.4006619157272424,
+    "complexity": 3,
+    "id": 105
+  },
+  {
+    "text": "Should the national security council impose sanctions on a major trading partner following a nuclear test?",
+    "ground_truth_quality": 0.7464706665557418,
+    "complexity": 3,
+    "id": 106
+  },
+  {
+    "text": "Assess the constitutional validity of emergency censorship during a pandemic.",
+    "ground_truth_quality": 0.4771929877319361,
+    "complexity": 2,
+    "id": 107
+  },
+  {
+    "text": "Analyse the geopolitical implications of a major trading partner developing cyber offensive tools.",
+    "ground_truth_quality": 0.5344157831755247,
+    "complexity": 2,
+    "id": 108
+  },
+  {
+    "text": "Evaluate whether autonomous weapon deployment violates digital sovereignty under international law.",
+    "ground_truth_quality": 0.8373782848162096,
+    "complexity": 2,
+    "id": 109
+  },
+  {
+    "text": "Should intelligence agencies use predictive policing to counter disinformation in Central Africa?",
+    "ground_truth_quality": 0.7062141839014656,
+    "complexity": 3,
+    "id": 110
+  },
+  {
+    "text": "Assess the strategic impact of an assassination attempt on regional stability in Eastern Europe.",
+    "ground_truth_quality": 0.5371721083582999,
+    "complexity": 2,
+    "id": 111
+  },
+  {
+    "text": "Evaluate the proportionality of economic blockade to zero-day exploitation by an insider threat network.",
+    "ground_truth_quality": 0.35647809130226565,
+    "complexity": 3,
+    "id": 112
+  },
+  {
+    "text": "Should the intelligence directorate share classified signals intelligence with a Five Eyes partner regarding cyber operations?",
+    "ground_truth_quality": 0.8045767057477192,
+    "complexity": 4,
+    "id": 113
+  },
+  {
+    "text": "Analyse the legal framework for mass surveillance in the context of the Geneva Conventions.",
+    "ground_truth_quality": 0.35691449605561565,
+    "complexity": 2,
+    "id": 114
+  },
+  {
+    "text": "Evaluate the ethical implications of deploying quantum decryption for military intelligence.",
+    "ground_truth_quality": 0.5197672245753308,
+    "complexity": 2,
+    "id": 115
+  },
+  {
+    "text": "Assess the risk of hybrid warfare escalation following a nuclear test in the Arctic.",
+    "ground_truth_quality": 0.599838119178613,
+    "complexity": 3,
+    "id": 116
+  },
+  {
+    "text": "Should the cybersecurity agency authorise pre-emptive military deployment against a terrorist organisation?",
+    "ground_truth_quality": 0.7825669730311927,
+    "complexity": 3,
+    "id": 117
+  },
+  {
+    "text": "Evaluate the effectiveness of AI-assisted judicial decisions in countering cyber terrorism.",
+    "ground_truth_quality": 0.6479795218341353,
+    "complexity": 2,
+    "id": 118
+  },
+  {
+    "text": "Analyse the diplomatic fallout of a cyber-espionage revelation between a failing state and a private-sector partner.",
+    "ground_truth_quality": 0.7124137962039515,
+    "complexity": 3,
+    "id": 119
+  },
+  {
+    "text": "Evaluate the cybersecurity posture of financial services after a insider threat targeting civilian hospitals.",
+    "ground_truth_quality": 0.2579837666907937,
+    "complexity": 3,
+    "id": 120
+  },
+  {
+    "text": "Should NATO impose sanctions on a nuclear-armed neighbour following a nuclear test?",
+    "ground_truth_quality": 0.38317632887949427,
+    "complexity": 3,
+    "id": 121
+  },
+  {
+    "text": "Assess the constitutional validity of emergency censorship during a refugee crisis.",
+    "ground_truth_quality": 0.5266831180710417,
+    "complexity": 2,
+    "id": 122
+  },
+  {
+    "text": "Analyse the geopolitical implications of a rival superpower developing quantum computing.",
+    "ground_truth_quality": 0.6945624922326561,
+    "complexity": 2,
+    "id": 123
+  },
+  {
+    "text": "Evaluate whether facial recognition bans violates digital sovereignty under international law.",
+    "ground_truth_quality": 0.6407047521529798,
+    "complexity": 2,
+    "id": 124
+  },
+  {
+    "text": "Should intelligence agencies use autonomous drones to counter radicalisation in the Indo-Pacific?",
+    "ground_truth_quality": 0.8005814930097369,
+    "complexity": 3,
+    "id": 125
+  },
+  {
+    "text": "Assess the strategic impact of a cyber-espionage revelation on regional stability in the Middle East.",
+    "ground_truth_quality": 0.5850186813648817,
+    "complexity": 2,
+    "id": 126
+  },
+  {
+    "text": "Evaluate the proportionality of joint exercises to zero-day exploitation by a transnational crime syndicate.",
+    "ground_truth_quality": 0.6122113156056626,
+    "complexity": 3,
+    "id": 127
+  },
+  {
+    "text": "Should parliament share classified satellite imagery with a regional ally regarding cyber operations?",
+    "ground_truth_quality": 0.5017728642127957,
+    "complexity": 4,
+    "id": 128
+  },
+  {
+    "text": "Analyse the legal framework for internet shutdowns in the context of the Nuclear Non-Proliferation Treaty.",
+    "ground_truth_quality": 0.7473576241967125,
+    "complexity": 2,
+    "id": 129
+  },
+  {
+    "text": "Evaluate the ethical implications of deploying behavioural analytics for border security.",
+    "ground_truth_quality": 0.60963980799505,
+    "complexity": 2,
+    "id": 130
+  },
+  {
+    "text": "Assess the risk of radicalisation escalation following a cyber-espionage revelation in Central Africa.",
+    "ground_truth_quality": 0.7949189982428712,
+    "complexity": 3,
+    "id": 131
+  },
+  {
+    "text": "Should the national security council authorise pre-emptive cyber retaliation against a terrorist organisation?",
+    "ground_truth_quality": 0.8111552085365922,
+    "complexity": 3,
+    "id": 132
+  },
+  {
+    "text": "Evaluate the effectiveness of mandatory encryption backdoors in countering radicalisation.",
+    "ground_truth_quality": 0.5258171094132221,
+    "complexity": 2,
+    "id": 133
+  },
+  {
+    "text": "Analyse the diplomatic fallout of a territorial incursion between a nuclear-armed neighbour and a strategic competitor.",
+    "ground_truth_quality": 0.6354900546141077,
+    "complexity": 3,
+    "id": 134
+  },
+  {
+    "text": "Evaluate the cybersecurity posture of telecommunications after a ransomware attack targeting power grids.",
+    "ground_truth_quality": 0.6688966218420729,
+    "complexity": 3,
+    "id": 135
+  },
+  {
+    "text": "Should parliament impose sanctions on a non-aligned state following a nuclear test?",
+    "ground_truth_quality": 0.7668086756727651,
+    "complexity": 3,
+    "id": 136
+  },
+  {
+    "text": "Assess the constitutional validity of forced decryption during a refugee crisis.",
+    "ground_truth_quality": 0.6551480987320867,
+    "complexity": 2,
+    "id": 137
+  },
+  {
+    "text": "Analyse the geopolitical implications of a rival superpower developing hypersonic missiles.",
+    "ground_truth_quality": 0.5027853690909477,
+    "complexity": 2,
+    "id": 138
+  },
+  {
+    "text": "Evaluate whether bulk data collection violates due process under international law.",
+    "ground_truth_quality": 0.9405342943111037,
+    "complexity": 2,
+    "id": 139
+  },
+  {
+    "text": "Should intelligence agencies use behavioural analytics to counter state-sponsored espionage in Central Africa?",
+    "ground_truth_quality": 0.7423977228110842,
+    "complexity": 3,
+    "id": 140
+  },
+  {
+    "text": "Assess the strategic impact of a cyber-espionage revelation on regional stability in the Indo-Pacific.",
+    "ground_truth_quality": 0.4135067029332109,
+    "complexity": 2,
+    "id": 141
+  },
+  {
+    "text": "Evaluate the proportionality of economic blockade to insider threat by a transnational crime syndicate.",
+    "ground_truth_quality": 0.42684615140374677,
+    "complexity": 3,
+    "id": 142
+  },
+  {
+    "text": "Should the UN Security Council share classified cyber threat indicators with a regional ally regarding cyber operations?",
+    "ground_truth_quality": 0.4986573733324198,
+    "complexity": 4,
+    "id": 143
+  },
+  {
+    "text": "Analyse the legal framework for biometric registration in the context of the Wassenaar Arrangement.",
+    "ground_truth_quality": 0.45123865406592095,
+    "complexity": 2,
+    "id": 144
+  },
+  {
+    "text": "Evaluate the ethical implications of deploying deepfake detection for border security.",
+    "ground_truth_quality": 0.534560406376384,
+    "complexity": 2,
+    "id": 145
+  },
+  {
+    "text": "Assess the risk of radicalisation escalation following an assassination attempt in Central Africa.",
+    "ground_truth_quality": 0.6004854403719982,
+    "complexity": 3,
+    "id": 146
+  },
+  {
+    "text": "Should parliament authorise pre-emptive military deployment against a state-backed APT group?",
+    "ground_truth_quality": 0.8794996633820512,
+    "complexity": 3,
+    "id": 147
+  },
+  {
+    "text": "Evaluate the effectiveness of social media monitoring in countering radicalisation.",
+    "ground_truth_quality": 0.24373127435888903,
+    "complexity": 2,
+    "id": 148
+  },
+  {
+    "text": "Analyse the diplomatic fallout of a cyber-espionage revelation between a major trading partner and an international organisation.",
+    "ground_truth_quality": 0.751141780923587,
+    "complexity": 3,
+    "id": 149
+  },
+  {
+    "text": "Evaluate the history implications of Attrition on law applications involving right to constitutional remedies.",
+    "ground_truth_quality": 0.7747120883414802,
+    "complexity": 3.3,
+    "domains": [
+      "history",
+      "law"
+    ],
+    "id": 0
+  },
+  {
+    "text": "Should governments regulate Ce (chemistry) given its impact on privilege escalation (cybersecurity)?",
+    "ground_truth_quality": 0.699077089446222,
+    "complexity": 3.3,
+    "domains": [
+      "chemistry",
+      "cybersecurity"
+    ],
+    "id": 1
+  },
+  {
+    "text": "Assess the risk of applying phase space from physics to solve problems in mathematics involving Algebra.",
+    "ground_truth_quality": 0.5093912599588073,
+    "complexity": 3.3,
+    "domains": [
+      "physics",
+      "mathematics"
+    ],
+    "id": 2
+  },
+  {
+    "text": "Analyse how advances in Vector Space (mathematics) could transform metalloid in chemistry.",
+    "ground_truth_quality": 0.538713999870016,
+    "complexity": 3.1,
+    "domains": [
+      "mathematics",
+      "chemistry"
+    ],
+    "id": 3
+  },
+  {
+    "text": "Evaluate the ethical considerations of using Space Science: Orbital Mechanics (physics) for Psychological manipulation of enemy formation is decisive (history).",
+    "ground_truth_quality": 0.4392985409387435,
+    "complexity": 3.0,
+    "domains": [
+      "physics",
+      "history"
+    ],
+    "id": 4
+  },
+  {
+    "text": "Compare the approaches of computing (P) and law (Wollstonecraft) to solving complex problems.",
+    "ground_truth_quality": 0.6806098462349246,
+    "complexity": 3.1,
+    "domains": [
+      "computing",
+      "law"
+    ],
+    "id": 5
+  },
+  {
+    "text": "Should energy from innovation be taught alongside limits from mathematics in education?",
+    "ground_truth_quality": 0.3708500391893375,
+    "complexity": 3.2,
+    "domains": [
+      "innovation",
+      "mathematics"
+    ],
+    "id": 6
+  },
+  {
+    "text": "Assess the strategic value of combining chemistry knowledge of Germanium with innovation expertise in SpaceX Falcon 9.",
+    "ground_truth_quality": 0.801905796030429,
+    "complexity": 3.3,
+    "domains": [
+      "chemistry",
+      "innovation"
+    ],
+    "id": 7
+  },
+  {
+    "text": "Evaluate whether physics (innovation) contradicts or supports halogen (chemistry).",
+    "ground_truth_quality": 0.5331350101163057,
+    "complexity": 3.2,
+    "domains": [
+      "innovation",
+      "chemistry"
+    ],
+    "id": 8
+  },
+  {
+    "text": "Analyse the future impact of integrating cybersecurity (A04: Insecure Design) with physics (Space Science: Orbital Mechanics) research.",
+    "ground_truth_quality": 0.5787755846480129,
+    "complexity": 3.1,
+    "domains": [
+      "cybersecurity",
+      "physics"
+    ],
+    "id": 9
+  },
+  {
+    "text": "Evaluate the mathematics implications of Calculus & Real Analysis on cybersecurity applications involving IDA Pro.",
+    "ground_truth_quality": 0.6671161726396598,
+    "complexity": 3.1,
+    "domains": [
+      "mathematics",
+      "cybersecurity"
+    ],
+    "id": 10
+  },
+  {
+    "text": "Should governments regulate Suppressed & Fringe Physics: Electric Universe Theory (physics) given its impact on ultranationalism (law)?",
+    "ground_truth_quality": 0.7166433140262548,
+    "complexity": 3.0,
+    "domains": [
+      "physics",
+      "law"
+    ],
+    "id": 11
+  },
+  {
+    "text": "Assess the risk of applying spin networks from physics to solve problems in cybersecurity involving persistence.",
+    "ground_truth_quality": 0.5519557764458572,
+    "complexity": 3.3,
+    "domains": [
+      "physics",
+      "cybersecurity"
+    ],
+    "id": 12
+  },
+  {
+    "text": "Analyse how advances in Naval power is essential for Mediterranean dominance (history) could transform JavaScript/TypeScript in computing.",
+    "ground_truth_quality": 0.7273912699180684,
+    "complexity": 3.3,
+    "domains": [
+      "history",
+      "computing"
+    ],
+    "id": 13
+  },
+  {
+    "text": "Evaluate the ethical considerations of using theory of everything (innovation) for wireless (cybersecurity).",
+    "ground_truth_quality": 0.9430814074742172,
+    "complexity": 3.2,
+    "domains": [
+      "innovation",
+      "cybersecurity"
+    ],
+    "id": 14
+  },
+  {
+    "text": "Compare the approaches of physics (quantum no-cloning theorem) and cybersecurity (cracking) to solving complex problems.",
+    "ground_truth_quality": 0.8681647408989481,
+    "complexity": 3.3,
+    "domains": [
+      "physics",
+      "cybersecurity"
+    ],
+    "id": 15
+  },
+  {
+    "text": "Should synthetic_biology from innovation be taught alongside Field from mathematics in education?",
+    "ground_truth_quality": 0.353498348715503,
+    "complexity": 3.2,
+    "domains": [
+      "innovation",
+      "mathematics"
+    ],
+    "id": 16
+  },
+  {
+    "text": "Assess the strategic value of combining history knowledge of popular support with computing expertise in Hash Table.",
+    "ground_truth_quality": 0.6028772288345731,
+    "complexity": 3.3,
+    "domains": [
+      "history",
+      "computing"
+    ],
+    "id": 17
+  },
+  {
+    "text": "Evaluate whether diffusion models (computing) contradicts or supports quantum_computing (innovation).",
+    "ground_truth_quality": 0.5940442418821454,
+    "complexity": 3.3,
+    "domains": [
+      "computing",
+      "innovation"
+    ],
+    "id": 18
+  },
+  {
+    "text": "Analyse the future impact of integrating physics (Suppressed & Fringe Physics: Tesla Free Energy / Radiant Energy) with computing (Lisp/Scheme) research.",
+    "ground_truth_quality": 0.6506457227643498,
+    "complexity": 3.0,
+    "domains": [
+      "physics",
+      "computing"
+    ],
+    "id": 19
+  },
+  {
+    "text": "Evaluate the mathematics implications of Math/Probability: Uniform on cybersecurity applications involving wireless.",
+    "ground_truth_quality": 0.7099435368976811,
+    "complexity": 3.0,
+    "domains": [
+      "mathematics",
+      "cybersecurity"
+    ],
+    "id": 20
+  },
+  {
+    "text": "Should governments regulate Trie (computing) given its impact on mutual aid (law)?",
+    "ground_truth_quality": 0.7797659485738653,
+    "complexity": 3.1,
+    "domains": [
+      "computing",
+      "law"
+    ],
+    "id": 21
+  },
+  {
+    "text": "Assess the risk of applying no single document from law to solve problems in mathematics involving Group.",
+    "ground_truth_quality": 0.43504934858668226,
+    "complexity": 3.3,
+    "domains": [
+      "law",
+      "mathematics"
+    ],
+    "id": 22
+  },
+  {
+    "text": "Analyse how advances in Space Science: Exoplanets (physics) could transform masscan in cybersecurity.",
+    "ground_truth_quality": 0.7046412435178739,
+    "complexity": 3.0,
+    "domains": [
+      "physics",
+      "cybersecurity"
+    ],
+    "id": 23
+  },
+  {
+    "text": "Evaluate the ethical considerations of using intelligence from Lucy spy ring (history) for mathematics (innovation).",
+    "ground_truth_quality": 0.4974729094544226,
+    "complexity": 3.3,
+    "domains": [
+      "history",
+      "innovation"
+    ],
+    "id": 24
+  },
+  {
+    "text": "Compare the approaches of history (deep defensive zones) and law (right to a fair trial) to solving complex problems.",
+    "ground_truth_quality": 0.7313715552229596,
+    "complexity": 3.3,
+    "domains": [
+      "history",
+      "law"
+    ],
+    "id": 25
+  },
+  {
+    "text": "Should smart_materials from innovation be taught alongside organic society from law in education?",
+    "ground_truth_quality": 0.6044539578179515,
+    "complexity": 3.2,
+    "domains": [
+      "innovation",
+      "law"
+    ],
+    "id": 26
+  },
+  {
+    "text": "Assess the strategic value of combining cybersecurity knowledge of network with history expertise in Technology (radar) can multiply defensive effectiveness.",
+    "ground_truth_quality": 0.643193520008192,
+    "complexity": 3.3,
+    "domains": [
+      "cybersecurity",
+      "history"
+    ],
+    "id": 27
+  },
+  {
+    "text": "Evaluate whether superconductors (innovation) contradicts or supports archery softening (history).",
+    "ground_truth_quality": 0.6615057084358938,
+    "complexity": 3.2,
+    "domains": [
+      "innovation",
+      "history"
+    ],
+    "id": 28
+  },
+  {
+    "text": "Analyse the future impact of integrating mathematics (limits) with innovation (brain_interfaces) research.",
+    "ground_truth_quality": 0.7241597728571079,
+    "complexity": 3.3,
+    "domains": [
+      "mathematics",
+      "innovation"
+    ],
+    "id": 29
+  },
+  {
+    "text": "Evaluate the mathematics implications of Algebra on innovation applications involving Hodge conjecture.",
+    "ground_truth_quality": 0.48412331852802887,
+    "complexity": 3.1,
+    "domains": [
+      "mathematics",
+      "innovation"
+    ],
+    "id": 30
+  },
+  {
+    "text": "Should governments regulate Red-Black Tree (computing) given its impact on brain_interfaces (innovation)?",
+    "ground_truth_quality": 0.6858338351680189,
+    "complexity": 3.1,
+    "domains": [
+      "computing",
+      "innovation"
+    ],
+    "id": 31
+  },
+  {
+    "text": "Assess the risk of applying Math/Probability: Binomial from mathematics to solve problems in physics involving gauge bosons.",
+    "ground_truth_quality": 0.7622750019210166,
+    "complexity": 3.0,
+    "domains": [
+      "mathematics",
+      "physics"
+    ],
+    "id": 32
+  },
+  {
+    "text": "Analyse how advances in civilian endurance (history) could transform corporatism in law.",
+    "ground_truth_quality": 0.8188610068690748,
+    "complexity": 3.3,
+    "domains": [
+      "history",
+      "law"
+    ],
+    "id": 33
+  },
+  {
+    "text": "Evaluate the ethical considerations of using Urban (history) for Lutetium (chemistry).",
+    "ground_truth_quality": 0.6973646367026659,
+    "complexity": 3.3,
+    "domains": [
+      "history",
+      "chemistry"
+    ],
+    "id": 34
+  },
+  {
+    "text": "Compare the approaches of physics (quantum teleportation) and law (Budapest Convention on Cybercrime) to solving complex problems.",
+    "ground_truth_quality": 0.8283971308784839,
+    "complexity": 3.3,
+    "domains": [
+      "physics",
+      "law"
+    ],
+    "id": 35
+  },
+  {
+    "text": "Should Ring from mathematics be taught alongside password from cybersecurity in education?",
+    "ground_truth_quality": 0.9111049990857065,
+    "complexity": 3.1,
+    "domains": [
+      "mathematics",
+      "cybersecurity"
+    ],
+    "id": 36
+  },
+  {
+    "text": "Assess the strategic value of combining history knowledge of Charismatic leadership can revitalize a losing cause with physics expertise in syndrome measurement.",
+    "ground_truth_quality": 0.6370692875049937,
+    "complexity": 3.3,
+    "domains": [
+      "history",
+      "physics"
+    ],
+    "id": 37
+  },
+  {
+    "text": "Evaluate whether Hash Table (computing) contradicts or supports Probability & Statistics (mathematics).",
+    "ground_truth_quality": 0.7442959472757229,
+    "complexity": 3.1,
+    "domains": [
+      "computing",
+      "mathematics"
+    ],
+    "id": 38
+  },
+  {
+    "text": "Analyse the future impact of integrating cybersecurity (forensics) with computing (TimSort) research.",
+    "ground_truth_quality": 0.5615838132741658,
+    "complexity": 3.3,
+    "domains": [
+      "cybersecurity",
+      "computing"
+    ],
+    "id": 39
+  },
+  {
+    "text": "Evaluate the innovation implications of SLS (Space Launch System) on law applications involving CFAA (USA).",
+    "ground_truth_quality": 0.867552899688842,
+    "complexity": 3.1,
+    "domains": [
+      "innovation",
+      "law"
+    ],
+    "id": 40
+  },
+  {
+    "text": "Should governments regulate alkyne (chemistry) given its impact on NTLM (cybersecurity)?",
+    "ground_truth_quality": 0.42129730417210337,
+    "complexity": 3.1,
+    "domains": [
+      "chemistry",
+      "cybersecurity"
+    ],
+    "id": 41
+  },
+  {
+    "text": "Assess the risk of applying Superior technology breaks previously impregnable defenses from history to solve problems in innovation involving quantum_computing.",
+    "ground_truth_quality": 0.9403329836960713,
+    "complexity": 3.3,
+    "domains": [
+      "history",
+      "innovation"
+    ],
+    "id": 42
+  },
+  {
+    "text": "Analyse how advances in Milky Way SMBH: Sagittarius A* \u2014 4 million solar masses (physics) could transform right to constitutional remedies in law.",
+    "ground_truth_quality": 0.653410296594364,
+    "complexity": 3.3,
+    "domains": [
+      "physics",
+      "law"
+    ],
+    "id": 43
+  },
+  {
+    "text": "Evaluate the ethical considerations of using Terrain selection forces enemy into disadvantageous positions (history) for superconductors (innovation).",
+    "ground_truth_quality": 0.6456292619232894,
+    "complexity": 3.3,
+    "domains": [
+      "history",
+      "innovation"
+    ],
+    "id": 44
+  },
+  {
+    "text": "Compare the approaches of mathematics (Math/Probability: Uniform) and law (right to life and liberty) to solving complex problems.",
+    "ground_truth_quality": 0.6414653637756268,
+    "complexity": 3.0,
+    "domains": [
+      "mathematics",
+      "law"
+    ],
+    "id": 45
+  },
+  {
+    "text": "Should torpedo attacks from history be taught alongside Field from mathematics in education?",
+    "ground_truth_quality": 0.9219434155191275,
+    "complexity": 3.3,
+    "domains": [
+      "history",
+      "mathematics"
+    ],
+    "id": 46
+  },
+  {
+    "text": "Assess the strategic value of combining innovation knowledge of longevity with history expertise in Traditional tactics can defeat modern firepower when properly applied.",
+    "ground_truth_quality": 0.6632553238747234,
+    "complexity": 3.2,
+    "domains": [
+      "innovation",
+      "history"
+    ],
+    "id": 47
+  },
+  {
+    "text": "Evaluate whether Lu (chemistry) contradicts or supports Java (computing).",
+    "ground_truth_quality": 0.6540268107604049,
+    "complexity": 3.3,
+    "domains": [
+      "chemistry",
+      "computing"
+    ],
+    "id": 48
+  },
+  {
+    "text": "Analyse the future impact of integrating history (Morale and discipline outlast numbers) with innovation (quantum_computing) research.",
+    "ground_truth_quality": 0.8109266656337444,
+    "complexity": 3.3,
+    "domains": [
+      "history",
+      "innovation"
+    ],
+    "id": 49
+  },
+  {
+    "text": "Evaluate the history implications of Psychological manipulation of enemy formation is decisive on law applications involving freedom of speech and expression.",
+    "ground_truth_quality": 0.6300850247017016,
+    "complexity": 3.3,
+    "domains": [
+      "history",
+      "law"
+    ],
+    "id": 50
+  },
+  {
+    "text": "Should governments regulate ether (chemistry) given its impact on Urban (history)?",
+    "ground_truth_quality": 0.6592622406150621,
+    "complexity": 3.1,
+    "domains": [
+      "chemistry",
+      "history"
+    ],
+    "id": 51
+  },
+  {
+    "text": "Assess the risk of applying Superior technology breaks previously impregnable defenses from history to solve problems in mathematics involving Algebra.",
+    "ground_truth_quality": 0.4156301619432904,
+    "complexity": 3.3,
+    "domains": [
+      "history",
+      "mathematics"
+    ],
+    "id": 52
+  },
+  {
+    "text": "Analyse how advances in EXPTIME (computing) could transform de Beauvoir in law.",
+    "ground_truth_quality": 0.6110698530126263,
+    "complexity": 3.1,
+    "domains": [
+      "computing",
+      "law"
+    ],
+    "id": 53
+  },
+  {
+    "text": "Evaluate the ethical considerations of using flamethrowers (history) for Probability & Statistics (mathematics).",
+    "ground_truth_quality": 0.7302570194460369,
+    "complexity": 3.3,
+    "domains": [
+      "history",
+      "mathematics"
+    ],
+    "id": 54
+  },
+  {
+    "text": "Compare the approaches of chemistry (Silver) and law (Bakunin) to solving complex problems.",
+    "ground_truth_quality": 0.8745740922579311,
+    "complexity": 3.3,
+    "domains": [
+      "chemistry",
+      "law"
+    ],
+    "id": 55
+  },
+  {
+    "text": "Should Navier-Stokes existence from innovation be taught alongside NP from computing in education?",
+    "ground_truth_quality": 0.7767010797841813,
+    "complexity": 3.2,
+    "domains": [
+      "innovation",
+      "computing"
+    ],
+    "id": 56
+  },
+  {
+    "text": "Assess the strategic value of combining innovation knowledge of artificial_general_intelligence with chemistry expertise in lanthanide.",
+    "ground_truth_quality": 0.5840179782999131,
+    "complexity": 3.2,
+    "domains": [
+      "innovation",
+      "chemistry"
+    ],
+    "id": 57
+  },
+  {
+    "text": "Evaluate whether Budapest Convention on Cybercrime (law) contradicts or supports jewellery (chemistry).",
+    "ground_truth_quality": 0.824900267380856,
+    "complexity": 3.1,
+    "domains": [
+      "law",
+      "chemistry"
+    ],
+    "id": 58
+  },
+  {
+    "text": "Analyse the future impact of integrating computing (GAN) with mathematics (Vector Space) research.",
+    "ground_truth_quality": 0.646439656381989,
+    "complexity": 3.3,
+    "domains": [
+      "computing",
+      "mathematics"
+    ],
+    "id": 59
+  },
+  {
+    "text": "Evaluate the cybersecurity implications of FTK on history applications involving phalanx formation.",
+    "ground_truth_quality": 0.6940444600120237,
+    "complexity": 3.3,
+    "domains": [
+      "cybersecurity",
+      "history"
+    ],
+    "id": 60
+  },
+  {
+    "text": "Should governments regulate Graph (computing) given its impact on action principle (physics)?",
+    "ground_truth_quality": 0.6397791825333828,
+    "complexity": 3.1,
+    "domains": [
+      "computing",
+      "physics"
+    ],
+    "id": 61
+  },
+  {
+    "text": "Assess the risk of applying biotechnology from innovation to solve problems in physics involving decoherence.",
+    "ground_truth_quality": 0.7732981272215678,
+    "complexity": 3.2,
+    "domains": [
+      "innovation",
+      "physics"
+    ],
+    "id": 62
+  },
+  {
+    "text": "Analyse how advances in challenges (innovation) could transform gravitational waves in physics.",
+    "ground_truth_quality": 0.95,
+    "complexity": 3.2,
+    "domains": [
+      "innovation",
+      "physics"
+    ],
+    "id": 63
+  },
+  {
+    "text": "Evaluate the ethical considerations of using P (chemistry) for materials_science (innovation).",
+    "ground_truth_quality": 0.5009328607499701,
+    "complexity": 3.3,
+    "domains": [
+      "chemistry",
+      "innovation"
+    ],
+    "id": 64
+  },
+  {
+    "text": "Compare the approaches of mathematics (Vector Space) and chemistry (transition metal) to solving complex problems.",
+    "ground_truth_quality": 0.6525466646942149,
+    "complexity": 3.1,
+    "domains": [
+      "mathematics",
+      "chemistry"
+    ],
+    "id": 65
+  },
+  {
+    "text": "Should right to constitutional remedies from law be taught alongside impact from cybersecurity in education?",
+    "ground_truth_quality": 0.5444744427747764,
+    "complexity": 3.1,
+    "domains": [
+      "law",
+      "cybersecurity"
+    ],
+    "id": 66
+  },
+  {
+    "text": "Assess the strategic value of combining innovation knowledge of nanomaterials with mathematics expertise in Probability & Statistics.",
+    "ground_truth_quality": 0.8614818651194438,
+    "complexity": 3.2,
+    "domains": [
+      "innovation",
+      "mathematics"
+    ],
+    "id": 67
+  },
+  {
+    "text": "Evaluate whether sniffing (cybersecurity) contradicts or supports CCPA (California) (law).",
+    "ground_truth_quality": 0.7102669413814144,
+    "complexity": 3.3,
+    "domains": [
+      "cybersecurity",
+      "law"
+    ],
+    "id": 68
+  },
+  {
+    "text": "Analyse the future impact of integrating chemistry (Zr) with innovation (superconductors) research.",
+    "ground_truth_quality": 0.5949037820208162,
+    "complexity": 3.3,
+    "domains": [
+      "chemistry",
+      "innovation"
+    ],
+    "id": 69
+  },
+  {
+    "text": "Evaluate the mathematics implications of Algebra on cybersecurity applications involving lateral movement.",
+    "ground_truth_quality": 0.4808333417816008,
+    "complexity": 3.1,
+    "domains": [
+      "mathematics",
+      "cybersecurity"
+    ],
+    "id": 70
+  },
+  {
+    "text": "Should governments regulate Bell states (physics) given its impact on gender equality (law)?",
+    "ground_truth_quality": 0.3075361084302849,
+    "complexity": 3.3,
+    "domains": [
+      "physics",
+      "law"
+    ],
+    "id": 71
+  },
+  {
+    "text": "Assess the risk of applying forensics from cybersecurity to solve problems in history involving hugging the enemy.",
+    "ground_truth_quality": 0.5742756302606226,
+    "complexity": 3.3,
+    "domains": [
+      "cybersecurity",
+      "history"
+    ],
+    "id": 72
+  },
+  {
+    "text": "Analyse how advances in amine (chemistry) could transform wireless in cybersecurity.",
+    "ground_truth_quality": 0.48266316124858777,
+    "complexity": 3.1,
+    "domains": [
+      "chemistry",
+      "cybersecurity"
+    ],
+    "id": 73
+  },
+  {
+    "text": "Evaluate the ethical considerations of using Ghidra (cybersecurity) for Probability & Statistics (mathematics).",
+    "ground_truth_quality": 0.3471009979850903,
+    "complexity": 3.3,
+    "domains": [
+      "cybersecurity",
+      "mathematics"
+    ],
+    "id": 74
+  },
+  {
+    "text": "Compare the approaches of history (Psychological warfare can defeat armies before battle) and cybersecurity (network) to solving complex problems.",
+    "ground_truth_quality": 0.25406191958362634,
+    "complexity": 3.3,
+    "domains": [
+      "history",
+      "cybersecurity"
+    ],
+    "id": 75
+  },
+  {
+    "text": "Should Rotating troops prevents unit collapse from exhaustion from history be taught alongside Locke from law in education?",
+    "ground_truth_quality": 0.30050015856124795,
+    "complexity": 3.3,
+    "domains": [
+      "history",
+      "law"
+    ],
+    "id": 76
+  },
+  {
+    "text": "Assess the strategic value of combining mathematics knowledge of Arithmetic & Number Theory with chemistry expertise in Te.",
+    "ground_truth_quality": 0.6080867274319673,
+    "complexity": 3.1,
+    "domains": [
+      "mathematics",
+      "chemistry"
+    ],
+    "id": 77
+  },
+  {
+    "text": "Evaluate whether property rights (law) contradicts or supports Psychological (history).",
+    "ground_truth_quality": 0.5501255935100451,
+    "complexity": 3.3,
+    "domains": [
+      "law",
+      "history"
+    ],
+    "id": 78
+  },
+  {
+    "text": "Analyse the future impact of integrating physics (Quantum Physics: Quantum Hardware Platforms) with law (IT Act 2000 (India)) research.",
+    "ground_truth_quality": 0.7336532803749201,
+    "complexity": 3.0,
+    "domains": [
+      "physics",
+      "law"
+    ],
+    "id": 79
+  },
+  {
+    "text": "Evaluate the physics implications of Suppressed & Fringe Physics: Tesla Free Energy / Radiant Energy on chemistry applications involving electronics.",
+    "ground_truth_quality": 0.7272719765400476,
+    "complexity": 3.0,
+    "domains": [
+      "physics",
+      "chemistry"
+    ],
+    "id": 80
+  },
+  {
+    "text": "Should governments regulate right to life and liberty (law) given its impact on Be (chemistry)?",
+    "ground_truth_quality": 0.5679576833111373,
+    "complexity": 3.1,
+    "domains": [
+      "law",
+      "chemistry"
+    ],
+    "id": 81
+  },
+  {
+    "text": "Assess the risk of applying Sacrificing the center can be a trap for overconfident enemies from history to solve problems in chemistry involving actinide.",
+    "ground_truth_quality": 0.6625798353122384,
+    "complexity": 3.3,
+    "domains": [
+      "history",
+      "chemistry"
+    ],
+    "id": 82
+  },
+  {
+    "text": "Analyse how advances in Go (computing) could transform approaches in innovation.",
+    "ground_truth_quality": 0.6595453177948962,
+    "complexity": 3.1,
+    "domains": [
+      "computing",
+      "innovation"
+    ],
+    "id": 83
+  },
+  {
+    "text": "Evaluate the ethical considerations of using Arithmetic & Number Theory (mathematics) for Array (computing).",
+    "ground_truth_quality": 0.4417591341963463,
+    "complexity": 3.1,
+    "domains": [
+      "mathematics",
+      "computing"
+    ],
+    "id": 84
+  },
+  {
+    "text": "Compare the approaches of physics (Suppressed & Fringe Physics: Faster-Than-Light (FTL) Physics) and computing (BQP) to solving complex problems.",
+    "ground_truth_quality": 0.8666482546431831,
+    "complexity": 3.0,
+    "domains": [
+      "physics",
+      "computing"
+    ],
+    "id": 85
+  },
+  {
+    "text": "Should Rapid flanking maneuvers defeat static defensive lines from history be taught alongside Probability & Statistics from mathematics in education?",
+    "ground_truth_quality": 0.7242296416674314,
+    "complexity": 3.3,
+    "domains": [
+      "history",
+      "mathematics"
+    ],
+    "id": 86
+  },
+  {
+    "text": "Assess the strategic value of combining innovation knowledge of metamaterials with computing expertise in Graph.",
+    "ground_truth_quality": 0.8146152537857477,
+    "complexity": 3.2,
+    "domains": [
+      "innovation",
+      "computing"
+    ],
+    "id": 87
+  },
+  {
+    "text": "Evaluate whether random forest (computing) contradicts or supports lanthanide (chemistry).",
+    "ground_truth_quality": 0.661761847264643,
+    "complexity": 3.3,
+    "domains": [
+      "computing",
+      "chemistry"
+    ],
+    "id": 88
+  },
+  {
+    "text": "Analyse the future impact of integrating mathematics (Arithmetic & Number Theory) with innovation (energy) research.",
+    "ground_truth_quality": 0.7326017032050438,
+    "complexity": 3.1,
+    "domains": [
+      "mathematics",
+      "innovation"
+    ],
+    "id": 89
+  },
+  {
+    "text": "Evaluate the innovation implications of approaches on physics applications involving Suppressed & Fringe Physics: Hollow Earth Physics.",
+    "ground_truth_quality": 0.6145948834339169,
+    "complexity": 3.2,
+    "domains": [
+      "innovation",
+      "physics"
+    ],
+    "id": 90
+  },
+  {
+    "text": "Should governments regulate ambush preparation (history) given its impact on AVML (cybersecurity)?",
+    "ground_truth_quality": 0.6137409964497618,
+    "complexity": 3.3,
+    "domains": [
+      "history",
+      "cybersecurity"
+    ],
+    "id": 91
+  },
+  {
+    "text": "Assess the risk of applying federal system from law to solve problems in history involving booby traps.",
+    "ground_truth_quality": 0.3596527762763405,
+    "complexity": 3.3,
+    "domains": [
+      "law",
+      "history"
+    ],
+    "id": 92
+  },
+  {
+    "text": "Analyse how advances in Space Science: Solar System (physics) could transform storage in innovation.",
+    "ground_truth_quality": 0.31973680066604343,
+    "complexity": 3.0,
+    "domains": [
+      "physics",
+      "innovation"
+    ],
+    "id": 93
+  },
+  {
+    "text": "Evaluate the ethical considerations of using DBSCAN (computing) for Oxygen (chemistry).",
+    "ground_truth_quality": 0.7223547795640599,
+    "complexity": 3.3,
+    "domains": [
+      "computing",
+      "chemistry"
+    ],
+    "id": 94
+  },
+  {
+    "text": "Compare the approaches of cybersecurity (A08: Software and Data Integrity Failures) and mathematics (Math/Probability: Binomial) to solving complex problems.",
+    "ground_truth_quality": 0.6883173271605951,
+    "complexity": 3.1,
+    "domains": [
+      "cybersecurity",
+      "mathematics"
+    ],
+    "id": 95
+  },
+  {
+    "text": "Should de-extinction from innovation be taught alongside Graph from computing in education?",
+    "ground_truth_quality": 0.7359235874854257,
+    "complexity": 3.2,
+    "domains": [
+      "innovation",
+      "computing"
+    ],
+    "id": 96
+  },
+  {
+    "text": "Assess the strategic value of combining innovation knowledge of energy with mathematics expertise in Algebra.",
+    "ground_truth_quality": 0.4603925997146698,
+    "complexity": 3.2,
+    "domains": [
+      "innovation",
+      "mathematics"
+    ],
+    "id": 97
+  },
+  {
+    "text": "Evaluate whether biotechnology (innovation) contradicts or supports Nh (chemistry).",
+    "ground_truth_quality": 0.6974605821872373,
+    "complexity": 3.2,
+    "domains": [
+      "innovation",
+      "chemistry"
+    ],
+    "id": 98
+  },
+  {
+    "text": "Analyse the future impact of integrating chemistry (Pt) with history (Combined siege pressure on multiple fronts is decisive) research.",
+    "ground_truth_quality": 0.6841656453563469,
+    "complexity": 3.3,
+    "domains": [
+      "chemistry",
+      "history"
+    ],
+    "id": 99
+  },
+  {
+    "text": "Evaluate the cybersecurity implications of Nikto on innovation applications involving computing.",
+    "ground_truth_quality": 0.47539428356031793,
+    "complexity": 3.3,
+    "domains": [
+      "cybersecurity",
+      "innovation"
+    ],
+    "id": 100
+  },
+  {
+    "text": "Should governments regulate NP-complete (computing) given its impact on Ordinary matter: ~5% of universe (physics)?",
+    "ground_truth_quality": 0.5953404588772184,
+    "complexity": 3.1,
+    "domains": [
+      "computing",
+      "physics"
+    ],
+    "id": 101
+  },
+  {
+    "text": "Assess the risk of applying political warfare from history to solve problems in innovation involving storage.",
+    "ground_truth_quality": 0.6379608095741385,
+    "complexity": 3.3,
+    "domains": [
+      "history",
+      "innovation"
+    ],
+    "id": 102
+  },
+  {
+    "text": "Analyse how advances in Suppressed & Fringe Physics: Electric Universe Theory (physics) could transform Calculus & Real Analysis in mathematics.",
+    "ground_truth_quality": 0.6502348264292513,
+    "complexity": 3.0,
+    "domains": [
+      "physics",
+      "mathematics"
+    ],
+    "id": 103
+  },
+  {
+    "text": "Evaluate the ethical considerations of using ambush preparation (history) for B-Tree (computing).",
+    "ground_truth_quality": 0.4591796686130812,
+    "complexity": 3.3,
+    "domains": [
+      "history",
+      "computing"
+    ],
+    "id": 104
+  },
+  {
+    "text": "Compare the approaches of chemistry (alkane) and mathematics (Calculus & Real Analysis) to solving complex problems.",
+    "ground_truth_quality": 0.6709872648327581,
+    "complexity": 3.1,
+    "domains": [
+      "chemistry",
+      "mathematics"
+    ],
+    "id": 105
+  },
+  {
+    "text": "Should JavaScript/TypeScript from computing be taught alongside Oakeshott from law in education?",
+    "ground_truth_quality": 0.8736114454691454,
+    "complexity": 3.1,
+    "domains": [
+      "computing",
+      "law"
+    ],
+    "id": 106
+  },
+  {
+    "text": "Assess the strategic value of combining cybersecurity knowledge of password with history expertise in rotating units.",
+    "ground_truth_quality": 0.8701166358292002,
+    "complexity": 3.3,
+    "domains": [
+      "cybersecurity",
+      "history"
+    ],
+    "id": 107
+  },
+  {
+    "text": "Evaluate whether Array (computing) contradicts or supports Bernstein (law).",
+    "ground_truth_quality": 0.6260839838320752,
+    "complexity": 3.1,
+    "domains": [
+      "computing",
+      "law"
+    ],
+    "id": 108
+  },
+  {
+    "text": "Analyse the future impact of integrating computing (MergeSort) with physics (geodesics) research.",
+    "ground_truth_quality": 0.43327534926201516,
+    "complexity": 3.1,
+    "domains": [
+      "computing",
+      "physics"
+    ],
+    "id": 109
+  },
+  {
+    "text": "Evaluate the mathematics implications of Arithmetic & Number Theory on chemistry applications involving transition metal.",
+    "ground_truth_quality": 0.6596691665805338,
+    "complexity": 3.1,
+    "domains": [
+      "mathematics",
+      "chemistry"
+    ],
+    "id": 110
+  },
+  {
+    "text": "Should governments regulate Arithmetic & Number Theory (mathematics) given its impact on computing (innovation)?",
+    "ground_truth_quality": 0.8140207821670241,
+    "complexity": 3.1,
+    "domains": [
+      "mathematics",
+      "innovation"
+    ],
+    "id": 111
+  },
+  {
+    "text": "Assess the risk of applying divisibility from mathematics to solve problems in physics involving Suppressed & Fringe Physics: Cold Fusion / LENR.",
+    "ground_truth_quality": 0.42111704736062994,
+    "complexity": 3.3,
+    "domains": [
+      "mathematics",
+      "physics"
+    ],
+    "id": 112
+  },
+  {
+    "text": "Analyse how advances in quantum_computing (innovation) could transform Python in computing.",
+    "ground_truth_quality": 0.7496807430433085,
+    "complexity": 3.2,
+    "domains": [
+      "innovation",
+      "computing"
+    ],
+    "id": 113
+  },
+  {
+    "text": "Evaluate the ethical considerations of using diffusion models (computing) for quantum_computing (innovation).",
+    "ground_truth_quality": 0.3198738240491767,
+    "complexity": 3.3,
+    "domains": [
+      "computing",
+      "innovation"
+    ],
+    "id": 114
+  },
+  {
+    "text": "Compare the approaches of physics (Suppressed & Fringe Physics: Faster-Than-Light (FTL) Physics) and law (right to education) to solving complex problems.",
+    "ground_truth_quality": 0.7568022322429101,
+    "complexity": 3.0,
+    "domains": [
+      "physics",
+      "law"
+    ],
+    "id": 115
+  },
+  {
+    "text": "Should longevity from innovation be taught alongside Proudhon from law in education?",
+    "ground_truth_quality": 0.7586362293513664,
+    "complexity": 3.2,
+    "domains": [
+      "innovation",
+      "law"
+    ],
+    "id": 116
+  },
+  {
+    "text": "Assess the strategic value of combining mathematics knowledge of Calculus & Real Analysis with computing expertise in CNN.",
+    "ground_truth_quality": 0.5070617848900878,
+    "complexity": 3.1,
+    "domains": [
+      "mathematics",
+      "computing"
+    ],
+    "id": 117
+  },
+  {
+    "text": "Evaluate whether freedom of speech and expression (law) contradicts or supports A09: Security Logging and Monitoring Failures (cybersecurity).",
+    "ground_truth_quality": 0.7518010767707749,
+    "complexity": 3.1,
+    "domains": [
+      "law",
+      "cybersecurity"
+    ],
+    "id": 118
+  },
+  {
+    "text": "Analyse the future impact of integrating physics (Space Science: Exoplanets) with innovation (smart_materials) research.",
+    "ground_truth_quality": 0.55366034879428,
+    "complexity": 3.0,
+    "domains": [
+      "physics",
+      "innovation"
+    ],
+    "id": 119
+  },
+  {
+    "text": "Evaluate the innovation implications of brain_interfaces on law applications involving voluntary association.",
+    "ground_truth_quality": 0.45290656835086945,
+    "complexity": 3.2,
+    "domains": [
+      "innovation",
+      "law"
+    ],
+    "id": 120
+  },
+  {
+    "text": "Should governments regulate Probability & Statistics (mathematics) given its impact on transition metal (chemistry)?",
+    "ground_truth_quality": 0.5995980694768935,
+    "complexity": 3.1,
+    "domains": [
+      "mathematics",
+      "chemistry"
+    ],
+    "id": 121
+  },
+  {
+    "text": "Assess the risk of applying malware from cybersecurity to solve problems in history involving armored blitzkrieg.",
+    "ground_truth_quality": 0.8339663870349399,
+    "complexity": 3.3,
+    "domains": [
+      "cybersecurity",
+      "history"
+    ],
+    "id": 122
+  },
+  {
+    "text": "Analyse how advances in Attrition (history) could transform web in cybersecurity.",
+    "ground_truth_quality": 0.628786003744203,
+    "complexity": 3.3,
+    "domains": [
+      "history",
+      "cybersecurity"
+    ],
+    "id": 123
+  },
+  {
+    "text": "Evaluate the ethical considerations of using sequences (mathematics) for right to equality before law (law).",
+    "ground_truth_quality": 0.5356176385340179,
+    "complexity": 3.3,
+    "domains": [
+      "mathematics",
+      "law"
+    ],
+    "id": 124
+  },
+  {
+    "text": "Compare the approaches of cybersecurity (Armitage) and law (Bakunin) to solving complex problems.",
+    "ground_truth_quality": 0.5912130778133732,
+    "complexity": 3.3,
+    "domains": [
+      "cybersecurity",
+      "law"
+    ],
+    "id": 125
+  },
+  {
+    "text": "Should C from chemistry be taught alongside A08: Software and Data Integrity Failures from cybersecurity in education?",
+    "ground_truth_quality": 0.5671947353657346,
+    "complexity": 3.3,
+    "domains": [
+      "chemistry",
+      "cybersecurity"
+    ],
+    "id": 126
+  },
+  {
+    "text": "Assess the strategic value of combining law knowledge of workers' control with history expertise in Loss of carrier forces is irreplaceable in modern naval warfare.",
+    "ground_truth_quality": 0.7354377088653085,
+    "complexity": 3.3,
+    "domains": [
+      "law",
+      "history"
+    ],
+    "id": 127
+  },
+  {
+    "text": "Evaluate whether malware (cybersecurity) contradicts or supports P vs NP (innovation).",
+    "ground_truth_quality": 0.8344968334327081,
+    "complexity": 3.3,
+    "domains": [
+      "cybersecurity",
+      "innovation"
+    ],
+    "id": 128
+  },
+  {
+    "text": "Analyse the future impact of integrating innovation (mathematics) with history (Defending symbolic locations forces enemy into costly battles) research.",
+    "ground_truth_quality": 0.3931880719522932,
+    "complexity": 3.2,
+    "domains": [
+      "innovation",
+      "history"
+    ],
+    "id": 129
+  },
+  {
+    "text": "Evaluate the law implications of federal with unitary bias on computing applications involving SAC.",
+    "ground_truth_quality": 0.8318534768077532,
+    "complexity": 3.3,
+    "domains": [
+      "law",
+      "computing"
+    ],
+    "id": 130
+  },
+  {
+    "text": "Should governments regulate GDPR (EU) (law) given its impact on Math/Probability: Exponential (mathematics)?",
+    "ground_truth_quality": 0.5789817503008856,
+    "complexity": 3.1,
+    "domains": [
+      "law",
+      "mathematics"
+    ],
+    "id": 131
+  },
+  {
+    "text": "Assess the risk of applying approaches from innovation to solve problems in mathematics involving Math/Probability: Normal/Gaussian.",
+    "ground_truth_quality": 0.7153222989183988,
+    "complexity": 3.2,
+    "domains": [
+      "innovation",
+      "mathematics"
+    ],
+    "id": 132
+  },
+  {
+    "text": "Analyse how advances in polarization (physics) could transform Silicon in chemistry.",
+    "ground_truth_quality": 0.7830428567730852,
+    "complexity": 3.3,
+    "domains": [
+      "physics",
+      "chemistry"
+    ],
+    "id": 133
+  },
+  {
+    "text": "Evaluate the ethical considerations of using TimSort (computing) for spin foam (physics).",
+    "ground_truth_quality": 0.9157766829191745,
+    "complexity": 3.1,
+    "domains": [
+      "computing",
+      "physics"
+    ],
+    "id": 134
+  },
+  {
+    "text": "Compare the approaches of history (Media and public opinion are critical theaters in modern war) and computing (JavaScript/TypeScript) to solving complex problems.",
+    "ground_truth_quality": 0.95,
+    "complexity": 3.3,
+    "domains": [
+      "history",
+      "computing"
+    ],
+    "id": 135
+  },
+  {
+    "text": "Should intelligence from Lucy spy ring from history be taught alongside biology from innovation in education?",
+    "ground_truth_quality": 0.7464260774845723,
+    "complexity": 3.3,
+    "domains": [
+      "history",
+      "innovation"
+    ],
+    "id": 136
+  },
+  {
+    "text": "Assess the strategic value of combining innovation knowledge of biotechnology with computing expertise in C/C++.",
+    "ground_truth_quality": 0.6906618960535663,
+    "complexity": 3.2,
+    "domains": [
+      "innovation",
+      "computing"
+    ],
+    "id": 137
+  },
+  {
+    "text": "Evaluate whether BST (computing) contradicts or supports Seaborgium (chemistry).",
+    "ground_truth_quality": 0.45886507903131096,
+    "complexity": 3.1,
+    "domains": [
+      "computing",
+      "chemistry"
+    ],
+    "id": 138
+  },
+  {
+    "text": "Analyse the future impact of integrating law (rule of law) with mathematics (Arithmetic & Number Theory) research.",
+    "ground_truth_quality": 0.8534128062535655,
+    "complexity": 3.3,
+    "domains": [
+      "law",
+      "mathematics"
+    ],
+    "id": 139
+  },
+  {
+    "text": "Evaluate the cybersecurity implications of CyberSec/Hacking Phase 6: Reporting on law applications involving right to constitutional remedies.",
+    "ground_truth_quality": 0.6689335321416573,
+    "complexity": 3.0,
+    "domains": [
+      "cybersecurity",
+      "law"
+    ],
+    "id": 140
+  },
+  {
+    "text": "Should governments regulate Calculus & Real Analysis (mathematics) given its impact on Th (chemistry)?",
+    "ground_truth_quality": 0.6046148082954028,
+    "complexity": 3.1,
+    "domains": [
+      "mathematics",
+      "chemistry"
+    ],
+    "id": 141
+  },
+  {
+    "text": "Assess the risk of applying Computing/AI: Natural Language Processing from computing to solve problems in mathematics involving Probability & Statistics.",
+    "ground_truth_quality": 0.6596381879109143,
+    "complexity": 3.0,
+    "domains": [
+      "computing",
+      "mathematics"
+    ],
+    "id": 142
+  },
+  {
+    "text": "Analyse how advances in network (cybersecurity) could transform combustion in chemistry.",
+    "ground_truth_quality": 0.49432563616550007,
+    "complexity": 3.3,
+    "domains": [
+      "cybersecurity",
+      "chemistry"
+    ],
+    "id": 143
+  },
+  {
+    "text": "Evaluate the ethical considerations of using New Glenn (Blue Origin) (innovation) for Neodymium (chemistry).",
+    "ground_truth_quality": 0.8696214915384388,
+    "complexity": 3.1,
+    "domains": [
+      "innovation",
+      "chemistry"
+    ],
+    "id": 144
+  },
+  {
+    "text": "Compare the approaches of innovation (Dyson sphere concepts) and physics (First image: M87* imaged by Event Horizon Telescope in 2019) to solving complex problems.",
+    "ground_truth_quality": 0.5590939900216216,
+    "complexity": 3.2,
+    "domains": [
+      "innovation",
+      "physics"
+    ],
+    "id": 145
+  },
+  {
+    "text": "Should Bi from chemistry be taught alongside Space Science: Solar System from physics in education?",
+    "ground_truth_quality": 0.7844596900727687,
+    "complexity": 3.3,
+    "domains": [
+      "chemistry",
+      "physics"
+    ],
+    "id": 146
+  },
+  {
+    "text": "Assess the strategic value of combining mathematics knowledge of Calculus & Real Analysis with computing expertise in Trie.",
+    "ground_truth_quality": 0.5649008012110571,
+    "complexity": 3.1,
+    "domains": [
+      "mathematics",
+      "computing"
+    ],
+    "id": 147
+  },
+  {
+    "text": "Evaluate whether decimal organization (history) contradicts or supports Ring (mathematics).",
+    "ground_truth_quality": 0.7128056656149462,
+    "complexity": 3.3,
+    "domains": [
+      "history",
+      "mathematics"
+    ],
+    "id": 148
+  },
+  {
+    "text": "Analyse the future impact of integrating cybersecurity (Zeek/Bro) with innovation (Hodge conjecture) research.",
+    "ground_truth_quality": 0.7110366889942942,
+    "complexity": 3.3,
+    "domains": [
+      "cybersecurity",
+      "innovation"
+    ],
+    "id": 149
+  }
+]
