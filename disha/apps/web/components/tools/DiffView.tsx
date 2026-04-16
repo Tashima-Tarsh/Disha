@@ -3,7 +3,6 @@
 import { useState, useMemo } from "react";
 import { Columns2, AlignLeft, Copy, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useHighlightedCode } from "./SyntaxHighlight";
 
 // ─── Diff algorithm ──────────────────────────────────────────────────────────
 

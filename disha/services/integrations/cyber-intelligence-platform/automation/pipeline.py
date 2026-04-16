@@ -9,16 +9,15 @@ Usage:
 """
 import os
 import sys
-
 # Ensure sibling packages are importable regardless of working directory
 _ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if _ROOT not in sys.path:
     sys.path.insert(0, _ROOT)
 
-from ai.classifier import classify_crime
-from osint.aggregator import run_osint
-from alerts.alert_engine import generate_alert
-from reports.generator import generate_report
+from ai.classifier import classify_crime  # noqa: E402
+from osint.aggregator import run_osint  # noqa: E402
+from alerts.alert_engine import generate_alert  # noqa: E402
+from reports.generator import generate_report  # noqa: E402
 
 
 def run_pipeline(text: str, osint_target: str = "") -> dict:

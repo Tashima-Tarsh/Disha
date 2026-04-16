@@ -1,6 +1,6 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI
 from pydantic import BaseModel
-from typing import List, Optional
+from typing import List
 import datetime
 
 app = FastAPI(title="DISHA Alerts Service", version="6.0.0")

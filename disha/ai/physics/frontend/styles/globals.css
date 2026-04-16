@@ -102,10 +102,10 @@ body {
 .text-neon-yellow { color: var(--neon-yellow); text-shadow: 0 0 10px rgba(255,214,10,0.6); }
 
 /* ── Neon Border Glow ── */
-.border-neon-cyan   { border-color: var(--neon-cyan) !important; box-shadow: 0 0 8px rgba(0,229,255,0.3), inset 0 0 8px rgba(0,229,255,0.05); }
-.border-neon-purple { border-color: var(--neon-purple) !important; box-shadow: 0 0 8px rgba(191,90,242,0.3), inset 0 0 8px rgba(191,90,242,0.05); }
-.border-neon-green  { border-color: var(--neon-green) !important; box-shadow: 0 0 8px rgba(0,255,136,0.3), inset 0 0 8px rgba(0,255,136,0.05); }
-.border-neon-pink   { border-color: var(--neon-pink) !important; box-shadow: 0 0 8px rgba(255,45,120,0.3), inset 0 0 8px rgba(255,45,120,0.05); }
+.border-neon-cyan   { border-color: var(--neon-cyan); box-shadow: 0 0 8px rgba(0,229,255,0.3), inset 0 0 8px rgba(0,229,255,0.05); }
+.border-neon-purple { border-color: var(--neon-purple); box-shadow: 0 0 8px rgba(191,90,242,0.3), inset 0 0 8px rgba(191,90,242,0.05); }
+.border-neon-green  { border-color: var(--neon-green); box-shadow: 0 0 8px rgba(0,255,136,0.3), inset 0 0 8px rgba(0,255,136,0.05); }
+.border-neon-pink   { border-color: var(--neon-pink); box-shadow: 0 0 8px rgba(255,45,120,0.3), inset 0 0 8px rgba(255,45,120,0.05); }
 
 /* ── Neon Buttons ── */
 .btn-neon-cyan {

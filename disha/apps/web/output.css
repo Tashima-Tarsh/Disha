@@ -698,7 +698,7 @@ body {
 }
 
 .\!container {
-  width: 100% !important;
+  width: 100%;
 }
 
 .container {
@@ -707,7 +707,7 @@ body {
 
 @media (min-width: 640px) {
   .\!container {
-    max-width: 640px !important;
+    max-width: 640px;
   }
 
   .container {
@@ -717,7 +717,7 @@ body {
 
 @media (min-width: 768px) {
   .\!container {
-    max-width: 768px !important;
+    max-width: 768px;
   }
 
   .container {
@@ -727,7 +727,7 @@ body {
 
 @media (min-width: 1024px) {
   .\!container {
-    max-width: 1024px !important;
+    max-width: 1024px;
   }
 
   .container {
@@ -737,7 +737,7 @@ body {
 
 @media (min-width: 1280px) {
   .\!container {
-    max-width: 1280px !important;
+    max-width: 1280px;
   }
 
   .container {
@@ -747,7 +747,7 @@ body {
 
 @media (min-width: 1536px) {
   .\!container {
-    max-width: 1536px !important;
+    max-width: 1536px;
   }
 
   .container {
@@ -776,7 +776,7 @@ body {
 }
 
 .\!visible {
-  visibility: visible !important;
+  visibility: visible;
 }
 
 .visible {
@@ -4009,7 +4009,7 @@ body {
 }
 
 .\[\&_\.shiki\]\:\!bg-transparent .shiki {
-  background-color: transparent !important;
+  background-color: transparent;
 }
 
 .\[\&_a\:hover\]\:underline a:hover {
@@ -4160,11 +4160,11 @@ body {
 }
 
 .\[\&_pre\]\:\!m-0 pre {
-  margin: 0px !important;
+  margin: 0px;
 }
 
 .\[\&_pre\]\:\!bg-transparent pre {
-  background-color: transparent !important;
+  background-color: transparent;
 }
 
 .\[\&_pre\]\:p-3 pre {

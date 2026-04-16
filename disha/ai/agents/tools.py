@@ -14,7 +14,7 @@ from pathlib import Path
 from typing import Any
 
 from .config import ExecutorConfig
-from .types import ToolCall, ToolCategory, ToolResult
+from .types import ToolCategory, ToolResult
 
 # ---------------------------------------------------------------------------
 # Registry

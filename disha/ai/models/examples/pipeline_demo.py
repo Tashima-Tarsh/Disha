@@ -16,7 +16,6 @@ import os
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
-import json
 
 import numpy as np
 
@@ -81,19 +80,19 @@ def main() -> None:
         "variables": {},
     }
 
-    print(f"\n--- Input ---")
-    print(f"  Problem: Projectile motion")
+    print("\n--- Input ---")
+    print("  Problem: Projectile motion")
     print(f"  v0 = {v0} m/s, angle = 45°, g = {g} m/s²")
     print(f"  Expected range: {input_data['raw_input']['computed_range']:.2f} m")
     print(f"  Expected max height: {input_data['raw_input']['computed_max_height']:.2f} m")
     print(f"  Expected flight time: {input_data['raw_input']['computed_flight_time']:.2f} s")
 
     # --- Run the pipeline ---
-    print(f"\n--- Running Pipeline ---")
+    print("\n--- Running Pipeline ---")
     result = pipeline.run(input_data)
 
     # --- Show results at each stage ---
-    print(f"\n--- Stage Results ---")
+    print("\n--- Stage Results ---")
 
     # Input/Parsing
     parsed = result.get("parsed_input", {})
@@ -116,7 +115,7 @@ def main() -> None:
     num_result = result.get("numerical_result")
     print(f"\n  [NumericalStage] Numerical result: {num_result}")
     if "array_stats" in result:
-        print(f"  Array stats:")
+        print("  Array stats:")
         for key, stats in result["array_stats"].items():
             print(f"    {key}: mean={stats['mean']:.2f}, std={stats['std']:.2f}")
 
@@ -132,7 +131,7 @@ def main() -> None:
 
     # Output
     output = result.get("output", {})
-    print(f"\n  [OutputStage] Summary:")
+    print("\n  [OutputStage] Summary:")
     if isinstance(output, dict):
         for key, val in output.items():
             if key == "simulation_summary" and isinstance(val, dict):
@@ -143,11 +142,11 @@ def main() -> None:
                 print(f"    {key}: {val}")
 
     # --- Stage execution log ---
-    print(f"\n--- Pipeline Execution Log ---")
+    print("\n--- Pipeline Execution Log ---")
     for entry in stage_log:
         print(f"  [{entry['event']:6s}] {entry['stage']:12s} | data keys: {entry['keys']}")
 
-    print(f"\n[OK] Pipeline demo completed successfully!")
+    print("\n[OK] Pipeline demo completed successfully!")
 
 
 if __name__ == "__main__":

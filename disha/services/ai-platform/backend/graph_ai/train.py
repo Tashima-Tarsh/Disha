@@ -13,7 +13,6 @@ from __future__ import annotations
 
 import importlib
 import json
-import os
 import sys
 from pathlib import Path
 
@@ -90,7 +89,7 @@ def _generate_synthetic_graph(
     node_labels = np.zeros(num_nodes, dtype=np.int64)
     for i in range(num_nodes):
         risk = node_features[i, 6]
-        ntype = node_types[i]
+        node_types[i]
         # Combine type and risk to determine class
         if risk < 0.25:
             base_class = 0  # low risk

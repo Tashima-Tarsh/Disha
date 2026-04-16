@@ -3,7 +3,6 @@
 # Core
 import logging
 import os
-import json
 # Project
 from translation_service import TranslationService
 

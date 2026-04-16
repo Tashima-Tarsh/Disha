@@ -32,7 +32,7 @@ jobs:
       - name: Install Bandit
         run: pip install bandit
       - name: Run Bandit
-        run: bandit -r disha/services/ai-platform/backend disha/services/cyber -f json -o bandit-results.json || true
+        run: bandit -r disha/services/ai-platform/backend disha/services/cyber disha/ai/core -f json -o bandit-results.json || true
       - name: Upload Bandit Results
         uses: actions/upload-artifact@v4
         with:
@@ -52,12 +52,14 @@ jobs:
         run: |
           pip install safety
       - name: Run Safety
-        run: safety check -r disha/services/ai-platform/backend/requirements.txt --json > safety-results.json || true
+        run: |
+          safety check -r disha/services/ai-platform/backend/requirements.txt --json > safety-results-service.json || true
+          safety check -r disha/ai/core/requirements.txt --json > safety-results-core.json || true
       - name: Upload Safety Results
         uses: actions/upload-artifact@v4
         with:
           name: safety-results
-          path: safety-results.json
+          path: safety-results-*.json
 
   sbom-generation:
     name: SBOM Generation

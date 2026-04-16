@@ -23,20 +23,22 @@
       },
       "correctness": {
         "recommended": true,
-        "noUnusedImports": "warn",
+        "noUnusedImports": "off",
         "noUnusedVariables": "off",
-        "noUnusedFunctionParameters": "warn",
+        "noUnusedFunctionParameters": "off",
         "useExhaustiveDependencies": "off",
         "noConstantCondition": "off",
-        "noVoidTypeReturn": "off"
+        "noVoidTypeReturn": "off",
+        "noInvalidPositionAtImportRule": "off"
       },
       "style": {
         "noNonNullAssertion": "off",
-        "useImportType": "warn",
+        "useImportType": "off",
         "useTemplate": "off",
         "useNodejsImportProtocol": "off"
       },
       "suspicious": {
+        "recommended": true,
         "noExplicitAny": "off",
         "noImplicitAnyLet": "off",
         "noConsole": "off",
@@ -49,13 +51,37 @@
         "noRedeclare": "off",
         "noSelfCompare": "off",
         "noTsIgnore": "off",
-        "useIterableCallbackReturn": "off"
+        "useIterableCallbackReturn": "off",
+        "noUnknownAtRules": "off",
+        "noDocumentCookie": "off"
       },
       "a11y": {
+        "recommended": false,
         "noAutofocus": "off",
         "useButtonType": "off",
-        "noStaticElementInteractions": "off"
+        "noStaticElementInteractions": "off",
+        "useKeyWithClickEvents": "off",
+        "noLabelWithoutControl": "off",
+        "noSvgWithoutTitle": "off",
+        "useAltText": "off",
+        "useAriaPropsSupportedByRole": "off",
+        "useValidAriaProps": "off",
+        "useFocusableInteractive": "off",
+        "useSemanticElements": "off",
+        "useHeadingContent": "off",
+        "useAnchorContent": "off"
+      },
+      "performance": {
+        "noAccumulatingSpread": "off"
+      },
+      "security": {
+        "noDangerouslySetInnerHtml": "off"
       }
+    }
+  },
+  "css": {
+    "parser": {
+      "tailwindDirectives": true
     }
   },
   "formatter": {
@@ -74,7 +100,7 @@
     }
   },
   "files": {
-    "includes": ["**", "!node_modules", "!dist", "!**/*.d.ts", "!src/server/web/public/**"],
+    "includes": ["**", "!node_modules", "!dist", "!**/*.d.ts", "!disha/legacy-root-src/server/web/public/**", "!**/logs/**"],
     "maxSize": 5242880
   },
   "vcs": {

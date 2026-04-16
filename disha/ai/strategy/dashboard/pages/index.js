@@ -1,8 +1,8 @@
-import React, { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import dynamic from 'next/dynamic'
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
-  ResponsiveContainer, Cell, LineChart, Line,
+  ResponsiveContainer, Cell, 
 } from 'recharts'
 
 const Timeline = dynamic(() => import('../components/Timeline'), { ssr: false })

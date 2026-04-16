@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 
 const ERA_ORDER = ['Ancient', 'Medieval', 'Early Modern', 'Modern', 'Contemporary']
 

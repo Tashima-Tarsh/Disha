@@ -10,7 +10,6 @@
  * surface so callers can swap in this component without changing props.
  */
 
-import * as React from "react";
 import { cn } from "@/lib/utils";
 
 // ─── Types ────────────────────────────────────────────────────────────────────

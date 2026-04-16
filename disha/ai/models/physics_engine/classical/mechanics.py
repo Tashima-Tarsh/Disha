@@ -21,7 +21,7 @@ from __future__ import annotations
 
 import logging
 import uuid
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional
 
 import numpy as np
 

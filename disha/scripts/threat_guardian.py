@@ -14,11 +14,8 @@ Usage::
 
 from __future__ import annotations
 
-import hashlib
 import json
-import os
 import re
-import subprocess
 import sys
 import time
 from dataclasses import dataclass, field
@@ -245,8 +242,8 @@ class MergeConflictScanner:
                 continue
             lines = content.splitlines()
             # Only flag ======= lines if the file also has <<<<<<< or >>>>>>>
-            has_open = any(self._OPEN.match(l) for l in lines)
-            has_close = any(self._CLOSE.match(l) for l in lines)
+            has_open = any(self._OPEN.match(line) for line in lines)
+            has_close = any(self._CLOSE.match(line) for line in lines)
             for i, line in enumerate(lines, 1):
                 if self._OPEN.match(line) or self._CLOSE.match(line):
                     threats.append(Threat(

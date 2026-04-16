@@ -2,8 +2,6 @@
 
 # Core
 import logging
-logger = logging.getLogger(__name__)
-import json
 import os
 import importlib
 import time
@@ -11,9 +9,9 @@ import time
 from celery import Celery, shared_task
 # Project
 from database import Database, connect_db
-from gpt_api import GPT
-from models import ContentModel
 from translation_service import TranslationService
+
+logger = logging.getLogger(__name__)
 
 app = Celery('translate', broker='amqp://localhost', backend='rpc://')
 
@@ -77,7 +75,7 @@ def translate_content(content_id: int) -> bool:
         # Finally, issue an analysis task request for the translated content
         app.send_task('analyse_content', args=[content_id], queue="analysis")
 
-    except Exception as err:
+    except Exception:
         logging.error("Exception encountered when translating content!")
         # Re-raise the exception to Celery, which can handle/record it
         raise

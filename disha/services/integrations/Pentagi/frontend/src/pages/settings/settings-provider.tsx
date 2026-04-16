@@ -137,7 +137,7 @@ const FormInputNumberItem: React.FC<FormInputNumberItemProps> = ({
             return null;
         }
 
-        return valueType === 'float' ? Number.parseFloat(value) : Number.parseInt(value);
+        return valueType === 'float' ? Number.parseFloat(value) : Number.parseInt(value, 10);
     };
 
     const inputProps = {
@@ -920,7 +920,7 @@ const SettingsProvider = () => {
             // For existing providers, use current provider's agents
             (!isNew &&
                 providerId &&
-                data?.settingsProviders?.userDefined?.find((p: Provider) => p.id == providerId)?.agents) ||
+                data?.settingsProviders?.userDefined?.find((p: Provider) => p.id === providerId)?.agents) ||
             // Fallback to any available default provider
             (data?.settingsProviders?.default &&
                 Object.values(data.settingsProviders.default).find((provider) => provider?.agents)?.agents) ||
@@ -1051,7 +1051,7 @@ const SettingsProvider = () => {
 
             // If we have an id in query params, copy from existing provider
             if (queryId && data?.settingsProviders?.userDefined) {
-                const sourceProvider = data.settingsProviders.userDefined.find((p: Provider) => p.id == queryId);
+                const sourceProvider = data.settingsProviders.userDefined.find((p: Provider) => p.id === queryId);
 
                 if (sourceProvider) {
                     const { agents, name, type: sourceType } = sourceProvider;
@@ -1088,7 +1088,7 @@ const SettingsProvider = () => {
             return;
         }
 
-        const provider = providers.userDefined?.find((provider: Provider) => provider.id == providerId);
+        const provider = providers.userDefined?.find((provider: Provider) => provider.id === providerId);
 
         if (!provider) {
             navigate('/settings/providers');

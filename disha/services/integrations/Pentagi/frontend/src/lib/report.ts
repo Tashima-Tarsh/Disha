@@ -37,7 +37,7 @@ const getStatusEmoji = (status: StatusType): string => {
 
 // Helper function to shift markdown headers by specified levels
 const shiftMarkdownHeaders = (text: string, shiftBy: number): string => {
-    return text.replaceAll(/^(#{1,6})\s+(.+)$/gm, (match, hashes, content) => {
+    return text.replaceAll(/^(#{1,6})\s+(.+)$/gm, (_match, hashes, content) => {
         const currentLevel = hashes.length;
         const newLevel = Math.min(currentLevel + shiftBy, 6); // Max level is 6
         const newHashes = '#'.repeat(newLevel);

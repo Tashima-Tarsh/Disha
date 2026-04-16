@@ -25,12 +25,12 @@ on:
     branches: [main]
     paths:
       - "disha/scripts/continuous_train.py"
-      - "scripts/data_fetchers.py"
-      - "scripts/knowledge_engine.py"
-      - "knowledge-base/**"
-      - "ai-platform/backend/app/rl/train.py"
-      - "ai-platform/backend/graph_ai/train.py"
-      - "decision-engine/train.py"
+      - "disha/scripts/data_fetchers.py"
+      - "disha/scripts/knowledge_engine.py"
+      - "disha/ai/rag/**"
+      - "disha/services/ai-platform/backend/app/rl/train.py"
+      - "disha/services/ai-platform/backend/app/core/graph_ai/train.py"
+      - "disha/ai/core/decision-engine/train.py"
 
 permissions:
   contents: write
@@ -81,15 +81,15 @@ jobs:
         env:
           DISHA_MODEL_PROVIDER: mock
         run: |
-          python -m pytest ai-platform/backend/tests/test_trained_models.py -v --tb=short
+          python -m pytest disha/services/ai-platform/backend/tests/test_trained_models.py -v --tb=short
 
       - name: Upload training metrics
         uses: actions/upload-artifact@v4
         with:
           name: training-metrics-${{ github.run_number }}
           path: |
-            ai-platform/backend/checkpoints/*_metrics.json
-            decision-engine/checkpoints/*_metrics.json
+            disha/services/ai-platform/backend/checkpoints/*_metrics.json
+            disha/ai/core/decision-engine/checkpoints/*_metrics.json
             training_summary.json
           retention-days: 30
 
@@ -97,10 +97,11 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add ai-platform/backend/checkpoints/*.json decision-engine/checkpoints/ training_summary.json || true
+          git add disha/services/ai-platform/backend/checkpoints/*.json disha/ai/core/decision-engine/checkpoints/ training_summary.json || true
           if git diff --staged --quiet; then
             echo "No metric changes to commit"
           else
             git commit -m "chore: update training metrics [continuous-train #${{ github.run_number }}]"
             git push
           fi
+

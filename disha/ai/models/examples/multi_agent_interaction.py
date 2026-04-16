@@ -17,7 +17,7 @@ import os
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
-from typing import Any, Dict, List
+from typing import List
 
 import numpy as np
 
@@ -25,7 +25,6 @@ from world_model.entities.entity import AgentEntity, Entity, EntityState
 from world_model.environments.environment import Environment
 from world_model.interactions.interaction import (
     CommunicationInteraction,
-    InteractionResolver,
 )
 from world_model.world_manager.world import World
 
@@ -155,7 +154,7 @@ def main() -> None:
     for step in range(n_steps):
         # Every 10 steps, agents send status messages to each other
         if step % 10 == 0 and step > 0:
-            entity_lookup: Dict[str, Any] = {
+            {
                 e.id: e for e in world.registry.get_all()
             }
             for i, sender in enumerate(agents):
@@ -173,7 +172,7 @@ def main() -> None:
                         )
                         world.resolver.add(msg)
 
-        stats = world.step(dt)
+        world.step(dt)
 
         if step % 10 == 0:
             print(f"\n  Step {step}:")
@@ -201,7 +200,7 @@ def main() -> None:
 
         # Show last 3 memories
         if a.memory:
-            print(f"    Recent memory (last 3):")
+            print("    Recent memory (last 3):")
             for mem in a.memory[-3:]:
                 print(f"      {mem}")
 

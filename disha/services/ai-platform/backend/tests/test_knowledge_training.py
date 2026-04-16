@@ -12,13 +12,10 @@ Validates:
 
 from __future__ import annotations
 
-import json
 import os
 import sys
 from pathlib import Path
 
-import numpy as np
-import pytest
 
 # Path setup
 _REPO_ROOT = Path(__file__).resolve().parents[3]

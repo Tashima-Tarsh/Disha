@@ -25,8 +25,8 @@ import json
 import os
 import sys
 import time
-from copy import deepcopy
 from pathlib import Path
+from typing import Any
 
 import numpy as np
 import structlog
@@ -194,7 +194,7 @@ def _train_rl(
     except ImportError:
         return {"status": "skipped", "reason": "torch_not_available"}
 
-    from app.rl.environment import InvestigationEnvironment, ActionType
+    from app.rl.environment import InvestigationEnvironment
     from app.rl.policy import PolicyNetwork, TORCH_AVAILABLE
     from app.rl.experience_replay import ExperienceReplayBuffer
     from app.rl.reward import RewardComputer
@@ -648,7 +648,6 @@ def run_continuous_training(
         load_all_knowledge,
         build_knowledge_graph,
         generate_cross_domain_scenarios,
-        generate_knowledge_rl_scenarios,
     )
 
     scheduler = HyperparamScheduler()

@@ -1,6 +1,7 @@
 """Reasoning engine tests."""
-import sys, os, unittest
-import numpy as np
+import sys
+import os
+import unittest
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 from core.reasoning_engine.reasoning import ReasoningEngine, DecisionFramework, Hypothesis
@@ -29,7 +30,7 @@ class TestReasoning(unittest.TestCase):
     def test_collapse_returns_highest(self):
         engine = ReasoningEngine(seed=0)
         engine.add_hypothesis("low", initial_prob=0.1)
-        h_high = engine.add_hypothesis("high", initial_prob=0.9)
+        engine.add_hypothesis("high", initial_prob=0.9)
         chosen = engine.collapse(method="best")
         self.assertEqual(chosen.description, "high")
 

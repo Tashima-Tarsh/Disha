@@ -14,7 +14,7 @@ from typing import Any
 
 from .config import ClaudeConfig, ExecutorConfig
 from .memory import MemoryStore
-from .tools import BaseTool, get_tool, init_tools, list_tools
+from .tools import get_tool, init_tools, list_tools
 from .types import (
     LogLevel,
     MemoryScope,

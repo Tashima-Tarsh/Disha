@@ -155,7 +155,7 @@ class TestDecisionEngineTrainedModel:
     @pytest.mark.skipif(not (_DECISION / "checkpoints" / "calibration_model.json").exists(), reason="calibration_model.json missing")
     def test_load_and_predict(self):
         sys.path.insert(0, str(_DECISION))
-        from train import CalibrationModel, _extract_features
+        from train import CalibrationModel
 
         with open(self.CKPT_DIR / "calibration_model.json") as f:
             data = json.load(f)

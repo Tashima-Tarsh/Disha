@@ -2,7 +2,7 @@ import { User, Bot, AlertCircle, Bookmark, ShieldCheck, Gavel } from "lucide-rea
 import { cn, extractTextContent } from "@/lib/utils";
 import type { Message } from "@/lib/types";
 import { MarkdownContent } from "./MarkdownContent";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, } from "framer-motion";
 
 interface MessageBubbleProps {
   message: Message;

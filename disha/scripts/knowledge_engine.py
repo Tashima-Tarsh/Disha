@@ -17,7 +17,6 @@ from __future__ import annotations
 
 import json
 import hashlib
-import re
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
@@ -222,7 +221,7 @@ def _extract_mathematics(data: dict) -> list[KnowledgeItem]:
     items = []
     for branch in data.get("branches", []):
         name = branch.get("name", "Mathematics")
-        branch_id = branch.get("id", "")
+        branch.get("id", "")
 
         # Extract theorems
         for theorem in branch.get("key_theorems", branch.get("fundamental_theorems", [])):
@@ -278,7 +277,7 @@ def _extract_computing(data: dict) -> list[KnowledgeItem]:
     """Extract knowledge items from computing data."""
     items = []
     for branch in data.get("branches", []):
-        name = branch.get("name", "Computing")
+        branch.get("name", "Computing")
 
         # Algorithms & data structures
         for algo in branch.get("sorting", []):

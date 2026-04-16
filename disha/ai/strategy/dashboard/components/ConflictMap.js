@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import { useState, } from 'react'
 import dynamic from 'next/dynamic'
 
 // Approximate coordinates for conflict locations by region/name

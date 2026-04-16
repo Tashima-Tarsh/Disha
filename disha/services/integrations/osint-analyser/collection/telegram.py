@@ -126,7 +126,7 @@ class TelegramCollector(Collector):
 
         # Check whether this message includes media
         if event.photo:
-            logging.info(f"Attachment: Photo")
+            logging.info("Attachment: Photo")
 
         # Store this message in the database
         if event.message is not None and event.message.message is not None:

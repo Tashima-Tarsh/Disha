@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect } from "react";
 import { useChatStore } from "@/lib/store";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { Header } from "@/components/layout/Header";

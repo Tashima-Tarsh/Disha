@@ -7,7 +7,6 @@ import os
 import tempfile
 from pathlib import Path
 
-import pytest
 
 # ---------------------------------------------------------------------------
 # Import all modules under test
@@ -22,12 +21,9 @@ from agent_core.types import (
     Task,
     TaskPriority,
     TaskStatus,
-    ToolCall,
-    ToolResult,
 )
 from agent_core.memory import MemoryStore
 from agent_core.tools import (
-    BaseTool,
     ReadFileTool,
     WriteFileTool,
     ListDirectoryTool,
@@ -36,7 +32,6 @@ from agent_core.tools import (
     AnalyzeStructureTool,
     init_tools,
     list_tools,
-    get_tool,
 )
 from agent_core.planner import Planner
 from agent_core.executor import Executor

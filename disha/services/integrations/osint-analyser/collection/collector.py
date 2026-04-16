@@ -7,7 +7,6 @@ from typing import Optional
 import logging
 import os
 # Third-party
-from dotenv import load_dotenv
 # Project
 from database import Database
 from models import CollectorModel, SourceModel, ContentModel

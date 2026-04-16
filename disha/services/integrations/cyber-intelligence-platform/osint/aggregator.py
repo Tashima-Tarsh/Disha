@@ -32,7 +32,7 @@ def domain_lookup(domain: str) -> dict:
             timeout=_TIMEOUT,
         )
         resp.raise_for_status()
-        lines = [l.strip() for l in resp.text.splitlines() if l.strip()]
+        lines = [line.strip() for line in resp.text.splitlines() if line.strip()]
         if lines and "error" not in lines[0].lower():
             for line in lines:
                 parts = line.split(",")

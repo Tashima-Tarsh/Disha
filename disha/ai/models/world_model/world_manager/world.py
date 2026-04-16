@@ -17,9 +17,8 @@ import numpy as np
 
 from ..entities.entity import AgentEntity, Entity, EntityState, ObjectEntity
 from ..entities.entity_registry import EntityRegistry
-from ..environments.environment import Environment, EnvironmentConditions, Region
+from ..environments.environment import Environment
 from ..interactions.interaction import (
-    CollisionInteraction,
     Interaction,
     InteractionResolver,
 )

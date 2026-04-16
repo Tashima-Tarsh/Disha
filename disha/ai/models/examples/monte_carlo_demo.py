@@ -19,7 +19,6 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 import numpy as np
 
 from simulation.monte_carlo.monte_carlo import (
-    MonteCarloResults,
     MonteCarloSimulation,
 )
 
@@ -120,13 +119,13 @@ def main() -> None:
     ci90_low, ci90_high = results_project.confidence_interval(0.90)
     ci95_low, ci95_high = results_project.confidence_interval(0.95)
     ci99_low, ci99_high = results_project.confidence_interval(0.99)
-    print(f"\n  Confidence intervals for mean completion time:")
+    print("\n  Confidence intervals for mean completion time:")
     print(f"    90% CI: [{ci90_low:.1f}, {ci90_high:.1f}] days")
     print(f"    95% CI: [{ci95_low:.1f}, {ci95_high:.1f}] days")
     print(f"    99% CI: [{ci99_low:.1f}, {ci99_high:.1f}] days")
 
     # Percentiles (useful for risk management)
-    print(f"\n  Percentile analysis:")
+    print("\n  Percentile analysis:")
     for p in [10, 25, 50, 75, 90, 95, 99]:
         val = results_project.percentile(p)
         print(f"    P{p:2d}: {val:.1f} days")
@@ -136,13 +135,13 @@ def main() -> None:
 
     # Histogram summary
     counts, edges = results_project.histogram_data(bins=10)
-    print(f"\n  Histogram (10 bins):")
+    print("\n  Histogram (10 bins):")
     for i in range(len(counts)):
         bar_len = int(counts[i] / max(counts) * 30)
         bar = "█" * bar_len
         print(f"    [{edges[i]:5.0f}-{edges[i+1]:5.0f}] {counts[i]:3d} {bar}")
 
-    print(f"\n[OK] Monte Carlo demo completed successfully!")
+    print("\n[OK] Monte Carlo demo completed successfully!")
 
 
 if __name__ == "__main__":

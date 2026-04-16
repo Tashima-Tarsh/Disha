@@ -11,14 +11,13 @@ import logging
 import time
 from typing import Any, Callable
 
-from .config import AgentConfig, ControllerConfig
+from .config import ControllerConfig
 from .executor import Executor
 from .memory import MemoryStore
 from .planner import Planner
 from .types import (
     AgentState,
     LogLevel,
-    MemoryScope,
     Plan,
     Task,
     TaskStatus,

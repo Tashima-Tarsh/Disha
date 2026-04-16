@@ -63,7 +63,8 @@ def _import_model_hub():
     class HubStub:
         def status(self): return {"total_count": 0}
         def ask(self, *args, **kwargs):
-             class Resp: ok = True
+             class Resp:
+                 ok = True
              return Resp()
         def available_providers(self): return []
     return HubStub
@@ -297,7 +298,7 @@ def _print_summary(summary: dict) -> None:
     # Build the entire output as a safe buffer before writing
     lines: list[str] = [
         f"\n{'' * 70}",
-        f"    DISHA MYTHOS  Adaptive Intelligence Report",
+        "    DISHA MYTHOS  Adaptive Intelligence Report",
         f"  Completed in {elapsed:.1f}s",
         f"{'' * 70}",
     ]

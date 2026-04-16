@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useState, useEffect } from "react";
+import { motion, } from "framer-motion";
 
 export const StartupScreen = ({ onComplete }: { onComplete: () => void }) => {
   const [status, setStatus] = useState("INITIALIZING COGNITIVE ARCHITECTURE");

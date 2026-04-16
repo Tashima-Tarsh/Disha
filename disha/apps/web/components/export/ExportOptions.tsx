@@ -1,7 +1,7 @@
 "use client";
 
 import * as Switch from "@radix-ui/react-switch";
-import type { ExportOptions, ExportFormat } from "@/lib/types";
+import type { ExportOptions, } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
 interface OptionRowProps {

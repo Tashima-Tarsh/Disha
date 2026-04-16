@@ -1,11 +1,13 @@
 """Physics engine tests."""
-import sys, os, unittest
+import sys
+import os
+import unittest
 import numpy as np
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 from physics_engine.classical.mechanics import PhysicsObject, ClassicalMechanicsEngine
 from physics_engine.state_evolution.integrator import EulerIntegrator, RungeKutta4Integrator
-from physics_engine.constraints.constraint_solver import DistanceConstraint, BoundaryConstraint, ConstraintSolver
+from physics_engine.constraints.constraint_solver import DistanceConstraint, ConstraintSolver
 from physics_engine.quantum_inspired.superposition import QuantumState
 
 
@@ -49,14 +51,16 @@ class TestPhysicsEngine(unittest.TestCase):
     def test_euler_integrator(self):
         integrator = EulerIntegrator()
         state = np.array([0.0, 1.0])
-        deriv = lambda s, t: np.array([s[1], 0.0])
+        def deriv(s, t):
+            return np.array([s[1], 0.0])
         new = integrator.step(state, deriv, 0.0, 0.1)
         np.testing.assert_array_almost_equal(new, [0.1, 1.0])
 
     def test_rk4_integrator(self):
         integrator = RungeKutta4Integrator()
         state = np.array([0.0])
-        deriv = lambda s, t: np.array([1.0])
+        def deriv(s, t):
+            return np.array([1.0])
         new = integrator.step(state, deriv, 0.0, 1.0)
         self.assertAlmostEqual(new[0], 1.0)
 

@@ -4,7 +4,6 @@ import { Sun, Moon, Monitor, ChevronDown } from "lucide-react";
 import { useTheme } from "./ThemeProvider";
 import { useChatStore } from "@/lib/store";
 import { MODELS } from "@/lib/constants";
-import { cn } from "@/lib/utils";
 import { NotificationCenter } from "@/components/notifications/NotificationCenter";
 import { motion } from "framer-motion";
 

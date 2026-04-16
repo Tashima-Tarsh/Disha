@@ -29,18 +29,18 @@ var require_xterm = __commonJS({
   "node_modules/@xterm/xterm/lib/xterm.js"(exports, module) {
     
     !(function(e, t) {
-      if ("object" == typeof exports && "object" == typeof module) module.exports = t();
-      else if ("function" == typeof define && define.amd) define([], t);
+      if ("object" === typeof exports && "object" === typeof module) module.exports = t();
+      else if ("function" === typeof define && define.amd) define([], t);
       else {
         var i = t();
-        for (var s in i) ("object" == typeof exports ? exports : e)[s] = i[s];
+        for (var s in i) ("object" === typeof exports ? exports : e)[s] = i[s];
       }
     })(globalThis, (() => (() => {
       
-      var e = { 4567: function(e2, t2, i2) {
+      var e = { 4567: function(_e2, t2, i2) {
         var s2 = this && this.__decorate || function(e3, t3, i3, s3) {
           var r2, n2 = arguments.length, o2 = n2 < 3 ? t3 : null === s3 ? s3 = Object.getOwnPropertyDescriptor(t3, i3) : s3;
-          if ("object" == typeof Reflect && "function" == typeof Reflect.decorate) o2 = Reflect.decorate(e3, t3, i3, s3);
+          if ("object" === typeof Reflect && "function" === typeof Reflect.decorate) o2 = Reflect.decorate(e3, t3, i3, s3);
           else for (var a2 = e3.length - 1; a2 >= 0; a2--) (r2 = e3[a2]) && (o2 = (n2 < 3 ? r2(o2) : n2 > 3 ? r2(t3, i3, o2) : r2(t3, i3)) || o2);
           return n2 > 3 && o2 && Object.defineProperty(t3, i3, o2), o2;
         }, r = this && this.__param || function(e3, t3) {
@@ -51,7 +51,7 @@ var require_xterm = __commonJS({
         Object.defineProperty(t2, "__esModule", { value: true }), t2.AccessibilityManager = void 0;
         const n = i2(9042), o = i2(9924), a = i2(844), h = i2(4725), c = i2(2585), l = i2(3656);
         let d = t2.AccessibilityManager = class extends a.Disposable {
-          constructor(e3, t3, i3, s3) {
+          constructor(e3, _t3, i3, s3) {
             super(), this._terminal = e3, this._coreBrowserService = i3, this._renderService = s3, this._rowColumns = /* @__PURE__ */ new WeakMap(), this._liveRegionLineCount = 0, this._charsToConsume = [], this._charsToAnnounce = "", this._accessibilityContainer = this._coreBrowserService.mainDocument.createElement("div"), this._accessibilityContainer.classList.add("xterm-accessibility"), this._rowContainer = this._coreBrowserService.mainDocument.createElement("div"), this._rowContainer.setAttribute("role", "list"), this._rowContainer.classList.add("xterm-accessibility-tree"), this._rowElements = [];
             for (let e4 = 0; e4 < this._terminal.rows; e4++) this._rowElements[e4] = this._createAccessibilityTreeNode(), this._rowContainer.appendChild(this._rowElements[e4]);
             if (this._topBoundaryFocusListener = (e4) => this._handleBoundaryFocus(e4, 0), this._bottomBoundaryFocusListener = (e4) => this._handleBoundaryFocus(e4, 1), this._rowElements[0].addEventListener("focus", this._topBoundaryFocusListener), this._rowElements[this._rowElements.length - 1].addEventListener("focus", this._bottomBoundaryFocusListener), this._refreshRowsDimensions(), this._accessibilityContainer.appendChild(this._rowContainer), this._liveRegion = this._coreBrowserService.mainDocument.createElement("div"), this._liveRegion.classList.add("live-region"), this._liveRegion.setAttribute("aria-live", "assertive"), this._accessibilityContainer.appendChild(this._liveRegion), this._liveRegionDebouncer = this.register(new o.TimeBasedDebouncer(this._renderRows.bind(this))), !this._terminal.element) throw new Error("Cannot enable accessibility before Terminal.open");
@@ -145,7 +145,7 @@ var require_xterm = __commonJS({
           }
         };
         t2.AccessibilityManager = d = s2([r(1, c.IInstantiationService), r(2, h.ICoreBrowserService), r(3, h.IRenderService)], d);
-      }, 3614: (e2, t2) => {
+      }, 3614: (_e2, t2) => {
         function i2(e3) {
           return e3.replace(/\r?\n/g, "\r");
         }
@@ -166,7 +166,7 @@ var require_xterm = __commonJS({
         }, t2.paste = r, t2.moveTextAreaUnderMouseCursor = n, t2.rightClickHandler = function(e3, t3, i3, s3, r2) {
           n(e3, t3, i3), r2 && s3.rightClickSelect(e3), t3.value = s3.selectionText, t3.select();
         };
-      }, 7239: (e2, t2, i2) => {
+      }, 7239: (_e2, t2, i2) => {
         Object.defineProperty(t2, "__esModule", { value: true }), t2.ColorContrastCache = void 0;
         const s2 = i2(1505);
         t2.ColorContrastCache = class {
@@ -189,7 +189,7 @@ var require_xterm = __commonJS({
             this._color.clear(), this._css.clear();
           }
         };
-      }, 3656: (e2, t2) => {
+      }, 3656: (_e2, t2) => {
         Object.defineProperty(t2, "__esModule", { value: true }), t2.addDisposableDomListener = void 0, t2.addDisposableDomListener = function(e3, t3, i2, s2) {
           e3.addEventListener(t3, i2, s2);
           let r = false;
@@ -197,10 +197,10 @@ var require_xterm = __commonJS({
             r || (r = true, e3.removeEventListener(t3, i2, s2));
           } };
         };
-      }, 3551: function(e2, t2, i2) {
+      }, 3551: function(_e2, t2, i2) {
         var s2 = this && this.__decorate || function(e3, t3, i3, s3) {
           var r2, n2 = arguments.length, o2 = n2 < 3 ? t3 : null === s3 ? s3 = Object.getOwnPropertyDescriptor(t3, i3) : s3;
-          if ("object" == typeof Reflect && "function" == typeof Reflect.decorate) o2 = Reflect.decorate(e3, t3, i3, s3);
+          if ("object" === typeof Reflect && "function" === typeof Reflect.decorate) o2 = Reflect.decorate(e3, t3, i3, s3);
           else for (var a2 = e3.length - 1; a2 >= 0; a2--) (r2 = e3[a2]) && (o2 = (n2 < 3 ? r2(o2) : n2 > 3 ? r2(t3, i3, o2) : r2(t3, i3)) || o2);
           return n2 > 3 && o2 && Object.defineProperty(t3, i3, o2), o2;
         }, r = this && this.__param || function(e3, t3) {
@@ -354,12 +354,12 @@ var require_xterm = __commonJS({
           }
         };
         t2.Linkifier = l = s2([r(1, c.IMouseService), r(2, c.IRenderService), r(3, h.IBufferService), r(4, c.ILinkProviderService)], l);
-      }, 9042: (e2, t2) => {
+      }, 9042: (_e2, t2) => {
         Object.defineProperty(t2, "__esModule", { value: true }), t2.tooMuchOutput = t2.promptLabel = void 0, t2.promptLabel = "Terminal input", t2.tooMuchOutput = "Too much output to announce, navigate to rows manually to read";
-      }, 3730: function(e2, t2, i2) {
+      }, 3730: function(_e2, t2, i2) {
         var s2 = this && this.__decorate || function(e3, t3, i3, s3) {
           var r2, n2 = arguments.length, o2 = n2 < 3 ? t3 : null === s3 ? s3 = Object.getOwnPropertyDescriptor(t3, i3) : s3;
-          if ("object" == typeof Reflect && "function" == typeof Reflect.decorate) o2 = Reflect.decorate(e3, t3, i3, s3);
+          if ("object" === typeof Reflect && "function" === typeof Reflect.decorate) o2 = Reflect.decorate(e3, t3, i3, s3);
           else for (var a2 = e3.length - 1; a2 >= 0; a2--) (r2 = e3[a2]) && (o2 = (n2 < 3 ? r2(o2) : n2 > 3 ? r2(t3, i3, o2) : r2(t3, i3)) || o2);
           return n2 > 3 && o2 && Object.defineProperty(t3, i3, o2), o2;
         }, r = this && this.__param || function(e3, t3) {
@@ -412,7 +412,7 @@ var require_xterm = __commonJS({
             t3(s3);
           }
         };
-        function h(e3, t3) {
+        function h(_e3, t3) {
           if (confirm(`Do you want to navigate to ${t3}?
 
 WARNING: This link could potentially be dangerous`)) {
@@ -427,7 +427,7 @@ WARNING: This link could potentially be dangerous`)) {
           }
         }
         t2.OscLinkProvider = a = s2([r(0, o.IBufferService), r(1, o.IOptionsService), r(2, o.IOscLinkService)], a);
-      }, 6193: (e2, t2) => {
+      }, 6193: (_e2, t2) => {
         Object.defineProperty(t2, "__esModule", { value: true }), t2.RenderDebouncer = void 0, t2.RenderDebouncer = class {
           constructor(e3, t3) {
             this._renderCallback = e3, this._coreBrowserService = t3, this._refreshCallbacks = [];
@@ -451,7 +451,7 @@ WARNING: This link could potentially be dangerous`)) {
             this._refreshCallbacks = [];
           }
         };
-      }, 3236: (e2, t2, i2) => {
+      }, 3236: (_e2, t2, i2) => {
         Object.defineProperty(t2, "__esModule", { value: true }), t2.Terminal = void 0;
         const s2 = i2(3614), r = i2(3656), n = i2(3551), o = i2(9042), a = i2(3730), h = i2(1680), c = i2(3107), l = i2(5744), d = i2(2950), _ = i2(1296), u = i2(428), f = i2(4269), v = i2(5114), p = i2(8934), g = i2(3230), m = i2(9312), S = i2(4725), C = i2(6731), b = i2(8055), w = i2(8969), y = i2(8460), E = i2(844), k = i2(6114), L = i2(8437), D = i2(2584), R = i2(7399), x = i2(5941), A = i2(9074), B = i2(2585), T = i2(5435), M = i2(4567), O = i2(779);
         class P extends w.CoreTerminal {
@@ -522,7 +522,7 @@ WARNING: This link could potentially be dangerous`)) {
           _handleScreenReaderModeOptionChange(e3) {
             e3 ? !this._accessibilityManager.value && this._renderService && (this._accessibilityManager.value = this._instantiationService.createInstance(M.AccessibilityManager, this)) : this._accessibilityManager.clear();
           }
-          _handleTextAreaFocus(e3) {
+          _handleTextAreaFocus(_e3) {
             this.coreService.decPrivateModes.sendFocus && this.coreService.triggerDataEvent(D.C0.ESC + "[I"), this.element.classList.add("focus"), this._showCursor(), this._onFocus.fire();
           }
           blur() {
@@ -561,7 +561,7 @@ WARNING: This link could potentially be dangerous`)) {
             if (e3.isConnected || this._logService.debug("Terminal.open was called on an element that was not attached to the DOM"), ((_a = this.element) == null ? void 0 : _a.ownerDocument.defaultView) && this._coreBrowserService) return void (this.element.ownerDocument.defaultView !== this._coreBrowserService.window && (this._coreBrowserService.window = this.element.ownerDocument.defaultView));
             this._document = e3.ownerDocument, this.options.documentOverride && this.options.documentOverride instanceof Document && (this._document = this.optionsService.rawOptions.documentOverride), this.element = this._document.createElement("div"), this.element.dir = "ltr", this.element.classList.add("terminal"), this.element.classList.add("xterm"), e3.appendChild(this.element);
             const t3 = this._document.createDocumentFragment();
-            this._viewportElement = this._document.createElement("div"), this._viewportElement.classList.add("xterm-viewport"), t3.appendChild(this._viewportElement), this._viewportScrollArea = this._document.createElement("div"), this._viewportScrollArea.classList.add("xterm-scroll-area"), this._viewportElement.appendChild(this._viewportScrollArea), this.screenElement = this._document.createElement("div"), this.screenElement.classList.add("xterm-screen"), this.register((0, r.addDisposableDomListener)(this.screenElement, "mousemove", ((e4) => this.updateCursorStyle(e4)))), this._helperContainer = this._document.createElement("div"), this._helperContainer.classList.add("xterm-helpers"), this.screenElement.appendChild(this._helperContainer), t3.appendChild(this.screenElement), this.textarea = this._document.createElement("textarea"), this.textarea.classList.add("xterm-helper-textarea"), this.textarea.setAttribute("aria-label", o.promptLabel), k.isChromeOS || this.textarea.setAttribute("aria-multiline", "false"), this.textarea.setAttribute("autocorrect", "off"), this.textarea.setAttribute("autocapitalize", "off"), this.textarea.setAttribute("spellcheck", "false"), this.textarea.tabIndex = 0, this._coreBrowserService = this.register(this._instantiationService.createInstance(v.CoreBrowserService, this.textarea, e3.ownerDocument.defaultView ?? window, this._document ?? "undefined" != typeof window ? window.document : null)), this._instantiationService.setService(S.ICoreBrowserService, this._coreBrowserService), this.register((0, r.addDisposableDomListener)(this.textarea, "focus", ((e4) => this._handleTextAreaFocus(e4)))), this.register((0, r.addDisposableDomListener)(this.textarea, "blur", (() => this._handleTextAreaBlur()))), this._helperContainer.appendChild(this.textarea), this._charSizeService = this._instantiationService.createInstance(u.CharSizeService, this._document, this._helperContainer), this._instantiationService.setService(S.ICharSizeService, this._charSizeService), this._themeService = this._instantiationService.createInstance(C.ThemeService), this._instantiationService.setService(S.IThemeService, this._themeService), this._characterJoinerService = this._instantiationService.createInstance(f.CharacterJoinerService), this._instantiationService.setService(S.ICharacterJoinerService, this._characterJoinerService), this._renderService = this.register(this._instantiationService.createInstance(g.RenderService, this.rows, this.screenElement)), this._instantiationService.setService(S.IRenderService, this._renderService), this.register(this._renderService.onRenderedViewportChange(((e4) => this._onRender.fire(e4)))), this.onResize(((e4) => this._renderService.resize(e4.cols, e4.rows))), this._compositionView = this._document.createElement("div"), this._compositionView.classList.add("composition-view"), this._compositionHelper = this._instantiationService.createInstance(d.CompositionHelper, this.textarea, this._compositionView), this._helperContainer.appendChild(this._compositionView), this._mouseService = this._instantiationService.createInstance(p.MouseService), this._instantiationService.setService(S.IMouseService, this._mouseService), this.linkifier = this.register(this._instantiationService.createInstance(n.Linkifier, this.screenElement)), this.element.appendChild(t3);
+            this._viewportElement = this._document.createElement("div"), this._viewportElement.classList.add("xterm-viewport"), t3.appendChild(this._viewportElement), this._viewportScrollArea = this._document.createElement("div"), this._viewportScrollArea.classList.add("xterm-scroll-area"), this._viewportElement.appendChild(this._viewportScrollArea), this.screenElement = this._document.createElement("div"), this.screenElement.classList.add("xterm-screen"), this.register((0, r.addDisposableDomListener)(this.screenElement, "mousemove", ((e4) => this.updateCursorStyle(e4)))), this._helperContainer = this._document.createElement("div"), this._helperContainer.classList.add("xterm-helpers"), this.screenElement.appendChild(this._helperContainer), t3.appendChild(this.screenElement), this.textarea = this._document.createElement("textarea"), this.textarea.classList.add("xterm-helper-textarea"), this.textarea.setAttribute("aria-label", o.promptLabel), k.isChromeOS || this.textarea.setAttribute("aria-multiline", "false"), this.textarea.setAttribute("autocorrect", "off"), this.textarea.setAttribute("autocapitalize", "off"), this.textarea.setAttribute("spellcheck", "false"), this.textarea.tabIndex = 0, this._coreBrowserService = this.register(this._instantiationService.createInstance(v.CoreBrowserService, this.textarea, e3.ownerDocument.defaultView ?? window, this._document ?? "undefined" !== typeof window ? window.document : null)), this._instantiationService.setService(S.ICoreBrowserService, this._coreBrowserService), this.register((0, r.addDisposableDomListener)(this.textarea, "focus", ((e4) => this._handleTextAreaFocus(e4)))), this.register((0, r.addDisposableDomListener)(this.textarea, "blur", (() => this._handleTextAreaBlur()))), this._helperContainer.appendChild(this.textarea), this._charSizeService = this._instantiationService.createInstance(u.CharSizeService, this._document, this._helperContainer), this._instantiationService.setService(S.ICharSizeService, this._charSizeService), this._themeService = this._instantiationService.createInstance(C.ThemeService), this._instantiationService.setService(S.IThemeService, this._themeService), this._characterJoinerService = this._instantiationService.createInstance(f.CharacterJoinerService), this._instantiationService.setService(S.ICharacterJoinerService, this._characterJoinerService), this._renderService = this.register(this._instantiationService.createInstance(g.RenderService, this.rows, this.screenElement)), this._instantiationService.setService(S.IRenderService, this._renderService), this.register(this._renderService.onRenderedViewportChange(((e4) => this._onRender.fire(e4)))), this.onResize(((e4) => this._renderService.resize(e4.cols, e4.rows))), this._compositionView = this._document.createElement("div"), this._compositionView.classList.add("composition-view"), this._compositionHelper = this._instantiationService.createInstance(d.CompositionHelper, this.textarea, this._compositionView), this._helperContainer.appendChild(this._compositionView), this._mouseService = this._instantiationService.createInstance(p.MouseService), this._instantiationService.setService(S.IMouseService, this._mouseService), this.linkifier = this.register(this._instantiationService.createInstance(n.Linkifier, this.screenElement)), this.element.appendChild(t3);
             try {
               this._onWillOpen.fire(this.element);
             } catch {
@@ -570,7 +570,7 @@ WARNING: This link could potentially be dangerous`)) {
               this._renderService.handleCursorMove(), this._syncTextArea();
             }))), this.register(this.onResize((() => this._renderService.handleResize(this.cols, this.rows)))), this.register(this.onBlur((() => this._renderService.handleBlur()))), this.register(this.onFocus((() => this._renderService.handleFocus()))), this.register(this._renderService.onDimensionsChange((() => this.viewport.syncScrollArea()))), this._selectionService = this.register(this._instantiationService.createInstance(m.SelectionService, this.element, this.screenElement, this.linkifier)), this._instantiationService.setService(S.ISelectionService, this._selectionService), this.register(this._selectionService.onRequestScrollLines(((e4) => this.scrollLines(e4.amount, e4.suppressScrollEvent)))), this.register(this._selectionService.onSelectionChange((() => this._onSelectionChange.fire()))), this.register(this._selectionService.onRequestRedraw(((e4) => this._renderService.handleSelectionChanged(e4.start, e4.end, e4.columnSelectMode)))), this.register(this._selectionService.onLinuxMouseSelection(((e4) => {
               this.textarea.value = e4, this.textarea.focus(), this.textarea.select();
-            }))), this.register(this._onScroll.event(((e4) => {
+            }))), this.register(this._onScroll.event(((_e4) => {
               this.viewport.syncScrollArea(), this._selectionService.refresh();
             }))), this.register((0, r.addDisposableDomListener)(this._viewportElement, "scroll", (() => this._selectionService.refresh()))), this.register(this._instantiationService.createInstance(c.BufferDecorationRenderer, this.screenElement)), this.register((0, r.addDisposableDomListener)(this.element, "mousedown", ((e4) => this._selectionService.handleMouseDown(e4)))), this.coreMouseService.areMouseEventsActive ? (this._selectionService.disable(), this.element.classList.add("enable-mouse-events")) : this._selectionService.enable(), this.options.screenReaderMode && (this._accessibilityManager.value = this._instantiationService.createInstance(M.AccessibilityManager, this)), this.register(this.optionsService.onSpecificOptionChange("screenReaderMode", ((e4) => this._handleScreenReaderModeOptionChange(e4)))), this.options.overviewRulerWidth && (this._overviewRulerRenderer = this.register(this._instantiationService.createInstance(l.OverviewRulerRenderer, this._viewportElement, this.screenElement))), this.optionsService.onSpecificOptionChange("overviewRulerWidth", ((e4) => {
               !this._overviewRulerRenderer && e4 && this._viewportElement && this.screenElement && (this._overviewRulerRenderer = this.register(this._instantiationService.createInstance(l.OverviewRulerRenderer, this._viewportElement, this.screenElement)));
@@ -747,7 +747,7 @@ WARNING: This link could potentially be dangerous`)) {
           resize(e3, t3) {
             e3 !== this.cols || t3 !== this.rows ? super.resize(e3, t3) : this._charSizeService && !this._charSizeService.hasValidSize && this._charSizeService.measure();
           }
-          _afterResize(e3, t3) {
+          _afterResize(_e3, _t3) {
             var _a, _b;
             (_a = this._charSizeService) == null ? void 0 : _a.measure(), (_b = this.viewport) == null ? void 0 : _b.syncScrollArea(true);
           }
@@ -791,7 +791,7 @@ WARNING: This link could potentially be dangerous`)) {
           }
         }
         t2.Terminal = P;
-      }, 9924: (e2, t2) => {
+      }, 9924: (_e2, t2) => {
         Object.defineProperty(t2, "__esModule", { value: true }), t2.TimeBasedDebouncer = void 0, t2.TimeBasedDebouncer = class {
           constructor(e3, t3 = 1e3) {
             this._renderCallback = e3, this._debounceThresholdMS = t3, this._lastRefreshMs = 0, this._additionalRefreshRequested = false;
@@ -816,10 +816,10 @@ WARNING: This link could potentially be dangerous`)) {
             this._rowStart = void 0, this._rowEnd = void 0, this._renderCallback(e3, t3);
           }
         };
-      }, 1680: function(e2, t2, i2) {
+      }, 1680: function(_e2, t2, i2) {
         var s2 = this && this.__decorate || function(e3, t3, i3, s3) {
           var r2, n2 = arguments.length, o2 = n2 < 3 ? t3 : null === s3 ? s3 = Object.getOwnPropertyDescriptor(t3, i3) : s3;
-          if ("object" == typeof Reflect && "function" == typeof Reflect.decorate) o2 = Reflect.decorate(e3, t3, i3, s3);
+          if ("object" === typeof Reflect && "function" === typeof Reflect.decorate) o2 = Reflect.decorate(e3, t3, i3, s3);
           else for (var a2 = e3.length - 1; a2 >= 0; a2--) (r2 = e3[a2]) && (o2 = (n2 < 3 ? r2(o2) : n2 > 3 ? r2(t3, i3, o2) : r2(t3, i3)) || o2);
           return n2 > 3 && o2 && Object.defineProperty(t3, i3, o2), o2;
         }, r = this && this.__param || function(e3, t3) {
@@ -856,7 +856,7 @@ WARNING: This link could potentially be dangerous`)) {
             if (this._lastRecordedBufferLength !== this._bufferService.buffer.lines.length) return this._lastRecordedBufferLength = this._bufferService.buffer.lines.length, void this._refresh(e3);
             this._lastRecordedViewportHeight === this._renderService.dimensions.css.canvas.height && this._lastScrollTop === this._activeBuffer.ydisp * this._currentRowHeight && this._renderDimensions.device.cell.height === this._currentDeviceCellHeight || this._refresh(e3);
           }
-          _handleScroll(e3) {
+          _handleScroll(_e3) {
             if (this._lastScrollTop = this._viewportElement.scrollTop, !this._viewportElement.offsetParent) return;
             if (this._ignoreNextScrollEvent) return this._ignoreNextScrollEvent = false, void this._onRequestScrollLines.fire({ amount: 0, suppressScrollEvent: true });
             const t3 = Math.round(this._lastScrollTop / this._currentRowHeight) - this._bufferService.buffer.ydisp;
@@ -925,10 +925,10 @@ WARNING: This link could potentially be dangerous`)) {
           }
         };
         t2.Viewport = l = s2([r(2, c.IBufferService), r(3, c.IOptionsService), r(4, o.ICharSizeService), r(5, o.IRenderService), r(6, o.ICoreBrowserService), r(7, o.IThemeService)], l);
-      }, 3107: function(e2, t2, i2) {
+      }, 3107: function(_e2, t2, i2) {
         var s2 = this && this.__decorate || function(e3, t3, i3, s3) {
           var r2, n2 = arguments.length, o2 = n2 < 3 ? t3 : null === s3 ? s3 = Object.getOwnPropertyDescriptor(t3, i3) : s3;
-          if ("object" == typeof Reflect && "function" == typeof Reflect.decorate) o2 = Reflect.decorate(e3, t3, i3, s3);
+          if ("object" === typeof Reflect && "function" === typeof Reflect.decorate) o2 = Reflect.decorate(e3, t3, i3, s3);
           else for (var a2 = e3.length - 1; a2 >= 0; a2--) (r2 = e3[a2]) && (o2 = (n2 < 3 ? r2(o2) : n2 > 3 ? r2(t3, i3, o2) : r2(t3, i3)) || o2);
           return n2 > 3 && o2 && Object.defineProperty(t3, i3, o2), o2;
         }, r = this && this.__param || function(e3, t3) {
@@ -988,7 +988,7 @@ WARNING: This link could potentially be dangerous`)) {
           }
         };
         t2.BufferDecorationRenderer = h = s2([r(1, a.IBufferService), r(2, n.ICoreBrowserService), r(3, a.IDecorationService), r(4, n.IRenderService)], h);
-      }, 5871: (e2, t2) => {
+      }, 5871: (_e2, t2) => {
         Object.defineProperty(t2, "__esModule", { value: true }), t2.ColorZoneStore = void 0, t2.ColorZoneStore = class {
           constructor() {
             this._zones = [], this._zonePool = [], this._zonePoolIndex = 0, this._linePadding = { full: 0, left: 0, center: 0, right: 0 };
@@ -1022,10 +1022,10 @@ WARNING: This link could potentially be dangerous`)) {
             e3.startBufferLine = Math.min(e3.startBufferLine, t3), e3.endBufferLine = Math.max(e3.endBufferLine, t3);
           }
         };
-      }, 5744: function(e2, t2, i2) {
+      }, 5744: function(_e2, t2, i2) {
         var s2 = this && this.__decorate || function(e3, t3, i3, s3) {
           var r2, n2 = arguments.length, o2 = n2 < 3 ? t3 : null === s3 ? s3 = Object.getOwnPropertyDescriptor(t3, i3) : s3;
-          if ("object" == typeof Reflect && "function" == typeof Reflect.decorate) o2 = Reflect.decorate(e3, t3, i3, s3);
+          if ("object" === typeof Reflect && "function" === typeof Reflect.decorate) o2 = Reflect.decorate(e3, t3, i3, s3);
           else for (var a2 = e3.length - 1; a2 >= 0; a2--) (r2 = e3[a2]) && (o2 = (n2 < 3 ? r2(o2) : n2 > 3 ? r2(t3, i3, o2) : r2(t3, i3)) || o2);
           return n2 > 3 && o2 && Object.defineProperty(t3, i3, o2), o2;
         }, r = this && this.__param || function(e3, t3) {
@@ -1098,10 +1098,10 @@ WARNING: This link could potentially be dangerous`)) {
           }
         };
         t2.OverviewRulerRenderer = _ = s2([r(2, h.IBufferService), r(3, h.IDecorationService), r(4, o.IRenderService), r(5, h.IOptionsService), r(6, o.ICoreBrowserService)], _);
-      }, 2950: function(e2, t2, i2) {
+      }, 2950: function(_e2, t2, i2) {
         var s2 = this && this.__decorate || function(e3, t3, i3, s3) {
           var r2, n2 = arguments.length, o2 = n2 < 3 ? t3 : null === s3 ? s3 = Object.getOwnPropertyDescriptor(t3, i3) : s3;
-          if ("object" == typeof Reflect && "function" == typeof Reflect.decorate) o2 = Reflect.decorate(e3, t3, i3, s3);
+          if ("object" === typeof Reflect && "function" === typeof Reflect.decorate) o2 = Reflect.decorate(e3, t3, i3, s3);
           else for (var a2 = e3.length - 1; a2 >= 0; a2--) (r2 = e3[a2]) && (o2 = (n2 < 3 ? r2(o2) : n2 > 3 ? r2(t3, i3, o2) : r2(t3, i3)) || o2);
           return n2 > 3 && o2 && Object.defineProperty(t3, i3, o2), o2;
         }, r = this && this.__param || function(e3, t3) {
@@ -1174,9 +1174,9 @@ WARNING: This link could potentially be dangerous`)) {
           }
         };
         t2.CompositionHelper = h = s2([r(2, o.IBufferService), r(3, o.IOptionsService), r(4, o.ICoreService), r(5, n.IRenderService)], h);
-      }, 9806: (e2, t2) => {
+      }, 9806: (_e2, t2) => {
         function i2(e3, t3, i3) {
-          const s2 = i3.getBoundingClientRect(), r = e3.getComputedStyle(i3), n = parseInt(r.getPropertyValue("padding-left")), o = parseInt(r.getPropertyValue("padding-top"));
+          const s2 = i3.getBoundingClientRect(), r = e3.getComputedStyle(i3), n = parseInt(r.getPropertyValue("padding-left"), 10), o = parseInt(r.getPropertyValue("padding-top"), 10);
           return [t3.clientX - s2.left - n, t3.clientY - s2.top - o];
         }
         Object.defineProperty(t2, "__esModule", { value: true }), t2.getCoords = t2.getCoordsRelativeToElement = void 0, t2.getCoordsRelativeToElement = i2, t2.getCoords = function(e3, t3, s2, r, n, o, a, h, c) {
@@ -1184,7 +1184,7 @@ WARNING: This link could potentially be dangerous`)) {
           const l = i2(e3, t3, s2);
           return l ? (l[0] = Math.ceil((l[0] + (c ? a / 2 : 0)) / a), l[1] = Math.ceil(l[1] / h), l[0] = Math.min(Math.max(l[0], 1), r + (c ? 1 : 0)), l[1] = Math.min(Math.max(l[1], 1), n), l) : void 0;
         };
-      }, 9504: (e2, t2, i2) => {
+      }, 9504: (_e2, t2, i2) => {
         Object.defineProperty(t2, "__esModule", { value: true }), t2.moveToCellSequence = void 0;
         const s2 = i2(2584);
         function r(e3, t3, i3, s3) {
@@ -1224,7 +1224,7 @@ WARNING: This link could potentially be dangerous`)) {
         }
         t2.moveToCellSequence = function(e3, t3, i3, s3) {
           const o2 = i3.buffer.x, l = i3.buffer.y;
-          if (!i3.buffer.hasScrollback) return (function(e4, t4, i4, s4, o3, l2) {
+          if (!i3.buffer.hasScrollback) return (function(e4, t4, _i4, s4, o3, l2) {
             return 0 === r(t4, s4, o3, l2).length ? "" : c(a(e4, t4, e4, t4 - n(t4, o3), false, o3).length, h("D", l2));
           })(o2, l, 0, t3, i3, s3) + r(l, t3, i3, s3) + (function(e4, t4, i4, s4, o3, l2) {
             let d2;
@@ -1243,10 +1243,10 @@ WARNING: This link could potentially be dangerous`)) {
             return t4.cols - e4;
           })(l > t3 ? e3 : o2, i3) + (_ - 1) * i3.cols + 1 + ((l > t3 ? o2 : e3) - 1), h(d, s3));
         };
-      }, 1296: function(e2, t2, i2) {
+      }, 1296: function(_e2, t2, i2) {
         var s2 = this && this.__decorate || function(e3, t3, i3, s3) {
           var r2, n2 = arguments.length, o2 = n2 < 3 ? t3 : null === s3 ? s3 = Object.getOwnPropertyDescriptor(t3, i3) : s3;
-          if ("object" == typeof Reflect && "function" == typeof Reflect.decorate) o2 = Reflect.decorate(e3, t3, i3, s3);
+          if ("object" === typeof Reflect && "function" === typeof Reflect.decorate) o2 = Reflect.decorate(e3, t3, i3, s3);
           else for (var a2 = e3.length - 1; a2 >= 0; a2--) (r2 = e3[a2]) && (o2 = (n2 < 3 ? r2(o2) : n2 > 3 ? r2(t3, i3, o2) : r2(t3, i3)) || o2);
           return n2 > 3 && o2 && Object.defineProperty(t3, i3, o2), o2;
         }, r = this && this.__param || function(e3, t3) {
@@ -1286,7 +1286,7 @@ WARNING: This link could potentially be dangerous`)) {
           handleDevicePixelRatioChange() {
             this._updateDimensions(), this._widthCache.clear(), this._setDefaultSpacing();
           }
-          _refreshRowElements(e3, t3) {
+          _refreshRowElements(_e3, t3) {
             for (let e4 = this._rowElements.length; e4 <= t3; e4++) {
               const e5 = this._document.createElement("div");
               this._rowContainer.appendChild(e5), this._rowElements.push(e5);
@@ -1368,10 +1368,10 @@ WARNING: This link could potentially be dangerous`)) {
           }
         };
         t2.DomRenderer = w = s2([r(7, f.IInstantiationService), r(8, l.ICharSizeService), r(9, f.IOptionsService), r(10, f.IBufferService), r(11, l.ICoreBrowserService), r(12, l.IThemeService)], w);
-      }, 3787: function(e2, t2, i2) {
+      }, 3787: function(_e2, t2, i2) {
         var s2 = this && this.__decorate || function(e3, t3, i3, s3) {
           var r2, n2 = arguments.length, o2 = n2 < 3 ? t3 : null === s3 ? s3 = Object.getOwnPropertyDescriptor(t3, i3) : s3;
-          if ("object" == typeof Reflect && "function" == typeof Reflect.decorate) o2 = Reflect.decorate(e3, t3, i3, s3);
+          if ("object" === typeof Reflect && "function" === typeof Reflect.decorate) o2 = Reflect.decorate(e3, t3, i3, s3);
           else for (var a2 = e3.length - 1; a2 >= 0; a2--) (r2 = e3[a2]) && (o2 = (n2 < 3 ? r2(o2) : n2 > 3 ? r2(t3, i3, o2) : r2(t3, i3)) || o2);
           return n2 > 3 && o2 && Object.defineProperty(t3, i3, o2), o2;
         }, r = this && this.__param || function(e3, t3) {
@@ -1406,7 +1406,7 @@ WARNING: This link could potentially be dangerous`)) {
               }
               const H = this._isCellInSelection(M, t3), F = i3 && M === a2, W = T && M >= f2 && M <= p;
               let U = false;
-              this._decorationService.forEachDecorationAtCell(M, t3, void 0, ((e4) => {
+              this._decorationService.forEachDecorationAtCell(M, t3, void 0, ((_e4) => {
                 U = true;
               }));
               let N = I.getChars() || o.WHITESPACE_CELL_CHAR;
@@ -1504,7 +1504,7 @@ WARNING: This link could potentially be dangerous`)) {
           return e3;
         }
         t2.DomRendererRowFactory = f = s2([r(1, l.ICharacterJoinerService), r(2, h.IOptionsService), r(3, l.ICoreBrowserService), r(4, h.ICoreService), r(5, h.IDecorationService), r(6, l.IThemeService)], f);
-      }, 2550: (e2, t2) => {
+      }, 2550: (_e2, t2) => {
         Object.defineProperty(t2, "__esModule", { value: true }), t2.WidthCache = void 0, t2.WidthCache = class {
           constructor(e3, t3) {
             this._flat = new Float32Array(256), this._font = "", this._fontSize = 0, this._weight = "normal", this._weightBold = "bold", this._measureElements = [], this._container = e3.createElement("div"), this._container.classList.add("xterm-width-cache-measure-container"), this._container.setAttribute("aria-hidden", "true"), this._container.style.whiteSpace = "pre", this._container.style.fontKerning = "none";
@@ -1547,11 +1547,11 @@ WARNING: This link could potentially be dangerous`)) {
             return i2.textContent = e3.repeat(32), i2.offsetWidth / 32;
           }
         };
-      }, 2223: (e2, t2, i2) => {
+      }, 2223: (_e2, t2, i2) => {
         Object.defineProperty(t2, "__esModule", { value: true }), t2.TEXT_BASELINE = t2.DIM_OPACITY = t2.INVERTED_DEFAULT_COLOR = void 0;
         const s2 = i2(6114);
         t2.INVERTED_DEFAULT_COLOR = 257, t2.DIM_OPACITY = 0.5, t2.TEXT_BASELINE = s2.isFirefox || s2.isLegacyEdge ? "bottom" : "ideographic";
-      }, 6171: (e2, t2) => {
+      }, 6171: (_e2, t2) => {
         function i2(e3) {
           return 57508 <= e3 && e3 <= 57558;
         }
@@ -1576,7 +1576,7 @@ WARNING: This link could potentially be dangerous`)) {
         }, t2.computeNextVariantOffset = function(e3, t3, i3 = 0) {
           return (e3 - (2 * Math.round(t3) - i3)) % (2 * Math.round(t3));
         };
-      }, 6052: (e2, t2) => {
+      }, 6052: (_e2, t2) => {
         Object.defineProperty(t2, "__esModule", { value: true }), t2.createSelectionRenderModel = void 0;
         class i2 {
           constructor() {
@@ -1597,7 +1597,7 @@ WARNING: This link could potentially be dangerous`)) {
         t2.createSelectionRenderModel = function() {
           return new i2();
         };
-      }, 456: (e2, t2) => {
+      }, 456: (_e2, t2) => {
         Object.defineProperty(t2, "__esModule", { value: true }), t2.SelectionModel = void 0, t2.SelectionModel = class {
           constructor(e3) {
             this._bufferService = e3, this.isSelectAllActive = false, this.selectionStartLength = 0;
@@ -1613,7 +1613,7 @@ WARNING: This link could potentially be dangerous`)) {
             if (this.selectionStart) {
               if (!this.selectionEnd || this.areSelectionValuesReversed()) {
                 const e3 = this.selectionStart[0] + this.selectionStartLength;
-                return e3 > this._bufferService.cols ? e3 % this._bufferService.cols == 0 ? [this._bufferService.cols, this.selectionStart[1] + Math.floor(e3 / this._bufferService.cols) - 1] : [e3 % this._bufferService.cols, this.selectionStart[1] + Math.floor(e3 / this._bufferService.cols)] : [e3, this.selectionStart[1]];
+                return e3 > this._bufferService.cols ? e3 % this._bufferService.cols === 0 ? [this._bufferService.cols, this.selectionStart[1] + Math.floor(e3 / this._bufferService.cols) - 1] : [e3 % this._bufferService.cols, this.selectionStart[1] + Math.floor(e3 / this._bufferService.cols)] : [e3, this.selectionStart[1]];
               }
               if (this.selectionStartLength && this.selectionEnd[1] === this.selectionStart[1]) {
                 const e3 = this.selectionStart[0] + this.selectionStartLength;
@@ -1630,10 +1630,10 @@ WARNING: This link could potentially be dangerous`)) {
             return this.selectionStart && (this.selectionStart[1] -= e3), this.selectionEnd && (this.selectionEnd[1] -= e3), this.selectionEnd && this.selectionEnd[1] < 0 ? (this.clearSelection(), true) : (this.selectionStart && this.selectionStart[1] < 0 && (this.selectionStart[1] = 0), false);
           }
         };
-      }, 428: function(e2, t2, i2) {
+      }, 428: function(_e2, t2, i2) {
         var s2 = this && this.__decorate || function(e3, t3, i3, s3) {
           var r2, n2 = arguments.length, o2 = n2 < 3 ? t3 : null === s3 ? s3 = Object.getOwnPropertyDescriptor(t3, i3) : s3;
-          if ("object" == typeof Reflect && "function" == typeof Reflect.decorate) o2 = Reflect.decorate(e3, t3, i3, s3);
+          if ("object" === typeof Reflect && "function" === typeof Reflect.decorate) o2 = Reflect.decorate(e3, t3, i3, s3);
           else for (var a2 = e3.length - 1; a2 >= 0; a2--) (r2 = e3[a2]) && (o2 = (n2 < 3 ? r2(o2) : n2 > 3 ? r2(t3, i3, o2) : r2(t3, i3)) || o2);
           return n2 > 3 && o2 && Object.defineProperty(t3, i3, o2), o2;
         }, r = this && this.__param || function(e3, t3) {
@@ -1690,10 +1690,10 @@ WARNING: This link could potentially be dangerous`)) {
             return this._validateAndSet(e3.width, e3.fontBoundingBoxAscent + e3.fontBoundingBoxDescent), this._result;
           }
         }
-      }, 4269: function(e2, t2, i2) {
+      }, 4269: function(_e2, t2, i2) {
         var s2 = this && this.__decorate || function(e3, t3, i3, s3) {
           var r2, n2 = arguments.length, o2 = n2 < 3 ? t3 : null === s3 ? s3 = Object.getOwnPropertyDescriptor(t3, i3) : s3;
-          if ("object" == typeof Reflect && "function" == typeof Reflect.decorate) o2 = Reflect.decorate(e3, t3, i3, s3);
+          if ("object" === typeof Reflect && "function" === typeof Reflect.decorate) o2 = Reflect.decorate(e3, t3, i3, s3);
           else for (var a2 = e3.length - 1; a2 >= 0; a2--) (r2 = e3[a2]) && (o2 = (n2 < 3 ? r2(o2) : n2 > 3 ? r2(t3, i3, o2) : r2(t3, i3)) || o2);
           return n2 > 3 && o2 && Object.defineProperty(t3, i3, o2), o2;
         }, r = this && this.__param || function(e3, t3) {
@@ -1719,7 +1719,7 @@ WARNING: This link could potentially be dangerous`)) {
           getCode() {
             return 2097151;
           }
-          setFromCharData(e3) {
+          setFromCharData(_e3) {
             throw new Error("not implemented");
           }
           getAsCharData() {
@@ -1811,7 +1811,7 @@ WARNING: This link could potentially be dangerous`)) {
           }
         };
         t2.CharacterJoinerService = l = s2([r(0, h.IBufferService)], l);
-      }, 5114: (e2, t2, i2) => {
+      }, 5114: (_e2, t2, i2) => {
         Object.defineProperty(t2, "__esModule", { value: true }), t2.CoreBrowserService = void 0;
         const s2 = i2(844), r = i2(8460), n = i2(3656);
         class o extends s2.Disposable {
@@ -1853,7 +1853,7 @@ WARNING: This link could potentially be dangerous`)) {
             this._resolutionMediaMatchList && this._outerListener && (this._resolutionMediaMatchList.removeListener(this._outerListener), this._resolutionMediaMatchList = void 0, this._outerListener = void 0);
           }
         }
-      }, 779: (e2, t2, i2) => {
+      }, 779: (_e2, t2, i2) => {
         Object.defineProperty(t2, "__esModule", { value: true }), t2.LinkProviderService = void 0;
         const s2 = i2(844);
         class r extends s2.Disposable {
@@ -1868,10 +1868,10 @@ WARNING: This link could potentially be dangerous`)) {
           }
         }
         t2.LinkProviderService = r;
-      }, 8934: function(e2, t2, i2) {
+      }, 8934: function(_e2, t2, i2) {
         var s2 = this && this.__decorate || function(e3, t3, i3, s3) {
           var r2, n2 = arguments.length, o2 = n2 < 3 ? t3 : null === s3 ? s3 = Object.getOwnPropertyDescriptor(t3, i3) : s3;
-          if ("object" == typeof Reflect && "function" == typeof Reflect.decorate) o2 = Reflect.decorate(e3, t3, i3, s3);
+          if ("object" === typeof Reflect && "function" === typeof Reflect.decorate) o2 = Reflect.decorate(e3, t3, i3, s3);
           else for (var a2 = e3.length - 1; a2 >= 0; a2--) (r2 = e3[a2]) && (o2 = (n2 < 3 ? r2(o2) : n2 > 3 ? r2(t3, i3, o2) : r2(t3, i3)) || o2);
           return n2 > 3 && o2 && Object.defineProperty(t3, i3, o2), o2;
         }, r = this && this.__param || function(e3, t3) {
@@ -1894,10 +1894,10 @@ WARNING: This link could potentially be dangerous`)) {
           }
         };
         t2.MouseService = a = s2([r(0, n.IRenderService), r(1, n.ICharSizeService)], a);
-      }, 3230: function(e2, t2, i2) {
+      }, 3230: function(_e2, t2, i2) {
         var s2 = this && this.__decorate || function(e3, t3, i3, s3) {
           var r2, n2 = arguments.length, o2 = n2 < 3 ? t3 : null === s3 ? s3 = Object.getOwnPropertyDescriptor(t3, i3) : s3;
-          if ("object" == typeof Reflect && "function" == typeof Reflect.decorate) o2 = Reflect.decorate(e3, t3, i3, s3);
+          if ("object" === typeof Reflect && "function" === typeof Reflect.decorate) o2 = Reflect.decorate(e3, t3, i3, s3);
           else for (var a2 = e3.length - 1; a2 >= 0; a2--) (r2 = e3[a2]) && (o2 = (n2 < 3 ? r2(o2) : n2 > 3 ? r2(t3, i3, o2) : r2(t3, i3)) || o2);
           return n2 > 3 && o2 && Object.defineProperty(t3, i3, o2), o2;
         }, r = this && this.__param || function(e3, t3) {
@@ -1934,7 +1934,7 @@ WARNING: This link could potentially be dangerous`)) {
           _renderRows(e3, t3) {
             this._renderer.value && (e3 = Math.min(e3, this._rowCount - 1), t3 = Math.min(t3, this._rowCount - 1), this._renderer.value.renderRows(e3, t3), this._needsSelectionRefresh && (this._renderer.value.handleSelectionChanged(this._selectionState.start, this._selectionState.end, this._selectionState.columnSelectMode), this._needsSelectionRefresh = false), this._isNextRenderRedrawOnly || this._onRenderedViewportChange.fire({ start: e3, end: t3 }), this._onRender.fire({ start: e3, end: t3 }), this._isNextRenderRedrawOnly = true);
           }
-          resize(e3, t3) {
+          resize(_e3, t3) {
             this._rowCount = t3, this._fireOnCanvasResize();
           }
           _handleOptionsChanged() {
@@ -1994,10 +1994,10 @@ WARNING: This link could potentially be dangerous`)) {
           }
         };
         t2.RenderService = d = s2([r(2, l.IOptionsService), r(3, o.ICharSizeService), r(4, l.IDecorationService), r(5, l.IBufferService), r(6, o.ICoreBrowserService), r(7, o.IThemeService)], d);
-      }, 9312: function(e2, t2, i2) {
+      }, 9312: function(_e2, t2, i2) {
         var s2 = this && this.__decorate || function(e3, t3, i3, s3) {
           var r2, n2 = arguments.length, o2 = n2 < 3 ? t3 : null === s3 ? s3 = Object.getOwnPropertyDescriptor(t3, i3) : s3;
-          if ("object" == typeof Reflect && "function" == typeof Reflect.decorate) o2 = Reflect.decorate(e3, t3, i3, s3);
+          if ("object" === typeof Reflect && "function" === typeof Reflect.decorate) o2 = Reflect.decorate(e3, t3, i3, s3);
           else for (var a2 = e3.length - 1; a2 >= 0; a2--) (r2 = e3[a2]) && (o2 = (n2 < 3 ? r2(o2) : n2 > 3 ? r2(t3, i3, o2) : r2(t3, i3)) || o2);
           return n2 > 3 && o2 && Object.defineProperty(t3, i3, o2), o2;
         }, r = this && this.__param || function(e3, t3) {
@@ -2270,14 +2270,14 @@ WARNING: This link could potentially be dangerous`)) {
           }
         };
         t2.SelectionService = g = s2([r(3, f.IBufferService), r(4, f.ICoreService), r(5, h.IMouseService), r(6, f.IOptionsService), r(7, h.IRenderService), r(8, h.ICoreBrowserService)], g);
-      }, 4725: (e2, t2, i2) => {
+      }, 4725: (_e2, t2, i2) => {
         Object.defineProperty(t2, "__esModule", { value: true }), t2.ILinkProviderService = t2.IThemeService = t2.ICharacterJoinerService = t2.ISelectionService = t2.IRenderService = t2.IMouseService = t2.ICoreBrowserService = t2.ICharSizeService = void 0;
         const s2 = i2(8343);
         t2.ICharSizeService = (0, s2.createDecorator)("CharSizeService"), t2.ICoreBrowserService = (0, s2.createDecorator)("CoreBrowserService"), t2.IMouseService = (0, s2.createDecorator)("MouseService"), t2.IRenderService = (0, s2.createDecorator)("RenderService"), t2.ISelectionService = (0, s2.createDecorator)("SelectionService"), t2.ICharacterJoinerService = (0, s2.createDecorator)("CharacterJoinerService"), t2.IThemeService = (0, s2.createDecorator)("ThemeService"), t2.ILinkProviderService = (0, s2.createDecorator)("LinkProviderService");
-      }, 6731: function(e2, t2, i2) {
+      }, 6731: function(_e2, t2, i2) {
         var s2 = this && this.__decorate || function(e3, t3, i3, s3) {
           var r2, n2 = arguments.length, o2 = n2 < 3 ? t3 : null === s3 ? s3 = Object.getOwnPropertyDescriptor(t3, i3) : s3;
-          if ("object" == typeof Reflect && "function" == typeof Reflect.decorate) o2 = Reflect.decorate(e3, t3, i3, s3);
+          if ("object" === typeof Reflect && "function" === typeof Reflect.decorate) o2 = Reflect.decorate(e3, t3, i3, s3);
           else for (var a2 = e3.length - 1; a2 >= 0; a2--) (r2 = e3[a2]) && (o2 = (n2 < 3 ? r2(o2) : n2 > 3 ? r2(t3, i3, o2) : r2(t3, i3)) || o2);
           return n2 > 3 && o2 && Object.defineProperty(t3, i3, o2), o2;
         }, r = this && this.__param || function(e3, t3) {
@@ -2356,7 +2356,7 @@ WARNING: This link could potentially be dangerous`)) {
           return t3;
         }
         t2.ThemeService = v = s2([r(0, c.IOptionsService)], v);
-      }, 6349: (e2, t2, i2) => {
+      }, 6349: (_e2, t2, i2) => {
         Object.defineProperty(t2, "__esModule", { value: true }), t2.CircularList = void 0;
         const s2 = i2(8460), r = i2(844);
         class n extends r.Disposable {
@@ -2429,14 +2429,14 @@ WARNING: This link could potentially be dangerous`)) {
           }
         }
         t2.CircularList = n;
-      }, 1439: (e2, t2) => {
+      }, 1439: (_e2, t2) => {
         Object.defineProperty(t2, "__esModule", { value: true }), t2.clone = void 0, t2.clone = function e3(t3, i2 = 5) {
-          if ("object" != typeof t3) return t3;
+          if ("object" !== typeof t3) return t3;
           const s2 = Array.isArray(t3) ? [] : {};
           for (const r in t3) s2[r] = i2 <= 1 ? t3[r] : t3[r] && e3(t3[r], i2 - 1);
           return s2;
         };
-      }, 8055: (e2, t2) => {
+      }, 8055: (_e2, t2) => {
         Object.defineProperty(t2, "__esModule", { value: true }), t2.contrastRatio = t2.toPaddedHex = t2.rgba = t2.rgb = t2.css = t2.color = t2.channels = t2.NULL_COLOR = void 0;
         let i2 = 0, s2 = 0, r = 0, n = 0;
         var o, a, h, c, l;
@@ -2464,7 +2464,7 @@ WARNING: This link could potentially be dangerous`)) {
             const a2 = t4.rgba >> 24 & 255, h2 = t4.rgba >> 16 & 255, c2 = t4.rgba >> 8 & 255, l2 = e4.rgba >> 24 & 255, d2 = e4.rgba >> 16 & 255, _2 = e4.rgba >> 8 & 255;
             return i2 = l2 + Math.round((a2 - l2) * n), s2 = d2 + Math.round((h2 - d2) * n), r = _2 + Math.round((c2 - _2) * n), { css: o.toCss(i2, s2, r), rgba: o.toRgba(i2, s2, r) };
           }, e3.isOpaque = function(e4) {
-            return 255 == (255 & e4.rgba);
+            return 255 === (255 & e4.rgba);
           }, e3.ensureContrastRatio = function(e4, t4, i3) {
             const s3 = l.ensureContrastRatio(e4.rgba, t4.rgba, i3);
             if (s3) return o.toColor(s3 >> 24 & 255, s3 >> 16 & 255, s3 >> 8 & 255);
@@ -2497,9 +2497,9 @@ WARNING: This link could potentially be dangerous`)) {
                 return { css: e4, rgba: parseInt(e4.slice(1), 16) >>> 0 };
             }
             const h2 = e4.match(/rgba?\(\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})\s*(,\s*(0|1|\d?\.(\d+))\s*)?\)/);
-            if (h2) return i2 = parseInt(h2[1]), s2 = parseInt(h2[2]), r = parseInt(h2[3]), n = Math.round(255 * (void 0 === h2[5] ? 1 : parseFloat(h2[5]))), o.toColor(i2, s2, r, n);
+            if (h2) return i2 = parseInt(h2[1], 10), s2 = parseInt(h2[2], 10), r = parseInt(h2[3], 10), n = Math.round(255 * (void 0 === h2[5] ? 1 : parseFloat(h2[5]))), o.toColor(i2, s2, r, n);
             if (!t3 || !a2) throw new Error("css.toColor: Unsupported css format");
-            if (t3.fillStyle = a2, t3.fillStyle = e4, "string" != typeof t3.fillStyle) throw new Error("css.toColor: Unsupported css format");
+            if (t3.fillStyle = a2, t3.fillStyle = e4, "string" !== typeof t3.fillStyle) throw new Error("css.toColor: Unsupported css format");
             if (t3.fillRect(0, 0, 1, 1), [i2, s2, r, n] = t3.getImageData(0, 0, 1, 1).data, 255 !== n) throw new Error("css.toColor: Unsupported css format");
             return { rgba: o.toRgba(i2, s2, r, n), css: e4 };
           };
@@ -2550,7 +2550,7 @@ WARNING: This link could potentially be dangerous`)) {
             return [e4 >> 24 & 255, e4 >> 16 & 255, e4 >> 8 & 255, 255 & e4];
           };
         })(l || (t2.rgba = l = {})), t2.toPaddedHex = d, t2.contrastRatio = _;
-      }, 8969: (e2, t2, i2) => {
+      }, 8969: (_e2, t2, i2) => {
         Object.defineProperty(t2, "__esModule", { value: true }), t2.CoreTerminal = void 0;
         const s2 = i2(844), r = i2(2585), n = i2(4348), o = i2(7866), a = i2(744), h = i2(7302), c = i2(6975), l = i2(8460), d = i2(1753), _ = i2(1480), u = i2(7994), f = i2(9282), v = i2(5435), p = i2(5981), g = i2(2660);
         let m = false;
@@ -2577,9 +2577,9 @@ WARNING: This link could potentially be dangerous`)) {
             for (const t3 in e3) this.optionsService.options[t3] = e3[t3];
           }
           constructor(e3) {
-            super(), this._windowsWrappingHeuristics = this.register(new s2.MutableDisposable()), this._onBinary = this.register(new l.EventEmitter()), this.onBinary = this._onBinary.event, this._onData = this.register(new l.EventEmitter()), this.onData = this._onData.event, this._onLineFeed = this.register(new l.EventEmitter()), this.onLineFeed = this._onLineFeed.event, this._onResize = this.register(new l.EventEmitter()), this.onResize = this._onResize.event, this._onWriteParsed = this.register(new l.EventEmitter()), this.onWriteParsed = this._onWriteParsed.event, this._onScroll = this.register(new l.EventEmitter()), this._instantiationService = new n.InstantiationService(), this.optionsService = this.register(new h.OptionsService(e3)), this._instantiationService.setService(r.IOptionsService, this.optionsService), this._bufferService = this.register(this._instantiationService.createInstance(a.BufferService)), this._instantiationService.setService(r.IBufferService, this._bufferService), this._logService = this.register(this._instantiationService.createInstance(o.LogService)), this._instantiationService.setService(r.ILogService, this._logService), this.coreService = this.register(this._instantiationService.createInstance(c.CoreService)), this._instantiationService.setService(r.ICoreService, this.coreService), this.coreMouseService = this.register(this._instantiationService.createInstance(d.CoreMouseService)), this._instantiationService.setService(r.ICoreMouseService, this.coreMouseService), this.unicodeService = this.register(this._instantiationService.createInstance(_.UnicodeService)), this._instantiationService.setService(r.IUnicodeService, this.unicodeService), this._charsetService = this._instantiationService.createInstance(u.CharsetService), this._instantiationService.setService(r.ICharsetService, this._charsetService), this._oscLinkService = this._instantiationService.createInstance(g.OscLinkService), this._instantiationService.setService(r.IOscLinkService, this._oscLinkService), this._inputHandler = this.register(new v.InputHandler(this._bufferService, this._charsetService, this.coreService, this._logService, this.optionsService, this._oscLinkService, this.coreMouseService, this.unicodeService)), this.register((0, l.forwardEvent)(this._inputHandler.onLineFeed, this._onLineFeed)), this.register(this._inputHandler), this.register((0, l.forwardEvent)(this._bufferService.onResize, this._onResize)), this.register((0, l.forwardEvent)(this.coreService.onData, this._onData)), this.register((0, l.forwardEvent)(this.coreService.onBinary, this._onBinary)), this.register(this.coreService.onRequestScrollToBottom((() => this.scrollToBottom()))), this.register(this.coreService.onUserInput((() => this._writeBuffer.handleUserInput()))), this.register(this.optionsService.onMultipleOptionChange(["windowsMode", "windowsPty"], (() => this._handleWindowsPtyOptionChange()))), this.register(this._bufferService.onScroll(((e4) => {
+            super(), this._windowsWrappingHeuristics = this.register(new s2.MutableDisposable()), this._onBinary = this.register(new l.EventEmitter()), this.onBinary = this._onBinary.event, this._onData = this.register(new l.EventEmitter()), this.onData = this._onData.event, this._onLineFeed = this.register(new l.EventEmitter()), this.onLineFeed = this._onLineFeed.event, this._onResize = this.register(new l.EventEmitter()), this.onResize = this._onResize.event, this._onWriteParsed = this.register(new l.EventEmitter()), this.onWriteParsed = this._onWriteParsed.event, this._onScroll = this.register(new l.EventEmitter()), this._instantiationService = new n.InstantiationService(), this.optionsService = this.register(new h.OptionsService(e3)), this._instantiationService.setService(r.IOptionsService, this.optionsService), this._bufferService = this.register(this._instantiationService.createInstance(a.BufferService)), this._instantiationService.setService(r.IBufferService, this._bufferService), this._logService = this.register(this._instantiationService.createInstance(o.LogService)), this._instantiationService.setService(r.ILogService, this._logService), this.coreService = this.register(this._instantiationService.createInstance(c.CoreService)), this._instantiationService.setService(r.ICoreService, this.coreService), this.coreMouseService = this.register(this._instantiationService.createInstance(d.CoreMouseService)), this._instantiationService.setService(r.ICoreMouseService, this.coreMouseService), this.unicodeService = this.register(this._instantiationService.createInstance(_.UnicodeService)), this._instantiationService.setService(r.IUnicodeService, this.unicodeService), this._charsetService = this._instantiationService.createInstance(u.CharsetService), this._instantiationService.setService(r.ICharsetService, this._charsetService), this._oscLinkService = this._instantiationService.createInstance(g.OscLinkService), this._instantiationService.setService(r.IOscLinkService, this._oscLinkService), this._inputHandler = this.register(new v.InputHandler(this._bufferService, this._charsetService, this.coreService, this._logService, this.optionsService, this._oscLinkService, this.coreMouseService, this.unicodeService)), this.register((0, l.forwardEvent)(this._inputHandler.onLineFeed, this._onLineFeed)), this.register(this._inputHandler), this.register((0, l.forwardEvent)(this._bufferService.onResize, this._onResize)), this.register((0, l.forwardEvent)(this.coreService.onData, this._onData)), this.register((0, l.forwardEvent)(this.coreService.onBinary, this._onBinary)), this.register(this.coreService.onRequestScrollToBottom((() => this.scrollToBottom()))), this.register(this.coreService.onUserInput((() => this._writeBuffer.handleUserInput()))), this.register(this.optionsService.onMultipleOptionChange(["windowsMode", "windowsPty"], (() => this._handleWindowsPtyOptionChange()))), this.register(this._bufferService.onScroll(((_e4) => {
               this._onScroll.fire({ position: this._bufferService.buffer.ydisp, source: 0 }), this._inputHandler.markRangeDirty(this._bufferService.buffer.scrollTop, this._bufferService.buffer.scrollBottom);
-            }))), this.register(this._inputHandler.onScroll(((e4) => {
+            }))), this.register(this._inputHandler.onScroll(((_e4) => {
               this._onScroll.fire({ position: this._bufferService.buffer.ydisp, source: 0 }), this._inputHandler.markRangeDirty(this._bufferService.buffer.scrollTop, this._bufferService.buffer.scrollBottom);
             }))), this._writeBuffer = this.register(new p.WriteBuffer(((e4, t3) => this._inputHandler.parse(e4, t3)))), this.register((0, l.forwardEvent)(this._writeBuffer.onWriteParsed, this._onWriteParsed));
           }
@@ -2647,7 +2647,7 @@ WARNING: This link could potentially be dangerous`)) {
           }
         }
         t2.CoreTerminal = S;
-      }, 8460: (e2, t2) => {
+      }, 8460: (_e2, t2) => {
         Object.defineProperty(t2, "__esModule", { value: true }), t2.runAndSubscribe = t2.forwardEvent = t2.EventEmitter = void 0, t2.EventEmitter = class {
           constructor() {
             this._listeners = [], this._disposed = false;
@@ -2675,10 +2675,10 @@ WARNING: This link could potentially be dangerous`)) {
         }, t2.runAndSubscribe = function(e3, t3) {
           return t3(void 0), e3(((e4) => t3(e4)));
         };
-      }, 5435: function(e2, t2, i2) {
+      }, 5435: function(_e2, t2, i2) {
         var s2 = this && this.__decorate || function(e3, t3, i3, s3) {
           var r2, n2 = arguments.length, o2 = n2 < 3 ? t3 : null === s3 ? s3 = Object.getOwnPropertyDescriptor(t3, i3) : s3;
-          if ("object" == typeof Reflect && "function" == typeof Reflect.decorate) o2 = Reflect.decorate(e3, t3, i3, s3);
+          if ("object" === typeof Reflect && "function" === typeof Reflect.decorate) o2 = Reflect.decorate(e3, t3, i3, s3);
           else for (var a2 = e3.length - 1; a2 >= 0; a2--) (r2 = e3[a2]) && (o2 = (n2 < 3 ? r2(o2) : n2 > 3 ? r2(t3, i3, o2) : r2(t3, i3)) || o2);
           return n2 > 3 && o2 && Object.defineProperty(t3, i3, o2), o2;
         }, r = this && this.__param || function(e3, t3) {
@@ -2766,7 +2766,7 @@ WARNING: This link could potentially be dangerous`)) {
             this._parseStack.paused = true, this._parseStack.cursorStartX = e3, this._parseStack.cursorStartY = t3, this._parseStack.decodedLength = i3, this._parseStack.position = s3;
           }
           _logSlowResolvingAsync(e3) {
-            this._logService.logLevel <= v.LogLevelEnum.WARN && Promise.race([e3, new Promise(((e4, t3) => setTimeout((() => t3("#SLOW_TIMEOUT")), 5e3)))]).catch(((e4) => {
+            this._logService.logLevel <= v.LogLevelEnum.WARN && Promise.race([e3, new Promise(((_e4, t3) => setTimeout((() => t3("#SLOW_TIMEOUT")), 5e3)))]).catch(((e4) => {
               if ("#SLOW_TIMEOUT" !== e4) throw e4;
               console.warn("async parser handler taking longer than 5000 ms");
             }));
@@ -2781,12 +2781,12 @@ WARNING: This link could potentially be dangerous`)) {
               if (i3 = this._parser.parse(this._parseBuffer, this._parseStack.decodedLength, t3)) return this._logSlowResolvingAsync(i3), i3;
               s3 = this._parseStack.cursorStartX, r2 = this._parseStack.cursorStartY, this._parseStack.paused = false, e3.length > b && (n2 = this._parseStack.position + b);
             }
-            if (this._logService.logLevel <= v.LogLevelEnum.DEBUG && this._logService.debug("parsing data" + ("string" == typeof e3 ? ` "${e3}"` : ` "${Array.prototype.map.call(e3, ((e4) => String.fromCharCode(e4))).join("")}"`), "string" == typeof e3 ? e3.split("").map(((e4) => e4.charCodeAt(0))) : e3), this._parseBuffer.length < e3.length && this._parseBuffer.length < b && (this._parseBuffer = new Uint32Array(Math.min(e3.length, b))), o2 || this._dirtyRowTracker.clearRange(), e3.length > b) for (let t4 = n2; t4 < e3.length; t4 += b) {
-              const n3 = t4 + b < e3.length ? t4 + b : e3.length, o3 = "string" == typeof e3 ? this._stringDecoder.decode(e3.substring(t4, n3), this._parseBuffer) : this._utf8Decoder.decode(e3.subarray(t4, n3), this._parseBuffer);
+            if (this._logService.logLevel <= v.LogLevelEnum.DEBUG && this._logService.debug("parsing data" + ("string" === typeof e3 ? ` "${e3}"` : ` "${Array.prototype.map.call(e3, ((e4) => String.fromCharCode(e4))).join("")}"`), "string" === typeof e3 ? e3.split("").map(((e4) => e4.charCodeAt(0))) : e3), this._parseBuffer.length < e3.length && this._parseBuffer.length < b && (this._parseBuffer = new Uint32Array(Math.min(e3.length, b))), o2 || this._dirtyRowTracker.clearRange(), e3.length > b) for (let t4 = n2; t4 < e3.length; t4 += b) {
+              const n3 = t4 + b < e3.length ? t4 + b : e3.length, o3 = "string" === typeof e3 ? this._stringDecoder.decode(e3.substring(t4, n3), this._parseBuffer) : this._utf8Decoder.decode(e3.subarray(t4, n3), this._parseBuffer);
               if (i3 = this._parser.parse(this._parseBuffer, o3)) return this._preserveStack(s3, r2, o3, t4), this._logSlowResolvingAsync(i3), i3;
             }
             else if (!o2) {
-              const t4 = "string" == typeof e3 ? this._stringDecoder.decode(e3, this._parseBuffer) : this._utf8Decoder.decode(e3, this._parseBuffer);
+              const t4 = "string" === typeof e3 ? this._stringDecoder.decode(e3, this._parseBuffer) : this._utf8Decoder.decode(e3, this._parseBuffer);
               if (i3 = this._parser.parse(this._parseBuffer, t4)) return this._preserveStack(s3, r2, t4, 0), this._logSlowResolvingAsync(i3), i3;
             }
             this._activeBuffer.x === s3 && this._activeBuffer.y === r2 || this._onCursorMove.fire();
@@ -3295,7 +3295,7 @@ WARNING: This link could potentially be dangerous`)) {
             }
             return true;
           }
-          softReset(e3) {
+          softReset(_e3) {
             return this._coreService.isCursorHidden = false, this._onRequestSyncScrollBar.fire(), this._activeBuffer.scrollTop = 0, this._activeBuffer.scrollBottom = this._bufferService.rows - 1, this._curAttrData = l.DEFAULT_ATTR_DATA.clone(), this._coreService.reset(), this._charsetService.reset(), this._activeBuffer.savedX = 0, this._activeBuffer.savedY = this._activeBuffer.ybase, this._activeBuffer.savedCurAttrData.fg = this._curAttrData.fg, this._activeBuffer.savedCurAttrData.bg = this._curAttrData.bg, this._activeBuffer.savedCharset = this._charsetService.charset, this._coreService.decPrivateModes.origin = false, true;
           }
           setCursorStyle(e3) {
@@ -3313,7 +3313,7 @@ WARNING: This link could potentially be dangerous`)) {
               case 6:
                 this._optionsService.options.cursorStyle = "bar";
             }
-            const i3 = t3 % 2 == 1;
+            const i3 = t3 % 2 === 1;
             return this._optionsService.options.cursorBlink = i3, true;
           }
           setScrollRegion(e3) {
@@ -3342,10 +3342,10 @@ WARNING: This link could potentially be dangerous`)) {
             }
             return true;
           }
-          saveCursor(e3) {
+          saveCursor(_e3) {
             return this._activeBuffer.savedX = this._activeBuffer.x, this._activeBuffer.savedY = this._activeBuffer.ybase + this._activeBuffer.y, this._activeBuffer.savedCurAttrData.fg = this._curAttrData.fg, this._activeBuffer.savedCurAttrData.bg = this._curAttrData.bg, this._activeBuffer.savedCharset = this._charsetService.charset, true;
           }
-          restoreCursor(e3) {
+          restoreCursor(_e3) {
             return this._activeBuffer.x = this._activeBuffer.savedX || 0, this._activeBuffer.y = Math.max(this._activeBuffer.savedY - this._activeBuffer.ybase, 0), this._curAttrData.fg = this._activeBuffer.savedCurAttrData.fg, this._curAttrData.bg = this._activeBuffer.savedCurAttrData.bg, this._charsetService.charset = this._savedCharset, this._activeBuffer.savedCharset && (this._charsetService.charset = this._activeBuffer.savedCharset), this._restrictCursor(), true;
           }
           setTitle(e3) {
@@ -3359,7 +3359,7 @@ WARNING: This link could potentially be dangerous`)) {
             for (; i3.length > 1; ) {
               const e4 = i3.shift(), s3 = i3.shift();
               if (/^\d+$/.exec(e4)) {
-                const i4 = parseInt(e4);
+                const i4 = parseInt(e4, 10);
                 if (D(i4)) if ("?" === s3) t3.push({ type: 0, index: i4 });
                 else {
                   const e5 = (0, S.parseColor)(s3);
@@ -3405,18 +3405,18 @@ WARNING: This link could potentially be dangerous`)) {
             if (!e3) return this._onColor.fire([{ type: 2 }]), true;
             const t3 = [], i3 = e3.split(";");
             for (let e4 = 0; e4 < i3.length; ++e4) if (/^\d+$/.exec(i3[e4])) {
-              const s3 = parseInt(i3[e4]);
+              const s3 = parseInt(i3[e4], 10);
               D(s3) && t3.push({ type: 2, index: s3 });
             }
             return t3.length && this._onColor.fire(t3), true;
           }
-          restoreFgColor(e3) {
+          restoreFgColor(_e3) {
             return this._onColor.fire([{ type: 2, index: 256 }]), true;
           }
-          restoreBgColor(e3) {
+          restoreBgColor(_e3) {
             return this._onColor.fire([{ type: 2, index: 257 }]), true;
           }
-          restoreCursorColor(e3) {
+          restoreCursorColor(_e3) {
             return this._onColor.fire([{ type: 2, index: 258 }]), true;
           }
           nextLine() {
@@ -3468,7 +3468,7 @@ WARNING: This link could potentially be dangerous`)) {
             }
             return this._dirtyRowTracker.markAllDirty(), this._setCursor(0, 0), true;
           }
-          requestStatusString(e3, t3) {
+          requestStatusString(e3, _t3) {
             const i3 = this._bufferService.buffer, s3 = this._optionsService.rawOptions;
             return ((e4) => (this._coreService.triggerDataEvent(`${n.C0.ESC}${e4}${n.C0.ESC}\\`), true))('"q' === e3 ? `P1$r${this._curAttrData.isProtected() ? 1 : 0}"q` : '"p' === e3 ? 'P1$r61;1"p' : "r" === e3 ? `P1$r${i3.scrollTop + 1};${i3.scrollBottom + 1}r` : "m" === e3 ? "P1$r0m" : " q" === e3 ? `P1$r${{ block: 2, underline: 4, bar: 6 }[s3.cursorStyle] - (s3.cursorBlink ? 1 : 0)} q` : "P0$r");
           }
@@ -3498,7 +3498,7 @@ WARNING: This link could potentially be dangerous`)) {
           return 0 <= e3 && e3 < 256;
         }
         L = s2([r(0, v.IBufferService)], L);
-      }, 844: (e2, t2) => {
+      }, 844: (_e2, t2) => {
         function i2(e3) {
           for (const t3 of e3) t3.dispose();
           e3.length = 0;
@@ -3542,7 +3542,7 @@ WARNING: This link could potentially be dangerous`)) {
         }, t2.disposeArray = i2, t2.getDisposeArrayDisposable = function(e3) {
           return { dispose: () => i2(e3) };
         };
-      }, 1505: (e2, t2) => {
+      }, 1505: (_e2, t2) => {
         Object.defineProperty(t2, "__esModule", { value: true }), t2.FourKeyMap = t2.TwoKeyMap = void 0;
         class i2 {
           constructor() {
@@ -3573,15 +3573,15 @@ WARNING: This link could potentially be dangerous`)) {
             this._data.clear();
           }
         };
-      }, 6114: (e2, t2) => {
-        Object.defineProperty(t2, "__esModule", { value: true }), t2.isChromeOS = t2.isLinux = t2.isWindows = t2.isIphone = t2.isIpad = t2.isMac = t2.getSafariVersion = t2.isSafari = t2.isLegacyEdge = t2.isFirefox = t2.isNode = void 0, t2.isNode = "undefined" != typeof process && "title" in process;
+      }, 6114: (_e2, t2) => {
+        Object.defineProperty(t2, "__esModule", { value: true }), t2.isChromeOS = t2.isLinux = t2.isWindows = t2.isIphone = t2.isIpad = t2.isMac = t2.getSafariVersion = t2.isSafari = t2.isLegacyEdge = t2.isFirefox = t2.isNode = void 0, t2.isNode = "undefined" !== typeof process && "title" in process;
         const i2 = t2.isNode ? "node" : navigator.userAgent, s2 = t2.isNode ? "node" : navigator.platform;
         t2.isFirefox = i2.includes("Firefox"), t2.isLegacyEdge = i2.includes("Edge"), t2.isSafari = /^((?!chrome|android).)*safari/i.test(i2), t2.getSafariVersion = function() {
           if (!t2.isSafari) return 0;
           const e3 = i2.match(/Version\/(\d+)/);
-          return null === e3 || e3.length < 2 ? 0 : parseInt(e3[1]);
+          return null === e3 || e3.length < 2 ? 0 : parseInt(e3[1], 10);
         }, t2.isMac = ["Macintosh", "MacIntel", "MacPPC", "Mac68K"].includes(s2), t2.isIpad = "iPad" === s2, t2.isIphone = "iPhone" === s2, t2.isWindows = ["Windows", "Win16", "Win32", "WinCE"].includes(s2), t2.isLinux = s2.indexOf("Linux") >= 0, t2.isChromeOS = /\bCrOS\b/.test(i2);
-      }, 6106: (e2, t2) => {
+      }, 6106: (_e2, t2) => {
         Object.defineProperty(t2, "__esModule", { value: true }), t2.SortedList = void 0;
         let i2 = 0;
         t2.SortedList = class {
@@ -3635,7 +3635,7 @@ WARNING: This link could potentially be dangerous`)) {
             return t3;
           }
         };
-      }, 7226: (e2, t2, i2) => {
+      }, 7226: (_e2, t2, i2) => {
         Object.defineProperty(t2, "__esModule", { value: true }), t2.DebouncedIdleTask = t2.IdleTaskQueue = t2.PriorityTaskQueue = void 0;
         const s2 = i2(6114);
         class r {
@@ -3695,14 +3695,14 @@ WARNING: This link could potentially be dangerous`)) {
             this._queue.flush();
           }
         };
-      }, 9282: (e2, t2, i2) => {
+      }, 9282: (_e2, t2, i2) => {
         Object.defineProperty(t2, "__esModule", { value: true }), t2.updateWindowsModeWrappedState = void 0;
         const s2 = i2(643);
         t2.updateWindowsModeWrappedState = function(e3) {
           const t3 = e3.buffer.lines.get(e3.buffer.ybase + e3.buffer.y - 1), i3 = t3 == null ? void 0 : t3.get(e3.cols - 1), r = e3.buffer.lines.get(e3.buffer.ybase + e3.buffer.y);
           r && i3 && (r.isWrapped = i3[s2.CHAR_DATA_CODE_INDEX] !== s2.NULL_CELL_CODE && i3[s2.CHAR_DATA_CODE_INDEX] !== s2.WHITESPACE_CELL_CODE);
         };
-      }, 3734: (e2, t2) => {
+      }, 3734: (_e2, t2) => {
         Object.defineProperty(t2, "__esModule", { value: true }), t2.ExtendedAttrs = t2.AttributeData = void 0;
         class i2 {
           constructor() {
@@ -3755,22 +3755,22 @@ WARNING: This link could potentially be dangerous`)) {
             return 50331648 & this.bg;
           }
           isFgRGB() {
-            return 50331648 == (50331648 & this.fg);
+            return 50331648 === (50331648 & this.fg);
           }
           isBgRGB() {
-            return 50331648 == (50331648 & this.bg);
+            return 50331648 === (50331648 & this.bg);
           }
           isFgPalette() {
-            return 16777216 == (50331648 & this.fg) || 33554432 == (50331648 & this.fg);
+            return 16777216 === (50331648 & this.fg) || 33554432 === (50331648 & this.fg);
           }
           isBgPalette() {
-            return 16777216 == (50331648 & this.bg) || 33554432 == (50331648 & this.bg);
+            return 16777216 === (50331648 & this.bg) || 33554432 === (50331648 & this.bg);
           }
           isFgDefault() {
-            return 0 == (50331648 & this.fg);
+            return 0 === (50331648 & this.fg);
           }
           isBgDefault() {
-            return 0 == (50331648 & this.bg);
+            return 0 === (50331648 & this.bg);
           }
           isAttributeDefault() {
             return 0 === this.fg && 0 === this.bg;
@@ -3819,13 +3819,13 @@ WARNING: This link could potentially be dangerous`)) {
             return 268435456 & this.bg && ~this.extended.underlineColor ? 50331648 & this.extended.underlineColor : this.getFgColorMode();
           }
           isUnderlineColorRGB() {
-            return 268435456 & this.bg && ~this.extended.underlineColor ? 50331648 == (50331648 & this.extended.underlineColor) : this.isFgRGB();
+            return 268435456 & this.bg && ~this.extended.underlineColor ? 50331648 === (50331648 & this.extended.underlineColor) : this.isFgRGB();
           }
           isUnderlineColorPalette() {
-            return 268435456 & this.bg && ~this.extended.underlineColor ? 16777216 == (50331648 & this.extended.underlineColor) || 33554432 == (50331648 & this.extended.underlineColor) : this.isFgPalette();
+            return 268435456 & this.bg && ~this.extended.underlineColor ? 16777216 === (50331648 & this.extended.underlineColor) || 33554432 === (50331648 & this.extended.underlineColor) : this.isFgPalette();
           }
           isUnderlineColorDefault() {
-            return 268435456 & this.bg && ~this.extended.underlineColor ? 0 == (50331648 & this.extended.underlineColor) : this.isFgDefault();
+            return 268435456 & this.bg && ~this.extended.underlineColor ? 0 === (50331648 & this.extended.underlineColor) : this.isFgDefault();
           }
           getUnderlineStyle() {
             return 268435456 & this.fg ? 268435456 & this.bg ? this.extended.underlineStyle : 1 : 0;
@@ -3878,7 +3878,7 @@ WARNING: This link could potentially be dangerous`)) {
           }
         }
         t2.ExtendedAttrs = s2;
-      }, 9092: (e2, t2, i2) => {
+      }, 9092: (_e2, t2, i2) => {
         Object.defineProperty(t2, "__esModule", { value: true }), t2.Buffer = t2.MAX_BUFFER_SIZE = void 0;
         const s2 = i2(6349), r = i2(7226), n = i2(3734), o = i2(8437), a = i2(4634), h = i2(511), c = i2(643), l = i2(4863), d = i2(7116);
         t2.MAX_BUFFER_SIZE = 4294967295, t2.Buffer = class {
@@ -4059,7 +4059,7 @@ WARNING: This link could potentially be dangerous`)) {
             this._isClearing || this.markers.splice(this.markers.indexOf(e3), 1);
           }
         };
-      }, 8437: (e2, t2, i2) => {
+      }, 8437: (_e2, t2, i2) => {
         Object.defineProperty(t2, "__esModule", { value: true }), t2.BufferLine = t2.DEFAULT_ATTR_DATA = void 0;
         const s2 = i2(3734), r = i2(511), n = i2(643), o = i2(482);
         t2.DEFAULT_ATTR_DATA = Object.freeze(new s2.AttributeData());
@@ -4229,12 +4229,12 @@ WARNING: This link could potentially be dangerous`)) {
           }
         }
         t2.BufferLine = h;
-      }, 4841: (e2, t2) => {
+      }, 4841: (_e2, t2) => {
         Object.defineProperty(t2, "__esModule", { value: true }), t2.getRangeLength = void 0, t2.getRangeLength = function(e3, t3) {
           if (e3.start.y > e3.end.y) throw new Error(`Buffer range end (${e3.end.x}, ${e3.end.y}) cannot be before start (${e3.start.x}, ${e3.start.y})`);
           return t3 * (e3.end.y - e3.start.y) + (e3.end.x - e3.start.x + 1);
         };
-      }, 4634: (e2, t2) => {
+      }, 4634: (_e2, t2) => {
         function i2(e3, t3, i3) {
           if (t3 === e3.length - 1) return e3[t3].getTrimmedLength();
           const s2 = !e3[t3].hasContent(i3 - 1) && 1 === e3[t3].getWidth(i3 - 1), r = 2 === e3[t3 + 1].getWidth(0);
@@ -4276,7 +4276,7 @@ WARNING: This link could potentially be dangerous`)) {
           for (let t4 = 0; t4 < i3.length; t4++) e3.set(t4, i3[t4]);
           e3.length = t3.length;
         }, t2.reflowSmallerGetNewLineLengths = function(e3, t3, s2) {
-          const r = [], n = e3.map(((s3, r2) => i2(e3, r2, t3))).reduce(((e4, t4) => e4 + t4));
+          const r = [], n = e3.map(((_s3, r2) => i2(e3, r2, t3))).reduce(((e4, t4) => e4 + t4));
           let o = 0, a = 0, h = 0;
           for (; h < n; ) {
             if (n - h < s2) {
@@ -4293,7 +4293,7 @@ WARNING: This link could potentially be dangerous`)) {
           }
           return r;
         }, t2.getWrappedLineTrimmedLength = i2;
-      }, 5295: (e2, t2, i2) => {
+      }, 5295: (_e2, t2, i2) => {
         Object.defineProperty(t2, "__esModule", { value: true }), t2.BufferSet = void 0;
         const s2 = i2(8460), r = i2(844), n = i2(9092);
         class o extends r.Disposable {
@@ -4326,7 +4326,7 @@ WARNING: This link could potentially be dangerous`)) {
           }
         }
         t2.BufferSet = o;
-      }, 511: (e2, t2, i2) => {
+      }, 511: (_e2, t2, i2) => {
         Object.defineProperty(t2, "__esModule", { value: true }), t2.CellData = void 0;
         const s2 = i2(482), r = i2(643), n = i2(3734);
         class o extends n.AttributeData {
@@ -4367,9 +4367,9 @@ WARNING: This link could potentially be dangerous`)) {
           }
         }
         t2.CellData = o;
-      }, 643: (e2, t2) => {
+      }, 643: (_e2, t2) => {
         Object.defineProperty(t2, "__esModule", { value: true }), t2.WHITESPACE_CELL_CODE = t2.WHITESPACE_CELL_WIDTH = t2.WHITESPACE_CELL_CHAR = t2.NULL_CELL_CODE = t2.NULL_CELL_WIDTH = t2.NULL_CELL_CHAR = t2.CHAR_DATA_CODE_INDEX = t2.CHAR_DATA_WIDTH_INDEX = t2.CHAR_DATA_CHAR_INDEX = t2.CHAR_DATA_ATTR_INDEX = t2.DEFAULT_EXT = t2.DEFAULT_ATTR = t2.DEFAULT_COLOR = void 0, t2.DEFAULT_COLOR = 0, t2.DEFAULT_ATTR = 256 | t2.DEFAULT_COLOR << 9, t2.DEFAULT_EXT = 0, t2.CHAR_DATA_ATTR_INDEX = 0, t2.CHAR_DATA_CHAR_INDEX = 1, t2.CHAR_DATA_WIDTH_INDEX = 2, t2.CHAR_DATA_CODE_INDEX = 3, t2.NULL_CELL_CHAR = "", t2.NULL_CELL_WIDTH = 1, t2.NULL_CELL_CODE = 0, t2.WHITESPACE_CELL_CHAR = " ", t2.WHITESPACE_CELL_WIDTH = 1, t2.WHITESPACE_CELL_CODE = 32;
-      }, 4863: (e2, t2, i2) => {
+      }, 4863: (_e2, t2, i2) => {
         Object.defineProperty(t2, "__esModule", { value: true }), t2.Marker = void 0;
         const s2 = i2(8460), r = i2(844);
         class n {
@@ -4387,9 +4387,9 @@ WARNING: This link could potentially be dangerous`)) {
           }
         }
         t2.Marker = n, n._nextId = 1;
-      }, 7116: (e2, t2) => {
+      }, 7116: (_e2, t2) => {
         Object.defineProperty(t2, "__esModule", { value: true }), t2.DEFAULT_CHARSET = t2.CHARSETS = void 0, t2.CHARSETS = {}, t2.DEFAULT_CHARSET = t2.CHARSETS.B, t2.CHARSETS[0] = { "`": "\u25C6", a: "\u2592", b: "\u2409", c: "\u240C", d: "\u240D", e: "\u240A", f: "\xB0", g: "\xB1", h: "\u2424", i: "\u240B", j: "\u2518", k: "\u2510", l: "\u250C", m: "\u2514", n: "\u253C", o: "\u23BA", p: "\u23BB", q: "\u2500", r: "\u23BC", s: "\u23BD", t: "\u251C", u: "\u2524", v: "\u2534", w: "\u252C", x: "\u2502", y: "\u2264", z: "\u2265", "{": "\u03C0", "|": "\u2260", "}": "\xA3", "~": "\xB7" }, t2.CHARSETS.A = { "#": "\xA3" }, t2.CHARSETS.B = void 0, t2.CHARSETS[4] = { "#": "\xA3", "@": "\xBE", "[": "ij", "\\": "\xBD", "]": "|", "{": "\xA8", "|": "f", "}": "\xBC", "~": "\xB4" }, t2.CHARSETS.C = t2.CHARSETS[5] = { "[": "\xC4", "\\": "\xD6", "]": "\xC5", "^": "\xDC", "`": "\xE9", "{": "\xE4", "|": "\xF6", "}": "\xE5", "~": "\xFC" }, t2.CHARSETS.R = { "#": "\xA3", "@": "\xE0", "[": "\xB0", "\\": "\xE7", "]": "\xA7", "{": "\xE9", "|": "\xF9", "}": "\xE8", "~": "\xA8" }, t2.CHARSETS.Q = { "@": "\xE0", "[": "\xE2", "\\": "\xE7", "]": "\xEA", "^": "\xEE", "`": "\xF4", "{": "\xE9", "|": "\xF9", "}": "\xE8", "~": "\xFB" }, t2.CHARSETS.K = { "@": "\xA7", "[": "\xC4", "\\": "\xD6", "]": "\xDC", "{": "\xE4", "|": "\xF6", "}": "\xFC", "~": "\xDF" }, t2.CHARSETS.Y = { "#": "\xA3", "@": "\xA7", "[": "\xB0", "\\": "\xE7", "]": "\xE9", "`": "\xF9", "{": "\xE0", "|": "\xF2", "}": "\xE8", "~": "\xEC" }, t2.CHARSETS.E = t2.CHARSETS[6] = { "@": "\xC4", "[": "\xC6", "\\": "\xD8", "]": "\xC5", "^": "\xDC", "`": "\xE4", "{": "\xE6", "|": "\xF8", "}": "\xE5", "~": "\xFC" }, t2.CHARSETS.Z = { "#": "\xA3", "@": "\xA7", "[": "\xA1", "\\": "\xD1", "]": "\xBF", "{": "\xB0", "|": "\xF1", "}": "\xE7" }, t2.CHARSETS.H = t2.CHARSETS[7] = { "@": "\xC9", "[": "\xC4", "\\": "\xD6", "]": "\xC5", "^": "\xDC", "`": "\xE9", "{": "\xE4", "|": "\xF6", "}": "\xE5", "~": "\xFC" }, t2.CHARSETS["="] = { "#": "\xF9", "@": "\xE0", "[": "\xE9", "\\": "\xE7", "]": "\xEA", "^": "\xEE", _: "\xE8", "`": "\xF4", "{": "\xE4", "|": "\xF6", "}": "\xFC", "~": "\xFB" };
-      }, 2584: (e2, t2) => {
+      }, 2584: (_e2, t2) => {
         var i2, s2, r;
         Object.defineProperty(t2, "__esModule", { value: true }), t2.C1_ESCAPED = t2.C1 = t2.C0 = void 0, (function(e3) {
           e3.NUL = "\0", e3.SOH = "", e3.STX = "", e3.ETX = "", e3.EOT = "", e3.ENQ = "", e3.ACK = "", e3.BEL = "\x07", e3.BS = "\b", e3.HT = "	", e3.LF = "\n", e3.VT = "\v", e3.FF = "\f", e3.CR = "\r", e3.SO = "", e3.SI = "", e3.DLE = "", e3.DC1 = "", e3.DC2 = "", e3.DC3 = "", e3.DC4 = "", e3.NAK = "", e3.SYN = "", e3.ETB = "", e3.CAN = "", e3.EM = "", e3.SUB = "", e3.ESC = "\x1B", e3.FS = "", e3.GS = "", e3.RS = "", e3.US = "", e3.SP = " ", e3.DEL = "\x7F";
@@ -4398,7 +4398,7 @@ WARNING: This link could potentially be dangerous`)) {
         })(s2 || (t2.C1 = s2 = {})), (function(e3) {
           e3.ST = `${i2.ESC}\\`;
         })(r || (t2.C1_ESCAPED = r = {}));
-      }, 7399: (e2, t2, i2) => {
+      }, 7399: (_e2, t2, i2) => {
         Object.defineProperty(t2, "__esModule", { value: true }), t2.evaluateKeyboardEvent = void 0;
         const s2 = i2(2584), r = { 48: ["0", ")"], 49: ["1", "!"], 50: ["2", "@"], 51: ["3", "#"], 52: ["4", "$"], 53: ["5", "%"], 54: ["6", "^"], 55: ["7", "&"], 56: ["8", "*"], 57: ["9", "("], 186: [";", ":"], 187: ["=", "+"], 188: [",", "<"], 189: ["-", "_"], 190: [".", ">"], 191: ["/", "?"], 192: ["`", "~"], 219: ["[", "{"], 220: ["\\", "|"], 221: ["]", "}"], 222: ["'", '"'] };
         t2.evaluateKeyboardEvent = function(e3, t3, i3, n) {
@@ -4512,7 +4512,7 @@ WARNING: This link could potentially be dangerous`)) {
           }
           return o;
         };
-      }, 482: (e2, t2) => {
+      }, 482: (_e2, t2) => {
         Object.defineProperty(t2, "__esModule", { value: true }), t2.Utf8ToUtf32 = t2.StringToUtf32 = t2.utf32ToString = t2.stringFromCodePoint = void 0, t2.stringFromCodePoint = function(e3) {
           return e3 > 65535 ? (e3 -= 65536, String.fromCharCode(55296 + (e3 >> 10)) + String.fromCharCode(e3 % 1024 + 56320)) : String.fromCharCode(e3);
         }, t2.utf32ToString = function(e3, t3 = 0, i2 = e3.length) {
@@ -4560,13 +4560,13 @@ WARNING: This link could potentially be dangerous`)) {
             let s2, r, n, o, a = 0, h = 0, c = 0;
             if (this.interim[0]) {
               let s3 = false, r2 = this.interim[0];
-              r2 &= 192 == (224 & r2) ? 31 : 224 == (240 & r2) ? 15 : 7;
+              r2 &= 192 === (224 & r2) ? 31 : 224 === (240 & r2) ? 15 : 7;
               let n2, o2 = 0;
               for (; (n2 = 63 & this.interim[++o2]) && o2 < 4; ) r2 <<= 6, r2 |= n2;
-              const h2 = 192 == (224 & this.interim[0]) ? 2 : 224 == (240 & this.interim[0]) ? 3 : 4, l2 = h2 - o2;
+              const h2 = 192 === (224 & this.interim[0]) ? 2 : 224 === (240 & this.interim[0]) ? 3 : 4, l2 = h2 - o2;
               for (; c < l2; ) {
                 if (c >= i2) return 0;
-                if (n2 = e3[c++], 128 != (192 & n2)) {
+                if (n2 = e3[c++], 128 !== (192 & n2)) {
                   c--, s3 = true;
                   break;
                 }
@@ -4579,9 +4579,9 @@ WARNING: This link could potentially be dangerous`)) {
             for (; d < i2; ) {
               for (; !(!(d < l) || 128 & (s2 = e3[d]) || 128 & (r = e3[d + 1]) || 128 & (n = e3[d + 2]) || 128 & (o = e3[d + 3])); ) t3[a++] = s2, t3[a++] = r, t3[a++] = n, t3[a++] = o, d += 4;
               if (s2 = e3[d++], s2 < 128) t3[a++] = s2;
-              else if (192 == (224 & s2)) {
+              else if (192 === (224 & s2)) {
                 if (d >= i2) return this.interim[0] = s2, a;
-                if (r = e3[d++], 128 != (192 & r)) {
+                if (r = e3[d++], 128 !== (192 & r)) {
                   d--;
                   continue;
                 }
@@ -4590,32 +4590,32 @@ WARNING: This link could potentially be dangerous`)) {
                   continue;
                 }
                 t3[a++] = h;
-              } else if (224 == (240 & s2)) {
+              } else if (224 === (240 & s2)) {
                 if (d >= i2) return this.interim[0] = s2, a;
-                if (r = e3[d++], 128 != (192 & r)) {
+                if (r = e3[d++], 128 !== (192 & r)) {
                   d--;
                   continue;
                 }
                 if (d >= i2) return this.interim[0] = s2, this.interim[1] = r, a;
-                if (n = e3[d++], 128 != (192 & n)) {
+                if (n = e3[d++], 128 !== (192 & n)) {
                   d--;
                   continue;
                 }
                 if (h = (15 & s2) << 12 | (63 & r) << 6 | 63 & n, h < 2048 || h >= 55296 && h <= 57343 || 65279 === h) continue;
                 t3[a++] = h;
-              } else if (240 == (248 & s2)) {
+              } else if (240 === (248 & s2)) {
                 if (d >= i2) return this.interim[0] = s2, a;
-                if (r = e3[d++], 128 != (192 & r)) {
+                if (r = e3[d++], 128 !== (192 & r)) {
                   d--;
                   continue;
                 }
                 if (d >= i2) return this.interim[0] = s2, this.interim[1] = r, a;
-                if (n = e3[d++], 128 != (192 & n)) {
+                if (n = e3[d++], 128 !== (192 & n)) {
                   d--;
                   continue;
                 }
                 if (d >= i2) return this.interim[0] = s2, this.interim[1] = r, this.interim[2] = n, a;
-                if (o = e3[d++], 128 != (192 & o)) {
+                if (o = e3[d++], 128 !== (192 & o)) {
                   d--;
                   continue;
                 }
@@ -4626,7 +4626,7 @@ WARNING: This link could potentially be dangerous`)) {
             return a;
           }
         };
-      }, 225: (e2, t2, i2) => {
+      }, 225: (_e2, t2, i2) => {
         Object.defineProperty(t2, "__esModule", { value: true }), t2.UnicodeV6 = void 0;
         const s2 = i2(1480), r = [[768, 879], [1155, 1158], [1160, 1161], [1425, 1469], [1471, 1471], [1473, 1474], [1476, 1477], [1479, 1479], [1536, 1539], [1552, 1557], [1611, 1630], [1648, 1648], [1750, 1764], [1767, 1768], [1770, 1773], [1807, 1807], [1809, 1809], [1840, 1866], [1958, 1968], [2027, 2035], [2305, 2306], [2364, 2364], [2369, 2376], [2381, 2381], [2385, 2388], [2402, 2403], [2433, 2433], [2492, 2492], [2497, 2500], [2509, 2509], [2530, 2531], [2561, 2562], [2620, 2620], [2625, 2626], [2631, 2632], [2635, 2637], [2672, 2673], [2689, 2690], [2748, 2748], [2753, 2757], [2759, 2760], [2765, 2765], [2786, 2787], [2817, 2817], [2876, 2876], [2879, 2879], [2881, 2883], [2893, 2893], [2902, 2902], [2946, 2946], [3008, 3008], [3021, 3021], [3134, 3136], [3142, 3144], [3146, 3149], [3157, 3158], [3260, 3260], [3263, 3263], [3270, 3270], [3276, 3277], [3298, 3299], [3393, 3395], [3405, 3405], [3530, 3530], [3538, 3540], [3542, 3542], [3633, 3633], [3636, 3642], [3655, 3662], [3761, 3761], [3764, 3769], [3771, 3772], [3784, 3789], [3864, 3865], [3893, 3893], [3895, 3895], [3897, 3897], [3953, 3966], [3968, 3972], [3974, 3975], [3984, 3991], [3993, 4028], [4038, 4038], [4141, 4144], [4146, 4146], [4150, 4151], [4153, 4153], [4184, 4185], [4448, 4607], [4959, 4959], [5906, 5908], [5938, 5940], [5970, 5971], [6002, 6003], [6068, 6069], [6071, 6077], [6086, 6086], [6089, 6099], [6109, 6109], [6155, 6157], [6313, 6313], [6432, 6434], [6439, 6440], [6450, 6450], [6457, 6459], [6679, 6680], [6912, 6915], [6964, 6964], [6966, 6970], [6972, 6972], [6978, 6978], [7019, 7027], [7616, 7626], [7678, 7679], [8203, 8207], [8234, 8238], [8288, 8291], [8298, 8303], [8400, 8431], [12330, 12335], [12441, 12442], [43014, 43014], [43019, 43019], [43045, 43046], [64286, 64286], [65024, 65039], [65056, 65059], [65279, 65279], [65529, 65531]], n = [[68097, 68099], [68101, 68102], [68108, 68111], [68152, 68154], [68159, 68159], [119143, 119145], [119155, 119170], [119173, 119179], [119210, 119213], [119362, 119364], [917505, 917505], [917536, 917631], [917760, 917999]];
         let o;
@@ -4658,7 +4658,7 @@ WARNING: This link could potentially be dangerous`)) {
             return s2.UnicodeService.createPropertyValue(0, i3, r2);
           }
         };
-      }, 5981: (e2, t2, i2) => {
+      }, 5981: (_e2, t2, i2) => {
         Object.defineProperty(t2, "__esModule", { value: true }), t2.WriteBuffer = void 0;
         const s2 = i2(8460), r = i2(844);
         class n extends r.Disposable {
@@ -4704,7 +4704,7 @@ WARNING: This link could potentially be dangerous`)) {
           }
         }
         t2.WriteBuffer = n;
-      }, 5941: (e2, t2) => {
+      }, 5941: (_e2, t2) => {
         Object.defineProperty(t2, "__esModule", { value: true }), t2.toRgbString = t2.parseColor = void 0;
         const i2 = /^([\da-f])\/([\da-f])\/([\da-f])$|^([\da-f]{2})\/([\da-f]{2})\/([\da-f]{2})$|^([\da-f]{3})\/([\da-f]{3})\/([\da-f]{3})$|^([\da-f]{4})\/([\da-f]{4})\/([\da-f]{4})$/, s2 = /^[\da-f]+$/;
         function r(e3, t3) {
@@ -4742,9 +4742,9 @@ WARNING: This link could potentially be dangerous`)) {
           const [i3, s3, n] = e3;
           return `rgb:${r(i3, t3)}/${r(s3, t3)}/${r(n, t3)}`;
         };
-      }, 5770: (e2, t2) => {
+      }, 5770: (_e2, t2) => {
         Object.defineProperty(t2, "__esModule", { value: true }), t2.PAYLOAD_LIMIT = void 0, t2.PAYLOAD_LIMIT = 1e7;
-      }, 6351: (e2, t2, i2) => {
+      }, 6351: (_e2, t2, i2) => {
         Object.defineProperty(t2, "__esModule", { value: true }), t2.DcsHandler = t2.DcsParser = void 0;
         const s2 = i2(482), r = i2(8742), n = i2(5770), o = [];
         t2.DcsParser = class {
@@ -4812,7 +4812,7 @@ WARNING: This link could potentially be dangerous`)) {
             return this._params = a, this._data = "", this._hitLimit = false, t3;
           }
         };
-      }, 2015: (e2, t2, i2) => {
+      }, 2015: (_e2, t2, i2) => {
         Object.defineProperty(t2, "__esModule", { value: true }), t2.EscapeSequenceParser = t2.VT500_TRANSITION_TABLE = t2.TransitionTable = void 0;
         const s2 = i2(844), r = i2(8742), n = i2(6242), o = i2(6351);
         class a {
@@ -4832,7 +4832,7 @@ WARNING: This link could potentially be dangerous`)) {
         t2.TransitionTable = a;
         const h = 160;
         t2.VT500_TRANSITION_TABLE = (function() {
-          const e3 = new a(4095), t3 = Array.apply(null, Array(256)).map(((e4, t4) => t4)), i3 = (e4, i4) => t3.slice(e4, i4), s3 = i3(32, 127), r2 = i3(0, 24);
+          const e3 = new a(4095), t3 = Array.apply(null, Array(256)).map(((_e4, t4) => t4)), i3 = (e4, i4) => t3.slice(e4, i4), s3 = i3(32, 127), r2 = i3(0, 24);
           r2.push(25), r2.push.apply(r2, i3(28, 32));
           const n2 = i3(0, 14);
           let o2;
@@ -4841,10 +4841,10 @@ WARNING: This link could potentially be dangerous`)) {
         })();
         class c extends s2.Disposable {
           constructor(e3 = t2.VT500_TRANSITION_TABLE) {
-            super(), this._transitions = e3, this._parseStack = { state: 0, handlers: [], handlerPos: 0, transition: 0, chunkPos: 0 }, this.initialState = 0, this.currentState = this.initialState, this._params = new r.Params(), this._params.addParam(0), this._collect = 0, this.precedingJoinState = 0, this._printHandlerFb = (e4, t3, i3) => {
-            }, this._executeHandlerFb = (e4) => {
-            }, this._csiHandlerFb = (e4, t3) => {
-            }, this._escHandlerFb = (e4) => {
+            super(), this._transitions = e3, this._parseStack = { state: 0, handlers: [], handlerPos: 0, transition: 0, chunkPos: 0 }, this.initialState = 0, this.currentState = this.initialState, this._params = new r.Params(), this._params.addParam(0), this._collect = 0, this.precedingJoinState = 0, this._printHandlerFb = (_e4, _t3, _i3) => {
+            }, this._executeHandlerFb = (_e4) => {
+            }, this._csiHandlerFb = (_e4, _t3) => {
+            }, this._escHandlerFb = (_e4) => {
             }, this._errorHandlerFb = (e4) => e4, this._printHandler = this._printHandlerFb, this._executeHandlers = /* @__PURE__ */ Object.create(null), this._csiHandlers = /* @__PURE__ */ Object.create(null), this._escHandlers = /* @__PURE__ */ Object.create(null), this.register((0, s2.toDisposable)((() => {
               this._csiHandlers = /* @__PURE__ */ Object.create(null), this._executeHandlers = /* @__PURE__ */ Object.create(null), this._escHandlers = /* @__PURE__ */ Object.create(null);
             }))), this._oscParser = this.register(new n.OscParser()), this._dcsParser = this.register(new o.DcsParser()), this._errorHandler = this._errorHandlerFb, this.registerEscHandler({ final: "\\" }, (() => true));
@@ -5074,7 +5074,7 @@ WARNING: This link could potentially be dangerous`)) {
           }
         }
         t2.EscapeSequenceParser = c;
-      }, 6242: (e2, t2, i2) => {
+      }, 6242: (_e2, t2, i2) => {
         Object.defineProperty(t2, "__esModule", { value: true }), t2.OscHandler = t2.OscParser = void 0;
         const s2 = i2(5770), r = i2(482), n = [];
         t2.OscParser = class {
@@ -5159,7 +5159,7 @@ WARNING: This link could potentially be dangerous`)) {
             return this._data = "", this._hitLimit = false, t3;
           }
         };
-      }, 8742: (e2, t2) => {
+      }, 8742: (_e2, t2) => {
         Object.defineProperty(t2, "__esModule", { value: true }), t2.Params = void 0;
         const i2 = 2147483647;
         class s2 {
@@ -5230,7 +5230,7 @@ WARNING: This link could potentially be dangerous`)) {
           }
         }
         t2.Params = s2;
-      }, 5741: (e2, t2) => {
+      }, 5741: (_e2, t2) => {
         Object.defineProperty(t2, "__esModule", { value: true }), t2.AddonManager = void 0, t2.AddonManager = class {
           constructor() {
             this._addons = [];
@@ -5253,7 +5253,7 @@ WARNING: This link could potentially be dangerous`)) {
             e3.isDisposed = true, e3.dispose.apply(e3.instance), this._addons.splice(t3, 1);
           }
         };
-      }, 8771: (e2, t2, i2) => {
+      }, 8771: (_e2, t2, i2) => {
         Object.defineProperty(t2, "__esModule", { value: true }), t2.BufferApiView = void 0;
         const s2 = i2(3785), r = i2(511);
         t2.BufferApiView = class {
@@ -5286,7 +5286,7 @@ WARNING: This link could potentially be dangerous`)) {
             return new r.CellData();
           }
         };
-      }, 3785: (e2, t2, i2) => {
+      }, 3785: (_e2, t2, i2) => {
         Object.defineProperty(t2, "__esModule", { value: true }), t2.BufferLineApiView = void 0;
         const s2 = i2(511);
         t2.BufferLineApiView = class {
@@ -5306,7 +5306,7 @@ WARNING: This link could potentially be dangerous`)) {
             return this._line.translateToString(e3, t3, i3);
           }
         };
-      }, 8285: (e2, t2, i2) => {
+      }, 8285: (_e2, t2, i2) => {
         Object.defineProperty(t2, "__esModule", { value: true }), t2.BufferNamespaceApi = void 0;
         const s2 = i2(8771), r = i2(8460), n = i2(844);
         class o extends n.Disposable {
@@ -5326,7 +5326,7 @@ WARNING: This link could potentially be dangerous`)) {
           }
         }
         t2.BufferNamespaceApi = o;
-      }, 7975: (e2, t2) => {
+      }, 7975: (_e2, t2) => {
         Object.defineProperty(t2, "__esModule", { value: true }), t2.ParserApi = void 0, t2.ParserApi = class {
           constructor(e3) {
             this._core = e3;
@@ -5356,7 +5356,7 @@ WARNING: This link could potentially be dangerous`)) {
             return this.registerOscHandler(e3, t3);
           }
         };
-      }, 7090: (e2, t2) => {
+      }, 7090: (_e2, t2) => {
         Object.defineProperty(t2, "__esModule", { value: true }), t2.UnicodeApi = void 0, t2.UnicodeApi = class {
           constructor(e3) {
             this._core = e3;
@@ -5374,10 +5374,10 @@ WARNING: This link could potentially be dangerous`)) {
             this._core.unicodeService.activeVersion = e3;
           }
         };
-      }, 744: function(e2, t2, i2) {
+      }, 744: function(_e2, t2, i2) {
         var s2 = this && this.__decorate || function(e3, t3, i3, s3) {
           var r2, n2 = arguments.length, o2 = n2 < 3 ? t3 : null === s3 ? s3 = Object.getOwnPropertyDescriptor(t3, i3) : s3;
-          if ("object" == typeof Reflect && "function" == typeof Reflect.decorate) o2 = Reflect.decorate(e3, t3, i3, s3);
+          if ("object" === typeof Reflect && "function" === typeof Reflect.decorate) o2 = Reflect.decorate(e3, t3, i3, s3);
           else for (var a2 = e3.length - 1; a2 >= 0; a2--) (r2 = e3[a2]) && (o2 = (n2 < 3 ? r2(o2) : n2 > 3 ? r2(t3, i3, o2) : r2(t3, i3)) || o2);
           return n2 > 3 && o2 && Object.defineProperty(t3, i3, o2), o2;
         }, r = this && this.__param || function(e3, t3) {
@@ -5415,7 +5415,7 @@ WARNING: This link could potentially be dangerous`)) {
             }
             this.isUserScrolling || (i3.ydisp = i3.ybase), this._onScroll.fire(i3.ydisp);
           }
-          scrollLines(e3, t3, i3) {
+          scrollLines(e3, t3, _i3) {
             const s3 = this.buffer;
             if (e3 < 0) {
               if (0 === s3.ydisp) return;
@@ -5426,7 +5426,7 @@ WARNING: This link could potentially be dangerous`)) {
           }
         };
         t2.BufferService = c = s2([r(0, h.IOptionsService)], c);
-      }, 7994: (e2, t2) => {
+      }, 7994: (_e2, t2) => {
         Object.defineProperty(t2, "__esModule", { value: true }), t2.CharsetService = void 0, t2.CharsetService = class {
           constructor() {
             this.glevel = 0, this._charsets = [];
@@ -5441,10 +5441,10 @@ WARNING: This link could potentially be dangerous`)) {
             this._charsets[e3] = t3, this.glevel === e3 && (this.charset = t3);
           }
         };
-      }, 1753: function(e2, t2, i2) {
+      }, 1753: function(_e2, t2, i2) {
         var s2 = this && this.__decorate || function(e3, t3, i3, s3) {
           var r2, n2 = arguments.length, o2 = n2 < 3 ? t3 : null === s3 ? s3 = Object.getOwnPropertyDescriptor(t3, i3) : s3;
-          if ("object" == typeof Reflect && "function" == typeof Reflect.decorate) o2 = Reflect.decorate(e3, t3, i3, s3);
+          if ("object" === typeof Reflect && "function" === typeof Reflect.decorate) o2 = Reflect.decorate(e3, t3, i3, s3);
           else for (var a2 = e3.length - 1; a2 >= 0; a2--) (r2 = e3[a2]) && (o2 = (n2 < 3 ? r2(o2) : n2 > 3 ? r2(t3, i3, o2) : r2(t3, i3)) || o2);
           return n2 > 3 && o2 && Object.defineProperty(t3, i3, o2), o2;
         }, r = this && this.__param || function(e3, t3) {
@@ -5453,7 +5453,7 @@ WARNING: This link could potentially be dangerous`)) {
           };
         };
         Object.defineProperty(t2, "__esModule", { value: true }), t2.CoreMouseService = void 0;
-        const n = i2(2585), o = i2(8460), a = i2(844), h = { NONE: { events: 0, restrict: () => false }, X10: { events: 1, restrict: (e3) => 4 !== e3.button && 1 === e3.action && (e3.ctrl = false, e3.alt = false, e3.shift = false, true) }, VT200: { events: 19, restrict: (e3) => 32 !== e3.action }, DRAG: { events: 23, restrict: (e3) => 32 !== e3.action || 3 !== e3.button }, ANY: { events: 31, restrict: (e3) => true } };
+        const n = i2(2585), o = i2(8460), a = i2(844), h = { NONE: { events: 0, restrict: () => false }, X10: { events: 1, restrict: (e3) => 4 !== e3.button && 1 === e3.action && (e3.ctrl = false, e3.alt = false, e3.shift = false, true) }, VT200: { events: 19, restrict: (e3) => 32 !== e3.action }, DRAG: { events: 23, restrict: (e3) => 32 !== e3.action || 3 !== e3.button }, ANY: { events: 31, restrict: (_e3) => true } };
         function c(e3, t3) {
           let i3 = (e3.ctrl ? 16 : 0) | (e3.shift ? 4 : 0) | (e3.alt ? 8 : 0);
           return 4 === e3.button ? (i3 |= 64, i3 |= e3.action) : (i3 |= 3 & e3.button, 4 & e3.button && (i3 |= 64), 8 & e3.button && (i3 |= 128), 32 === e3.action ? i3 |= 32 : 0 !== e3.action || t3 || (i3 |= 3)), i3;
@@ -5526,10 +5526,10 @@ WARNING: This link could potentially be dangerous`)) {
           }
         };
         t2.CoreMouseService = _ = s2([r(0, n.IBufferService), r(1, n.ICoreService)], _);
-      }, 6975: function(e2, t2, i2) {
+      }, 6975: function(_e2, t2, i2) {
         var s2 = this && this.__decorate || function(e3, t3, i3, s3) {
           var r2, n2 = arguments.length, o2 = n2 < 3 ? t3 : null === s3 ? s3 = Object.getOwnPropertyDescriptor(t3, i3) : s3;
-          if ("object" == typeof Reflect && "function" == typeof Reflect.decorate) o2 = Reflect.decorate(e3, t3, i3, s3);
+          if ("object" === typeof Reflect && "function" === typeof Reflect.decorate) o2 = Reflect.decorate(e3, t3, i3, s3);
           else for (var a2 = e3.length - 1; a2 >= 0; a2--) (r2 = e3[a2]) && (o2 = (n2 < 3 ? r2(o2) : n2 > 3 ? r2(t3, i3, o2) : r2(t3, i3)) || o2);
           return n2 > 3 && o2 && Object.defineProperty(t3, i3, o2), o2;
         }, r = this && this.__param || function(e3, t3) {
@@ -5556,7 +5556,7 @@ WARNING: This link could potentially be dangerous`)) {
           }
         };
         t2.CoreService = d = s2([r(0, h.IBufferService), r(1, h.ILogService), r(2, h.IOptionsService)], d);
-      }, 9074: (e2, t2, i2) => {
+      }, 9074: (_e2, t2, i2) => {
         Object.defineProperty(t2, "__esModule", { value: true }), t2.DecorationService = void 0;
         const s2 = i2(8055), r = i2(8460), n = i2(844), o = i2(6106);
         let a = 0, h = 0;
@@ -5610,7 +5610,7 @@ WARNING: This link could potentially be dangerous`)) {
             this._onDispose.fire(), super.dispose();
           }
         }
-      }, 4348: (e2, t2, i2) => {
+      }, 4348: (_e2, t2, i2) => {
         Object.defineProperty(t2, "__esModule", { value: true }), t2.InstantiationService = t2.ServiceCollection = void 0;
         const s2 = i2(2585), r = i2(8343);
         class n {
@@ -5654,10 +5654,10 @@ WARNING: This link could potentially be dangerous`)) {
             return new e3(...[...t3, ...s3]);
           }
         };
-      }, 7866: function(e2, t2, i2) {
+      }, 7866: function(_e2, t2, i2) {
         var s2 = this && this.__decorate || function(e3, t3, i3, s3) {
           var r2, n2 = arguments.length, o2 = n2 < 3 ? t3 : null === s3 ? s3 = Object.getOwnPropertyDescriptor(t3, i3) : s3;
-          if ("object" == typeof Reflect && "function" == typeof Reflect.decorate) o2 = Reflect.decorate(e3, t3, i3, s3);
+          if ("object" === typeof Reflect && "function" === typeof Reflect.decorate) o2 = Reflect.decorate(e3, t3, i3, s3);
           else for (var a2 = e3.length - 1; a2 >= 0; a2--) (r2 = e3[a2]) && (o2 = (n2 < 3 ? r2(o2) : n2 > 3 ? r2(t3, i3, o2) : r2(t3, i3)) || o2);
           return n2 > 3 && o2 && Object.defineProperty(t3, i3, o2), o2;
         }, r = this && this.__param || function(e3, t3) {
@@ -5678,7 +5678,7 @@ WARNING: This link could potentially be dangerous`)) {
             this._logLevel = a[this._optionsService.rawOptions.logLevel];
           }
           _evalLazyOptionalParams(e3) {
-            for (let t3 = 0; t3 < e3.length; t3++) "function" == typeof e3[t3] && (e3[t3] = e3[t3]());
+            for (let t3 = 0; t3 < e3.length; t3++) "function" === typeof e3[t3] && (e3[t3] = e3[t3]());
           }
           _log(e3, t3, i3) {
             this._evalLazyOptionalParams(i3), e3.call(console, (this._optionsService.options.logger ? "" : "xterm.js: ") + t3, ...i3);
@@ -5706,8 +5706,8 @@ WARNING: This link could potentially be dangerous`)) {
         };
         t2.LogService = c = s2([r(0, o.IOptionsService)], c), t2.setTraceLogger = function(e3) {
           h = e3;
-        }, t2.traceCall = function(e3, t3, i3) {
-          if ("function" != typeof i3.value) throw new Error("not supported");
+        }, t2.traceCall = function(_e3, _t3, i3) {
+          if ("function" !== typeof i3.value) throw new Error("not supported");
           const s3 = i3.value;
           i3.value = function(...e4) {
             if (h.logLevel !== o.LogLevelEnum.TRACE) return s3.apply(this, e4);
@@ -5716,7 +5716,7 @@ WARNING: This link could potentially be dangerous`)) {
             return h.trace(`GlyphRenderer#${s3.name} return`, t4), t4;
           };
         };
-      }, 7302: (e2, t2, i2) => {
+      }, 7302: (_e2, t2, i2) => {
         Object.defineProperty(t2, "__esModule", { value: true }), t2.OptionsService = t2.DEFAULT_OPTIONS = void 0;
         const s2 = i2(8460), r = i2(844), n = i2(6114);
         t2.DEFAULT_OPTIONS = { cols: 80, rows: 24, cursorBlink: false, cursorStyle: "block", cursorWidth: 1, cursorInactiveStyle: "outline", customGlyphs: true, drawBoldTextInBrightColors: true, documentOverride: null, fastScrollModifier: "alt", fastScrollSensitivity: 5, fontFamily: "courier-new, courier, monospace", fontSize: 15, fontWeight: "normal", fontWeightBold: "bold", ignoreBracketedPasteMode: false, lineHeight: 1, letterSpacing: 0, linkHandler: null, logLevel: "info", logger: null, scrollback: 1e3, scrollOnUserInput: true, scrollSensitivity: 1, screenReaderMode: false, smoothScrollDuration: 0, macOptionIsMeta: false, macOptionClickForcesSelection: false, minimumContrastRatio: 1, disableStdin: false, allowProposedApi: false, allowTransparency: false, tabStopWidth: 8, theme: {}, rescaleOverlappingGlyphs: false, rightClickSelectsWord: n.isMac, windowOptions: {}, windowsMode: false, windowsPty: {}, wordSeparator: " ()[]{}',\"`", altClickMovesCursor: true, convertEol: false, termName: "xterm", cancelEvents: false, overviewRulerWidth: 0 };
@@ -5770,7 +5770,7 @@ WARNING: This link could potentially be dangerous`)) {
                 break;
               case "fontWeight":
               case "fontWeightBold":
-                if ("number" == typeof i3 && 1 <= i3 && i3 <= 1e3) break;
+                if ("number" === typeof i3 && 1 <= i3 && i3 <= 1e3) break;
                 i3 = o.includes(i3) ? i3 : t2.DEFAULT_OPTIONS[e3];
                 break;
               case "cursorWidth":
@@ -5800,10 +5800,10 @@ WARNING: This link could potentially be dangerous`)) {
           }
         }
         t2.OptionsService = a;
-      }, 2660: function(e2, t2, i2) {
+      }, 2660: function(_e2, t2, i2) {
         var s2 = this && this.__decorate || function(e3, t3, i3, s3) {
           var r2, n2 = arguments.length, o2 = n2 < 3 ? t3 : null === s3 ? s3 = Object.getOwnPropertyDescriptor(t3, i3) : s3;
-          if ("object" == typeof Reflect && "function" == typeof Reflect.decorate) o2 = Reflect.decorate(e3, t3, i3, s3);
+          if ("object" === typeof Reflect && "function" === typeof Reflect.decorate) o2 = Reflect.decorate(e3, t3, i3, s3);
           else for (var a = e3.length - 1; a >= 0; a--) (r2 = e3[a]) && (o2 = (n2 < 3 ? r2(o2) : n2 > 3 ? r2(t3, i3, o2) : r2(t3, i3)) || o2);
           return n2 > 3 && o2 && Object.defineProperty(t3, i3, o2), o2;
         }, r = this && this.__param || function(e3, t3) {
@@ -5848,14 +5848,14 @@ WARNING: This link could potentially be dangerous`)) {
           }
         };
         t2.OscLinkService = o = s2([r(0, n.IBufferService)], o);
-      }, 8343: (e2, t2) => {
+      }, 8343: (_e2, t2) => {
         Object.defineProperty(t2, "__esModule", { value: true }), t2.createDecorator = t2.getServiceDependencies = t2.serviceRegistry = void 0;
         const i2 = "di$target", s2 = "di$dependencies";
         t2.serviceRegistry = /* @__PURE__ */ new Map(), t2.getServiceDependencies = function(e3) {
           return e3[s2] || [];
         }, t2.createDecorator = function(e3) {
           if (t2.serviceRegistry.has(e3)) return t2.serviceRegistry.get(e3);
-          const r = function(e4, t3, n) {
+          const r = function(e4, _t3, n) {
             if (3 !== arguments.length) throw new Error("@IServiceName-decorator can only be used to decorate a parameter");
             !(function(e5, t4, r2) {
               t4[i2] === t4 ? t4[s2].push({ id: e5, index: r2 }) : (t4[s2] = [{ id: e5, index: r2 }], t4[i2] = t4);
@@ -5863,19 +5863,19 @@ WARNING: This link could potentially be dangerous`)) {
           };
           return r.toString = () => e3, t2.serviceRegistry.set(e3, r), r;
         };
-      }, 2585: (e2, t2, i2) => {
+      }, 2585: (_e2, t2, i2) => {
         Object.defineProperty(t2, "__esModule", { value: true }), t2.IDecorationService = t2.IUnicodeService = t2.IOscLinkService = t2.IOptionsService = t2.ILogService = t2.LogLevelEnum = t2.IInstantiationService = t2.ICharsetService = t2.ICoreService = t2.ICoreMouseService = t2.IBufferService = void 0;
         const s2 = i2(8343);
         var r;
         t2.IBufferService = (0, s2.createDecorator)("BufferService"), t2.ICoreMouseService = (0, s2.createDecorator)("CoreMouseService"), t2.ICoreService = (0, s2.createDecorator)("CoreService"), t2.ICharsetService = (0, s2.createDecorator)("CharsetService"), t2.IInstantiationService = (0, s2.createDecorator)("InstantiationService"), (function(e3) {
           e3[e3.TRACE = 0] = "TRACE", e3[e3.DEBUG = 1] = "DEBUG", e3[e3.INFO = 2] = "INFO", e3[e3.WARN = 3] = "WARN", e3[e3.ERROR = 4] = "ERROR", e3[e3.OFF = 5] = "OFF";
         })(r || (t2.LogLevelEnum = r = {})), t2.ILogService = (0, s2.createDecorator)("LogService"), t2.IOptionsService = (0, s2.createDecorator)("OptionsService"), t2.IOscLinkService = (0, s2.createDecorator)("OscLinkService"), t2.IUnicodeService = (0, s2.createDecorator)("UnicodeService"), t2.IDecorationService = (0, s2.createDecorator)("DecorationService");
-      }, 1480: (e2, t2, i2) => {
+      }, 1480: (_e2, t2, i2) => {
         Object.defineProperty(t2, "__esModule", { value: true }), t2.UnicodeService = void 0;
         const s2 = i2(8460), r = i2(225);
         class n {
           static extractShouldJoin(e3) {
-            return 0 != (1 & e3);
+            return 0 !== (1 & e3);
           }
           static extractWidth(e3) {
             return e3 >> 1 & 3;
@@ -6147,10 +6147,10 @@ WARNING: This link could potentially be dangerous`)) {
             return t2;
           }
           _verifyIntegers(...e3) {
-            for (const t3 of e3) if (t3 === 1 / 0 || isNaN(t3) || t3 % 1 != 0) throw new Error("This API only accepts integers");
+            for (const t3 of e3) if (t3 === 1 / 0 || isNaN(t3) || t3 % 1 !== 0) throw new Error("This API only accepts integers");
           }
           _verifyPositiveIntegers(...e3) {
-            for (const t3 of e3) if (t3 && (t3 === 1 / 0 || isNaN(t3) || t3 % 1 != 0 || t3 < 0)) throw new Error("This API only accepts positive integers");
+            for (const t3 of e3) if (t3 && (t3 === 1 / 0 || isNaN(t3) || t3 % 1 !== 0 || t3 < 0)) throw new Error("This API only accepts positive integers");
           }
         }
         e2.Terminal = d;
@@ -6164,7 +6164,7 @@ var require_addon_fit = __commonJS({
   "node_modules/@xterm/addon-fit/lib/addon-fit.js"(exports, module) {
     
     !(function(e, t) {
-      "object" == typeof exports && "object" == typeof module ? module.exports = t() : "function" == typeof define && define.amd ? define([], t) : "object" == typeof exports ? exports.FitAddon = t() : e.FitAddon = t();
+      "object" === typeof exports && "object" === typeof module ? module.exports = t() : "function" === typeof define && define.amd ? define([], t) : "object" === typeof exports ? exports.FitAddon = t() : e.FitAddon = t();
     })(self, (() => (() => {
       
       var e = {};
@@ -6187,7 +6187,7 @@ var require_addon_fit = __commonJS({
             if (!this._terminal.element || !this._terminal.element.parentElement) return;
             const e2 = this._terminal._core, t2 = e2._renderService.dimensions;
             if (0 === t2.css.cell.width || 0 === t2.css.cell.height) return;
-            const r = 0 === this._terminal.options.scrollback ? 0 : e2.viewport.scrollBarWidth, i = window.getComputedStyle(this._terminal.element.parentElement), o = parseInt(i.getPropertyValue("height")), s = Math.max(0, parseInt(i.getPropertyValue("width"))), n = window.getComputedStyle(this._terminal.element), l = o - (parseInt(n.getPropertyValue("padding-top")) + parseInt(n.getPropertyValue("padding-bottom"))), a = s - (parseInt(n.getPropertyValue("padding-right")) + parseInt(n.getPropertyValue("padding-left"))) - r;
+            const r = 0 === this._terminal.options.scrollback ? 0 : e2.viewport.scrollBarWidth, i = window.getComputedStyle(this._terminal.element.parentElement), o = parseInt(i.getPropertyValue("height"), 10), s = Math.max(0, parseInt(i.getPropertyValue("width"), 10)), n = window.getComputedStyle(this._terminal.element), l = o - (parseInt(n.getPropertyValue("padding-top"), 10) + parseInt(n.getPropertyValue("padding-bottom"), 10)), a = s - (parseInt(n.getPropertyValue("padding-right"), 10) + parseInt(n.getPropertyValue("padding-left"), 10)) - r;
             return { cols: Math.max(2, Math.floor(a / t2.css.cell.width)), rows: Math.max(1, Math.floor(l / t2.css.cell.height)) };
           }
         };
@@ -6201,10 +6201,10 @@ var require_addon_web_links = __commonJS({
   "node_modules/@xterm/addon-web-links/lib/addon-web-links.js"(exports, module) {
     
     !(function(e, t) {
-      "object" == typeof exports && "object" == typeof module ? module.exports = t() : "function" == typeof define && define.amd ? define([], t) : "object" == typeof exports ? exports.WebLinksAddon = t() : e.WebLinksAddon = t();
+      "object" === typeof exports && "object" === typeof module ? module.exports = t() : "function" === typeof define && define.amd ? define([], t) : "object" === typeof exports ? exports.WebLinksAddon = t() : e.WebLinksAddon = t();
     })(self, (() => (() => {
       
-      var e = { 6: (e2, t2) => {
+      var e = { 6: (_e2, t2) => {
         function n2(e3) {
           try {
             const t3 = new URL(e3), n3 = t3.password && t3.username ? `${t3.protocol}//${t3.username}:${t3.password}@${t3.host}` : t3.username ? `${t3.protocol}//${t3.username}@${t3.host}` : `${t3.protocol}//${t3.host}`;
@@ -6291,7 +6291,7 @@ var require_addon_web_links = __commonJS({
         var e2 = o;
         Object.defineProperty(e2, "__esModule", { value: true }), e2.WebLinksAddon = void 0;
         const t2 = n(6), r = /(https?|HTTPS?):[/]{2}[^\s"'!*(){}|\\^<>`]*[^\s"':,.!?{}|\\^~[\]`()<>]/;
-        function i(e3, t3) {
+        function i(_e3, t3) {
           const n2 = window.open();
           if (n2) {
             try {
@@ -6325,10 +6325,10 @@ var require_addon_search = __commonJS({
   "node_modules/@xterm/addon-search/lib/addon-search.js"(exports, module) {
     
     !(function(e, t) {
-      "object" == typeof exports && "object" == typeof module ? module.exports = t() : "function" == typeof define && define.amd ? define([], t) : "object" == typeof exports ? exports.SearchAddon = t() : e.SearchAddon = t();
+      "object" === typeof exports && "object" === typeof module ? module.exports = t() : "function" === typeof define && define.amd ? define([], t) : "object" === typeof exports ? exports.SearchAddon = t() : e.SearchAddon = t();
     })(self, (() => (() => {
       
-      var e = { 345: (e2, t2) => {
+      var e = { 345: (_e2, t2) => {
         Object.defineProperty(t2, "__esModule", { value: true }), t2.runAndSubscribe = t2.forwardEvent = t2.EventEmitter = void 0, t2.EventEmitter = class {
           constructor() {
             this._listeners = [], this._disposed = false;
@@ -6356,7 +6356,7 @@ var require_addon_search = __commonJS({
         }, t2.runAndSubscribe = function(e3, t3) {
           return t3(void 0), e3(((e4) => t3(e4)));
         };
-      }, 859: (e2, t2) => {
+      }, 859: (_e2, t2) => {
         function i2(e3) {
           for (const t3 of e3) t3.dispose();
           e3.length = 0;
@@ -6643,10 +6643,10 @@ var require_addon_unicode11 = __commonJS({
   "node_modules/@xterm/addon-unicode11/lib/addon-unicode11.js"(exports, module) {
     
     !(function(e, t) {
-      "object" == typeof exports && "object" == typeof module ? module.exports = t() : "function" == typeof define && define.amd ? define([], t) : "object" == typeof exports ? exports.Unicode11Addon = t() : e.Unicode11Addon = t();
+      "object" === typeof exports && "object" === typeof module ? module.exports = t() : "function" === typeof define && define.amd ? define([], t) : "object" === typeof exports ? exports.Unicode11Addon = t() : e.Unicode11Addon = t();
     })(exports, (() => (() => {
       
-      var e = { 433: (e2, t2, i2) => {
+      var e = { 433: (_e2, t2, i2) => {
         Object.defineProperty(t2, "__esModule", { value: true }), t2.UnicodeV11 = void 0;
         const r2 = i2(938), s = [[768, 879], [1155, 1161], [1425, 1469], [1471, 1471], [1473, 1474], [1476, 1477], [1479, 1479], [1536, 1541], [1552, 1562], [1564, 1564], [1611, 1631], [1648, 1648], [1750, 1757], [1759, 1764], [1767, 1768], [1770, 1773], [1807, 1807], [1809, 1809], [1840, 1866], [1958, 1968], [2027, 2035], [2045, 2045], [2070, 2073], [2075, 2083], [2085, 2087], [2089, 2093], [2137, 2139], [2259, 2306], [2362, 2362], [2364, 2364], [2369, 2376], [2381, 2381], [2385, 2391], [2402, 2403], [2433, 2433], [2492, 2492], [2497, 2500], [2509, 2509], [2530, 2531], [2558, 2558], [2561, 2562], [2620, 2620], [2625, 2626], [2631, 2632], [2635, 2637], [2641, 2641], [2672, 2673], [2677, 2677], [2689, 2690], [2748, 2748], [2753, 2757], [2759, 2760], [2765, 2765], [2786, 2787], [2810, 2815], [2817, 2817], [2876, 2876], [2879, 2879], [2881, 2884], [2893, 2893], [2902, 2902], [2914, 2915], [2946, 2946], [3008, 3008], [3021, 3021], [3072, 3072], [3076, 3076], [3134, 3136], [3142, 3144], [3146, 3149], [3157, 3158], [3170, 3171], [3201, 3201], [3260, 3260], [3263, 3263], [3270, 3270], [3276, 3277], [3298, 3299], [3328, 3329], [3387, 3388], [3393, 3396], [3405, 3405], [3426, 3427], [3530, 3530], [3538, 3540], [3542, 3542], [3633, 3633], [3636, 3642], [3655, 3662], [3761, 3761], [3764, 3772], [3784, 3789], [3864, 3865], [3893, 3893], [3895, 3895], [3897, 3897], [3953, 3966], [3968, 3972], [3974, 3975], [3981, 3991], [3993, 4028], [4038, 4038], [4141, 4144], [4146, 4151], [4153, 4154], [4157, 4158], [4184, 4185], [4190, 4192], [4209, 4212], [4226, 4226], [4229, 4230], [4237, 4237], [4253, 4253], [4448, 4607], [4957, 4959], [5906, 5908], [5938, 5940], [5970, 5971], [6002, 6003], [6068, 6069], [6071, 6077], [6086, 6086], [6089, 6099], [6109, 6109], [6155, 6158], [6277, 6278], [6313, 6313], [6432, 6434], [6439, 6440], [6450, 6450], [6457, 6459], [6679, 6680], [6683, 6683], [6742, 6742], [6744, 6750], [6752, 6752], [6754, 6754], [6757, 6764], [6771, 6780], [6783, 6783], [6832, 6846], [6912, 6915], [6964, 6964], [6966, 6970], [6972, 6972], [6978, 6978], [7019, 7027], [7040, 7041], [7074, 7077], [7080, 7081], [7083, 7085], [7142, 7142], [7144, 7145], [7149, 7149], [7151, 7153], [7212, 7219], [7222, 7223], [7376, 7378], [7380, 7392], [7394, 7400], [7405, 7405], [7412, 7412], [7416, 7417], [7616, 7673], [7675, 7679], [8203, 8207], [8234, 8238], [8288, 8292], [8294, 8303], [8400, 8432], [11503, 11505], [11647, 11647], [11744, 11775], [12330, 12333], [12441, 12442], [42607, 42610], [42612, 42621], [42654, 42655], [42736, 42737], [43010, 43010], [43014, 43014], [43019, 43019], [43045, 43046], [43204, 43205], [43232, 43249], [43263, 43263], [43302, 43309], [43335, 43345], [43392, 43394], [43443, 43443], [43446, 43449], [43452, 43453], [43493, 43493], [43561, 43566], [43569, 43570], [43573, 43574], [43587, 43587], [43596, 43596], [43644, 43644], [43696, 43696], [43698, 43700], [43703, 43704], [43710, 43711], [43713, 43713], [43756, 43757], [43766, 43766], [44005, 44005], [44008, 44008], [44013, 44013], [64286, 64286], [65024, 65039], [65056, 65071], [65279, 65279], [65529, 65531]], n = [[66045, 66045], [66272, 66272], [66422, 66426], [68097, 68099], [68101, 68102], [68108, 68111], [68152, 68154], [68159, 68159], [68325, 68326], [68900, 68903], [69446, 69456], [69633, 69633], [69688, 69702], [69759, 69761], [69811, 69814], [69817, 69818], [69821, 69821], [69837, 69837], [69888, 69890], [69927, 69931], [69933, 69940], [70003, 70003], [70016, 70017], [70070, 70078], [70089, 70092], [70191, 70193], [70196, 70196], [70198, 70199], [70206, 70206], [70367, 70367], [70371, 70378], [70400, 70401], [70459, 70460], [70464, 70464], [70502, 70508], [70512, 70516], [70712, 70719], [70722, 70724], [70726, 70726], [70750, 70750], [70835, 70840], [70842, 70842], [70847, 70848], [70850, 70851], [71090, 71093], [71100, 71101], [71103, 71104], [71132, 71133], [71219, 71226], [71229, 71229], [71231, 71232], [71339, 71339], [71341, 71341], [71344, 71349], [71351, 71351], [71453, 71455], [71458, 71461], [71463, 71467], [71727, 71735], [71737, 71738], [72148, 72151], [72154, 72155], [72160, 72160], [72193, 72202], [72243, 72248], [72251, 72254], [72263, 72263], [72273, 72278], [72281, 72283], [72330, 72342], [72344, 72345], [72752, 72758], [72760, 72765], [72767, 72767], [72850, 72871], [72874, 72880], [72882, 72883], [72885, 72886], [73009, 73014], [73018, 73018], [73020, 73021], [73023, 73029], [73031, 73031], [73104, 73105], [73109, 73109], [73111, 73111], [73459, 73460], [78896, 78904], [92912, 92916], [92976, 92982], [94031, 94031], [94095, 94098], [113821, 113822], [113824, 113827], [119143, 119145], [119155, 119170], [119173, 119179], [119210, 119213], [119362, 119364], [121344, 121398], [121403, 121452], [121461, 121461], [121476, 121476], [121499, 121503], [121505, 121519], [122880, 122886], [122888, 122904], [122907, 122913], [122915, 122916], [122918, 122922], [123184, 123190], [123628, 123631], [125136, 125142], [125252, 125258], [917505, 917505], [917536, 917631], [917760, 917999]], o = [[4352, 4447], [8986, 8987], [9001, 9002], [9193, 9196], [9200, 9200], [9203, 9203], [9725, 9726], [9748, 9749], [9800, 9811], [9855, 9855], [9875, 9875], [9889, 9889], [9898, 9899], [9917, 9918], [9924, 9925], [9934, 9934], [9940, 9940], [9962, 9962], [9970, 9971], [9973, 9973], [9978, 9978], [9981, 9981], [9989, 9989], [9994, 9995], [10024, 10024], [10060, 10060], [10062, 10062], [10067, 10069], [10071, 10071], [10133, 10135], [10160, 10160], [10175, 10175], [11035, 11036], [11088, 11088], [11093, 11093], [11904, 11929], [11931, 12019], [12032, 12245], [12272, 12283], [12288, 12329], [12334, 12350], [12353, 12438], [12443, 12543], [12549, 12591], [12593, 12686], [12688, 12730], [12736, 12771], [12784, 12830], [12832, 12871], [12880, 19903], [19968, 42124], [42128, 42182], [43360, 43388], [44032, 55203], [63744, 64255], [65040, 65049], [65072, 65106], [65108, 65126], [65128, 65131], [65281, 65376], [65504, 65510]], c = [[94176, 94179], [94208, 100343], [100352, 101106], [110592, 110878], [110928, 110930], [110948, 110951], [110960, 111355], [126980, 126980], [127183, 127183], [127374, 127374], [127377, 127386], [127488, 127490], [127504, 127547], [127552, 127560], [127568, 127569], [127584, 127589], [127744, 127776], [127789, 127797], [127799, 127868], [127870, 127891], [127904, 127946], [127951, 127955], [127968, 127984], [127988, 127988], [127992, 128062], [128064, 128064], [128066, 128252], [128255, 128317], [128331, 128334], [128336, 128359], [128378, 128378], [128405, 128406], [128420, 128420], [128507, 128591], [128640, 128709], [128716, 128716], [128720, 128722], [128725, 128725], [128747, 128748], [128756, 128762], [128992, 129003], [129293, 129393], [129395, 129398], [129402, 129442], [129445, 129450], [129454, 129482], [129485, 129535], [129648, 129651], [129656, 129658], [129664, 129666], [129680, 129685], [131072, 196605], [196608, 262141]];
         let l;
@@ -6680,7 +6680,7 @@ var require_addon_unicode11 = __commonJS({
             return r2.UnicodeService.createPropertyValue(0, i3, s2);
           }
         };
-      }, 345: (e2, t2) => {
+      }, 345: (_e2, t2) => {
         Object.defineProperty(t2, "__esModule", { value: true }), t2.runAndSubscribe = t2.forwardEvent = t2.EventEmitter = void 0, t2.EventEmitter = class {
           constructor() {
             this._listeners = [], this._disposed = false;
@@ -6708,7 +6708,7 @@ var require_addon_unicode11 = __commonJS({
         }, t2.runAndSubscribe = function(e3, t3) {
           return t3(void 0), e3(((e4) => t3(e4)));
         };
-      }, 490: (e2, t2, i2) => {
+      }, 490: (_e2, t2, i2) => {
         Object.defineProperty(t2, "__esModule", { value: true }), t2.UnicodeV6 = void 0;
         const r2 = i2(938), s = [[768, 879], [1155, 1158], [1160, 1161], [1425, 1469], [1471, 1471], [1473, 1474], [1476, 1477], [1479, 1479], [1536, 1539], [1552, 1557], [1611, 1630], [1648, 1648], [1750, 1764], [1767, 1768], [1770, 1773], [1807, 1807], [1809, 1809], [1840, 1866], [1958, 1968], [2027, 2035], [2305, 2306], [2364, 2364], [2369, 2376], [2381, 2381], [2385, 2388], [2402, 2403], [2433, 2433], [2492, 2492], [2497, 2500], [2509, 2509], [2530, 2531], [2561, 2562], [2620, 2620], [2625, 2626], [2631, 2632], [2635, 2637], [2672, 2673], [2689, 2690], [2748, 2748], [2753, 2757], [2759, 2760], [2765, 2765], [2786, 2787], [2817, 2817], [2876, 2876], [2879, 2879], [2881, 2883], [2893, 2893], [2902, 2902], [2946, 2946], [3008, 3008], [3021, 3021], [3134, 3136], [3142, 3144], [3146, 3149], [3157, 3158], [3260, 3260], [3263, 3263], [3270, 3270], [3276, 3277], [3298, 3299], [3393, 3395], [3405, 3405], [3530, 3530], [3538, 3540], [3542, 3542], [3633, 3633], [3636, 3642], [3655, 3662], [3761, 3761], [3764, 3769], [3771, 3772], [3784, 3789], [3864, 3865], [3893, 3893], [3895, 3895], [3897, 3897], [3953, 3966], [3968, 3972], [3974, 3975], [3984, 3991], [3993, 4028], [4038, 4038], [4141, 4144], [4146, 4146], [4150, 4151], [4153, 4153], [4184, 4185], [4448, 4607], [4959, 4959], [5906, 5908], [5938, 5940], [5970, 5971], [6002, 6003], [6068, 6069], [6071, 6077], [6086, 6086], [6089, 6099], [6109, 6109], [6155, 6157], [6313, 6313], [6432, 6434], [6439, 6440], [6450, 6450], [6457, 6459], [6679, 6680], [6912, 6915], [6964, 6964], [6966, 6970], [6972, 6972], [6978, 6978], [7019, 7027], [7616, 7626], [7678, 7679], [8203, 8207], [8234, 8238], [8288, 8291], [8298, 8303], [8400, 8431], [12330, 12335], [12441, 12442], [43014, 43014], [43019, 43019], [43045, 43046], [64286, 64286], [65024, 65039], [65056, 65059], [65279, 65279], [65529, 65531]], n = [[68097, 68099], [68101, 68102], [68108, 68111], [68152, 68154], [68159, 68159], [119143, 119145], [119155, 119170], [119173, 119179], [119210, 119213], [119362, 119364], [917505, 917505], [917536, 917631], [917760, 917999]];
         let o;
@@ -6740,12 +6740,12 @@ var require_addon_unicode11 = __commonJS({
             return r2.UnicodeService.createPropertyValue(0, i3, s2);
           }
         };
-      }, 938: (e2, t2, i2) => {
+      }, 938: (_e2, t2, i2) => {
         Object.defineProperty(t2, "__esModule", { value: true }), t2.UnicodeService = void 0;
         const r2 = i2(345), s = i2(490);
         class n {
           static extractShouldJoin(e3) {
-            return 0 != (1 & e3);
+            return 0 !== (1 & e3);
           }
           static extractWidth(e3) {
             return e3 >> 1 & 3;
@@ -6830,10 +6830,10 @@ var require_addon_webgl = __commonJS({
   "node_modules/@xterm/addon-webgl/lib/addon-webgl.js"(exports, module) {
     
     !(function(e, t) {
-      "object" == typeof exports && "object" == typeof module ? module.exports = t() : "function" == typeof define && define.amd ? define([], t) : "object" == typeof exports ? exports.WebglAddon = t() : e.WebglAddon = t();
+      "object" === typeof exports && "object" === typeof module ? module.exports = t() : "function" === typeof define && define.amd ? define([], t) : "object" === typeof exports ? exports.WebglAddon = t() : e.WebglAddon = t();
     })(self, (() => (() => {
       
-      var e = { 965: (e2, t2, i2) => {
+      var e = { 965: (_e2, t2, i2) => {
         Object.defineProperty(t2, "__esModule", { value: true }), t2.GlyphRenderer = void 0;
         const s2 = i2(374), r = i2(509), o = i2(855), n = i2(859), a = i2(381), h = 11, l = h * Float32Array.BYTES_PER_ELEMENT;
         let c, d = 0, _ = 0, u = 0;
@@ -6920,7 +6920,7 @@ void main() {
           }
         }
         t2.GlyphRenderer = g;
-      }, 742: (e2, t2, i2) => {
+      }, 742: (_e2, t2, i2) => {
         Object.defineProperty(t2, "__esModule", { value: true }), t2.RectangleRenderer = void 0;
         const s2 = i2(374), r = i2(859), o = i2(310), n = i2(381), a = 8 * Float32Array.BYTES_PER_ELEMENT;
         class h {
@@ -7014,7 +7014,7 @@ void main() {
           }
         }
         t2.RectangleRenderer = f;
-      }, 310: (e2, t2, i2) => {
+      }, 310: (_e2, t2, i2) => {
         Object.defineProperty(t2, "__esModule", { value: true }), t2.RenderModel = t2.COMBINED_CHAR_BIT_MASK = t2.RENDER_MODEL_EXT_OFFSET = t2.RENDER_MODEL_FG_OFFSET = t2.RENDER_MODEL_BG_OFFSET = t2.RENDER_MODEL_INDICIES_PER_CELL = void 0;
         const s2 = i2(296);
         t2.RENDER_MODEL_INDICIES_PER_CELL = 4, t2.RENDER_MODEL_BG_OFFSET = 1, t2.RENDER_MODEL_FG_OFFSET = 2, t2.RENDER_MODEL_EXT_OFFSET = 3, t2.COMBINED_CHAR_BIT_MASK = 2147483648, t2.RenderModel = class {
@@ -7029,7 +7029,7 @@ void main() {
             this.cells.fill(0, 0), this.lineLengths.fill(0, 0);
           }
         };
-      }, 666: (e2, t2, i2) => {
+      }, 666: (_e2, t2, i2) => {
         Object.defineProperty(t2, "__esModule", { value: true }), t2.JoinedCellData = t2.WebglRenderer = void 0;
         const s2 = i2(820), r = i2(274), o = i2(627), n = i2(457), a = i2(56), h = i2(374), l = i2(345), c = i2(859), d = i2(147), _ = i2(782), u = i2(855), g = i2(965), v = i2(742), f = i2(310), p = i2(733);
         class C extends c.Disposable {
@@ -7041,7 +7041,7 @@ void main() {
               console.log("webglcontextlost event received"), e4.preventDefault(), this._contextRestorationTimeout = setTimeout((() => {
                 this._contextRestorationTimeout = void 0, console.warn("webgl context not restored; firing onContextLoss"), this._onContextLoss.fire(e4);
               }), 3e3);
-            }))), this.register((0, s2.addDisposableDomListener)(this._canvas, "webglcontextrestored", ((e4) => {
+            }))), this.register((0, s2.addDisposableDomListener)(this._canvas, "webglcontextrestored", ((_e4) => {
               console.warn("webglcontextrestored event received"), clearTimeout(this._contextRestorationTimeout), this._contextRestorationTimeout = void 0, (0, o.removeTerminalFromCache)(this._terminal), this._initializeWebGLState(), this._requestRedrawViewport();
             }))), this._observerDisposable.value = (0, a.observeDevicePixelDimensions)(this._canvas, this._coreBrowserService.window, ((e4, t4) => this._setCanvasDevicePixelDimensions(e4, t4))), this.register(this._coreBrowserService.onWindowChange(((e4) => {
               this._observerDisposable.value = (0, a.observeDevicePixelDimensions)(this._canvas, e4, ((e5, t4) => this._setCanvasDevicePixelDimensions(e5, t4)));
@@ -7061,7 +7061,7 @@ void main() {
           handleDevicePixelRatioChange() {
             this._devicePixelRatio !== this._coreBrowserService.dpr && (this._devicePixelRatio = this._coreBrowserService.dpr, this.handleResize(this._terminal.cols, this._terminal.rows));
           }
-          handleResize(e3, t3) {
+          handleResize(_e3, _t3) {
             var _a, _b, _c, _d;
             this._updateDimensions(), this._model.resize(this._terminal.cols, this._terminal.rows);
             for (const e4 of this._renderLayers) e4.resize(this._terminal, this.dimensions);
@@ -7115,10 +7115,10 @@ void main() {
             for (const e3 of this._renderLayers) e3.reset(this._terminal);
             (_a = this._cursorBlinkStateManager.value) == null ? void 0 : _a.restartBlinkAnimation(), this._updateCursorBlink();
           }
-          registerCharacterJoiner(e3) {
+          registerCharacterJoiner(_e3) {
             return -1;
           }
-          deregisterCharacterJoiner(e3) {
+          deregisterCharacterJoiner(_e3) {
             return false;
           }
           renderRows(e3, t3) {
@@ -7177,7 +7177,7 @@ void main() {
           getCode() {
             return 2097151;
           }
-          setFromCharData(e3) {
+          setFromCharData(_e3) {
             throw new Error("not implemented");
           }
           getAsCharData() {
@@ -7188,7 +7188,7 @@ void main() {
           return Math.max(Math.min(e3, t3), i3);
         }
         t2.JoinedCellData = m;
-      }, 381: (e2, t2, i2) => {
+      }, 381: (_e2, t2, i2) => {
         Object.defineProperty(t2, "__esModule", { value: true }), t2.GLTexture = t2.expandFloat32Array = t2.createShader = t2.createProgram = t2.PROJECTION_MATRIX = void 0;
         const s2 = i2(374);
         function r(e3, t3, i3) {
@@ -7209,7 +7209,7 @@ void main() {
             this.texture = e3, this.version = -1;
           }
         };
-      }, 592: (e2, t2, i2) => {
+      }, 592: (_e2, t2, i2) => {
         Object.defineProperty(t2, "__esModule", { value: true }), t2.BaseRenderLayer = void 0;
         const s2 = i2(627), r = i2(237), o = i2(374), n = i2(859);
         class a extends n.Disposable {
@@ -7223,15 +7223,15 @@ void main() {
           _initCanvas() {
             this._ctx = (0, o.throwIfFalsy)(this._canvas.getContext("2d", { alpha: this._alpha })), this._alpha || this._clearAll();
           }
-          handleBlur(e3) {
+          handleBlur(_e3) {
           }
-          handleFocus(e3) {
+          handleFocus(_e3) {
           }
-          handleCursorMove(e3) {
+          handleCursorMove(_e3) {
           }
-          handleGridChanged(e3, t3, i3) {
+          handleGridChanged(_e3, _t3, _i3) {
           }
-          handleSelectionChanged(e3, t3, i3, s3 = false) {
+          handleSelectionChanged(_e3, _t3, _i3, _s3 = false) {
           }
           _setTransparency(e3, t3) {
             if (t3 === this._alpha) return;
@@ -7264,7 +7264,7 @@ void main() {
           }
         }
         t2.BaseRenderLayer = a;
-      }, 733: (e2, t2, i2) => {
+      }, 733: (_e2, t2, i2) => {
         Object.defineProperty(t2, "__esModule", { value: true }), t2.LinkRenderLayer = void 0;
         const s2 = i2(197), r = i2(237), o = i2(592);
         class n extends o.BaseRenderLayer {
@@ -7274,7 +7274,7 @@ void main() {
           resize(e3, t3) {
             super.resize(e3, t3), this._state = void 0;
           }
-          reset(e3) {
+          reset(_e3) {
             this._clearCurrentLink();
           }
           _clearCurrentLink() {
@@ -7293,12 +7293,12 @@ void main() {
             }
             this._state = e3;
           }
-          _handleHideLinkUnderline(e3) {
+          _handleHideLinkUnderline(_e3) {
             this._clearCurrentLink();
           }
         }
         t2.LinkRenderLayer = n;
-      }, 820: (e2, t2) => {
+      }, 820: (_e2, t2) => {
         Object.defineProperty(t2, "__esModule", { value: true }), t2.addDisposableDomListener = void 0, t2.addDisposableDomListener = function(e3, t3, i2, s2) {
           e3.addEventListener(t3, i2, s2);
           let r = false;
@@ -7306,7 +7306,7 @@ void main() {
             r || (r = true, e3.removeEventListener(t3, i2, s2));
           } };
         };
-      }, 274: (e2, t2, i2) => {
+      }, 274: (_e2, t2, i2) => {
         Object.defineProperty(t2, "__esModule", { value: true }), t2.CellColorResolver = void 0;
         const s2 = i2(855), r = i2(160), o = i2(374);
         let n, a = 0, h = 0, l = false, c = false, d = false, _ = 0;
@@ -7322,7 +7322,7 @@ void main() {
             if (this._decorationService.forEachDecorationAtCell(t3, i3, "bottom", ((e4) => {
               e4.backgroundColorRGB && (h = e4.backgroundColorRGB.rgba >> 8 & 16777215, c = true), e4.foregroundColorRGB && (a = e4.foregroundColorRGB.rgba >> 8 & 16777215, l = true);
             })), d = this._selectionRenderModel.isCellSelected(this._terminal, t3, i3), d) {
-              if (67108864 & this.result.fg || 0 != (50331648 & this.result.bg)) {
+              if (67108864 & this.result.fg || 0 !== (50331648 & this.result.bg)) {
                 if (67108864 & this.result.fg) switch (50331648 & this.result.fg) {
                   case 16777216:
                   case 33554432:
@@ -7345,7 +7345,7 @@ void main() {
                 h = r.rgba.blend(h, 4294967040 & (this._coreBrowserService.isFocused ? n.selectionBackgroundOpaque : n.selectionInactiveBackgroundOpaque).rgba | 128) >> 8 & 16777215;
               } else h = (this._coreBrowserService.isFocused ? n.selectionBackgroundOpaque : n.selectionInactiveBackgroundOpaque).rgba >> 8 & 16777215;
               if (c = true, n.selectionForeground && (a = n.selectionForeground.rgba >> 8 & 16777215, l = true), (0, o.treatGlyphAsBackgroundColor)(e3.getCode())) {
-                if (67108864 & this.result.fg && 0 == (50331648 & this.result.bg)) a = (this._coreBrowserService.isFocused ? n.selectionBackgroundOpaque : n.selectionInactiveBackgroundOpaque).rgba >> 8 & 16777215;
+                if (67108864 & this.result.fg && 0 === (50331648 & this.result.bg)) a = (this._coreBrowserService.isFocused ? n.selectionBackgroundOpaque : n.selectionInactiveBackgroundOpaque).rgba >> 8 & 16777215;
                 else {
                   if (67108864 & this.result.fg) switch (50331648 & this.result.bg) {
                     case 16777216:
@@ -7373,10 +7373,10 @@ void main() {
             }
             this._decorationService.forEachDecorationAtCell(t3, i3, "top", ((e4) => {
               e4.backgroundColorRGB && (h = e4.backgroundColorRGB.rgba >> 8 & 16777215, c = true), e4.foregroundColorRGB && (a = e4.foregroundColorRGB.rgba >> 8 & 16777215, l = true);
-            })), c && (h = d ? -16777216 & e3.bg & -134217729 | h | 50331648 : -16777216 & e3.bg | h | 50331648), l && (a = -16777216 & e3.fg & -67108865 | a | 50331648), 67108864 & this.result.fg && (c && !l && (a = 0 == (50331648 & this.result.bg) ? -134217728 & this.result.fg | 16777215 & n.background.rgba >> 8 | 50331648 : -134217728 & this.result.fg | 67108863 & this.result.bg, l = true), !c && l && (h = 0 == (50331648 & this.result.fg) ? -67108864 & this.result.bg | 16777215 & n.foreground.rgba >> 8 | 50331648 : -67108864 & this.result.bg | 67108863 & this.result.fg, c = true)), n = void 0, this.result.bg = c ? h : this.result.bg, this.result.fg = l ? a : this.result.fg, this.result.ext &= 536870911, this.result.ext |= _ << 29 & 3758096384;
+            })), c && (h = d ? -16777216 & e3.bg & -134217729 | h | 50331648 : -16777216 & e3.bg | h | 50331648), l && (a = -16777216 & e3.fg & -67108865 | a | 50331648), 67108864 & this.result.fg && (c && !l && (a = 0 === (50331648 & this.result.bg) ? -134217728 & this.result.fg | 16777215 & n.background.rgba >> 8 | 50331648 : -134217728 & this.result.fg | 67108863 & this.result.bg, l = true), !c && l && (h = 0 === (50331648 & this.result.fg) ? -67108864 & this.result.bg | 16777215 & n.foreground.rgba >> 8 | 50331648 : -67108864 & this.result.bg | 67108863 & this.result.fg, c = true)), n = void 0, this.result.bg = c ? h : this.result.bg, this.result.fg = l ? a : this.result.fg, this.result.ext &= 536870911, this.result.ext |= _ << 29 & 3758096384;
           }
         };
-      }, 627: (e2, t2, i2) => {
+      }, 627: (_e2, t2, i2) => {
         Object.defineProperty(t2, "__esModule", { value: true }), t2.removeTerminalFromCache = t2.acquireTextureAtlas = void 0;
         const s2 = i2(509), r = i2(197), o = [];
         t2.acquireTextureAtlas = function(e3, t3, i3, n, a, h, l, c) {
@@ -7404,7 +7404,7 @@ void main() {
             }
           }
         };
-      }, 197: (e2, t2, i2) => {
+      }, 197: (_e2, t2, i2) => {
         Object.defineProperty(t2, "__esModule", { value: true }), t2.is256Color = t2.configEquals = t2.generateConfig = void 0;
         const s2 = i2(160);
         t2.generateConfig = function(e3, t3, i3, r, o, n, a) {
@@ -7414,13 +7414,13 @@ void main() {
           for (let i3 = 0; i3 < e3.colors.ansi.length; i3++) if (e3.colors.ansi[i3].rgba !== t3.colors.ansi[i3].rgba) return false;
           return e3.devicePixelRatio === t3.devicePixelRatio && e3.customGlyphs === t3.customGlyphs && e3.lineHeight === t3.lineHeight && e3.letterSpacing === t3.letterSpacing && e3.fontFamily === t3.fontFamily && e3.fontSize === t3.fontSize && e3.fontWeight === t3.fontWeight && e3.fontWeightBold === t3.fontWeightBold && e3.allowTransparency === t3.allowTransparency && e3.deviceCharWidth === t3.deviceCharWidth && e3.deviceCharHeight === t3.deviceCharHeight && e3.drawBoldTextInBrightColors === t3.drawBoldTextInBrightColors && e3.minimumContrastRatio === t3.minimumContrastRatio && e3.colors.foreground.rgba === t3.colors.foreground.rgba && e3.colors.background.rgba === t3.colors.background.rgba;
         }, t2.is256Color = function(e3) {
-          return 16777216 == (50331648 & e3) || 33554432 == (50331648 & e3);
+          return 16777216 === (50331648 & e3) || 33554432 === (50331648 & e3);
         };
-      }, 237: (e2, t2, i2) => {
+      }, 237: (_e2, t2, i2) => {
         Object.defineProperty(t2, "__esModule", { value: true }), t2.TEXT_BASELINE = t2.DIM_OPACITY = t2.INVERTED_DEFAULT_COLOR = void 0;
         const s2 = i2(399);
         t2.INVERTED_DEFAULT_COLOR = 257, t2.DIM_OPACITY = 0.5, t2.TEXT_BASELINE = s2.isFirefox || s2.isLegacyEdge ? "bottom" : "ideographic";
-      }, 457: (e2, t2) => {
+      }, 457: (_e2, t2) => {
         Object.defineProperty(t2, "__esModule", { value: true }), t2.CursorBlinkStateManager = void 0;
         t2.CursorBlinkStateManager = class {
           constructor(e3, t3) {
@@ -7463,12 +7463,12 @@ void main() {
             this.pause(), this._animationTimeRestarted = void 0, this._restartInterval(), this.restartBlinkAnimation();
           }
         };
-      }, 860: (e2, t2, i2) => {
+      }, 860: (_e2, t2, i2) => {
         Object.defineProperty(t2, "__esModule", { value: true }), t2.tryDrawCustomChar = t2.powerlineDefinitions = t2.boxDrawingDefinitions = t2.blockElementDefinitions = void 0;
         const s2 = i2(374);
         t2.blockElementDefinitions = { "\u2580": [{ x: 0, y: 0, w: 8, h: 4 }], "\u2581": [{ x: 0, y: 7, w: 8, h: 1 }], "\u2582": [{ x: 0, y: 6, w: 8, h: 2 }], "\u2583": [{ x: 0, y: 5, w: 8, h: 3 }], "\u2584": [{ x: 0, y: 4, w: 8, h: 4 }], "\u2585": [{ x: 0, y: 3, w: 8, h: 5 }], "\u2586": [{ x: 0, y: 2, w: 8, h: 6 }], "\u2587": [{ x: 0, y: 1, w: 8, h: 7 }], "\u2588": [{ x: 0, y: 0, w: 8, h: 8 }], "\u2589": [{ x: 0, y: 0, w: 7, h: 8 }], "\u258A": [{ x: 0, y: 0, w: 6, h: 8 }], "\u258B": [{ x: 0, y: 0, w: 5, h: 8 }], "\u258C": [{ x: 0, y: 0, w: 4, h: 8 }], "\u258D": [{ x: 0, y: 0, w: 3, h: 8 }], "\u258E": [{ x: 0, y: 0, w: 2, h: 8 }], "\u258F": [{ x: 0, y: 0, w: 1, h: 8 }], "\u2590": [{ x: 4, y: 0, w: 4, h: 8 }], "\u2594": [{ x: 0, y: 0, w: 8, h: 1 }], "\u2595": [{ x: 7, y: 0, w: 1, h: 8 }], "\u2596": [{ x: 0, y: 4, w: 4, h: 4 }], "\u2597": [{ x: 4, y: 4, w: 4, h: 4 }], "\u2598": [{ x: 0, y: 0, w: 4, h: 4 }], "\u2599": [{ x: 0, y: 0, w: 4, h: 8 }, { x: 0, y: 4, w: 8, h: 4 }], "\u259A": [{ x: 0, y: 0, w: 4, h: 4 }, { x: 4, y: 4, w: 4, h: 4 }], "\u259B": [{ x: 0, y: 0, w: 4, h: 8 }, { x: 4, y: 0, w: 4, h: 4 }], "\u259C": [{ x: 0, y: 0, w: 8, h: 4 }, { x: 4, y: 0, w: 4, h: 8 }], "\u259D": [{ x: 4, y: 0, w: 4, h: 4 }], "\u259E": [{ x: 4, y: 0, w: 4, h: 4 }, { x: 0, y: 4, w: 4, h: 4 }], "\u259F": [{ x: 4, y: 0, w: 4, h: 8 }, { x: 0, y: 4, w: 8, h: 4 }], "\u{1FB70}": [{ x: 1, y: 0, w: 1, h: 8 }], "\u{1FB71}": [{ x: 2, y: 0, w: 1, h: 8 }], "\u{1FB72}": [{ x: 3, y: 0, w: 1, h: 8 }], "\u{1FB73}": [{ x: 4, y: 0, w: 1, h: 8 }], "\u{1FB74}": [{ x: 5, y: 0, w: 1, h: 8 }], "\u{1FB75}": [{ x: 6, y: 0, w: 1, h: 8 }], "\u{1FB76}": [{ x: 0, y: 1, w: 8, h: 1 }], "\u{1FB77}": [{ x: 0, y: 2, w: 8, h: 1 }], "\u{1FB78}": [{ x: 0, y: 3, w: 8, h: 1 }], "\u{1FB79}": [{ x: 0, y: 4, w: 8, h: 1 }], "\u{1FB7A}": [{ x: 0, y: 5, w: 8, h: 1 }], "\u{1FB7B}": [{ x: 0, y: 6, w: 8, h: 1 }], "\u{1FB7C}": [{ x: 0, y: 0, w: 1, h: 8 }, { x: 0, y: 7, w: 8, h: 1 }], "\u{1FB7D}": [{ x: 0, y: 0, w: 1, h: 8 }, { x: 0, y: 0, w: 8, h: 1 }], "\u{1FB7E}": [{ x: 7, y: 0, w: 1, h: 8 }, { x: 0, y: 0, w: 8, h: 1 }], "\u{1FB7F}": [{ x: 7, y: 0, w: 1, h: 8 }, { x: 0, y: 7, w: 8, h: 1 }], "\u{1FB80}": [{ x: 0, y: 0, w: 8, h: 1 }, { x: 0, y: 7, w: 8, h: 1 }], "\u{1FB81}": [{ x: 0, y: 0, w: 8, h: 1 }, { x: 0, y: 2, w: 8, h: 1 }, { x: 0, y: 4, w: 8, h: 1 }, { x: 0, y: 7, w: 8, h: 1 }], "\u{1FB82}": [{ x: 0, y: 0, w: 8, h: 2 }], "\u{1FB83}": [{ x: 0, y: 0, w: 8, h: 3 }], "\u{1FB84}": [{ x: 0, y: 0, w: 8, h: 5 }], "\u{1FB85}": [{ x: 0, y: 0, w: 8, h: 6 }], "\u{1FB86}": [{ x: 0, y: 0, w: 8, h: 7 }], "\u{1FB87}": [{ x: 6, y: 0, w: 2, h: 8 }], "\u{1FB88}": [{ x: 5, y: 0, w: 3, h: 8 }], "\u{1FB89}": [{ x: 3, y: 0, w: 5, h: 8 }], "\u{1FB8A}": [{ x: 2, y: 0, w: 6, h: 8 }], "\u{1FB8B}": [{ x: 1, y: 0, w: 7, h: 8 }], "\u{1FB95}": [{ x: 0, y: 0, w: 2, h: 2 }, { x: 4, y: 0, w: 2, h: 2 }, { x: 2, y: 2, w: 2, h: 2 }, { x: 6, y: 2, w: 2, h: 2 }, { x: 0, y: 4, w: 2, h: 2 }, { x: 4, y: 4, w: 2, h: 2 }, { x: 2, y: 6, w: 2, h: 2 }, { x: 6, y: 6, w: 2, h: 2 }], "\u{1FB96}": [{ x: 2, y: 0, w: 2, h: 2 }, { x: 6, y: 0, w: 2, h: 2 }, { x: 0, y: 2, w: 2, h: 2 }, { x: 4, y: 2, w: 2, h: 2 }, { x: 2, y: 4, w: 2, h: 2 }, { x: 6, y: 4, w: 2, h: 2 }, { x: 0, y: 6, w: 2, h: 2 }, { x: 4, y: 6, w: 2, h: 2 }], "\u{1FB97}": [{ x: 0, y: 2, w: 8, h: 2 }, { x: 0, y: 6, w: 8, h: 2 }] };
         const r = { "\u2591": [[1, 0, 0, 0], [0, 0, 0, 0], [0, 0, 1, 0], [0, 0, 0, 0]], "\u2592": [[1, 0], [0, 0], [0, 1], [0, 0]], "\u2593": [[0, 1], [1, 1], [1, 0], [1, 1]] };
-        t2.boxDrawingDefinitions = { "\u2500": { 1: "M0,.5 L1,.5" }, "\u2501": { 3: "M0,.5 L1,.5" }, "\u2502": { 1: "M.5,0 L.5,1" }, "\u2503": { 3: "M.5,0 L.5,1" }, "\u250C": { 1: "M0.5,1 L.5,.5 L1,.5" }, "\u250F": { 3: "M0.5,1 L.5,.5 L1,.5" }, "\u2510": { 1: "M0,.5 L.5,.5 L.5,1" }, "\u2513": { 3: "M0,.5 L.5,.5 L.5,1" }, "\u2514": { 1: "M.5,0 L.5,.5 L1,.5" }, "\u2517": { 3: "M.5,0 L.5,.5 L1,.5" }, "\u2518": { 1: "M.5,0 L.5,.5 L0,.5" }, "\u251B": { 3: "M.5,0 L.5,.5 L0,.5" }, "\u251C": { 1: "M.5,0 L.5,1 M.5,.5 L1,.5" }, "\u2523": { 3: "M.5,0 L.5,1 M.5,.5 L1,.5" }, "\u2524": { 1: "M.5,0 L.5,1 M.5,.5 L0,.5" }, "\u252B": { 3: "M.5,0 L.5,1 M.5,.5 L0,.5" }, "\u252C": { 1: "M0,.5 L1,.5 M.5,.5 L.5,1" }, "\u2533": { 3: "M0,.5 L1,.5 M.5,.5 L.5,1" }, "\u2534": { 1: "M0,.5 L1,.5 M.5,.5 L.5,0" }, "\u253B": { 3: "M0,.5 L1,.5 M.5,.5 L.5,0" }, "\u253C": { 1: "M0,.5 L1,.5 M.5,0 L.5,1" }, "\u254B": { 3: "M0,.5 L1,.5 M.5,0 L.5,1" }, "\u2574": { 1: "M.5,.5 L0,.5" }, "\u2578": { 3: "M.5,.5 L0,.5" }, "\u2575": { 1: "M.5,.5 L.5,0" }, "\u2579": { 3: "M.5,.5 L.5,0" }, "\u2576": { 1: "M.5,.5 L1,.5" }, "\u257A": { 3: "M.5,.5 L1,.5" }, "\u2577": { 1: "M.5,.5 L.5,1" }, "\u257B": { 3: "M.5,.5 L.5,1" }, "\u2550": { 1: (e3, t3) => `M0,${0.5 - t3} L1,${0.5 - t3} M0,${0.5 + t3} L1,${0.5 + t3}` }, "\u2551": { 1: (e3, t3) => `M${0.5 - e3},0 L${0.5 - e3},1 M${0.5 + e3},0 L${0.5 + e3},1` }, "\u2552": { 1: (e3, t3) => `M.5,1 L.5,${0.5 - t3} L1,${0.5 - t3} M.5,${0.5 + t3} L1,${0.5 + t3}` }, "\u2553": { 1: (e3, t3) => `M${0.5 - e3},1 L${0.5 - e3},.5 L1,.5 M${0.5 + e3},.5 L${0.5 + e3},1` }, "\u2554": { 1: (e3, t3) => `M1,${0.5 - t3} L${0.5 - e3},${0.5 - t3} L${0.5 - e3},1 M1,${0.5 + t3} L${0.5 + e3},${0.5 + t3} L${0.5 + e3},1` }, "\u2555": { 1: (e3, t3) => `M0,${0.5 - t3} L.5,${0.5 - t3} L.5,1 M0,${0.5 + t3} L.5,${0.5 + t3}` }, "\u2556": { 1: (e3, t3) => `M${0.5 + e3},1 L${0.5 + e3},.5 L0,.5 M${0.5 - e3},.5 L${0.5 - e3},1` }, "\u2557": { 1: (e3, t3) => `M0,${0.5 + t3} L${0.5 - e3},${0.5 + t3} L${0.5 - e3},1 M0,${0.5 - t3} L${0.5 + e3},${0.5 - t3} L${0.5 + e3},1` }, "\u2558": { 1: (e3, t3) => `M.5,0 L.5,${0.5 + t3} L1,${0.5 + t3} M.5,${0.5 - t3} L1,${0.5 - t3}` }, "\u2559": { 1: (e3, t3) => `M1,.5 L${0.5 - e3},.5 L${0.5 - e3},0 M${0.5 + e3},.5 L${0.5 + e3},0` }, "\u255A": { 1: (e3, t3) => `M1,${0.5 - t3} L${0.5 + e3},${0.5 - t3} L${0.5 + e3},0 M1,${0.5 + t3} L${0.5 - e3},${0.5 + t3} L${0.5 - e3},0` }, "\u255B": { 1: (e3, t3) => `M0,${0.5 + t3} L.5,${0.5 + t3} L.5,0 M0,${0.5 - t3} L.5,${0.5 - t3}` }, "\u255C": { 1: (e3, t3) => `M0,.5 L${0.5 + e3},.5 L${0.5 + e3},0 M${0.5 - e3},.5 L${0.5 - e3},0` }, "\u255D": { 1: (e3, t3) => `M0,${0.5 - t3} L${0.5 - e3},${0.5 - t3} L${0.5 - e3},0 M0,${0.5 + t3} L${0.5 + e3},${0.5 + t3} L${0.5 + e3},0` }, "\u255E": { 1: (e3, t3) => `M.5,0 L.5,1 M.5,${0.5 - t3} L1,${0.5 - t3} M.5,${0.5 + t3} L1,${0.5 + t3}` }, "\u255F": { 1: (e3, t3) => `M${0.5 - e3},0 L${0.5 - e3},1 M${0.5 + e3},0 L${0.5 + e3},1 M${0.5 + e3},.5 L1,.5` }, "\u2560": { 1: (e3, t3) => `M${0.5 - e3},0 L${0.5 - e3},1 M1,${0.5 + t3} L${0.5 + e3},${0.5 + t3} L${0.5 + e3},1 M1,${0.5 - t3} L${0.5 + e3},${0.5 - t3} L${0.5 + e3},0` }, "\u2561": { 1: (e3, t3) => `M.5,0 L.5,1 M0,${0.5 - t3} L.5,${0.5 - t3} M0,${0.5 + t3} L.5,${0.5 + t3}` }, "\u2562": { 1: (e3, t3) => `M0,.5 L${0.5 - e3},.5 M${0.5 - e3},0 L${0.5 - e3},1 M${0.5 + e3},0 L${0.5 + e3},1` }, "\u2563": { 1: (e3, t3) => `M${0.5 + e3},0 L${0.5 + e3},1 M0,${0.5 + t3} L${0.5 - e3},${0.5 + t3} L${0.5 - e3},1 M0,${0.5 - t3} L${0.5 - e3},${0.5 - t3} L${0.5 - e3},0` }, "\u2564": { 1: (e3, t3) => `M0,${0.5 - t3} L1,${0.5 - t3} M0,${0.5 + t3} L1,${0.5 + t3} M.5,${0.5 + t3} L.5,1` }, "\u2565": { 1: (e3, t3) => `M0,.5 L1,.5 M${0.5 - e3},.5 L${0.5 - e3},1 M${0.5 + e3},.5 L${0.5 + e3},1` }, "\u2566": { 1: (e3, t3) => `M0,${0.5 - t3} L1,${0.5 - t3} M0,${0.5 + t3} L${0.5 - e3},${0.5 + t3} L${0.5 - e3},1 M1,${0.5 + t3} L${0.5 + e3},${0.5 + t3} L${0.5 + e3},1` }, "\u2567": { 1: (e3, t3) => `M.5,0 L.5,${0.5 - t3} M0,${0.5 - t3} L1,${0.5 - t3} M0,${0.5 + t3} L1,${0.5 + t3}` }, "\u2568": { 1: (e3, t3) => `M0,.5 L1,.5 M${0.5 - e3},.5 L${0.5 - e3},0 M${0.5 + e3},.5 L${0.5 + e3},0` }, "\u2569": { 1: (e3, t3) => `M0,${0.5 + t3} L1,${0.5 + t3} M0,${0.5 - t3} L${0.5 - e3},${0.5 - t3} L${0.5 - e3},0 M1,${0.5 - t3} L${0.5 + e3},${0.5 - t3} L${0.5 + e3},0` }, "\u256A": { 1: (e3, t3) => `M.5,0 L.5,1 M0,${0.5 - t3} L1,${0.5 - t3} M0,${0.5 + t3} L1,${0.5 + t3}` }, "\u256B": { 1: (e3, t3) => `M0,.5 L1,.5 M${0.5 - e3},0 L${0.5 - e3},1 M${0.5 + e3},0 L${0.5 + e3},1` }, "\u256C": { 1: (e3, t3) => `M0,${0.5 + t3} L${0.5 - e3},${0.5 + t3} L${0.5 - e3},1 M1,${0.5 + t3} L${0.5 + e3},${0.5 + t3} L${0.5 + e3},1 M0,${0.5 - t3} L${0.5 - e3},${0.5 - t3} L${0.5 - e3},0 M1,${0.5 - t3} L${0.5 + e3},${0.5 - t3} L${0.5 + e3},0` }, "\u2571": { 1: "M1,0 L0,1" }, "\u2572": { 1: "M0,0 L1,1" }, "\u2573": { 1: "M1,0 L0,1 M0,0 L1,1" }, "\u257C": { 1: "M.5,.5 L0,.5", 3: "M.5,.5 L1,.5" }, "\u257D": { 1: "M.5,.5 L.5,0", 3: "M.5,.5 L.5,1" }, "\u257E": { 1: "M.5,.5 L1,.5", 3: "M.5,.5 L0,.5" }, "\u257F": { 1: "M.5,.5 L.5,1", 3: "M.5,.5 L.5,0" }, "\u250D": { 1: "M.5,.5 L.5,1", 3: "M.5,.5 L1,.5" }, "\u250E": { 1: "M.5,.5 L1,.5", 3: "M.5,.5 L.5,1" }, "\u2511": { 1: "M.5,.5 L.5,1", 3: "M.5,.5 L0,.5" }, "\u2512": { 1: "M.5,.5 L0,.5", 3: "M.5,.5 L.5,1" }, "\u2515": { 1: "M.5,.5 L.5,0", 3: "M.5,.5 L1,.5" }, "\u2516": { 1: "M.5,.5 L1,.5", 3: "M.5,.5 L.5,0" }, "\u2519": { 1: "M.5,.5 L.5,0", 3: "M.5,.5 L0,.5" }, "\u251A": { 1: "M.5,.5 L0,.5", 3: "M.5,.5 L.5,0" }, "\u251D": { 1: "M.5,0 L.5,1", 3: "M.5,.5 L1,.5" }, "\u251E": { 1: "M0.5,1 L.5,.5 L1,.5", 3: "M.5,.5 L.5,0" }, "\u251F": { 1: "M.5,0 L.5,.5 L1,.5", 3: "M.5,.5 L.5,1" }, "\u2520": { 1: "M.5,.5 L1,.5", 3: "M.5,0 L.5,1" }, "\u2521": { 1: "M.5,.5 L.5,1", 3: "M.5,0 L.5,.5 L1,.5" }, "\u2522": { 1: "M.5,.5 L.5,0", 3: "M0.5,1 L.5,.5 L1,.5" }, "\u2525": { 1: "M.5,0 L.5,1", 3: "M.5,.5 L0,.5" }, "\u2526": { 1: "M0,.5 L.5,.5 L.5,1", 3: "M.5,.5 L.5,0" }, "\u2527": { 1: "M.5,0 L.5,.5 L0,.5", 3: "M.5,.5 L.5,1" }, "\u2528": { 1: "M.5,.5 L0,.5", 3: "M.5,0 L.5,1" }, "\u2529": { 1: "M.5,.5 L.5,1", 3: "M.5,0 L.5,.5 L0,.5" }, "\u252A": { 1: "M.5,.5 L.5,0", 3: "M0,.5 L.5,.5 L.5,1" }, "\u252D": { 1: "M0.5,1 L.5,.5 L1,.5", 3: "M.5,.5 L0,.5" }, "\u252E": { 1: "M0,.5 L.5,.5 L.5,1", 3: "M.5,.5 L1,.5" }, "\u252F": { 1: "M.5,.5 L.5,1", 3: "M0,.5 L1,.5" }, "\u2530": { 1: "M0,.5 L1,.5", 3: "M.5,.5 L.5,1" }, "\u2531": { 1: "M.5,.5 L1,.5", 3: "M0,.5 L.5,.5 L.5,1" }, "\u2532": { 1: "M.5,.5 L0,.5", 3: "M0.5,1 L.5,.5 L1,.5" }, "\u2535": { 1: "M.5,0 L.5,.5 L1,.5", 3: "M.5,.5 L0,.5" }, "\u2536": { 1: "M.5,0 L.5,.5 L0,.5", 3: "M.5,.5 L1,.5" }, "\u2537": { 1: "M.5,.5 L.5,0", 3: "M0,.5 L1,.5" }, "\u2538": { 1: "M0,.5 L1,.5", 3: "M.5,.5 L.5,0" }, "\u2539": { 1: "M.5,.5 L1,.5", 3: "M.5,0 L.5,.5 L0,.5" }, "\u253A": { 1: "M.5,.5 L0,.5", 3: "M.5,0 L.5,.5 L1,.5" }, "\u253D": { 1: "M.5,0 L.5,1 M.5,.5 L1,.5", 3: "M.5,.5 L0,.5" }, "\u253E": { 1: "M.5,0 L.5,1 M.5,.5 L0,.5", 3: "M.5,.5 L1,.5" }, "\u253F": { 1: "M.5,0 L.5,1", 3: "M0,.5 L1,.5" }, "\u2540": { 1: "M0,.5 L1,.5 M.5,.5 L.5,1", 3: "M.5,.5 L.5,0" }, "\u2541": { 1: "M.5,.5 L.5,0 M0,.5 L1,.5", 3: "M.5,.5 L.5,1" }, "\u2542": { 1: "M0,.5 L1,.5", 3: "M.5,0 L.5,1" }, "\u2543": { 1: "M0.5,1 L.5,.5 L1,.5", 3: "M.5,0 L.5,.5 L0,.5" }, "\u2544": { 1: "M0,.5 L.5,.5 L.5,1", 3: "M.5,0 L.5,.5 L1,.5" }, "\u2545": { 1: "M.5,0 L.5,.5 L1,.5", 3: "M0,.5 L.5,.5 L.5,1" }, "\u2546": { 1: "M.5,0 L.5,.5 L0,.5", 3: "M0.5,1 L.5,.5 L1,.5" }, "\u2547": { 1: "M.5,.5 L.5,1", 3: "M.5,.5 L.5,0 M0,.5 L1,.5" }, "\u2548": { 1: "M.5,.5 L.5,0", 3: "M0,.5 L1,.5 M.5,.5 L.5,1" }, "\u2549": { 1: "M.5,.5 L1,.5", 3: "M.5,0 L.5,1 M.5,.5 L0,.5" }, "\u254A": { 1: "M.5,.5 L0,.5", 3: "M.5,0 L.5,1 M.5,.5 L1,.5" }, "\u254C": { 1: "M.1,.5 L.4,.5 M.6,.5 L.9,.5" }, "\u254D": { 3: "M.1,.5 L.4,.5 M.6,.5 L.9,.5" }, "\u2504": { 1: "M.0667,.5 L.2667,.5 M.4,.5 L.6,.5 M.7333,.5 L.9333,.5" }, "\u2505": { 3: "M.0667,.5 L.2667,.5 M.4,.5 L.6,.5 M.7333,.5 L.9333,.5" }, "\u2508": { 1: "M.05,.5 L.2,.5 M.3,.5 L.45,.5 M.55,.5 L.7,.5 M.8,.5 L.95,.5" }, "\u2509": { 3: "M.05,.5 L.2,.5 M.3,.5 L.45,.5 M.55,.5 L.7,.5 M.8,.5 L.95,.5" }, "\u254E": { 1: "M.5,.1 L.5,.4 M.5,.6 L.5,.9" }, "\u254F": { 3: "M.5,.1 L.5,.4 M.5,.6 L.5,.9" }, "\u2506": { 1: "M.5,.0667 L.5,.2667 M.5,.4 L.5,.6 M.5,.7333 L.5,.9333" }, "\u2507": { 3: "M.5,.0667 L.5,.2667 M.5,.4 L.5,.6 M.5,.7333 L.5,.9333" }, "\u250A": { 1: "M.5,.05 L.5,.2 M.5,.3 L.5,.45 L.5,.55 M.5,.7 L.5,.95" }, "\u250B": { 3: "M.5,.05 L.5,.2 M.5,.3 L.5,.45 L.5,.55 M.5,.7 L.5,.95" }, "\u256D": { 1: (e3, t3) => `M.5,1 L.5,${0.5 + t3 / 0.15 * 0.5} C.5,${0.5 + t3 / 0.15 * 0.5},.5,.5,1,.5` }, "\u256E": { 1: (e3, t3) => `M.5,1 L.5,${0.5 + t3 / 0.15 * 0.5} C.5,${0.5 + t3 / 0.15 * 0.5},.5,.5,0,.5` }, "\u256F": { 1: (e3, t3) => `M.5,0 L.5,${0.5 - t3 / 0.15 * 0.5} C.5,${0.5 - t3 / 0.15 * 0.5},.5,.5,0,.5` }, "\u2570": { 1: (e3, t3) => `M.5,0 L.5,${0.5 - t3 / 0.15 * 0.5} C.5,${0.5 - t3 / 0.15 * 0.5},.5,.5,1,.5` } }, t2.powerlineDefinitions = { "\uE0B0": { d: "M0,0 L1,.5 L0,1", type: 0, rightPadding: 2 }, "\uE0B1": { d: "M-1,-.5 L1,.5 L-1,1.5", type: 1, leftPadding: 1, rightPadding: 1 }, "\uE0B2": { d: "M1,0 L0,.5 L1,1", type: 0, leftPadding: 2 }, "\uE0B3": { d: "M2,-.5 L0,.5 L2,1.5", type: 1, leftPadding: 1, rightPadding: 1 }, "\uE0B4": { d: "M0,0 L0,1 C0.552,1,1,0.776,1,.5 C1,0.224,0.552,0,0,0", type: 0, rightPadding: 1 }, "\uE0B5": { d: "M.2,1 C.422,1,.8,.826,.78,.5 C.8,.174,0.422,0,.2,0", type: 1, rightPadding: 1 }, "\uE0B6": { d: "M1,0 L1,1 C0.448,1,0,0.776,0,.5 C0,0.224,0.448,0,1,0", type: 0, leftPadding: 1 }, "\uE0B7": { d: "M.8,1 C0.578,1,0.2,.826,.22,.5 C0.2,0.174,0.578,0,0.8,0", type: 1, leftPadding: 1 }, "\uE0B8": { d: "M-.5,-.5 L1.5,1.5 L-.5,1.5", type: 0 }, "\uE0B9": { d: "M-.5,-.5 L1.5,1.5", type: 1, leftPadding: 1, rightPadding: 1 }, "\uE0BA": { d: "M1.5,-.5 L-.5,1.5 L1.5,1.5", type: 0 }, "\uE0BC": { d: "M1.5,-.5 L-.5,1.5 L-.5,-.5", type: 0 }, "\uE0BD": { d: "M1.5,-.5 L-.5,1.5", type: 1, leftPadding: 1, rightPadding: 1 }, "\uE0BE": { d: "M-.5,-.5 L1.5,1.5 L1.5,-.5", type: 0 } }, t2.powerlineDefinitions["\uE0BB"] = t2.powerlineDefinitions["\uE0BD"], t2.powerlineDefinitions["\uE0BF"] = t2.powerlineDefinitions["\uE0B9"], t2.tryDrawCustomChar = function(e3, i3, n2, l, c, d, _, u) {
+        t2.boxDrawingDefinitions = { "\u2500": { 1: "M0,.5 L1,.5" }, "\u2501": { 3: "M0,.5 L1,.5" }, "\u2502": { 1: "M.5,0 L.5,1" }, "\u2503": { 3: "M.5,0 L.5,1" }, "\u250C": { 1: "M0.5,1 L.5,.5 L1,.5" }, "\u250F": { 3: "M0.5,1 L.5,.5 L1,.5" }, "\u2510": { 1: "M0,.5 L.5,.5 L.5,1" }, "\u2513": { 3: "M0,.5 L.5,.5 L.5,1" }, "\u2514": { 1: "M.5,0 L.5,.5 L1,.5" }, "\u2517": { 3: "M.5,0 L.5,.5 L1,.5" }, "\u2518": { 1: "M.5,0 L.5,.5 L0,.5" }, "\u251B": { 3: "M.5,0 L.5,.5 L0,.5" }, "\u251C": { 1: "M.5,0 L.5,1 M.5,.5 L1,.5" }, "\u2523": { 3: "M.5,0 L.5,1 M.5,.5 L1,.5" }, "\u2524": { 1: "M.5,0 L.5,1 M.5,.5 L0,.5" }, "\u252B": { 3: "M.5,0 L.5,1 M.5,.5 L0,.5" }, "\u252C": { 1: "M0,.5 L1,.5 M.5,.5 L.5,1" }, "\u2533": { 3: "M0,.5 L1,.5 M.5,.5 L.5,1" }, "\u2534": { 1: "M0,.5 L1,.5 M.5,.5 L.5,0" }, "\u253B": { 3: "M0,.5 L1,.5 M.5,.5 L.5,0" }, "\u253C": { 1: "M0,.5 L1,.5 M.5,0 L.5,1" }, "\u254B": { 3: "M0,.5 L1,.5 M.5,0 L.5,1" }, "\u2574": { 1: "M.5,.5 L0,.5" }, "\u2578": { 3: "M.5,.5 L0,.5" }, "\u2575": { 1: "M.5,.5 L.5,0" }, "\u2579": { 3: "M.5,.5 L.5,0" }, "\u2576": { 1: "M.5,.5 L1,.5" }, "\u257A": { 3: "M.5,.5 L1,.5" }, "\u2577": { 1: "M.5,.5 L.5,1" }, "\u257B": { 3: "M.5,.5 L.5,1" }, "\u2550": { 1: (_e3, t3) => `M0,${0.5 - t3} L1,${0.5 - t3} M0,${0.5 + t3} L1,${0.5 + t3}` }, "\u2551": { 1: (e3, _t3) => `M${0.5 - e3},0 L${0.5 - e3},1 M${0.5 + e3},0 L${0.5 + e3},1` }, "\u2552": { 1: (_e3, t3) => `M.5,1 L.5,${0.5 - t3} L1,${0.5 - t3} M.5,${0.5 + t3} L1,${0.5 + t3}` }, "\u2553": { 1: (e3, _t3) => `M${0.5 - e3},1 L${0.5 - e3},.5 L1,.5 M${0.5 + e3},.5 L${0.5 + e3},1` }, "\u2554": { 1: (e3, t3) => `M1,${0.5 - t3} L${0.5 - e3},${0.5 - t3} L${0.5 - e3},1 M1,${0.5 + t3} L${0.5 + e3},${0.5 + t3} L${0.5 + e3},1` }, "\u2555": { 1: (_e3, t3) => `M0,${0.5 - t3} L.5,${0.5 - t3} L.5,1 M0,${0.5 + t3} L.5,${0.5 + t3}` }, "\u2556": { 1: (e3, _t3) => `M${0.5 + e3},1 L${0.5 + e3},.5 L0,.5 M${0.5 - e3},.5 L${0.5 - e3},1` }, "\u2557": { 1: (e3, t3) => `M0,${0.5 + t3} L${0.5 - e3},${0.5 + t3} L${0.5 - e3},1 M0,${0.5 - t3} L${0.5 + e3},${0.5 - t3} L${0.5 + e3},1` }, "\u2558": { 1: (_e3, t3) => `M.5,0 L.5,${0.5 + t3} L1,${0.5 + t3} M.5,${0.5 - t3} L1,${0.5 - t3}` }, "\u2559": { 1: (e3, _t3) => `M1,.5 L${0.5 - e3},.5 L${0.5 - e3},0 M${0.5 + e3},.5 L${0.5 + e3},0` }, "\u255A": { 1: (e3, t3) => `M1,${0.5 - t3} L${0.5 + e3},${0.5 - t3} L${0.5 + e3},0 M1,${0.5 + t3} L${0.5 - e3},${0.5 + t3} L${0.5 - e3},0` }, "\u255B": { 1: (_e3, t3) => `M0,${0.5 + t3} L.5,${0.5 + t3} L.5,0 M0,${0.5 - t3} L.5,${0.5 - t3}` }, "\u255C": { 1: (e3, _t3) => `M0,.5 L${0.5 + e3},.5 L${0.5 + e3},0 M${0.5 - e3},.5 L${0.5 - e3},0` }, "\u255D": { 1: (e3, t3) => `M0,${0.5 - t3} L${0.5 - e3},${0.5 - t3} L${0.5 - e3},0 M0,${0.5 + t3} L${0.5 + e3},${0.5 + t3} L${0.5 + e3},0` }, "\u255E": { 1: (_e3, t3) => `M.5,0 L.5,1 M.5,${0.5 - t3} L1,${0.5 - t3} M.5,${0.5 + t3} L1,${0.5 + t3}` }, "\u255F": { 1: (e3, _t3) => `M${0.5 - e3},0 L${0.5 - e3},1 M${0.5 + e3},0 L${0.5 + e3},1 M${0.5 + e3},.5 L1,.5` }, "\u2560": { 1: (e3, t3) => `M${0.5 - e3},0 L${0.5 - e3},1 M1,${0.5 + t3} L${0.5 + e3},${0.5 + t3} L${0.5 + e3},1 M1,${0.5 - t3} L${0.5 + e3},${0.5 - t3} L${0.5 + e3},0` }, "\u2561": { 1: (_e3, t3) => `M.5,0 L.5,1 M0,${0.5 - t3} L.5,${0.5 - t3} M0,${0.5 + t3} L.5,${0.5 + t3}` }, "\u2562": { 1: (e3, _t3) => `M0,.5 L${0.5 - e3},.5 M${0.5 - e3},0 L${0.5 - e3},1 M${0.5 + e3},0 L${0.5 + e3},1` }, "\u2563": { 1: (e3, t3) => `M${0.5 + e3},0 L${0.5 + e3},1 M0,${0.5 + t3} L${0.5 - e3},${0.5 + t3} L${0.5 - e3},1 M0,${0.5 - t3} L${0.5 - e3},${0.5 - t3} L${0.5 - e3},0` }, "\u2564": { 1: (_e3, t3) => `M0,${0.5 - t3} L1,${0.5 - t3} M0,${0.5 + t3} L1,${0.5 + t3} M.5,${0.5 + t3} L.5,1` }, "\u2565": { 1: (e3, _t3) => `M0,.5 L1,.5 M${0.5 - e3},.5 L${0.5 - e3},1 M${0.5 + e3},.5 L${0.5 + e3},1` }, "\u2566": { 1: (e3, t3) => `M0,${0.5 - t3} L1,${0.5 - t3} M0,${0.5 + t3} L${0.5 - e3},${0.5 + t3} L${0.5 - e3},1 M1,${0.5 + t3} L${0.5 + e3},${0.5 + t3} L${0.5 + e3},1` }, "\u2567": { 1: (_e3, t3) => `M.5,0 L.5,${0.5 - t3} M0,${0.5 - t3} L1,${0.5 - t3} M0,${0.5 + t3} L1,${0.5 + t3}` }, "\u2568": { 1: (e3, _t3) => `M0,.5 L1,.5 M${0.5 - e3},.5 L${0.5 - e3},0 M${0.5 + e3},.5 L${0.5 + e3},0` }, "\u2569": { 1: (e3, t3) => `M0,${0.5 + t3} L1,${0.5 + t3} M0,${0.5 - t3} L${0.5 - e3},${0.5 - t3} L${0.5 - e3},0 M1,${0.5 - t3} L${0.5 + e3},${0.5 - t3} L${0.5 + e3},0` }, "\u256A": { 1: (_e3, t3) => `M.5,0 L.5,1 M0,${0.5 - t3} L1,${0.5 - t3} M0,${0.5 + t3} L1,${0.5 + t3}` }, "\u256B": { 1: (e3, _t3) => `M0,.5 L1,.5 M${0.5 - e3},0 L${0.5 - e3},1 M${0.5 + e3},0 L${0.5 + e3},1` }, "\u256C": { 1: (e3, t3) => `M0,${0.5 + t3} L${0.5 - e3},${0.5 + t3} L${0.5 - e3},1 M1,${0.5 + t3} L${0.5 + e3},${0.5 + t3} L${0.5 + e3},1 M0,${0.5 - t3} L${0.5 - e3},${0.5 - t3} L${0.5 - e3},0 M1,${0.5 - t3} L${0.5 + e3},${0.5 - t3} L${0.5 + e3},0` }, "\u2571": { 1: "M1,0 L0,1" }, "\u2572": { 1: "M0,0 L1,1" }, "\u2573": { 1: "M1,0 L0,1 M0,0 L1,1" }, "\u257C": { 1: "M.5,.5 L0,.5", 3: "M.5,.5 L1,.5" }, "\u257D": { 1: "M.5,.5 L.5,0", 3: "M.5,.5 L.5,1" }, "\u257E": { 1: "M.5,.5 L1,.5", 3: "M.5,.5 L0,.5" }, "\u257F": { 1: "M.5,.5 L.5,1", 3: "M.5,.5 L.5,0" }, "\u250D": { 1: "M.5,.5 L.5,1", 3: "M.5,.5 L1,.5" }, "\u250E": { 1: "M.5,.5 L1,.5", 3: "M.5,.5 L.5,1" }, "\u2511": { 1: "M.5,.5 L.5,1", 3: "M.5,.5 L0,.5" }, "\u2512": { 1: "M.5,.5 L0,.5", 3: "M.5,.5 L.5,1" }, "\u2515": { 1: "M.5,.5 L.5,0", 3: "M.5,.5 L1,.5" }, "\u2516": { 1: "M.5,.5 L1,.5", 3: "M.5,.5 L.5,0" }, "\u2519": { 1: "M.5,.5 L.5,0", 3: "M.5,.5 L0,.5" }, "\u251A": { 1: "M.5,.5 L0,.5", 3: "M.5,.5 L.5,0" }, "\u251D": { 1: "M.5,0 L.5,1", 3: "M.5,.5 L1,.5" }, "\u251E": { 1: "M0.5,1 L.5,.5 L1,.5", 3: "M.5,.5 L.5,0" }, "\u251F": { 1: "M.5,0 L.5,.5 L1,.5", 3: "M.5,.5 L.5,1" }, "\u2520": { 1: "M.5,.5 L1,.5", 3: "M.5,0 L.5,1" }, "\u2521": { 1: "M.5,.5 L.5,1", 3: "M.5,0 L.5,.5 L1,.5" }, "\u2522": { 1: "M.5,.5 L.5,0", 3: "M0.5,1 L.5,.5 L1,.5" }, "\u2525": { 1: "M.5,0 L.5,1", 3: "M.5,.5 L0,.5" }, "\u2526": { 1: "M0,.5 L.5,.5 L.5,1", 3: "M.5,.5 L.5,0" }, "\u2527": { 1: "M.5,0 L.5,.5 L0,.5", 3: "M.5,.5 L.5,1" }, "\u2528": { 1: "M.5,.5 L0,.5", 3: "M.5,0 L.5,1" }, "\u2529": { 1: "M.5,.5 L.5,1", 3: "M.5,0 L.5,.5 L0,.5" }, "\u252A": { 1: "M.5,.5 L.5,0", 3: "M0,.5 L.5,.5 L.5,1" }, "\u252D": { 1: "M0.5,1 L.5,.5 L1,.5", 3: "M.5,.5 L0,.5" }, "\u252E": { 1: "M0,.5 L.5,.5 L.5,1", 3: "M.5,.5 L1,.5" }, "\u252F": { 1: "M.5,.5 L.5,1", 3: "M0,.5 L1,.5" }, "\u2530": { 1: "M0,.5 L1,.5", 3: "M.5,.5 L.5,1" }, "\u2531": { 1: "M.5,.5 L1,.5", 3: "M0,.5 L.5,.5 L.5,1" }, "\u2532": { 1: "M.5,.5 L0,.5", 3: "M0.5,1 L.5,.5 L1,.5" }, "\u2535": { 1: "M.5,0 L.5,.5 L1,.5", 3: "M.5,.5 L0,.5" }, "\u2536": { 1: "M.5,0 L.5,.5 L0,.5", 3: "M.5,.5 L1,.5" }, "\u2537": { 1: "M.5,.5 L.5,0", 3: "M0,.5 L1,.5" }, "\u2538": { 1: "M0,.5 L1,.5", 3: "M.5,.5 L.5,0" }, "\u2539": { 1: "M.5,.5 L1,.5", 3: "M.5,0 L.5,.5 L0,.5" }, "\u253A": { 1: "M.5,.5 L0,.5", 3: "M.5,0 L.5,.5 L1,.5" }, "\u253D": { 1: "M.5,0 L.5,1 M.5,.5 L1,.5", 3: "M.5,.5 L0,.5" }, "\u253E": { 1: "M.5,0 L.5,1 M.5,.5 L0,.5", 3: "M.5,.5 L1,.5" }, "\u253F": { 1: "M.5,0 L.5,1", 3: "M0,.5 L1,.5" }, "\u2540": { 1: "M0,.5 L1,.5 M.5,.5 L.5,1", 3: "M.5,.5 L.5,0" }, "\u2541": { 1: "M.5,.5 L.5,0 M0,.5 L1,.5", 3: "M.5,.5 L.5,1" }, "\u2542": { 1: "M0,.5 L1,.5", 3: "M.5,0 L.5,1" }, "\u2543": { 1: "M0.5,1 L.5,.5 L1,.5", 3: "M.5,0 L.5,.5 L0,.5" }, "\u2544": { 1: "M0,.5 L.5,.5 L.5,1", 3: "M.5,0 L.5,.5 L1,.5" }, "\u2545": { 1: "M.5,0 L.5,.5 L1,.5", 3: "M0,.5 L.5,.5 L.5,1" }, "\u2546": { 1: "M.5,0 L.5,.5 L0,.5", 3: "M0.5,1 L.5,.5 L1,.5" }, "\u2547": { 1: "M.5,.5 L.5,1", 3: "M.5,.5 L.5,0 M0,.5 L1,.5" }, "\u2548": { 1: "M.5,.5 L.5,0", 3: "M0,.5 L1,.5 M.5,.5 L.5,1" }, "\u2549": { 1: "M.5,.5 L1,.5", 3: "M.5,0 L.5,1 M.5,.5 L0,.5" }, "\u254A": { 1: "M.5,.5 L0,.5", 3: "M.5,0 L.5,1 M.5,.5 L1,.5" }, "\u254C": { 1: "M.1,.5 L.4,.5 M.6,.5 L.9,.5" }, "\u254D": { 3: "M.1,.5 L.4,.5 M.6,.5 L.9,.5" }, "\u2504": { 1: "M.0667,.5 L.2667,.5 M.4,.5 L.6,.5 M.7333,.5 L.9333,.5" }, "\u2505": { 3: "M.0667,.5 L.2667,.5 M.4,.5 L.6,.5 M.7333,.5 L.9333,.5" }, "\u2508": { 1: "M.05,.5 L.2,.5 M.3,.5 L.45,.5 M.55,.5 L.7,.5 M.8,.5 L.95,.5" }, "\u2509": { 3: "M.05,.5 L.2,.5 M.3,.5 L.45,.5 M.55,.5 L.7,.5 M.8,.5 L.95,.5" }, "\u254E": { 1: "M.5,.1 L.5,.4 M.5,.6 L.5,.9" }, "\u254F": { 3: "M.5,.1 L.5,.4 M.5,.6 L.5,.9" }, "\u2506": { 1: "M.5,.0667 L.5,.2667 M.5,.4 L.5,.6 M.5,.7333 L.5,.9333" }, "\u2507": { 3: "M.5,.0667 L.5,.2667 M.5,.4 L.5,.6 M.5,.7333 L.5,.9333" }, "\u250A": { 1: "M.5,.05 L.5,.2 M.5,.3 L.5,.45 L.5,.55 M.5,.7 L.5,.95" }, "\u250B": { 3: "M.5,.05 L.5,.2 M.5,.3 L.5,.45 L.5,.55 M.5,.7 L.5,.95" }, "\u256D": { 1: (_e3, t3) => `M.5,1 L.5,${0.5 + t3 / 0.15 * 0.5} C.5,${0.5 + t3 / 0.15 * 0.5},.5,.5,1,.5` }, "\u256E": { 1: (_e3, t3) => `M.5,1 L.5,${0.5 + t3 / 0.15 * 0.5} C.5,${0.5 + t3 / 0.15 * 0.5},.5,.5,0,.5` }, "\u256F": { 1: (_e3, t3) => `M.5,0 L.5,${0.5 - t3 / 0.15 * 0.5} C.5,${0.5 - t3 / 0.15 * 0.5},.5,.5,0,.5` }, "\u2570": { 1: (_e3, t3) => `M.5,0 L.5,${0.5 - t3 / 0.15 * 0.5} C.5,${0.5 - t3 / 0.15 * 0.5},.5,.5,1,.5` } }, t2.powerlineDefinitions = { "\uE0B0": { d: "M0,0 L1,.5 L0,1", type: 0, rightPadding: 2 }, "\uE0B1": { d: "M-1,-.5 L1,.5 L-1,1.5", type: 1, leftPadding: 1, rightPadding: 1 }, "\uE0B2": { d: "M1,0 L0,.5 L1,1", type: 0, leftPadding: 2 }, "\uE0B3": { d: "M2,-.5 L0,.5 L2,1.5", type: 1, leftPadding: 1, rightPadding: 1 }, "\uE0B4": { d: "M0,0 L0,1 C0.552,1,1,0.776,1,.5 C1,0.224,0.552,0,0,0", type: 0, rightPadding: 1 }, "\uE0B5": { d: "M.2,1 C.422,1,.8,.826,.78,.5 C.8,.174,0.422,0,.2,0", type: 1, rightPadding: 1 }, "\uE0B6": { d: "M1,0 L1,1 C0.448,1,0,0.776,0,.5 C0,0.224,0.448,0,1,0", type: 0, leftPadding: 1 }, "\uE0B7": { d: "M.8,1 C0.578,1,0.2,.826,.22,.5 C0.2,0.174,0.578,0,0.8,0", type: 1, leftPadding: 1 }, "\uE0B8": { d: "M-.5,-.5 L1.5,1.5 L-.5,1.5", type: 0 }, "\uE0B9": { d: "M-.5,-.5 L1.5,1.5", type: 1, leftPadding: 1, rightPadding: 1 }, "\uE0BA": { d: "M1.5,-.5 L-.5,1.5 L1.5,1.5", type: 0 }, "\uE0BC": { d: "M1.5,-.5 L-.5,1.5 L-.5,-.5", type: 0 }, "\uE0BD": { d: "M1.5,-.5 L-.5,1.5", type: 1, leftPadding: 1, rightPadding: 1 }, "\uE0BE": { d: "M-.5,-.5 L1.5,1.5 L1.5,-.5", type: 0 } }, t2.powerlineDefinitions["\uE0BB"] = t2.powerlineDefinitions["\uE0BD"], t2.powerlineDefinitions["\uE0BF"] = t2.powerlineDefinitions["\uE0B9"], t2.tryDrawCustomChar = function(e3, i3, n2, l, c, d, _, u) {
           const g = t2.blockElementDefinitions[i3];
           if (g) return (function(e4, t3, i4, s3, r2, o2) {
             for (let n3 = 0; n3 < t3.length; n3++) {
@@ -7481,7 +7481,7 @@ void main() {
             let h2 = o.get(t3);
             h2 || (h2 = /* @__PURE__ */ new Map(), o.set(t3, h2));
             const l2 = e4.fillStyle;
-            if ("string" != typeof l2) throw new Error(`Unexpected fillStyle type "${l2}"`);
+            if ("string" !== typeof l2) throw new Error(`Unexpected fillStyle type "${l2}"`);
             let c2 = h2.get(l2);
             if (!c2) {
               const i5 = t3[0].length, r3 = t3.length, o2 = e4.canvas.ownerDocument.createElement("canvas");
@@ -7503,7 +7503,7 @@ void main() {
             e4.strokeStyle = e4.fillStyle;
             for (const [l2, c2] of Object.entries(t3)) {
               let t4;
-              e4.beginPath(), e4.lineWidth = n3 * Number.parseInt(l2), t4 = "function" == typeof c2 ? c2(0.15, 0.15 / o2 * r2) : c2;
+              e4.beginPath(), e4.lineWidth = n3 * Number.parseInt(l2, 10), t4 = "function" === typeof c2 ? c2(0.15, 0.15 / o2 * r2) : c2;
               for (const l3 of t4.split(" ")) {
                 const t5 = l3[0], c3 = a[t5];
                 if (!c3) {
@@ -7540,13 +7540,13 @@ void main() {
         }
         const a = { C: (e3, t3) => e3.bezierCurveTo(t3[0], t3[1], t3[2], t3[3], t3[4], t3[5]), L: (e3, t3) => e3.lineTo(t3[0], t3[1]), M: (e3, t3) => e3.moveTo(t3[0], t3[1]) };
         function h(e3, t3, i3, s3, r2, o2, a2, h2 = 0, l = 0) {
-          const c = e3.map(((e4) => parseFloat(e4) || parseInt(e4)));
+          const c = e3.map(((e4) => parseFloat(e4) || parseInt(e4, 10)));
           if (c.length < 2) throw new Error("Too few arguments for instruction");
           for (let e4 = 0; e4 < c.length; e4 += 2) c[e4] *= t3 - h2 * a2 - l * a2, o2 && 0 !== c[e4] && (c[e4] = n(Math.round(c[e4] + 0.5) - 0.5, t3, 0)), c[e4] += s3 + h2 * a2;
           for (let e4 = 1; e4 < c.length; e4 += 2) c[e4] *= i3, o2 && 0 !== c[e4] && (c[e4] = n(Math.round(c[e4] + 0.5) - 0.5, i3, 0)), c[e4] += r2;
           return c;
         }
-      }, 56: (e2, t2, i2) => {
+      }, 56: (_e2, t2, i2) => {
         Object.defineProperty(t2, "__esModule", { value: true }), t2.observeDevicePixelDimensions = void 0;
         const s2 = i2(859);
         t2.observeDevicePixelDimensions = function(e3, t3, i3) {
@@ -7564,7 +7564,7 @@ void main() {
           }
           return (0, s2.toDisposable)((() => r == null ? void 0 : r.disconnect()));
         };
-      }, 374: (e2, t2) => {
+      }, 374: (_e2, t2) => {
         function i2(e3) {
           return 57508 <= e3 && e3 <= 57558;
         }
@@ -7589,7 +7589,7 @@ void main() {
         }, t2.computeNextVariantOffset = function(e3, t3, i3 = 0) {
           return (e3 - (2 * Math.round(t3) - i3)) % (2 * Math.round(t3));
         };
-      }, 296: (e2, t2) => {
+      }, 296: (_e2, t2) => {
         Object.defineProperty(t2, "__esModule", { value: true }), t2.createSelectionRenderModel = void 0;
         class i2 {
           constructor() {
@@ -7610,7 +7610,7 @@ void main() {
         t2.createSelectionRenderModel = function() {
           return new i2();
         };
-      }, 509: (e2, t2, i2) => {
+      }, 509: (_e2, t2, i2) => {
         Object.defineProperty(t2, "__esModule", { value: true }), t2.TextureAtlas = void 0;
         const s2 = i2(237), r = i2(860), o = i2(374), n = i2(160), a = i2(345), h = i2(485), l = i2(385), c = i2(147), d = i2(855), _ = { texturePage: 0, texturePosition: { x: 0, y: 0 }, texturePositionClipSpace: { x: 0, y: 0 }, offset: { x: 0, y: 0 }, size: { x: 0, y: 0 }, sizeClipSpace: { x: 0, y: 0 } };
         let u;
@@ -7651,7 +7651,7 @@ void main() {
               const e4 = this._pages.filter(((e5) => 2 * e5.canvas.width <= (g.maxTextureSize || 4096))).sort(((e5, t4) => t4.canvas.width !== e5.canvas.width ? t4.canvas.width - e5.canvas.width : t4.percentageUsed - e5.percentageUsed));
               let t3 = -1, i3 = 0;
               for (let s4 = 0; s4 < e4.length; s4++) if (e4[s4].canvas.width !== i3) t3 = s4, i3 = e4[s4].canvas.width;
-              else if (s4 - t3 == 3) break;
+              else if (s4 - t3 === 3) break;
               const s3 = e4.slice(t3, t3 + 4), r2 = s3.map(((e5) => e5.glyphs[0].texturePage)).sort(((e5, t4) => e5 > t4 ? 1 : -1)), o2 = this.pages.length - s3.length, n2 = this._mergePages(s3, o2);
               n2.version++;
               for (let e5 = r2.length - 1; e5 >= 0; e5--) this._deletePage(r2[e5]);
@@ -7693,7 +7693,7 @@ void main() {
             if (e3 >= this._config.colors.ansi.length) throw new Error("No color found for idx " + e3);
             return this._config.colors.ansi[e3];
           }
-          _getBackgroundColor(e3, t3, i3, s3) {
+          _getBackgroundColor(e3, t3, i3, _s3) {
             if (this._config.allowTransparency) return n.NULL_COLOR;
             let r2;
             switch (e3) {
@@ -7765,7 +7765,7 @@ void main() {
             return e3 ? this._config.colors.halfContrastCache : this._config.colors.contrastCache;
           }
           _drawToCache(e3, t3, i3, n2, a2 = false) {
-            const h2 = "number" == typeof e3 ? String.fromCharCode(e3) : e3, l2 = Math.min(this._config.deviceCellWidth * Math.max(h2.length, 2) + 4, this._textureSize);
+            const h2 = "number" === typeof e3 ? String.fromCharCode(e3) : e3, l2 = Math.min(this._config.deviceCellWidth * Math.max(h2.length, 2) + 4, this._textureSize);
             this._tmpCanvas.width < l2 && (this._tmpCanvas.width = l2);
             const d2 = Math.min(this._config.deviceCellHeight + 8, this._textureSize);
             if (this._tmpCanvas.height < d2 && (this._tmpCanvas.height = d2), this._tmpCtx.save(), this._workAttributeData.fg = i3, this._workAttributeData.bg = t3, this._workAttributeData.extended.ext = n2, this._workAttributeData.isInvisible()) return _;
@@ -7787,9 +7787,9 @@ void main() {
             let F = false;
             false !== this._config.customGlyphs && (F = (0, r.tryDrawCustomChar)(this._tmpCtx, h2, B, B, this._config.deviceCellWidth, this._config.deviceCellHeight, this._config.fontSize, this._config.devicePixelRatio));
             let P, I = !S;
-            if (P = "number" == typeof e3 ? this._unicodeService.wcwidth(e3) : this._unicodeService.getStringCellWidth(e3), m) {
+            if (P = "number" === typeof e3 ? this._unicodeService.wcwidth(e3) : this._unicodeService.getStringCellWidth(e3), m) {
               this._tmpCtx.save();
-              const e4 = Math.max(1, Math.floor(this._config.fontSize * this._config.devicePixelRatio / 15)), t4 = e4 % 2 == 1 ? 0.5 : 0;
+              const e4 = Math.max(1, Math.floor(this._config.fontSize * this._config.devicePixelRatio / 15)), t4 = e4 % 2 === 1 ? 0.5 : 0;
               if (this._tmpCtx.lineWidth = e4, this._workAttributeData.isUnderlineColorDefault()) this._tmpCtx.strokeStyle = this._tmpCtx.fillStyle;
               else if (this._workAttributeData.isUnderlineColorRGB()) I = false, this._tmpCtx.strokeStyle = `rgb(${c.AttributeData.toColorRGB(this._workAttributeData.getUnderlineColor()).join(",")})`;
               else {
@@ -7814,7 +7814,7 @@ void main() {
                   }
                   case 4: {
                     const u3 = 0 === l3 ? 0 : l3 >= e4 ? 2 * e4 - l3 : e4 - l3;
-                    false == !(l3 >= e4) || 0 === u3 ? (this._tmpCtx.setLineDash([Math.round(e4), Math.round(e4)]), this._tmpCtx.moveTo(h3 + u3, s3), this._tmpCtx.lineTo(c2, s3)) : (this._tmpCtx.setLineDash([Math.round(e4), Math.round(e4)]), this._tmpCtx.moveTo(h3, s3), this._tmpCtx.lineTo(h3 + u3, s3), this._tmpCtx.moveTo(h3 + u3 + e4, s3), this._tmpCtx.lineTo(c2, s3)), l3 = (0, o.computeNextVariantOffset)(c2 - h3, e4, l3);
+                    false === !(l3 >= e4) || 0 === u3 ? (this._tmpCtx.setLineDash([Math.round(e4), Math.round(e4)]), this._tmpCtx.moveTo(h3 + u3, s3), this._tmpCtx.lineTo(c2, s3)) : (this._tmpCtx.setLineDash([Math.round(e4), Math.round(e4)]), this._tmpCtx.moveTo(h3, s3), this._tmpCtx.lineTo(h3 + u3, s3), this._tmpCtx.moveTo(h3 + u3 + e4, s3), this._tmpCtx.lineTo(c2, s3)), l3 = (0, o.computeNextVariantOffset)(c2 - h3, e4, l3);
                     break;
                   }
                   case 5: {
@@ -7838,7 +7838,7 @@ void main() {
               }
             }
             if (x) {
-              const e4 = Math.max(1, Math.floor(this._config.fontSize * this._config.devicePixelRatio / 15)), t4 = e4 % 2 == 1 ? 0.5 : 0;
+              const e4 = Math.max(1, Math.floor(this._config.fontSize * this._config.devicePixelRatio / 15)), t4 = e4 % 2 === 1 ? 0.5 : 0;
               this._tmpCtx.lineWidth = e4, this._tmpCtx.strokeStyle = this._tmpCtx.fillStyle, this._tmpCtx.beginPath(), this._tmpCtx.moveTo(B, B + t4), this._tmpCtx.lineTo(B + this._config.deviceCharWidth * P, B + t4), this._tmpCtx.stroke();
             }
             if (F || this._tmpCtx.fillText(h2, B, B + this._config.deviceCharHeight), "_" === h2 && !this._config.allowTransparency) {
@@ -7846,7 +7846,7 @@ void main() {
               if (e4) for (let t4 = 1; t4 <= 5 && (this._tmpCtx.save(), this._tmpCtx.fillStyle = y.css, this._tmpCtx.fillRect(0, 0, this._tmpCanvas.width, this._tmpCanvas.height), this._tmpCtx.restore(), this._tmpCtx.fillText(h2, B, B + this._config.deviceCharHeight - t4), e4 = f(this._tmpCtx.getImageData(B, B, this._config.deviceCellWidth, this._config.deviceCellHeight), y, D, I), e4); t4++) ;
             }
             if (L) {
-              const e4 = Math.max(1, Math.floor(this._config.fontSize * this._config.devicePixelRatio / 10)), t4 = this._tmpCtx.lineWidth % 2 == 1 ? 0.5 : 0;
+              const e4 = Math.max(1, Math.floor(this._config.fontSize * this._config.devicePixelRatio / 10)), t4 = this._tmpCtx.lineWidth % 2 === 1 ? 0.5 : 0;
               this._tmpCtx.lineWidth = e4, this._tmpCtx.strokeStyle = this._tmpCtx.fillStyle, this._tmpCtx.beginPath(), this._tmpCtx.moveTo(B, B + Math.floor(this._config.deviceCharHeight / 2) - t4), this._tmpCtx.lineTo(B + this._config.deviceCharWidth * P, B + Math.floor(this._config.deviceCharHeight / 2) - t4), this._tmpCtx.stroke();
             }
             this._tmpCtx.restore();
@@ -7968,7 +7968,7 @@ void main() {
           const s3 = e3.createElement("canvas");
           return s3.width = t3, s3.height = i3, s3;
         }
-      }, 160: (e2, t2) => {
+      }, 160: (_e2, t2) => {
         Object.defineProperty(t2, "__esModule", { value: true }), t2.contrastRatio = t2.toPaddedHex = t2.rgba = t2.rgb = t2.css = t2.color = t2.channels = t2.NULL_COLOR = void 0;
         let i2 = 0, s2 = 0, r = 0, o = 0;
         var n, a, h, l, c;
@@ -7996,7 +7996,7 @@ void main() {
             const a2 = t4.rgba >> 24 & 255, h2 = t4.rgba >> 16 & 255, l2 = t4.rgba >> 8 & 255, c2 = e4.rgba >> 24 & 255, d2 = e4.rgba >> 16 & 255, _2 = e4.rgba >> 8 & 255;
             return i2 = c2 + Math.round((a2 - c2) * o), s2 = d2 + Math.round((h2 - d2) * o), r = _2 + Math.round((l2 - _2) * o), { css: n.toCss(i2, s2, r), rgba: n.toRgba(i2, s2, r) };
           }, e3.isOpaque = function(e4) {
-            return 255 == (255 & e4.rgba);
+            return 255 === (255 & e4.rgba);
           }, e3.ensureContrastRatio = function(e4, t4, i3) {
             const s3 = c.ensureContrastRatio(e4.rgba, t4.rgba, i3);
             if (s3) return n.toColor(s3 >> 24 & 255, s3 >> 16 & 255, s3 >> 8 & 255);
@@ -8029,9 +8029,9 @@ void main() {
                 return { css: e4, rgba: parseInt(e4.slice(1), 16) >>> 0 };
             }
             const h2 = e4.match(/rgba?\(\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})\s*(,\s*(0|1|\d?\.(\d+))\s*)?\)/);
-            if (h2) return i2 = parseInt(h2[1]), s2 = parseInt(h2[2]), r = parseInt(h2[3]), o = Math.round(255 * (void 0 === h2[5] ? 1 : parseFloat(h2[5]))), n.toColor(i2, s2, r, o);
+            if (h2) return i2 = parseInt(h2[1], 10), s2 = parseInt(h2[2], 10), r = parseInt(h2[3], 10), o = Math.round(255 * (void 0 === h2[5] ? 1 : parseFloat(h2[5]))), n.toColor(i2, s2, r, o);
             if (!t3 || !a2) throw new Error("css.toColor: Unsupported css format");
-            if (t3.fillStyle = a2, t3.fillStyle = e4, "string" != typeof t3.fillStyle) throw new Error("css.toColor: Unsupported css format");
+            if (t3.fillStyle = a2, t3.fillStyle = e4, "string" !== typeof t3.fillStyle) throw new Error("css.toColor: Unsupported css format");
             if (t3.fillRect(0, 0, 1, 1), [i2, s2, r, o] = t3.getImageData(0, 0, 1, 1).data, 255 !== o) throw new Error("css.toColor: Unsupported css format");
             return { rgba: n.toRgba(i2, s2, r, o), css: e4 };
           };
@@ -8082,7 +8082,7 @@ void main() {
             return [e4 >> 24 & 255, e4 >> 16 & 255, e4 >> 8 & 255, 255 & e4];
           };
         })(c || (t2.rgba = c = {})), t2.toPaddedHex = d, t2.contrastRatio = _;
-      }, 345: (e2, t2) => {
+      }, 345: (_e2, t2) => {
         Object.defineProperty(t2, "__esModule", { value: true }), t2.runAndSubscribe = t2.forwardEvent = t2.EventEmitter = void 0, t2.EventEmitter = class {
           constructor() {
             this._listeners = [], this._disposed = false;
@@ -8110,7 +8110,7 @@ void main() {
         }, t2.runAndSubscribe = function(e3, t3) {
           return t3(void 0), e3(((e4) => t3(e4)));
         };
-      }, 859: (e2, t2) => {
+      }, 859: (_e2, t2) => {
         function i2(e3) {
           for (const t3 of e3) t3.dispose();
           e3.length = 0;
@@ -8154,7 +8154,7 @@ void main() {
         }, t2.disposeArray = i2, t2.getDisposeArrayDisposable = function(e3) {
           return { dispose: () => i2(e3) };
         };
-      }, 485: (e2, t2) => {
+      }, 485: (_e2, t2) => {
         Object.defineProperty(t2, "__esModule", { value: true }), t2.FourKeyMap = t2.TwoKeyMap = void 0;
         class i2 {
           constructor() {
@@ -8185,15 +8185,15 @@ void main() {
             this._data.clear();
           }
         };
-      }, 399: (e2, t2) => {
-        Object.defineProperty(t2, "__esModule", { value: true }), t2.isChromeOS = t2.isLinux = t2.isWindows = t2.isIphone = t2.isIpad = t2.isMac = t2.getSafariVersion = t2.isSafari = t2.isLegacyEdge = t2.isFirefox = t2.isNode = void 0, t2.isNode = "undefined" != typeof process && "title" in process;
+      }, 399: (_e2, t2) => {
+        Object.defineProperty(t2, "__esModule", { value: true }), t2.isChromeOS = t2.isLinux = t2.isWindows = t2.isIphone = t2.isIpad = t2.isMac = t2.getSafariVersion = t2.isSafari = t2.isLegacyEdge = t2.isFirefox = t2.isNode = void 0, t2.isNode = "undefined" !== typeof process && "title" in process;
         const i2 = t2.isNode ? "node" : navigator.userAgent, s2 = t2.isNode ? "node" : navigator.platform;
         t2.isFirefox = i2.includes("Firefox"), t2.isLegacyEdge = i2.includes("Edge"), t2.isSafari = /^((?!chrome|android).)*safari/i.test(i2), t2.getSafariVersion = function() {
           if (!t2.isSafari) return 0;
           const e3 = i2.match(/Version\/(\d+)/);
-          return null === e3 || e3.length < 2 ? 0 : parseInt(e3[1]);
+          return null === e3 || e3.length < 2 ? 0 : parseInt(e3[1], 10);
         }, t2.isMac = ["Macintosh", "MacIntel", "MacPPC", "Mac68K"].includes(s2), t2.isIpad = "iPad" === s2, t2.isIphone = "iPhone" === s2, t2.isWindows = ["Windows", "Win16", "Win32", "WinCE"].includes(s2), t2.isLinux = s2.indexOf("Linux") >= 0, t2.isChromeOS = /\bCrOS\b/.test(i2);
-      }, 385: (e2, t2, i2) => {
+      }, 385: (_e2, t2, i2) => {
         Object.defineProperty(t2, "__esModule", { value: true }), t2.DebouncedIdleTask = t2.IdleTaskQueue = t2.PriorityTaskQueue = void 0;
         const s2 = i2(399);
         class r {
@@ -8253,7 +8253,7 @@ void main() {
             this._queue.flush();
           }
         };
-      }, 147: (e2, t2) => {
+      }, 147: (_e2, t2) => {
         Object.defineProperty(t2, "__esModule", { value: true }), t2.ExtendedAttrs = t2.AttributeData = void 0;
         class i2 {
           constructor() {
@@ -8306,22 +8306,22 @@ void main() {
             return 50331648 & this.bg;
           }
           isFgRGB() {
-            return 50331648 == (50331648 & this.fg);
+            return 50331648 === (50331648 & this.fg);
           }
           isBgRGB() {
-            return 50331648 == (50331648 & this.bg);
+            return 50331648 === (50331648 & this.bg);
           }
           isFgPalette() {
-            return 16777216 == (50331648 & this.fg) || 33554432 == (50331648 & this.fg);
+            return 16777216 === (50331648 & this.fg) || 33554432 === (50331648 & this.fg);
           }
           isBgPalette() {
-            return 16777216 == (50331648 & this.bg) || 33554432 == (50331648 & this.bg);
+            return 16777216 === (50331648 & this.bg) || 33554432 === (50331648 & this.bg);
           }
           isFgDefault() {
-            return 0 == (50331648 & this.fg);
+            return 0 === (50331648 & this.fg);
           }
           isBgDefault() {
-            return 0 == (50331648 & this.bg);
+            return 0 === (50331648 & this.bg);
           }
           isAttributeDefault() {
             return 0 === this.fg && 0 === this.bg;
@@ -8370,13 +8370,13 @@ void main() {
             return 268435456 & this.bg && ~this.extended.underlineColor ? 50331648 & this.extended.underlineColor : this.getFgColorMode();
           }
           isUnderlineColorRGB() {
-            return 268435456 & this.bg && ~this.extended.underlineColor ? 50331648 == (50331648 & this.extended.underlineColor) : this.isFgRGB();
+            return 268435456 & this.bg && ~this.extended.underlineColor ? 50331648 === (50331648 & this.extended.underlineColor) : this.isFgRGB();
           }
           isUnderlineColorPalette() {
-            return 268435456 & this.bg && ~this.extended.underlineColor ? 16777216 == (50331648 & this.extended.underlineColor) || 33554432 == (50331648 & this.extended.underlineColor) : this.isFgPalette();
+            return 268435456 & this.bg && ~this.extended.underlineColor ? 16777216 === (50331648 & this.extended.underlineColor) || 33554432 === (50331648 & this.extended.underlineColor) : this.isFgPalette();
           }
           isUnderlineColorDefault() {
-            return 268435456 & this.bg && ~this.extended.underlineColor ? 0 == (50331648 & this.extended.underlineColor) : this.isFgDefault();
+            return 268435456 & this.bg && ~this.extended.underlineColor ? 0 === (50331648 & this.extended.underlineColor) : this.isFgDefault();
           }
           getUnderlineStyle() {
             return 268435456 & this.fg ? 268435456 & this.bg ? this.extended.underlineStyle : 1 : 0;
@@ -8429,7 +8429,7 @@ void main() {
           }
         }
         t2.ExtendedAttrs = s2;
-      }, 782: (e2, t2, i2) => {
+      }, 782: (_e2, t2, i2) => {
         Object.defineProperty(t2, "__esModule", { value: true }), t2.CellData = void 0;
         const s2 = i2(133), r = i2(855), o = i2(147);
         class n extends o.AttributeData {
@@ -8470,9 +8470,9 @@ void main() {
           }
         }
         t2.CellData = n;
-      }, 855: (e2, t2) => {
+      }, 855: (_e2, t2) => {
         Object.defineProperty(t2, "__esModule", { value: true }), t2.WHITESPACE_CELL_CODE = t2.WHITESPACE_CELL_WIDTH = t2.WHITESPACE_CELL_CHAR = t2.NULL_CELL_CODE = t2.NULL_CELL_WIDTH = t2.NULL_CELL_CHAR = t2.CHAR_DATA_CODE_INDEX = t2.CHAR_DATA_WIDTH_INDEX = t2.CHAR_DATA_CHAR_INDEX = t2.CHAR_DATA_ATTR_INDEX = t2.DEFAULT_EXT = t2.DEFAULT_ATTR = t2.DEFAULT_COLOR = void 0, t2.DEFAULT_COLOR = 0, t2.DEFAULT_ATTR = 256 | t2.DEFAULT_COLOR << 9, t2.DEFAULT_EXT = 0, t2.CHAR_DATA_ATTR_INDEX = 0, t2.CHAR_DATA_CHAR_INDEX = 1, t2.CHAR_DATA_WIDTH_INDEX = 2, t2.CHAR_DATA_CODE_INDEX = 3, t2.NULL_CELL_CHAR = "", t2.NULL_CELL_WIDTH = 1, t2.NULL_CELL_CODE = 0, t2.WHITESPACE_CELL_CHAR = " ", t2.WHITESPACE_CELL_WIDTH = 1, t2.WHITESPACE_CELL_CODE = 32;
-      }, 133: (e2, t2) => {
+      }, 133: (_e2, t2) => {
         Object.defineProperty(t2, "__esModule", { value: true }), t2.Utf8ToUtf32 = t2.StringToUtf32 = t2.utf32ToString = t2.stringFromCodePoint = void 0, t2.stringFromCodePoint = function(e3) {
           return e3 > 65535 ? (e3 -= 65536, String.fromCharCode(55296 + (e3 >> 10)) + String.fromCharCode(e3 % 1024 + 56320)) : String.fromCharCode(e3);
         }, t2.utf32ToString = function(e3, t3 = 0, i2 = e3.length) {
@@ -8520,13 +8520,13 @@ void main() {
             let s2, r, o, n, a = 0, h = 0, l = 0;
             if (this.interim[0]) {
               let s3 = false, r2 = this.interim[0];
-              r2 &= 192 == (224 & r2) ? 31 : 224 == (240 & r2) ? 15 : 7;
+              r2 &= 192 === (224 & r2) ? 31 : 224 === (240 & r2) ? 15 : 7;
               let o2, n2 = 0;
               for (; (o2 = 63 & this.interim[++n2]) && n2 < 4; ) r2 <<= 6, r2 |= o2;
-              const h2 = 192 == (224 & this.interim[0]) ? 2 : 224 == (240 & this.interim[0]) ? 3 : 4, c2 = h2 - n2;
+              const h2 = 192 === (224 & this.interim[0]) ? 2 : 224 === (240 & this.interim[0]) ? 3 : 4, c2 = h2 - n2;
               for (; l < c2; ) {
                 if (l >= i2) return 0;
-                if (o2 = e3[l++], 128 != (192 & o2)) {
+                if (o2 = e3[l++], 128 !== (192 & o2)) {
                   l--, s3 = true;
                   break;
                 }
@@ -8539,9 +8539,9 @@ void main() {
             for (; d < i2; ) {
               for (; !(!(d < c) || 128 & (s2 = e3[d]) || 128 & (r = e3[d + 1]) || 128 & (o = e3[d + 2]) || 128 & (n = e3[d + 3])); ) t3[a++] = s2, t3[a++] = r, t3[a++] = o, t3[a++] = n, d += 4;
               if (s2 = e3[d++], s2 < 128) t3[a++] = s2;
-              else if (192 == (224 & s2)) {
+              else if (192 === (224 & s2)) {
                 if (d >= i2) return this.interim[0] = s2, a;
-                if (r = e3[d++], 128 != (192 & r)) {
+                if (r = e3[d++], 128 !== (192 & r)) {
                   d--;
                   continue;
                 }
@@ -8550,32 +8550,32 @@ void main() {
                   continue;
                 }
                 t3[a++] = h;
-              } else if (224 == (240 & s2)) {
+              } else if (224 === (240 & s2)) {
                 if (d >= i2) return this.interim[0] = s2, a;
-                if (r = e3[d++], 128 != (192 & r)) {
+                if (r = e3[d++], 128 !== (192 & r)) {
                   d--;
                   continue;
                 }
                 if (d >= i2) return this.interim[0] = s2, this.interim[1] = r, a;
-                if (o = e3[d++], 128 != (192 & o)) {
+                if (o = e3[d++], 128 !== (192 & o)) {
                   d--;
                   continue;
                 }
                 if (h = (15 & s2) << 12 | (63 & r) << 6 | 63 & o, h < 2048 || h >= 55296 && h <= 57343 || 65279 === h) continue;
                 t3[a++] = h;
-              } else if (240 == (248 & s2)) {
+              } else if (240 === (248 & s2)) {
                 if (d >= i2) return this.interim[0] = s2, a;
-                if (r = e3[d++], 128 != (192 & r)) {
+                if (r = e3[d++], 128 !== (192 & r)) {
                   d--;
                   continue;
                 }
                 if (d >= i2) return this.interim[0] = s2, this.interim[1] = r, a;
-                if (o = e3[d++], 128 != (192 & o)) {
+                if (o = e3[d++], 128 !== (192 & o)) {
                   d--;
                   continue;
                 }
                 if (d >= i2) return this.interim[0] = s2, this.interim[1] = r, this.interim[2] = o, a;
-                if (n = e3[d++], 128 != (192 & n)) {
+                if (n = e3[d++], 128 !== (192 & n)) {
                   d--;
                   continue;
                 }
@@ -8586,10 +8586,10 @@ void main() {
             return a;
           }
         };
-      }, 776: function(e2, t2, i2) {
+      }, 776: function(_e2, t2, i2) {
         var s2 = this && this.__decorate || function(e3, t3, i3, s3) {
           var r2, o2 = arguments.length, n2 = o2 < 3 ? t3 : null === s3 ? s3 = Object.getOwnPropertyDescriptor(t3, i3) : s3;
-          if ("object" == typeof Reflect && "function" == typeof Reflect.decorate) n2 = Reflect.decorate(e3, t3, i3, s3);
+          if ("object" === typeof Reflect && "function" === typeof Reflect.decorate) n2 = Reflect.decorate(e3, t3, i3, s3);
           else for (var a2 = e3.length - 1; a2 >= 0; a2--) (r2 = e3[a2]) && (n2 = (o2 < 3 ? r2(n2) : o2 > 3 ? r2(t3, i3, n2) : r2(t3, i3)) || n2);
           return o2 > 3 && n2 && Object.defineProperty(t3, i3, n2), n2;
         }, r = this && this.__param || function(e3, t3) {
@@ -8610,7 +8610,7 @@ void main() {
             this._logLevel = a[this._optionsService.rawOptions.logLevel];
           }
           _evalLazyOptionalParams(e3) {
-            for (let t3 = 0; t3 < e3.length; t3++) "function" == typeof e3[t3] && (e3[t3] = e3[t3]());
+            for (let t3 = 0; t3 < e3.length; t3++) "function" === typeof e3[t3] && (e3[t3] = e3[t3]());
           }
           _log(e3, t3, i3) {
             this._evalLazyOptionalParams(i3), e3.call(console, (this._optionsService.options.logger ? "" : "xterm.js: ") + t3, ...i3);
@@ -8638,8 +8638,8 @@ void main() {
         };
         t2.LogService = l = s2([r(0, n.IOptionsService)], l), t2.setTraceLogger = function(e3) {
           h = e3;
-        }, t2.traceCall = function(e3, t3, i3) {
-          if ("function" != typeof i3.value) throw new Error("not supported");
+        }, t2.traceCall = function(_e3, _t3, i3) {
+          if ("function" !== typeof i3.value) throw new Error("not supported");
           const s3 = i3.value;
           i3.value = function(...e4) {
             if (h.logLevel !== n.LogLevelEnum.TRACE) return s3.apply(this, e4);
@@ -8648,14 +8648,14 @@ void main() {
             return h.trace(`GlyphRenderer#${s3.name} return`, t4), t4;
           };
         };
-      }, 726: (e2, t2) => {
+      }, 726: (_e2, t2) => {
         Object.defineProperty(t2, "__esModule", { value: true }), t2.createDecorator = t2.getServiceDependencies = t2.serviceRegistry = void 0;
         const i2 = "di$target", s2 = "di$dependencies";
         t2.serviceRegistry = /* @__PURE__ */ new Map(), t2.getServiceDependencies = function(e3) {
           return e3[s2] || [];
         }, t2.createDecorator = function(e3) {
           if (t2.serviceRegistry.has(e3)) return t2.serviceRegistry.get(e3);
-          const r = function(e4, t3, o) {
+          const r = function(e4, _t3, o) {
             if (3 !== arguments.length) throw new Error("@IServiceName-decorator can only be used to decorate a parameter");
             !(function(e5, t4, r2) {
               t4[i2] === t4 ? t4[s2].push({ id: e5, index: r2 }) : (t4[s2] = [{ id: e5, index: r2 }], t4[i2] = t4);
@@ -8663,7 +8663,7 @@ void main() {
           };
           return r.toString = () => e3, t2.serviceRegistry.set(e3, r), r;
         };
-      }, 97: (e2, t2, i2) => {
+      }, 97: (_e2, t2, i2) => {
         Object.defineProperty(t2, "__esModule", { value: true }), t2.IDecorationService = t2.IUnicodeService = t2.IOscLinkService = t2.IOptionsService = t2.ILogService = t2.LogLevelEnum = t2.IInstantiationService = t2.ICharsetService = t2.ICoreService = t2.ICoreMouseService = t2.IBufferService = void 0;
         const s2 = i2(726);
         var r;

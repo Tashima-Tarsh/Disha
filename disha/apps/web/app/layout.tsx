@@ -7,7 +7,7 @@ import { JarvisProvider } from "@/components/layout/JarvisProvider";
 import { StartupScreen } from "@/components/layout/StartupScreen";
 import { JarvisOrb } from "@/components/ui/JarvisOrb";
 import type React from "react";
-import { useState, useEffect } from "react";
+import { useState, } from "react";
 import { AnimatePresence } from "framer-motion";
 
 const inter = Inter({

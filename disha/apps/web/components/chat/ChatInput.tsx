@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useCallback } from "react";
-import { Send, Square, Paperclip, Sparkles } from "lucide-react";
+import { Send, Square, Paperclip, } from "lucide-react";
 import { useChatStore } from "@/lib/store";
 import { streamChat } from "@/lib/api";
 import { cn } from "@/lib/utils";

@@ -21,7 +21,6 @@ import math
 import uuid
 from typing import Dict, List, Optional, Tuple
 
-import numpy as np
 
 logger = logging.getLogger(__name__)
 

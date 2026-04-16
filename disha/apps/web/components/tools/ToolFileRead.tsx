@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { ChevronRight, ChevronDown } from "lucide-react";
-import { cn } from "@/lib/utils";
 import { FileIcon } from "./FileIcon";
 import { SyntaxHighlight, getLanguageFromPath } from "./SyntaxHighlight";
 import { ToolUseBlock } from "./ToolUseBlock";

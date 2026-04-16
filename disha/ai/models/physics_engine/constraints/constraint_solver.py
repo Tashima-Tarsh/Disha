@@ -21,7 +21,7 @@ from __future__ import annotations
 
 import abc
 import logging
-from typing import Any, List, Optional, Protocol
+from typing import Any, List, Protocol
 
 import numpy as np
 

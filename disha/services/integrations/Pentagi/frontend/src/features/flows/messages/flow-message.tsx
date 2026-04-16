@@ -136,8 +136,7 @@ const FlowMessage = ({ log, searchValue = '' }: FlowMessageProps) => {
         }
 
         return (
-            <>
-                <div className="border-muted mb-3 border-l-2 pl-3">
+            <div className="border-muted mb-3 border-l-2 pl-3">
                     <Markdown
                         className="prose-xs prose-fixed text-muted-foreground/80 wrap-break-word"
                         searchValue={searchValue}
@@ -145,7 +144,6 @@ const FlowMessage = ({ log, searchValue = '' }: FlowMessageProps) => {
                         {thinking}
                     </Markdown>
                 </div>
-            </>
         );
     };
 

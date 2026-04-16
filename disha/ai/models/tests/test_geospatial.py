@@ -1,5 +1,7 @@
 """Geospatial tests."""
-import sys, os, unittest
+import sys
+import os
+import unittest
 import numpy as np
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
@@ -7,7 +9,7 @@ from geospatial.gis_processing.coordinate_system import (
     GeoCoordinate, CoordinateTransformer,
 )
 from geospatial.gis_processing.spatial_index import SpatialGrid, Point2D
-from geospatial.sensor_integration.sensor import Sensor, SensorType, SensorReading
+from geospatial.sensor_integration.sensor import Sensor, SensorType
 from geospatial.tracking.tracker import ObjectTracker
 
 

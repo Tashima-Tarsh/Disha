@@ -2,16 +2,12 @@
 
 # Core
 import logging
-import json
 import os
 import importlib
-import time
 # Third-party
 from celery import Celery, shared_task
 # Project
 from database import Database, connect_db
-from gpt_api import GPT
-from models import ContentModel
 from analysis_service import AnalysisService, AnalysisException
 
 app = Celery('analyse', broker='amqp://localhost', backend='rpc://')
@@ -80,7 +76,7 @@ def analyse_content(content_id: int) -> bool:
     # Check whether analysis of content from this source is enabled
     source_enabled = database.get_source_attribute(source_id, 'enabled')
     if not source_enabled:
-        logging.info(f"Analysis is not enabled for this source, terminating!")
+        logging.info("Analysis is not enabled for this source, terminating!")
         return None
 
     # Retrieve the analysis requirements for this source
