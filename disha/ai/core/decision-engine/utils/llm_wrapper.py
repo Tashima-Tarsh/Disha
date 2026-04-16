@@ -16,8 +16,6 @@ Environment variables
 
 from __future__ import annotations
 
-import hashlib
-import os
 from typing import Optional
 
 # Use the centralized registry
@@ -26,8 +24,7 @@ from disha.ai.core.api.registry import ModelRegistry
 
 # ── llama-cpp-python availability ─────────────────────────────────────
 try:
-    from llama_cpp import Llama as _Llama  # type: ignore[import-untyped]
-
+    import llama_cpp # noqa: F401
     _LLAMA_AVAILABLE = True
 except ImportError:
     _LLAMA_AVAILABLE = False

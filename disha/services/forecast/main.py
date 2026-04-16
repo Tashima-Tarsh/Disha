@@ -1,6 +1,6 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI
 from pydantic import BaseModel
-from typing import Optional, List, Dict
+from typing import Optional, List
 import datetime
 import random
 

@@ -1,6 +1,5 @@
 {
   "link_prediction": {
-<<<<<<< HEAD
     "epochs": 300,
     "final_loss": 1.1207128763198853
   },
