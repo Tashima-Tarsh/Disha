@@ -7,7 +7,7 @@ import { JarvisProvider } from "@/components/layout/JarvisProvider";
 import { StartupScreen } from "@/components/layout/StartupScreen";
 import { JarvisOrb } from "@/components/ui/JarvisOrb";
 import type React from "react";
-import { useState, } from "react";
+import { useState, useEffect } from "react";
 import { AnimatePresence } from "framer-motion";
 
 const inter = Inter({
@@ -38,20 +38,20 @@ const plusJakartaSans = Plus_Jakarta_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "DISHA v5.0.0 | The Autonomous Cognitive Operating System",
+  title: "DISHA v6.0.0 | The Autonomous Cognitive Operating System",
   description: "DISHA is an elite AGI platform integrating multi-agent reasoning, cognitive loops, and domain-specific intelligence (Cyber, Quantum, Strategy). Built for the future of digital defense.",
   keywords: ["AGI", "Cognitive AI", "Cyber Defense", "Security Operations", "Quantum Computing", "Autonomous Intelligence"],
   openGraph: {
-    title: "DISHA v5.0.0 | Autonomous Cognitive AGI",
+    title: "DISHA v6.0.0 | Autonomous Cognitive AGI",
     description: "The world-class 7-layer AGI platform for intelligence and defense.",
-    images: ["/docs/images/banner_v5.png"],
+    images: ["/docs/images/banner_v6.png"],
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "DISHA v5.0.0 | AGI Ecosystem",
+    title: "DISHA v6.0.0 | AGI Ecosystem",
     description: "Empowering the top 1% organizations with cognitive decision systems.",
-    images: ["/docs/images/banner_v5.png"],
+    images: ["/docs/images/banner_v6.png"],
   },
 };
 
