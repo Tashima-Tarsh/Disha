@@ -4,11 +4,11 @@ on:
   push:
     branches: [main]
     paths:
-      - 'cyber-defense/**'
+      - 'disha/services/cyber/**'
   pull_request:
     branches: [main]
     paths:
-      - 'cyber-defense/**'
+      - 'disha/services/cyber/**'
 
 permissions:
   contents: read
@@ -32,13 +32,13 @@ jobs:
           pip install scikit-learn numpy requests
 
       - name: Lint model engine
-        run: flake8 cyber-defense/model/ --max-line-length=120 --ignore=E501
+        run: flake8 disha/services/cyber/model/ --max-line-length=120 --ignore=E501
 
       - name: Lint response engine
-        run: flake8 cyber-defense/response_engine/ --max-line-length=120 --ignore=E501
+        run: flake8 disha/services/cyber/response_engine/ --max-line-length=120 --ignore=E501
 
       - name: Lint threat intel
-        run: flake8 cyber-defense/scripts/threat_intel/ --max-line-length=120 --ignore=E501
+        run: flake8 disha/services/cyber/scripts/threat_intel/ --max-line-length=120 --ignore=E501
 
   test-python:
     name: Test Python Components
@@ -58,7 +58,7 @@ jobs:
 
       - name: Run tests
         run: |
-          cd cyber-defense
+          cd disha/services/cyber
           python -m pytest test/ -v
 
   validate-configs:
@@ -69,7 +69,7 @@ jobs:
 
       - name: Validate docker-compose
         run: |
-          cd cyber-defense
+          cd disha/services/cyber
           if docker compose version >/dev/null 2>&1; then
             docker compose config --quiet
           elif docker-compose version >/dev/null 2>&1; then
@@ -82,7 +82,7 @@ jobs:
         run: |
           python3 -c "
           import json, glob
-          for f in glob.glob('cyber-defense/logs/**/*.json', recursive=True):
+          for f in glob.glob('disha/services/cyber/logs/**/*.json', recursive=True):
               with open(f) as fh:
                   for i, line in enumerate(fh, 1):
                       line = line.strip()

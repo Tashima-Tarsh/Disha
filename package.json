@@ -5,28 +5,27 @@
   "license": "UNLICENSED",
   "private": true,
   "type": "module",
-  "main": "src/entrypoints/cli.tsx",
+  "workspaces": [
+    "disha/apps/*",
+    "disha/services/*",
+    "disha/ai/*"
+  ],
+  "main": "disha/legacy-root-src/main.tsx",
   "bin": {
-    "claude": "src/entrypoints/cli.tsx"
+    "disha": "disha/legacy-root-src/main.tsx"
   },
   "scripts": {
-    "dev": "npx tsx scripts/build-bundle.ts --watch",
+    "lint": "biome check disha/",
+    "lint:fix": "biome check --write disha/",
+    "format": "biome format --write disha/",
+    "check": "biome check disha/ && tsc --noEmit",
+    "dev": "npx esbuild disha/legacy-root-src/main.tsx --bundle --platform=node --format=esm --outfile=dist/cli.mjs --watch",
     "start": "node dist/cli.mjs",
     "test": "echo \"No root tests configured\" && exit 0",
-    "build": "npx tsx scripts/build-bundle.ts",
-    "build:bun": "bun scripts/build-bundle.ts",
-    "build:watch": "npx tsx scripts/build-bundle.ts --watch",
-    "build:prod": "npx tsx scripts/build-bundle.ts --minify",
-    "build:web": "npx tsx scripts/build-web.ts",
-    "build:web:watch": "npx tsx scripts/build-web.ts --watch",
-    "build:web:prod": "npx tsx scripts/build-web.ts --minify",
-    "typecheck": "tsc --noEmit",
-    "lint": "biome check src/",
-    "lint:fix": "biome check --write src/",
-    "format": "biome format --write src/",
-    "check": "biome check src/ && tsc --noEmit",
-    "dev:web": "cd web && npm run dev",
-    "dev:mcp": "cd mcp-server && npm run dev"
+    "build": "npx esbuild disha/legacy-root-src/main.tsx --bundle --platform=node --format=esm --outfile=dist/cli.mjs",
+    "build:web": "cd disha/apps/web && npm run build",
+    "dev:web": "cd disha/apps/web && npm run dev",
+    "dev:mcp": "cd disha/services/mcp && npm run dev"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.89.0",

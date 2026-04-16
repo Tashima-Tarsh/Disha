@@ -21,7 +21,7 @@
       "bun:bundle": ["./src/types/bun-bundle.d.ts"]
     }
   },
-  "include": ["src/**/*.ts", "src/**/*.tsx"],
+  "include": ["disha/**/*.ts", "disha/**/*.tsx"],
   "exclude": ["node_modules", "dist"]
 }
 
