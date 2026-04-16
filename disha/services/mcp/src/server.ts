@@ -1,10 +1,3 @@
-/**
- * Shared MCP server definition — transport-agnostic.
- *
- * Exposes tools and resources for exploring the Claude Code source code.
- * This module is imported by both the STDIO and HTTP entrypoints.
- */
-
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import {
   CallToolRequestSchema,
@@ -27,7 +20,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 export const SRC_ROOT = path.resolve(
-  process.env.CLAUDE_CODE_SRC_ROOT ?? path.join(__dirname, "..", "..", "src")
+  process.env.DISHA_SRC_ROOT ?? path.join(__dirname, "..", "..", "..", "..")
 );
 
 // ---------------------------------------------------------------------------
@@ -80,7 +73,6 @@ async function walkFiles(root: string, rel = ""): Promise<string[]> {
   return results;
 }
 
-/** Safely resolve a user-supplied relative path under SRC_ROOT (blocks path traversal). */
 function safePath(relPath: string): string | null {
   const resolved = path.resolve(SRC_ROOT, relPath);
   if (!resolved.startsWith(SRC_ROOT)) return null;
@@ -105,20 +97,23 @@ interface CommandInfo {
 }
 
 async function getToolList(): Promise<ToolInfo[]> {
-  const toolsDir = path.join(SRC_ROOT, "tools");
+  // In DISHA monorepo, tools might be in disha/legacy-root-src/tools
+  const toolsDir = path.join(SRC_ROOT, "disha", "legacy-root-src", "tools");
+  if (!(await dirExists(toolsDir))) return [];
   const entries = await fs.readdir(toolsDir, { withFileTypes: true });
   const tools: ToolInfo[] = [];
   for (const e of entries) {
     if (!e.isDirectory() || e.name === "shared" || e.name === "testing")
       continue;
     const files = await listDir(path.join(toolsDir, e.name));
-    tools.push({ name: e.name, directory: `tools/${e.name}`, files });
+    tools.push({ name: e.name, directory: `disha/legacy-root-src/tools/${e.name}`, files });
   }
   return tools.sort((a, b) => a.name.localeCompare(b.name));
 }
 
 async function getCommandList(): Promise<CommandInfo[]> {
-  const cmdsDir = path.join(SRC_ROOT, "commands");
+  const cmdsDir = path.join(SRC_ROOT, "disha", "legacy-root-src", "commands");
+  if (!(await dirExists(cmdsDir))) return [];
   const entries = await fs.readdir(cmdsDir, { withFileTypes: true });
   const commands: CommandInfo[] = [];
   for (const e of entries) {
@@ -126,14 +121,14 @@ async function getCommandList(): Promise<CommandInfo[]> {
       const files = await listDir(path.join(cmdsDir, e.name));
       commands.push({
         name: e.name,
-        path: `commands/${e.name}`,
+        path: `disha/legacy-root-src/commands/${e.name}`,
         isDirectory: true,
         files,
       });
     } else {
       commands.push({
         name: e.name.replace(/\.(ts|tsx)$/, ""),
-        path: `commands/${e.name}`,
+        path: `disha/legacy-root-src/commands/${e.name}`,
         isDirectory: false,
       });
     }
@@ -147,7 +142,7 @@ async function getCommandList(): Promise<CommandInfo[]> {
 
 export function createServer(): Server {
   const server = new Server(
-    { name: "claude-code-explorer", version: "1.1.0" },
+    { name: "disha-explorer", version: "1.2.0" },
     {
       capabilities: {
         tools: {},
@@ -157,27 +152,25 @@ export function createServer(): Server {
     }
   );
 
-  // ---- Resources ---------------------------------------------------------
-
   server.setRequestHandler(ListResourcesRequestSchema, async () => ({
     resources: [
       {
-        uri: "claude-code://architecture",
+        uri: "disha://architecture",
         name: "Architecture Overview",
         description:
-          "High-level overview of the Claude Code source architecture",
+          "High-level overview of the DISHA Sovereign Intelligence architecture",
         mimeType: "text/markdown",
       },
       {
-        uri: "claude-code://tools",
+        uri: "disha://tools",
         name: "Tool Registry",
-        description: "List of all agent tools with their files",
+        description: "List of all DISHA agent tools with their files",
         mimeType: "application/json",
       },
       {
-        uri: "claude-code://commands",
+        uri: "disha://commands",
         name: "Command Registry",
-        description: "List of all slash commands",
+        description: "List of all sovereign slash commands",
         mimeType: "application/json",
       },
     ],
@@ -188,10 +181,10 @@ export function createServer(): Server {
     async () => ({
       resourceTemplates: [
         {
-          uriTemplate: "claude-code://source/{path}",
+          uriTemplate: "disha://source/{path}",
           name: "Source file",
           description:
-            "Read a source file from the Claude Code src/ directory",
+            "Read a source file from the DISHA monorepo",
           mimeType: "text/plain",
         },
       ],
@@ -203,8 +196,8 @@ export function createServer(): Server {
     async (request: { params: { uri: string } }) => {
       const { uri } = request.params;
 
-      if (uri === "claude-code://architecture") {
-        const readmePath = path.resolve(SRC_ROOT, "..", "README.md");
+      if (uri === "disha://architecture") {
+        const readmePath = path.resolve(SRC_ROOT, "README.md");
         let text: string;
         try {
           text = await fs.readFile(readmePath, "utf-8");
@@ -214,7 +207,7 @@ export function createServer(): Server {
         return { contents: [{ uri, mimeType: "text/markdown", text }] };
       }
 
-      if (uri === "claude-code://tools") {
+      if (uri === "disha://tools") {
         const tools = await getToolList();
         return {
           contents: [
@@ -227,7 +220,7 @@ export function createServer(): Server {
         };
       }
 
-      if (uri === "claude-code://commands") {
+      if (uri === "disha://commands") {
         const commands = await getCommandList();
         return {
           contents: [
@@ -240,8 +233,8 @@ export function createServer(): Server {
         };
       }
 
-      if (uri.startsWith("claude-code://source/")) {
-        const relPath = uri.slice("claude-code://source/".length);
+      if (uri.startsWith("disha://source/")) {
+        const relPath = uri.slice("disha://source/".length);
         const abs = safePath(relPath);
         if (!abs) throw new Error("Invalid path");
         const text = await fs.readFile(abs, "utf-8");
@@ -252,26 +245,24 @@ export function createServer(): Server {
     }
   );
 
-  // ---- Tools -------------------------------------------------------------
-
   server.setRequestHandler(ListToolsRequestSchema, async () => ({
     tools: [
       {
         name: "list_tools",
         description:
-          "List all Claude Code agent tools (BashTool, FileReadTool, etc.) with their source files.",
+          "List all DISHA agent tools (BashTool, FileEditTool, etc.) with their source files.",
         inputSchema: { type: "object" as const, properties: {} },
       },
       {
         name: "list_commands",
         description:
-          "List all Claude Code slash commands (/commit, /review, /mcp, etc.) with their source files.",
+          "List all DISHA sovereign slash commands (/commit, /review, /mcp, etc.) with their source files.",
         inputSchema: { type: "object" as const, properties: {} },
       },
       {
         name: "get_tool_source",
         description:
-          "Read the full source code of a specific Claude Code tool implementation.",
+          "Read the full source code of a specific DISHA tool implementation.",
         inputSchema: {
           type: "object" as const,
           properties: {
@@ -291,7 +282,7 @@ export function createServer(): Server {
       {
         name: "get_command_source",
         description:
-          "Read the source code of a specific Claude Code slash command.",
+          "Read the source code of a specific DISHA sovereign slash command.",
         inputSchema: {
           type: "object" as const,
           properties: {
@@ -310,13 +301,13 @@ export function createServer(): Server {
       {
         name: "read_source_file",
         description:
-          "Read any source file from the Claude Code src/ directory by relative path.",
+          "Read any source file from the DISHA monorepo by relative path.",
         inputSchema: {
           type: "object" as const,
           properties: {
             path: {
               type: "string",
-              description: "Relative path from src/, e.g. 'QueryEngine.ts'",
+              description: "Relative path from root, e.g. 'disha/ai/core/cognitive_loop.py'",
             },
             startLine: {
               type: "number",
@@ -333,7 +324,7 @@ export function createServer(): Server {
       {
         name: "search_source",
         description:
-          "Search for a regex pattern across the Claude Code source. Returns matching lines with paths and line numbers.",
+          "Search for a regex pattern across the DISHA monorepo source. Returns matching lines with paths and line numbers.",
         inputSchema: {
           type: "object" as const,
           properties: {
@@ -343,7 +334,7 @@ export function createServer(): Server {
             },
             filePattern: {
               type: "string",
-              description: "File extension filter, e.g. '.ts'",
+              description: "File extension filter, e.g. '.ts', '.py'",
             },
             maxResults: {
               type: "number",
@@ -355,13 +346,13 @@ export function createServer(): Server {
       },
       {
         name: "list_directory",
-        description: "List files and subdirectories under src/.",
+        description: "List files and subdirectories within the DISHA monorepo.",
         inputSchema: {
           type: "object" as const,
           properties: {
             path: {
               type: "string",
-              description: "Relative path from src/, e.g. 'services'. '' for root.",
+              description: "Relative path from root, e.g. 'disha/services'. '' for root.",
             },
           },
           required: ["path"],
@@ -370,7 +361,7 @@ export function createServer(): Server {
       {
         name: "get_architecture",
         description:
-          "Get a high-level architecture overview of Claude Code.",
+          "Get a high-level architecture overview of DISHA.",
         inputSchema: { type: "object" as const, properties: {} },
       },
     ],
@@ -409,7 +400,7 @@ export function createServer(): Server {
           const toolName = (args as Record<string, unknown>)
             ?.toolName as string;
           if (!toolName) throw new Error("toolName is required");
-          const toolDir = safePath(`tools/${toolName}`);
+          const toolDir = safePath(`disha/legacy-root-src/tools/${toolName}`);
           if (!toolDir || !(await dirExists(toolDir)))
             throw new Error(`Tool not found: ${toolName}`);
 
@@ -427,7 +418,7 @@ export function createServer(): Server {
             fileName = main;
           }
 
-          const filePath = safePath(`tools/${toolName}/${fileName}`);
+          const filePath = safePath(`disha/legacy-root-src/tools/${toolName}/${fileName}`);
           if (!filePath || !(await fileExists(filePath)))
             throw new Error(`File not found: tools/${toolName}/${fileName}`);
           const content = await fs.readFile(filePath, "utf-8");
@@ -435,7 +426,7 @@ export function createServer(): Server {
             content: [
               {
                 type: "text" as const,
-                text: `// tools/${toolName}/${fileName}\n// ${content.split("\n").length} lines\n\n${content}`,
+                text: `// disha/legacy-root-src/tools/${toolName}/${fileName}\n// ${content.split("\n").length} lines\n\n${content}`,
               },
             ],
           };
@@ -447,9 +438,9 @@ export function createServer(): Server {
           if (!commandName) throw new Error("commandName is required");
 
           const candidates = [
-            `commands/${commandName}`,
-            `commands/${commandName}.ts`,
-            `commands/${commandName}.tsx`,
+            `disha/legacy-root-src/commands/${commandName}`,
+            `disha/legacy-root-src/commands/${commandName}.ts`,
+            `disha/legacy-root-src/commands/${commandName}.tsx`,
           ];
           let found: string | null = null;
           let isDir = false;
@@ -476,7 +467,7 @@ export function createServer(): Server {
             | string
             | undefined;
           if (reqFile) {
-            const filePath = safePath(`commands/${commandName}/${reqFile}`);
+            const filePath = safePath(`disha/legacy-root-src/commands/${commandName}/${reqFile}`);
             if (!filePath || !(await fileExists(filePath)))
               throw new Error(
                 `File not found: commands/${commandName}/${reqFile}`
@@ -607,9 +598,9 @@ export function createServer(): Server {
           const tools = await getToolList();
           const commands = await getCommandList();
 
-          const overview = `# Claude Code Architecture Overview
+          const overview = `# DISHA Architecture Overview
 
-## Source Root
+## Monorepo Root
 ${SRC_ROOT}
 
 ## Top-Level Entries
@@ -618,26 +609,15 @@ ${topLevel.map((e) => `- ${e}`).join("\n")}
 ## Agent Tools (${tools.length})
 ${tools.map((t) => `- **${t.name}** — ${t.files.length} files: ${t.files.join(", ")}`).join("\n")}
 
-## Slash Commands (${commands.length})
+## Sovereign Commands (${commands.length})
 ${commands.map((c) => `- **${c.name}** ${c.isDirectory ? "(directory)" : "(file)"}${c.files ? ": " + c.files.join(", ") : ""}`).join("\n")}
 
-## Key Files
-- **main.tsx** — CLI entrypoint (Commander.js)
-- **QueryEngine.ts** — Core LLM API caller, streaming, tool loops
-- **Tool.ts** — Base tool types, schemas, permission model
-- **commands.ts** — Command registry and loader
-- **tools.ts** — Tool registry and loader
-- **context.ts** — System/user context collection
-
-## Core Subsystems
-- **bridge/** — IDE integration (VS Code, JetBrains)
-- **coordinator/** — Multi-agent orchestration
-- **services/mcp/** — MCP client connections
-- **services/api/** — Anthropic API client
-- **plugins/** — Plugin system
-- **skills/** — Skill system
-- **tasks/** — Background task management
-- **server/** — Server/remote mode
+## Key Architecture Files
+- **README.md** — Premium landing page and mission summary
+- **disha/ai/core/cognitive_loop.py** — The 7-stage DISHA-MIND loop
+- **disha/services/** — Sovereign microservices registry
+- **disha/apps/web/** — Elite Command Dashboard
+- **disha/scripts/disha_mythos.py** — System orchestrator and self-healing engine
 `;
           return { content: [{ type: "text" as const, text: overview }] };
         }
@@ -655,7 +635,7 @@ ${commands.map((c) => `- **${c.name}** ${c.isDirectory ? "(directory)" : "(file)
       {
         name: "explain_tool",
         description:
-          "Explain how a specific Claude Code tool works, including its input schema, permissions, and execution flow.",
+          "Explain how a specific DISHA tool works, including its purpose and execution flow.",
         arguments: [
           {
             name: "toolName",
@@ -666,7 +646,7 @@ ${commands.map((c) => `- **${c.name}** ${c.isDirectory ? "(directory)" : "(file)
       },
       {
         name: "explain_command",
-        description: "Explain how a specific Claude Code slash command works.",
+        description: "Explain how a specific DISHA sovereign command works.",
         arguments: [
           {
             name: "commandName",
@@ -678,17 +658,17 @@ ${commands.map((c) => `- **${c.name}** ${c.isDirectory ? "(directory)" : "(file)
       {
         name: "architecture_overview",
         description:
-          "Get a guided tour of the Claude Code architecture with explanations of each subsystem.",
+          "Get a guided tour of the DISHA monorepo architecture with explanations of each layer.",
       },
       {
         name: "how_does_it_work",
         description:
-          "Explain how a specific feature or subsystem of Claude Code works.",
+          "Explain how a specific feature or subsystem of DISHA works.",
         arguments: [
           {
             name: "feature",
             description:
-              "Feature or subsystem, e.g. 'permission system', 'MCP client', 'query engine', 'bridge'",
+              "Feature or subsystem, e.g. 'cognitive loop', 'sentinel', 'physics engine'",
             required: true,
           },
         ],
@@ -696,7 +676,7 @@ ${commands.map((c) => `- **${c.name}** ${c.isDirectory ? "(directory)" : "(file)
       {
         name: "compare_tools",
         description:
-          "Compare two Claude Code tools side by side — purpose, inputs, permissions, implementation.",
+          "Compare two DISHA tools side by side — purpose and implementation.",
         arguments: [
           { name: "tool1", description: "First tool name", required: true },
           { name: "tool2", description: "Second tool name", required: true },
@@ -716,7 +696,7 @@ ${commands.map((c) => `- **${c.name}** ${c.isDirectory ? "(directory)" : "(file)
         case "explain_tool": {
           const toolName = args?.toolName;
           if (!toolName) throw new Error("toolName argument is required");
-          const toolDir = safePath(`tools/${toolName}`);
+          const toolDir = safePath(`disha/legacy-root-src/tools/${toolName}`);
           if (!toolDir || !(await dirExists(toolDir)))
             throw new Error(`Tool not found: ${toolName}`);
           const files = await listDir(toolDir);
@@ -735,7 +715,7 @@ ${commands.map((c) => `- **${c.name}** ${c.isDirectory ? "(directory)" : "(file)
                 role: "user" as const,
                 content: {
                   type: "text" as const,
-                  text: `Analyze and explain this Claude Code tool implementation. Cover:\n1. Purpose\n2. Input Schema\n3. Permissions\n4. Execution Flow\n5. Output\n6. Safety characteristics\n\nFiles in tools/${toolName}/: ${files.join(", ")}\n\nMain source (${mainFile ?? "not found"}):\n\`\`\`typescript\n${source}\n\`\`\``,
+                  text: `Analyze and explain this DISHA tool implementation. Cover:\n1. Purpose\n2. Input Schema\n3. Execution Flow\n4. Role in the sovereign ecosystem\n\nFiles in tools/${toolName}/: ${files.join(", ")}\n\nMain source (${mainFile ?? "not found"}):\n\`\`\`typescript\n${source}\n\`\`\``,
                 },
               },
             ],
@@ -747,9 +727,9 @@ ${commands.map((c) => `- **${c.name}** ${c.isDirectory ? "(directory)" : "(file)
           if (!commandName)
             throw new Error("commandName argument is required");
           const candidates = [
-            `commands/${commandName}`,
-            `commands/${commandName}.ts`,
-            `commands/${commandName}.tsx`,
+            `disha/legacy-root-src/commands/${commandName}`,
+            `disha/legacy-root-src/commands/${commandName}.ts`,
+            `disha/legacy-root-src/commands/${commandName}.tsx`,
           ];
           let found: string | null = null;
           let isDir = false;
@@ -791,7 +771,7 @@ ${commands.map((c) => `- **${c.name}** ${c.isDirectory ? "(directory)" : "(file)
                 role: "user" as const,
                 content: {
                   type: "text" as const,
-                  text: `Analyze and explain this Claude Code slash command. Cover:\n1. Purpose\n2. Type (prompt vs action)\n3. Allowed Tools\n4. Arguments\n5. Implementation\n\nFiles: ${fileList}\n\nSource:\n\`\`\`typescript\n${source}\n\`\`\``,
+                  text: `Analyze and explain this DISHA sovereign slash command. Cover:\n1. Purpose\n2. Implementation details\n\nFiles: ${fileList}\n\nSource:\n\`\`\`typescript\n${source}\n\`\`\``,
                 },
               },
             ],
@@ -799,24 +779,25 @@ ${commands.map((c) => `- **${c.name}** ${c.isDirectory ? "(directory)" : "(file)
         }
 
         case "architecture_overview": {
-          const readmePath = path.resolve(SRC_ROOT, "..", "README.md");
+          const readmePath = path.resolve(SRC_ROOT, "README.md");
           let readme = "";
           try {
             readme = await fs.readFile(readmePath, "utf-8");
           } catch {
-            /* */
+            readme = "README.md not found.";
           }
           const topLevel = await listDir(SRC_ROOT);
           const tools = await getToolList();
           const commands = await getCommandList();
+
           return {
-            description: "Architecture overview of Claude Code",
+            description: "Guided tour of the DISHA architecture",
             messages: [
               {
                 role: "user" as const,
                 content: {
                   type: "text" as const,
-                  text: `Give a comprehensive guided tour of the Claude Code architecture.\n\n## README\n${readme}\n\n## src/ entries\n${topLevel.join("\n")}\n\n## Tools (${tools.length})\n${tools.map((t) => `- ${t.name}: ${t.files.join(", ")}`).join("\n")}\n\n## Commands (${commands.length})\n${commands.map((c) => `- ${c.name} ${c.isDirectory ? "(dir)" : "(file)"}`).join("\n")}`,
+                  text: `Give a comprehensive guided tour of the DISHA monorepo architecture.\\n\\n## Mission Summary (README)\\n${readme}\\n\\n## Monorepo entries\\n${topLevel.join("\\n")}\\n\\n## Tools (${tools.length})\\n${tools.map((t) => `- ${t.name}: ${t.files.join(", ")}`).join("\\n")}\\n\\n## Commands (${commands.length})\\n${commands.map((c) => `- ${c.name} ${c.isDirectory ? "(dir)" : "(file)"}`).join("\\n")}`,
                 },
               },
             ],
@@ -826,67 +807,14 @@ ${commands.map((c) => `- **${c.name}** ${c.isDirectory ? "(directory)" : "(file)
         case "how_does_it_work": {
           const feature = args?.feature;
           if (!feature) throw new Error("feature argument is required");
-          const featureMap: Record<string, string[]> = {
-            "permission system": [
-              "utils/permissions/",
-              "hooks/toolPermission/",
-              "Tool.ts",
-            ],
-            permissions: [
-              "utils/permissions/",
-              "hooks/toolPermission/",
-              "Tool.ts",
-            ],
-            "mcp client": [
-              "services/mcp/",
-              "tools/MCPTool/",
-              "tools/ListMcpResourcesTool/",
-            ],
-            mcp: ["services/mcp/", "entrypoints/mcp.ts", "tools/MCPTool/"],
-            "tool system": ["Tool.ts", "tools.ts", "tools/"],
-            tools: ["Tool.ts", "tools.ts"],
-            "query engine": ["QueryEngine.ts", "query/"],
-            bridge: ["bridge/"],
-            "ide integration": ["bridge/"],
-            context: ["context.ts", "context/"],
-            commands: ["commands.ts", "types/command.ts"],
-            "command system": ["commands.ts", "types/command.ts", "commands/"],
-            plugins: ["plugins/"],
-            skills: ["skills/"],
-            tasks: ["tasks.ts", "tasks/", "tools/TaskCreateTool/"],
-            coordinator: ["coordinator/", "tools/AgentTool/"],
-            "multi-agent": ["coordinator/", "tools/AgentTool/"],
-            memory: ["memdir/", "commands/memory/"],
-            voice: ["voice/"],
-            server: ["server/"],
-          };
-          const paths = featureMap[feature.toLowerCase()] ?? [];
-          let contextFiles = "";
-          for (const p of paths) {
-            const abs = safePath(p);
-            if (!abs) continue;
-            try {
-              const stat = await fs.stat(abs);
-              if (stat.isDirectory()) {
-                const files = await listDir(abs);
-                contextFiles += `\n### ${p}\nFiles: ${files.join(", ")}\n`;
-              } else {
-                const content = await fs.readFile(abs, "utf-8");
-                const preview = content.split("\n").slice(0, 200).join("\n");
-                contextFiles += `\n### ${p} (first 200 lines)\n\`\`\`typescript\n${preview}\n\`\`\`\n`;
-              }
-            } catch {
-              /* skip */
-            }
-          }
           return {
-            description: `How ${feature} works in Claude Code`,
+            description: `How ${feature} works in DISHA`,
             messages: [
               {
                 role: "user" as const,
                 content: {
                   type: "text" as const,
-                  text: `Explain how "${feature}" works in the Claude Code CLI.\n${contextFiles || "(No specific files mapped — use search_source and read_source_file to find relevant code.)"}`,
+                  text: `Explain how "${feature}" works in the DISHA Sovereign Intelligence platform. Use the explorer tools to find the relevant implementation in disha/ai/core/ or disha/services/.`,
                 },
               },
             ],
@@ -896,38 +824,26 @@ ${commands.map((c) => `- **${c.name}** ${c.isDirectory ? "(directory)" : "(file)
         case "compare_tools": {
           const tool1 = args?.tool1;
           const tool2 = args?.tool2;
-          if (!tool1 || !tool2)
-            throw new Error("Both tool1 and tool2 arguments are required");
+          if (!tool1 || !tool2) throw new Error("Both tool1 and tool2 are required");
+
           const sources: string[] = [];
-          for (const toolName of [tool1, tool2]) {
-            const toolDir = safePath(`tools/${toolName}`);
-            if (!toolDir || !(await dirExists(toolDir))) {
-              sources.push(`// Tool not found: ${toolName}`);
-              continue;
-            }
-            const files = await listDir(toolDir);
-            const mainFile =
-              files.find(
-                (f) => f === `${toolName}.ts` || f === `${toolName}.tsx`
-              ) ?? files.find((f) => f.endsWith(".ts") || f.endsWith(".tsx"));
-            if (mainFile) {
-              const content = await fs.readFile(
-                path.join(toolDir, mainFile),
-                "utf-8"
-              );
-              sources.push(`// tools/${toolName}/${mainFile}\n${content}`);
-            } else {
-              sources.push(`// No main source found for ${toolName}`);
-            }
+          for (const t of [tool1, tool2]) {
+            const dir = safePath(`disha/legacy-root-src/tools/${t}`);
+            if (!dir || !(await dirExists(dir))) throw new Error(`Tool not found: ${t}`);
+            const files = await listDir(dir);
+            const main = files.find((f) => f === `${t}.ts` || f === `${t}.tsx`) ?? files.find((f) => f.endsWith(".ts") || f.endsWith(".tsx"));
+            if (!main) throw new Error(`No source files in ${t}`);
+            sources.push(await fs.readFile(path.join(dir, main), "utf-8"));
           }
+
           return {
-            description: `Comparison of ${tool1} vs ${tool2}`,
+            description: `Comparison of ${tool1} and ${tool2}`,
             messages: [
               {
                 role: "user" as const,
                 content: {
                   type: "text" as const,
-                  text: `Compare these two Claude Code tools:\n\n## ${tool1}\n\`\`\`typescript\n${sources[0]}\n\`\`\`\n\n## ${tool2}\n\`\`\`typescript\n${sources[1]}\n\`\`\``,
+                  text: `Compare these two DISHA tools:\\n\\n## ${tool1}\\n\`\`\`typescript\\n${sources[0]}\\n\`\`\`\\n\\n## ${tool2}\\n\`\`\`typescript\\n${sources[1]}\\n\`\`\``,
                 },
               },
             ],
@@ -942,18 +858,3 @@ ${commands.map((c) => `- **${c.name}** ${c.isDirectory ? "(directory)" : "(file)
 
   return server;
 }
-
-/** Validate that SRC_ROOT exists. Exits with error if not. */
-export async function validateSrcRoot(): Promise<void> {
-  if (!(await dirExists(SRC_ROOT))) {
-    console.error(
-      `Error: Claude Code src/ directory not found at ${SRC_ROOT}`
-    );
-    console.error(
-      "Set CLAUDE_CODE_SRC_ROOT environment variable to the src/ directory path."
-    );
-    process.exit(1);
-  }
-}
-
-

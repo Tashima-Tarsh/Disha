@@ -1,55 +1,55 @@
-# Monster Codemaster — MCP Server
+# DISHA Intelligence Explorer — MCP Server
 
-A standalone [Model Context Protocol](https://modelcontextprotocol.io/) (MCP) server that lets any MCP-compatible client explore the Claude Code source code. Rebranded and published by Monster. Supports **STDIO**, **Streamable HTTP**, and **SSE** transports.
+A standalone [Model Context Protocol](https://modelcontextprotocol.io/) (MCP) server that enables any MCP-compatible client to explore the DISHA Sovereign Intelligence codebase. Supports **STDIO**, **Streamable HTTP**, and **SSE** transports.
 
 ## What It Does
 
-Exposes 8 tools, 3 resources, and 5 prompts for navigating the ~1,900-file, 512K+ line Claude Code codebase. This is the official npm package: `monster-codemaster`.
+Exposes 8 tools, 3 resources, and 5 prompts for navigating the DISHA monorepo architecture. This is the official explorer for the `@tashima-tarsh/disha` ecosystem.
 
 ### Transports
 
 | Transport | Endpoint | Best For |
 |-----------|----------|----------|
-| **STDIO** | `node dist/index.js` | Claude Desktop, local Claude Code, VS Code |
+| **STDIO** | `node dist/index.js` | Local agents, VS Code, Cursor |
 | **Streamable HTTP** | `POST/GET /mcp` | Modern MCP clients, remote hosting |
-| **Legacy SSE** | `GET /sse` + `POST /messages` | Older MCP clients |
+| **Legacy SSE** | `GET /sse` + `POST /messages` | Web-based MCP clients |
 
 ### Tools
 
 | Tool | Description |
 |------|-------------|
-| `list_tools` | List all 40+ agent tools (BashTool, FileEditTool, etc.) |
-| `list_commands` | List all 50+ slash commands (/commit, /review, etc.) |
+| `list_tools` | List all 40+ DISHA agents and core tools |
+| `list_commands` | List all 50+ sovereign slash commands |
 | `get_tool_source` | Read a specific tool's implementation |
 | `get_command_source` | Read a specific command's implementation |
-| `read_source_file` | Read any file from `src/` by relative path |
-| `search_source` | Regex search across the entire source tree |
-| `list_directory` | List contents of any directory under `src/` |
-| `get_architecture` | Get a full architecture overview |
+| `read_source_file` | Read any file from the `disha/` monorepo |
+| `search_source` | Regex search across the entire DISHA tree |
+| `list_directory` | List contents of any directory within the monorepo |
+| `get_architecture` | Get a full architecture overview of DISHA |
 
 ### Resources
 
 | URI | Description |
 |-----|-------------|
-| `claude-code://architecture` | README / architecture overview |
-| `claude-code://tools` | Tool registry (JSON) |
-| `claude-code://commands` | Command registry (JSON) |
-| `claude-code://source/{path}` | Any source file (template) |
+| `disha://architecture` | DISHA README / architecture overview |
+| `disha://tools` | Tool registry (JSON) |
+| `disha://commands` | Command registry (JSON) |
+| `disha://source/{path}` | Any source file (template) |
 
 ### Prompts
 
 | Prompt | Description |
 |--------|-------------|
-| `explain_tool` | Deep-dive explanation of a specific tool's purpose, schema, permissions, and flow |
-| `explain_command` | Explanation of a specific slash command's behavior and implementation |
-| `architecture_overview` | Guided tour of the full Claude Code architecture |
-| `how_does_it_work` | Explain a feature/subsystem (permissions, MCP, bridge, etc.) |
-| `compare_tools` | Side-by-side comparison of two tools |
+| `explain_tool` | Deep-dive explanation of a specific DISHA tool's purpose and schema |
+| `explain_command` | Explanation of a specific sovereign slash command's behavior |
+| `architecture_overview` | Guided tour of the full DISHA Monorepo architecture |
+| `how_does_it_work` | Explain a feature/subsystem (Cognitive Loop, Sentinel, etc.) |
+| `compare_tools` | Side-by-side comparison of two DISHA tools |
 
 ## Setup
 
 ```bash
-cd mcp-server
+cd disha/services/mcp
 npm install
 npm run build
 ```
@@ -59,7 +59,7 @@ npm run build
 ```bash
 npm start
 # or with custom source path:
-CLAUDE_CODE_SRC_ROOT=/path/to/src npm start
+DISHA_SRC_ROOT=/path/to/disha npm start
 ```
 
 ### Run Locally (HTTP)
@@ -80,55 +80,18 @@ MCP_API_KEY=your-secret-token npm run start:http
 
 ## Configuration
 
-### Claude Desktop
+### Example Agent Configuration
 
-Add to `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS) or `%APPDATA%\Claude\claude_desktop_config.json` (Windows):
-
-```json
-{
-  "mcpServers": {
-    "monster-codemaster": {
-      "command": "node",
-      "args": ["/absolute/path/to/claude-code/mcp-server/dist/index.js"],
-      "env": {
-        "CLAUDE_CODE_SRC_ROOT": "/absolute/path/to/claude-code/src"
-      }
-    }
-  }
-}
-```
-
-### VS Code (GitHub Copilot)
-
-Add to `.vscode/mcp.json` in your workspace:
-
-```json
-{
-  "servers": {
-    "claude-code-explorer": {
-      "type": "stdio",
-      "command": "node",
-      "args": ["${workspaceFolder}/mcp-server/dist/index.js"],
-      "env": {
-        "CLAUDE_CODE_SRC_ROOT": "${workspaceFolder}/src"
-      }
-    }
-  }
-}
-```
-
-### Cursor
-
-Add to `~/.cursor/mcp.json`:
+Add to your MCP-compatible agent's configuration:
 
 ```json
 {
   "mcpServers": {
-    "claude-code-explorer": {
+    "disha-explorer": {
       "command": "node",
-      "args": ["/absolute/path/to/claude-code/mcp-server/dist/index.js"],
+      "args": ["/absolute/path/to/disha/services/mcp/dist/index.js"],
       "env": {
-        "CLAUDE_CODE_SRC_ROOT": "/absolute/path/to/claude-code/src"
+        "DISHA_SRC_ROOT": "/absolute/path/to/disha"
       }
     }
   }
@@ -139,18 +102,18 @@ Add to `~/.cursor/mcp.json`:
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `CLAUDE_CODE_SRC_ROOT` | `../src` (relative to dist/) | Path to the Claude Code `src/` directory |
+| `DISHA_SRC_ROOT` | `../../` (relative to dist/) | Path to the DISHA monorepo root |
 | `PORT` | `3000` | HTTP server port (HTTP mode only) |
 | `MCP_API_KEY` | _(none)_ | Bearer token for HTTP auth (optional) |
 
 ## Remote HTTP Client Configuration
 
-For Claude Desktop connecting to a remote server:
+For clients connecting to a remote server:
 
 ```json
 {
   "mcpServers": {
-    "claude-code-explorer": {
+    "disha-explorer": {
       "url": "https://your-deployment.railway.app/mcp",
       "headers": {
         "Authorization": "Bearer your-secret-key"
@@ -162,92 +125,24 @@ For Claude Desktop connecting to a remote server:
 
 ## Deployment
 
-### Railway
-
-1. Connect your GitHub repo to [Railway](https://railway.app)
-2. Railway automatically detects the `mcp-server/Dockerfile`
-3. Set environment variables in the Railway dashboard:
-   - `MCP_API_KEY` — a secret bearer token
-   - `PORT` is set automatically by Railway
-4. Deploy — available at `your-app.railway.app`
-
-Or via CLI:
-
-```bash
-railway init
-railway up
-```
-
-### Vercel
-
-```bash
-npx vercel
-```
-
-Set environment variables in the Vercel dashboard:
-- `CLAUDE_CODE_SRC_ROOT` — path where src/ files are bundled
-- `MCP_API_KEY` — bearer token
-
-> **Note**: Vercel functions are stateless with execution time limits (10s hobby / 60s pro). Best for simple tool calls. For persistent SSE streams, use Railway or Docker.
-
 ### Docker
 
 ```bash
-# From repo root
-docker build -f mcp-server/Dockerfile -t claude-code-mcp .
-docker run -p 3000:3000 -e MCP_API_KEY=your-secret claude-code-mcp
+# From monorepo root
+docker build -f disha/services/mcp/Dockerfile -t disha-mcp .
+docker run -p 3000:3000 -e MCP_API_KEY=your-secret disha-mcp
 ```
-
-Works on any Docker host: Fly.io, Render, AWS ECS, Google Cloud Run, etc.
-
-## Prompts
-
-The server also exposes prompt templates for guided exploration:
-
-| Prompt | Description |
-|--------|-------------|
-| `explain_tool` | Deep-dive explanation of a specific tool (input schema, permissions, execution flow) |
-| `explain_command` | Explain how a slash command works |
-| `architecture_overview` | Guided tour of the entire Claude Code architecture |
-| `how_does_it_work` | Explain a feature or subsystem (e.g. "permission system", "MCP client", "query engine") |
-| `compare_tools` | Side-by-side comparison of two tools |
 
 ## Example Usage
 
 Once connected, you can ask your AI assistant things like:
 
-- "List all Claude Code tools"
-- "Show me the BashTool implementation"
-- "Search for how permissions are checked"
-- "What files are in the bridge directory?"
-- "Read the QueryEngine.ts file, lines 1-100"
-- "How does the MCP client connection work?"
-- Use the `explain_tool` prompt with "FileEditTool" to get a full breakdown
-- Use `how_does_it_work` with "bridge" to understand IDE integration
-
-## Publishing to MCP Registry
-
-This server is published to the [MCP Registry](https://registry.modelcontextprotocol.io) via GitHub Actions. On a tagged release (`v*`), the workflow:
-
-1. Publishes the npm package to npmjs.org
-2. Authenticates with the MCP Registry using GitHub OIDC
-3. Publishes the `server.json` metadata to the registry
-
-To publish manually:
-
-```bash
-# Install the MCP Publisher CLI
-curl -L "https://github.com/modelcontextprotocol/registry/releases/latest/download/mcp-publisher_$(uname -s | tr '[:upper:]' '[:lower:]')_$(uname -m | sed 's/x86_64/amd64/;s/aarch64/arm64/').tar.gz" | tar xz mcp-publisher
-
-# Authenticate (GitHub OAuth)
-./mcp-publisher login github
-
-# Publish
-cd mcp-server
-../mcp-publisher publish
-```
-
-Registry name: `monster-codemaster`
+- "List all DISHA core tools"
+- "Show me the CognitiveLoop implementation"
+- "Search for how Sentinel handles restarts"
+- "What files are in the disha/ai directory?"
+- "Read the architecture.md file"
+- "How does the 7-stage cognitive loop work?"
 
 ## Development
 
@@ -264,16 +159,11 @@ npm run start:http  # Run HTTP server
 ```
 mcp-server/
 ├── src/
-│   ├── server.ts    — Shared MCP server (tools, resources, prompts) — transport-agnostic
-│   ├── index.ts     — STDIO entrypoint (local)
-│   └── http.ts      — HTTP + SSE entrypoint (remote)
-├── api/
-│   ├── index.ts     — Vercel serverless function
-│   └── vercelApp.ts — Express app for Vercel
-├── Dockerfile       — Docker build (Railway, Fly.io, etc.)
+│   ├── server.ts    — Shared MCP server (tools, resources, prompts)
+│   ├── index.ts     — STDIO entrypoint
+│   └── http.ts      — HTTP + SSE entrypoint
+├── Dockerfile       — Docker build
 ├── railway.json     — Railway deployment config
 ├── package.json
 └── tsconfig.json
 ```
-
-
