@@ -9,8 +9,8 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(level
 logger = logging.getLogger("DISHA-AutoHeal")
 
 SERVICES = {
-    "alerts": "http://localhost:8001/",
-    "forecast": "http://localhost:8002/"
+    "alerts": os.getenv("DISHA_ALERTS_URL", "http://localhost:8001/"),
+    "forecast": os.getenv("DISHA_FORECAST_URL", "http://localhost:8002/")
 }
 
 class AutoHeal:

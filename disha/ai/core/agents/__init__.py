@@ -12,6 +12,6 @@ raw reasoning hypotheses and final action selection:
 The AgentDeliberator class orchestrates all three and returns a consensus dict.
 """
 
-from cognitive_engine.agents.deliberation import AgentDeliberator
+from .deliberation import AgentDeliberator
 
 __all__ = ["AgentDeliberator"]

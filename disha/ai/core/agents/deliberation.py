@@ -28,7 +28,7 @@ import structlog
 log = structlog.get_logger(__name__)
 
 if TYPE_CHECKING:
-    from cognitive_engine.cognitive_loop import CognitiveState
+    from disha.ai.core.cognitive_loop import CognitiveState
 
 
 # ---------------------------------------------------------------------------

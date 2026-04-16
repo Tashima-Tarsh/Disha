@@ -21,11 +21,11 @@ from dataclasses import dataclass, field
 
 import structlog
 
-from cognitive_engine.memory.memory_manager import MemoryManager
-from cognitive_engine.agents.deliberation import AgentDeliberator
-from cognitive_engine.intelligence.hybrid_reasoner import HybridReasoner
-from cognitive_engine.intelligence.quantum_decision import QuantumDecisionEngine
-from cognitive_engine.intelligence.goal_engine import GoalEngine
+from .memory.memory_manager import MemoryManager
+from .agents.deliberation import AgentDeliberator
+from .intelligence.hybrid_reasoner import HybridReasoner
+from .intelligence.quantum_decision import QuantumDecisionEngine
+from .intelligence.goal_engine import GoalEngine
 
 logger = structlog.get_logger("cognitive_loop")
 

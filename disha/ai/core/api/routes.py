@@ -20,7 +20,7 @@ import structlog
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 from pydantic import BaseModel
 
-from cognitive_engine.cognitive_loop import CognitiveEngine
+from disha.ai.core.cognitive_loop import CognitiveEngine
 
 logger = structlog.get_logger("cognitive_api")
 
@@ -140,7 +140,7 @@ async def _stream_cognitive_cycle(ws: WebSocket, raw_input: str, session_id: str
     """
     import time
 
-    from cognitive_engine.cognitive_loop import CognitiveState
+    from disha.ai.core.cognitive_loop import CognitiveState
 
     turn = len(_engine._traces.get(session_id, []))
     state = CognitiveState(session_id=session_id, turn=turn, raw_input=raw_input)

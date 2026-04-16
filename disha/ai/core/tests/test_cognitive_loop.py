@@ -14,7 +14,7 @@ from __future__ import annotations
 import pytest
 from unittest.mock import AsyncMock, MagicMock, patch
 
-from cognitive_engine.cognitive_loop import CognitiveEngine, CognitiveState
+from disha.ai.core.cognitive_loop import CognitiveEngine, CognitiveState
 
 
 # ── Fixtures ───────────────────────────────────────────────────────────────────
@@ -33,11 +33,11 @@ def state():
 def engine():
     """Engine with mocked sub-components to avoid network/disk I/O."""
     with (
-        patch("cognitive_engine.cognitive_loop.MemoryManager") as MockMem,
-        patch("cognitive_engine.cognitive_loop.AgentDeliberator") as MockDel,
-        patch("cognitive_engine.cognitive_loop.HybridReasoner") as MockReas,
-        patch("cognitive_engine.cognitive_loop.QuantumDecisionEngine"),
-        patch("cognitive_engine.cognitive_loop.GoalEngine") as MockGE,
+        patch("disha.ai.core.cognitive_loop.MemoryManager") as MockMem,
+        patch("disha.ai.core.cognitive_loop.AgentDeliberator") as MockDel,
+        patch("disha.ai.core.cognitive_loop.HybridReasoner") as MockReas,
+        patch("disha.ai.core.cognitive_loop.QuantumDecisionEngine"),
+        patch("disha.ai.core.cognitive_loop.GoalEngine") as MockGE,
     ):
         # Memory mock
         mem = MockMem.return_value

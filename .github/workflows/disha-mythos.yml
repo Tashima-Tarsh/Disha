@@ -49,7 +49,7 @@ jobs:
 
       - name: Run Threat Guardian
         run: |
-          python scripts/guardian/threat_guardian.py --scan --neutralize --json > guardian_report.json
+          python disha/scripts/threat_guardian.py --scan --neutralize --json > guardian_report.json
           cat guardian_report.json
         continue-on-error: true
 
@@ -80,7 +80,7 @@ jobs:
 
       - name: Run Health Monitor
         run: |
-          python scripts/self_heal/monitor.py --fix --json > health_report.json
+          python disha/scripts/monitor.py --fix --json > health_report.json
           cat health_report.json
         continue-on-error: true
 
@@ -121,13 +121,13 @@ jobs:
           ROUNDS="${{ github.event.inputs.train_rounds || '1' }}"
 
           if [ "$MODE" = "all" ]; then
-            python scripts/disha_mythos.py --all --train-rounds "$ROUNDS" --offline --json
+            python disha/scripts/disha_mythos.py --all --train-rounds "$ROUNDS" --offline --json
           elif [ "$MODE" = "train" ]; then
-            python scripts/disha_mythos.py --train --train-rounds "$ROUNDS" --offline --json
+            python disha/scripts/disha_mythos.py --train --train-rounds "$ROUNDS" --offline --json
           elif [ "$MODE" = "learn" ]; then
-            python scripts/disha_mythos.py --learn --json
+            python disha/scripts/disha_mythos.py --learn --json
           else
-            python scripts/disha_mythos.py --protect --json
+            python disha/scripts/disha_mythos.py --protect --json
           fi
 
       - name: Upload Mythos report

@@ -24,7 +24,7 @@ on:
   push:
     branches: [main]
     paths:
-      - "scripts/continuous_train.py"
+      - "disha/scripts/continuous_train.py"
       - "scripts/data_fetchers.py"
       - "scripts/knowledge_engine.py"
       - "knowledge-base/**"
@@ -66,7 +66,7 @@ jobs:
           COMPONENT="${{ github.event.inputs.component || '' }}"
           OFFLINE="${{ github.event.inputs.offline || 'false' }}"
 
-          CMD="python scripts/continuous_train.py --rounds $ROUNDS"
+          CMD="python disha/scripts/continuous_train.py --rounds $ROUNDS"
           if [ -n "$COMPONENT" ]; then
             CMD="$CMD --component $COMPONENT"
           fi

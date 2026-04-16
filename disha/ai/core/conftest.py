@@ -1,12 +1,5 @@
 """
-pytest conftest: makes 'cognitive_engine' importable from tests.
-
-The package lives in a directory named 'cognitive-engine' (hyphen), which
-Python cannot import directly. This conftest registers the directory as the
-'cognitive_engine' package in sys.modules before any test is collected,
-so that all test files can do:
-
-    from cognitive_engine.cognitive_loop import CognitiveEngine
+pytest conftest: makes 'disha.ai.core' and 'cognitive_engine' importable.
 """
 import importlib.util
 import sys

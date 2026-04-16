@@ -11,9 +11,9 @@ This subpackage contains three reasoning and decision-making components:
                          and rule-based goal decomposition.
 """
 
-from cognitive_engine.intelligence.hybrid_reasoner import HybridReasoner
-from cognitive_engine.intelligence.quantum_decision import QuantumDecisionEngine
-from cognitive_engine.intelligence.goal_engine import GoalEngine
+from .hybrid_reasoner import HybridReasoner
+from .quantum_decision import QuantumDecisionEngine
+from .goal_engine import GoalEngine
 
 __all__ = [
     "HybridReasoner",
