@@ -151,7 +151,10 @@ class ScenarioBuilder:
             events_schedule=events_sorted,
             duration=self._duration,
         )
-        logger.info("Built scenario '%s' with %d entities and %d events", scenario.name, len(scenario.entities), len(scenario.events_schedule))
+        logger.info(
+            "Built scenario '%s' with %d entities and %d events", scenario.name, len(
+                scenario.entities), len(
+                scenario.events_schedule))
         return scenario
 
 

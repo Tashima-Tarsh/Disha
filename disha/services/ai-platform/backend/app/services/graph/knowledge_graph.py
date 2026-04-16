@@ -46,7 +46,8 @@ class KnowledgeGraph:
             logger.error("add_entity_failed", error=str(e))
             return False
 
-    async def add_relationship(self, source_id: str, target_id: str, rel_type: str, properties: dict[str, Any] | None = None) -> bool:
+    async def add_relationship(self, source_id: str, target_id: str, rel_type: str,
+                               properties: dict[str, Any] | None = None) -> bool:
         """Add a relationship between entities."""
         try:
             driver = self._get_driver()

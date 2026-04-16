@@ -17,6 +17,7 @@ app = Celery('translate', broker='amqp://localhost', backend='rpc://')
 
 # --------------------------------------------------------------------------- #
 
+
 def load_translation_services() -> None:
     base_path = 'services/translation'
     for filename in os.listdir(base_path):
@@ -27,6 +28,7 @@ def load_translation_services() -> None:
             importlib.import_module(f"services.translation.{module_name}")
 
 # --------------------------------------------------------------------------- #
+
 
 @shared_task(name='translate_content')
 def translate_content(content_id: int) -> bool:
@@ -41,7 +43,7 @@ def translate_content(content_id: int) -> bool:
 
         # Retrieve the original text from the database record
         original_text = database.get_content_attribute(content_id,
-                'original_text')
+                                                       'original_text')
         logging.info(f"Original: '{original_text[:80]}..'")
 
         # Load the possible translation services
@@ -70,7 +72,7 @@ def translate_content(content_id: int) -> bool:
 
         # Update the database record with the translated text
         database.set_content_attribute(content_id, 'translated_text',
-                translated_text)
+                                       translated_text)
 
         # Finally, issue an analysis task request for the translated content
         app.send_task('analyse_content', args=[content_id], queue="analysis")

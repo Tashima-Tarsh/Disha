@@ -5,10 +5,12 @@ from abc import ABC, abstractmethod
 
 # =========================================================================== #
 
+
 class AnalysisException(Exception):
     pass
 
 # =========================================================================== #
+
 
 class AnalysisService(ABC):
 

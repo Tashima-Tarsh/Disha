@@ -275,7 +275,6 @@ def load_rule_file(file_path: str) -> Optional[Rule]:
 
 # For testing
 if __name__ == '__main__':
-    import sys
 
     # Test frontmatter parsing
     test_content = """---

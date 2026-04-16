@@ -1,15 +1,14 @@
 """World model tests."""
+from world_model.world_manager.world import World
+from world_model.interactions.interaction import CollisionInteraction
+from world_model.environments.environment import Environment
+from world_model.entities.entity_registry import EntityRegistry
+from world_model.entities.entity import Entity, AgentEntity, ObjectEntity, EntityState
 import sys
 import os
 import unittest
 import numpy as np
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
-
-from world_model.entities.entity import Entity, AgentEntity, ObjectEntity, EntityState
-from world_model.entities.entity_registry import EntityRegistry
-from world_model.environments.environment import Environment
-from world_model.interactions.interaction import CollisionInteraction
-from world_model.world_manager.world import World
 
 
 class TestWorldModel(unittest.TestCase):

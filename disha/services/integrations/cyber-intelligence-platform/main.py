@@ -33,4 +33,3 @@ if __name__ == "__main__":
     result = run_pipeline(incident_text, osint_target)
     logging.info("✅ Pipeline complete. Crime: %s", result.get("crime"))
     sys.exit(0)
-

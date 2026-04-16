@@ -13,27 +13,32 @@ except ImportError:
 
 # =========================================================================== #
 
+
 class GPTModel:
     def __init__(self, name, cost_input, cost_output, token_limit):
-        self.name        = name
-        self.cost_input  = cost_input
+        self.name = name
+        self.cost_input = cost_input
         self.cost_output = cost_output
         self.token_limit = token_limit
+
 
 class GPT3Turbo_4K(GPTModel):
     def __init__(self):
         # gpt-3.5-turbo is deprecated; use gpt-4o-mini (faster, cheaper, more capable)
         super().__init__('gpt-4o-mini', 0.00015, 0.0006, 128000)
 
+
 class GPT3Turbo_16K(GPTModel):
     def __init__(self):
         # gpt-3.5-turbo-1106 is deprecated; use gpt-4o-mini
         super().__init__('gpt-4o-mini', 0.00015, 0.0006, 128000)
 
+
 class GPT4_8K(GPTModel):
     def __init__(self):
         # gpt-4 (8K) is deprecated; use gpt-4o
         super().__init__('gpt-4o', 0.0025, 0.01, 128000)
+
 
 class GPT4_32K(GPTModel):
     def __init__(self):
@@ -42,30 +47,31 @@ class GPT4_32K(GPTModel):
 
 # =========================================================================== #
 
+
 class GPT:
     COST_ROUNDING = 4
     TOKENS_DIV_BY = 1024
 
     def __init__(self, api_key, model):
         self.api_key = api_key
-        self.model   = model
+        self.model = model
         self.api_response = None
-        self.messages     = []
-        self.total_cost   = 0
+        self.messages = []
+        self.total_cost = 0
 
     def reset(self):
-        self.messages   = []
+        self.messages = []
         self.total_cost = 0
 
     def single_prompt(self, prompt):
-        self.messages = [ { 'role': 'system', 'content': prompt } ]
+        self.messages = [{'role': 'system', 'content': prompt}]
         response = self.execute()
         self.reset()
         return response
 
     def add_prompt(self, prompt):
         role = 'system' if not self.messages else 'user'
-        self.messages.append({ 'role': role, 'content': prompt })
+        self.messages.append({'role': role, 'content': prompt})
 
     def load_template(self, template_path, params=None):
         if params is None:
@@ -98,24 +104,24 @@ class GPT:
         self.total_cost += cost
 
         first_choice = self.api_response.choices[0]
-        content      = first_choice.message.content
+        content = first_choice.message.content
 
         self.messages.append({
-                              'role': first_choice.message.role,
-                              'content': content
-                             })
+            'role': first_choice.message.role,
+            'content': content
+        })
 
-        response = { 'api_response': self.api_response,
-                     'response': content,
-                     'cost': cost }
+        response = {'api_response': self.api_response,
+                    'response': content,
+                    'cost': cost}
 
         return response
 
     def _get_cost(self, api_response):
-        input_cost = round((api_response.usage.prompt_tokens / self.TOKENS_DIV_BY) \
-                     * self.model.cost_input, self.COST_ROUNDING)
-        output_cost = round((api_response.usage.completion_tokens / self.TOKENS_DIV_BY) \
-                     * self.model.cost_output, self.COST_ROUNDING)
+        input_cost = round((api_response.usage.prompt_tokens / self.TOKENS_DIV_BY)
+                           * self.model.cost_input, self.COST_ROUNDING)
+        output_cost = round((api_response.usage.completion_tokens / self.TOKENS_DIV_BY)
+                            * self.model.cost_output, self.COST_ROUNDING)
         return input_cost + output_cost
 
     def _get_token_count(self, input_str):

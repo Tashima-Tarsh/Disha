@@ -5,10 +5,12 @@ from abc import ABC, abstractmethod
 
 # =========================================================================== #
 
+
 class TranslationException(Exception):
     pass
 
 # =========================================================================== #
+
 
 class TranslationService(ABC):
 

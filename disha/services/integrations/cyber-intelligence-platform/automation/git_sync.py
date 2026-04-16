@@ -60,4 +60,3 @@ if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
     success = git_sync()
     raise SystemExit(0 if success else 1)
-

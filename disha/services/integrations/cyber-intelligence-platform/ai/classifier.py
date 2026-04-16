@@ -1,4 +1,4 @@
-def classify_crime(text): 
+def classify_crime(text):
     text = text.lower()
 
     if "upi" in text or "otp" in text:

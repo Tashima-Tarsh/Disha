@@ -111,7 +111,13 @@ def evaluate_models(rf_clf, mlp_clf, X_test, y_test, metadata):
     present_labels = sorted(list(set(y_test) | set(rf_preds)))
     present_names = [labels[i] for i in present_labels if i < len(labels)]
     logger.info("--- Classification Report ---")
-    logger.info(classification_report(y_test, rf_preds, labels=present_labels, target_names=present_names, zero_division=0))
+    logger.info(
+        classification_report(
+            y_test,
+            rf_preds,
+            labels=present_labels,
+            target_names=present_names,
+            zero_division=0))
     rf_cm = confusion_matrix(y_test, rf_preds, labels=present_labels)
     print_confusion_matrix_text(rf_cm, present_names)
 

@@ -7,6 +7,7 @@ Base = declarative_base()
 
 # --------------------------------------------------------------------------- #
 
+
 class CollectorModel(Base):
     __tablename__ = 'collector'
 
@@ -18,6 +19,7 @@ class CollectorModel(Base):
     sources = relationship("SourceModel", back_populates="collector")
 
 # --------------------------------------------------------------------------- #
+
 
 class SourceModel(Base):
     __tablename__ = 'source'
@@ -34,6 +36,7 @@ class SourceModel(Base):
     contents = relationship("ContentModel", back_populates="source")
 
 # --------------------------------------------------------------------------- #
+
 
 class ContentModel(Base):
     __tablename__ = 'content'
@@ -53,6 +56,7 @@ class ContentModel(Base):
 
 # --------------------------------------------------------------------------- #
 
+
 class AnalysisRequirementModel(Base):
     __tablename__ = 'analysis_requirement'
 
@@ -67,6 +71,7 @@ class AnalysisRequirementModel(Base):
     analysis_results = relationship("AnalysisResultModel", back_populates="analysis_requirement")
 
 # --------------------------------------------------------------------------- #
+
 
 class AnalysisResultModel(Base):
     __tablename__ = 'analysis_result'

@@ -8,6 +8,7 @@ from gpt_api import GPT, GPT3Turbo_16K
 
 # =========================================================================== #
 
+
 class GPTTranslate(TranslationService):
     def __init__(self):
         super().__init__('gpt3.5')
@@ -31,7 +32,7 @@ class GPTTranslate(TranslationService):
         gpt.add_prompt(template)
 
         # Add our translation request
-        gpt.add_prompt(json.dumps({ 'translate_to': 'English', 'message': text }))
+        gpt.add_prompt(json.dumps({'translate_to': 'English', 'message': text}))
 
         # Send off our GPT request
         response = gpt.execute()
@@ -52,5 +53,6 @@ class GPTTranslate(TranslationService):
         return data['translation']
 
 # =========================================================================== #
+
 
 TranslationService.register('gpt3.5', GPTTranslate)

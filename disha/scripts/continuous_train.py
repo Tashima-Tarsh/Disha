@@ -31,7 +31,7 @@ from typing import Any
 import numpy as np
 import structlog
 
-#  Path setup 
+#  Path setup
 REPO_ROOT = Path(__file__).resolve().parents[2]
 BACKEND = REPO_ROOT / "ai-platform" / "backend"
 DECISION_DIR = REPO_ROOT / "decision-engine"
@@ -49,9 +49,9 @@ os.environ.setdefault("DISHA_MODEL_PROVIDER", "mock")
 logger = structlog.get_logger("continuous_train")
 
 
-# 
+#
 # Hyperparameter schedules for self-enhancement
-# 
+#
 
 class HyperparamScheduler:
     """Auto-tunes hyperparameters based on training metrics history."""
@@ -108,9 +108,9 @@ class HyperparamScheduler:
         }
 
 
-# 
+#
 # Graph merging utility
-# 
+#
 
 def _merge_graphs(threat_graph, knowledge_graph: dict):
     """Merge threat intelligence graph with knowledge graph for richer training."""
@@ -178,9 +178,9 @@ def _merge_graphs(threat_graph, knowledge_graph: dict):
     )
 
 
-# 
+#
 # Component trainers
-# 
+#
 
 def _train_rl(
     scenarios: list,
@@ -583,9 +583,9 @@ def _train_decision_engine(
     return metrics
 
 
-# 
+#
 # Checkpoint promotion with improvement gating
-# 
+#
 
 def _should_promote(current: dict, previous: dict | None, component: str) -> bool:
     """Decide if new checkpoint should replace the previous one."""
@@ -628,9 +628,9 @@ def _promote_checkpoint(staging_dir: Path, production_dir: Path, component: str)
     logger.info("checkpoint_promoted", component=component, src=str(staging_dir), dst=str(production_dir))
 
 
-# 
+#
 # Main continuous training loop
-# 
+#
 
 def run_continuous_training(
     rounds: int = 3,
@@ -663,7 +663,7 @@ def run_continuous_training(
     prev_gnn_metrics = _load_metrics(gnn_prod_dir / "gnn_training_metrics.json")
     prev_de_metrics = _load_metrics(de_prod_dir / "decision_training_metrics.json")
 
-    #  Load universal knowledge corpus once 
+    #  Load universal knowledge corpus once
     logger.info("loading_knowledge_corpus")
     knowledge_corpus = load_all_knowledge()
     logger.info("knowledge_corpus_loaded",
@@ -675,7 +675,7 @@ def run_continuous_training(
         t0 = time.time()
         round_metrics: dict[str, Any] = {"round": round_num}
 
-        #  1. Fetch fresh data 
+        #  1. Fetch fresh data
         logger.info("fetching_data", offline=offline)
         if offline:
             threat_scenarios = generate_synthetic_threats(n=150, seed=round_num * 42)
@@ -709,7 +709,7 @@ def run_continuous_training(
         )
         de_scenarios.extend(cross_scenarios)
 
-        #  2. Train each component 
+        #  2. Train each component
         # Staging dir for this round
         staging = REPO_ROOT / "checkpoints_staging" / f"round_{round_num}"
 
@@ -766,7 +766,7 @@ def run_continuous_training(
             else:
                 logger.warning("de_not_promoted", reason="regression")
 
-        #  3. Record for self-enhancement 
+        #  3. Record for self-enhancement
         elapsed = time.time() - t0
         round_metrics["elapsed_seconds"] = round(elapsed, 1)
         scheduler.record(round_metrics)
@@ -774,7 +774,7 @@ def run_continuous_training(
 
         logger.info("round_complete", round=round_num, elapsed=f"{elapsed:.1f}s")
 
-    #  Final summary 
+    #  Final summary
     summary = {
         "total_rounds": rounds,
         "rounds": round_results,
@@ -810,9 +810,9 @@ def _load_metrics(path: Path) -> dict | None:
     return None
 
 
-# 
+#
 # CLI
-# 
+#
 
 def main():
     parser = argparse.ArgumentParser(description="Continuous AI Training Pipeline")
@@ -828,9 +828,9 @@ def main():
         offline=args.offline,
     )
 
-    print(f"\n{'='*60}")
+    print(f"\n{'=' * 60}")
     print("  CONTINUOUS TRAINING COMPLETE")
-    print(f"{'='*60}")
+    print(f"{'=' * 60}")
 
     # Show knowledge domains loaded
     kd = result.get("knowledge_domains", [])

@@ -4,11 +4,8 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/layout/ThemeProvider";
 import { ToastProvider } from "@/components/notifications/ToastProvider";
 import { JarvisProvider } from "@/components/layout/JarvisProvider";
-import { StartupScreen } from "@/components/layout/StartupScreen";
-import { JarvisOrb } from "@/components/ui/JarvisOrb";
+import { ClientOrchestrator } from "@/components/layout/ClientOrchestrator";
 import type React from "react";
-import { useState, useEffect } from "react";
-import { AnimatePresence } from "framer-motion";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -60,8 +57,6 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const [isInitializing, setIsInitializing] = useState(true);
-
   return (
     <html lang="en" className="dark h-full w-full overflow-hidden" suppressHydrationWarning>
       <body className={`${inter.variable} ${jetbrainsMono.variable} ${outfit.variable} ${plusJakartaSans.variable} font-sans antialiased bg-background text-foreground h-full w-full overflow-hidden relative selection:bg-primary/30`}>
@@ -72,16 +67,9 @@ export default function RootLayout({
           <JarvisProvider>
             <ThemeProvider>
               <ToastProvider>
-                <AnimatePresence mode="wait">
-                  {isInitializing ? (
-                    <StartupScreen key="startup" onComplete={() => setIsInitializing(false)} />
-                  ) : (
-                    <div key="main" className="h-full w-full animate-in fade-in duration-700">
-                      {children}
-                      <JarvisOrb />
-                    </div>
-                  )}
-                </AnimatePresence>
+                <ClientOrchestrator>
+                  {children}
+                </ClientOrchestrator>
               </ToastProvider>
             </ThemeProvider>
           </JarvisProvider>

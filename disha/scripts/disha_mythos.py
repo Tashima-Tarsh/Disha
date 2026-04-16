@@ -32,7 +32,7 @@ from pathlib import Path
 
 import structlog
 
-#  Path setup 
+#  Path setup
 REPO_ROOT = Path(__file__).resolve().parents[2]
 SCRIPTS_DIR = REPO_ROOT / "disha" / "scripts"
 BACKEND = REPO_ROOT / "disha" / "ai" / "core"
@@ -61,12 +61,16 @@ def _import_model_hub():
     # Model hub functionality is being integrated into AI Core
     # For now, we stub this to prevent broken imports during transition
     class HubStub:
-        def status(self): return {"total_count": 0}
+        def status(self):
+            return {"total_count": 0}
+
         def ask(self, *args, **kwargs):
-             class Resp:
-                 ok = True
-             return Resp()
-        def available_providers(self): return []
+            class Resp:
+                ok = True
+            return Resp()
+
+        def available_providers(self):
+            return []
     return HubStub
 
 
@@ -75,9 +79,9 @@ def _import_knowledge_engine():
     return KnowledgeEngine
 
 
-# 
+#
 # Mythos phases
-# 
+#
 
 def phase_protect(auto_fix: bool = True) -> dict:
     """Phase 1: Threat Detection & Neutralization."""
@@ -206,9 +210,9 @@ def phase_train(rounds: int = 1, offline: bool = True) -> dict:
     return result
 
 
-# 
+#
 # Main orchestrator
-# 
+#
 
 def run_mythos(
     protect: bool = True,

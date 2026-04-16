@@ -45,7 +45,7 @@ class TestKnowledgeLoading:
 
         corpus = load_all_knowledge()
         expected_domains = {"physics", "mathematics", "computing", "chemistry",
-                           "law", "cybersecurity", "innovation", "history"}
+                            "law", "cybersecurity", "innovation", "history"}
         loaded_domains = set(corpus.domain_counts.keys())
         # At least 6 of 8 domains should be present
         assert len(loaded_domains & expected_domains) >= 6, f"Only loaded: {loaded_domains}"

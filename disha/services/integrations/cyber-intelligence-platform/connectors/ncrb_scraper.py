@@ -1,6 +1,7 @@
 import requests
 import os
 
+
 def scrape_ncrb():
     print("Downloading NCRB cybercrime reports...")
 

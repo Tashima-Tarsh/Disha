@@ -10,15 +10,6 @@ input → parse → symbolic → numerical → simulation → output
 * Shows intermediate results at each stage.
 """
 
-import sys
-import os
-
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
-
-
-import numpy as np
-
 from core.pipeline_engine.pipeline import (
     InputStage,
     NumericalStage,
@@ -28,6 +19,12 @@ from core.pipeline_engine.pipeline import (
     SimulationStage,
     SymbolicStage,
 )
+import numpy as np
+import sys
+import os
+
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
 
 def main() -> None:

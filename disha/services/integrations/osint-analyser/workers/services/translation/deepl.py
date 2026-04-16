@@ -6,10 +6,10 @@ import os
 # Project
 from translation_service import TranslationService
 
+
 class DeepLTranslate(TranslationService):
     def __init__(self):
         super().__init__('deepl')
-
 
     def translate(self, text: str):
         logging.info("DeepLTranslate() received translation request")

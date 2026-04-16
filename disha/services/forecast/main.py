@@ -6,27 +6,30 @@ import random
 
 app = FastAPI(title="DISHA Forecast Service", version="6.0.0")
 
+
 class ForecastRequest(BaseModel):
     region: str
     target_date: Optional[str] = None
     indicators: List[str] = ["weather", "crime", "traffic"]
 
+
 @app.get("/")
 async def root():
     return {"status": "online", "service": "DISHA Forecast", "version": "6.0.0"}
+
 
 @app.post("/predict")
 async def generate_forecast(request: ForecastRequest):
     # This would normally involve ML model inference
     # Placeholder logic simulating risk scores
-    
+
     risks = {
         "flood_risk": round(random.uniform(0.1, 0.9), 2),
         "crime_probability": round(random.uniform(0.05, 0.4), 2),
         "heatwave_index": round(random.uniform(20, 45), 1),
         "traffic_congestion": random.choice(["Low", "Moderate", "High", "Severe"])
     }
-    
+
     return {
         "region": request.region,
         "forecast_timestamp": datetime.datetime.now().isoformat(),

@@ -76,4 +76,3 @@ if __name__ == "__main__":
     print(f"  Alert      : {result['alert']}")
     if result.get("osint"):
         print(f"  OSINT      : {result['osint']}")
-

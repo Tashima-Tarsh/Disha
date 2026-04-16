@@ -13,7 +13,7 @@ from models import Base, ContentModel, AnalysisResultModel, \
     AnalysisRequirementModel, SourceModel
 
 logging.basicConfig(level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s')
+                    format='%(asctime)s - %(levelname)s - %(message)s')
 
 # =========================================================================== #
 
@@ -21,10 +21,12 @@ logging.basicConfig(level=logging.INFO,
 class DatabaseConnectionError(Exception):
     pass
 
+
 class ContentNotFoundError(Exception):
     pass
 
 # =========================================================================== #
+
 
 class Database:
     def __init__(self):
@@ -38,7 +40,7 @@ class Database:
             password = quote_plus(password)
 
             uri = f"mysql+mysqlconnector://{username}:{password}@database/" \
-                    f"{db_name}"
+                f"{db_name}"
             self.engine = create_engine(uri, echo=False)
 
             logging.debug("Connecting to SQL database..")
@@ -47,8 +49,8 @@ class Database:
             logging.error(f"Failed to connect to SQL database! Error: {err}")
             return False
         except Exception as err:
-            logging.error("Non-SQLAlchemy error encountered when connecting " \
-                    f"to SQL database! Error: {err}")
+            logging.error("Non-SQLAlchemy error encountered when connecting "
+                          f"to SQL database! Error: {err}")
             return False
         logging.debug("Connected to SQL database!")
         Base.metadata.create_all(self.engine)
@@ -82,47 +84,47 @@ class Database:
     def get_content_attribute(self, content_id: int, attribute_name: str):
         with self.session_scope() as session:
             content = session.query(ContentModel) \
-                      .filter_by(id=content_id) \
-                      .first()
+                .filter_by(id=content_id) \
+                .first()
             if content is not None:
                 return getattr(content, attribute_name, None)
             else:
-                raise ContentNotFoundError("No content record found with " \
-                        f"ID {content_id}")
+                raise ContentNotFoundError("No content record found with "
+                                           f"ID {content_id}")
 
     # ----------------------------------------------------------------------- #
 
     def set_content_attribute(self, content_id: int, attribute_name: str,
-            new_value) -> None:
+                              new_value) -> None:
         with self.session_scope() as session:
             content = session.query(ContentModel) \
-                      .filter_by(id=content_id) \
-                      .first()
+                .filter_by(id=content_id) \
+                .first()
             if content is not None:
                 if hasattr(content, attribute_name):
                     setattr(content, attribute_name, new_value)
                     session.commit()
-                    logging.info(f"Updated {attribute_name} for content ID " \
-                            f"{content_id}")
+                    logging.info(f"Updated {attribute_name} for content ID "
+                                 f"{content_id}")
                 else:
-                    raise AttributeError("Content record has no attribute " \
-                            f"'{attribute_name}'")
+                    raise AttributeError("Content record has no attribute "
+                                         f"'{attribute_name}'")
             else:
-                raise ContentNotFoundError(f"No content record found with " \
-                        f"ID {content_id}")
+                raise ContentNotFoundError(f"No content record found with "
+                                           f"ID {content_id}")
 
     # ----------------------------------------------------------------------- #
 
     def get_source_attribute(self, source_id: int, attribute_name: str):
         with self.session_scope() as session:
             source = session.query(SourceModel) \
-                     .filter_by(id=source_id) \
-                     .first()
+                .filter_by(id=source_id) \
+                .first()
             if source is not None:
                 return getattr(source, attribute_name, None)
             else:
-                raise ContentNotFoundError(f"No source record found with " \
-                        f"ID {source_id}")
+                raise ContentNotFoundError(f"No source record found with "
+                                           f"ID {source_id}")
 
     # ----------------------------------------------------------------------- #
 
@@ -130,8 +132,8 @@ class Database:
         requirements = []
         with self.session_scope() as session:
             analysis_requirements = session.query(AnalysisRequirementModel) \
-                    .filter(AnalysisRequirementModel.source_id == source_id) \
-                    .all()
+                .filter(AnalysisRequirementModel.source_id == source_id) \
+                .all()
 
             for requirement in analysis_requirements:
                 if requirement.enabled:
@@ -159,6 +161,7 @@ class Database:
 
 # =========================================================================== #
 
+
 def connect_db(database: Database) -> bool:
     """
     Connect to the database using credentials stored in environment
@@ -166,7 +169,7 @@ def connect_db(database: Database) -> bool:
     """
     username = os.environ.get('MYSQL_USER')
     password = os.environ.get('MYSQL_PASSWORD')
-    db_name  = os.environ.get('MYSQL_DATABASE')
+    db_name = os.environ.get('MYSQL_DATABASE')
 
     if not username or \
        not password or \

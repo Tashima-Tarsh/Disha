@@ -106,9 +106,9 @@ def _extract_concepts(obj: Any) -> list[str]:
     return concepts
 
 
-# 
+#
 # Domain-specific extractors
-# 
+#
 
 def _extract_physics(data: dict) -> list[KnowledgeItem]:
     """Extract knowledge items from physics JSON files."""
@@ -461,7 +461,16 @@ def _extract_innovation(data: dict) -> list[KnowledgeItem]:
             items.append(KnowledgeItem(
                 domain="innovation",
                 topic=f"Space/Launch: {name}",
-                text=f"Launch system {name}: {rocket.get('type', '')}, payload to LEO: {rocket.get('payload_leo_kg', '?')}kg, reusable: {rocket.get('reusable', '?')}",
+                text=f"Launch system {name}: {
+                    rocket.get(
+                        'type',
+                        '')}, payload to LEO: {
+                    rocket.get(
+                        'payload_leo_kg',
+                        '?')}kg, reusable: {
+                    rocket.get(
+                        'reusable',
+                        '?')}",
                 concepts=[name],
                 difficulty=0.5,
             ))
@@ -526,9 +535,9 @@ def _extract_history(data: list | dict) -> list[KnowledgeItem]:
     return items
 
 
-# 
+#
 # Main loading function
-# 
+#
 
 _EXTRACTORS = {
     "physics": _extract_physics,
@@ -575,9 +584,9 @@ def load_all_knowledge() -> KnowledgeCorpus:
     return corpus
 
 
-# 
+#
 # Knowledge  Training data transforms
-# 
+#
 
 def _text_to_features(text: str, dim: int = 32) -> np.ndarray:
     """Convert text to a deterministic feature vector using character hashing."""

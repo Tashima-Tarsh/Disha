@@ -76,7 +76,7 @@ class SystemHealth:
         if not self.checks:
             return 0.0
         weights = {HealthStatus.HEALTHY: 1.0, HealthStatus.DEGRADED: 0.5,
-                    HealthStatus.FAILING: 0.0, HealthStatus.UNKNOWN: 0.3}
+                   HealthStatus.FAILING: 0.0, HealthStatus.UNKNOWN: 0.3}
         return sum(weights.get(c.status, 0) for c in self.checks) / len(self.checks)
 
     def to_dict(self) -> dict[str, Any]:
@@ -98,9 +98,9 @@ class SystemHealth:
         }
 
 
-# 
+#
 # Individual health checkers
-# 
+#
 
 class PythonImportChecker:
     """Validates that all Python files parse without syntax errors."""
@@ -386,9 +386,9 @@ class SubsystemChecker:
         )
 
 
-# 
+#
 # Self-Healing Monitor (orchestrator)
-# 
+#
 
 class SelfHealingMonitor:
     """Orchestrates all health checkers, reports status, and auto-heals."""
@@ -463,9 +463,9 @@ class SelfHealingMonitor:
         return fixed_any
 
 
-# 
+#
 # CLI
-# 
+#
 
 def main() -> None:
     import argparse

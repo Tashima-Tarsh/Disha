@@ -44,7 +44,8 @@ class GraphExporter:
                 nodes = [dict(record) for record in nodes_result]
 
                 if not nodes:
-                    return {"node_features": np.zeros((0, 16)), "edge_index": np.zeros((2, 0), dtype=int), "node_ids": [], "node_map": {}}
+                    return {"node_features": np.zeros((0, 16)), "edge_index": np.zeros(
+                        (2, 0), dtype=int), "node_ids": [], "node_map": {}}
 
                 # Create node ID mapping
                 node_map = {node["id"]: i for i, node in enumerate(nodes)}
@@ -76,7 +77,8 @@ class GraphExporter:
 
         except Exception as e:
             logger.error("graph_export_failed", error=str(e))
-            return {"node_features": np.zeros((0, 16)), "edge_index": np.zeros((2, 0), dtype=int), "node_ids": [], "node_map": {}}
+            return {"node_features": np.zeros((0, 16)), "edge_index": np.zeros(
+                (2, 0), dtype=int), "node_ids": [], "node_map": {}}
 
     def _build_features(self, nodes: list[dict[str, Any]], feature_dim: int = 16) -> np.ndarray:
         """Build node feature matrix from entity properties."""

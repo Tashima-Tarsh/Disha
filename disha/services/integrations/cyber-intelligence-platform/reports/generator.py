@@ -48,4 +48,3 @@ def generate_report(data: list, output_dir: str = ".") -> str:
     doc.save(output_path)
     logger.info("Report saved to: %s", output_path)
     return output_path
-

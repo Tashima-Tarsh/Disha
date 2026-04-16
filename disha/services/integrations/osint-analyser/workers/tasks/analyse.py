@@ -14,6 +14,7 @@ app = Celery('analyse', broker='amqp://localhost', backend='rpc://')
 
 # --------------------------------------------------------------------------- #
 
+
 def load_analysis_services() -> None:
     """
     Iterate through the analysis service directory and dynamically load any
@@ -32,6 +33,7 @@ def load_analysis_services() -> None:
             importlib.import_module(f"services.analysis.{module_name}")
 
 # --------------------------------------------------------------------------- #
+
 
 @shared_task(name='analyse_content')
 def analyse_content(content_id: int) -> bool:
@@ -67,7 +69,7 @@ def analyse_content(content_id: int) -> bool:
 
     # Retrieve the translated text to analyse
     translated_text = database.get_content_attribute(content_id,
-            'translated_text')
+                                                     'translated_text')
 
     # Retrieve the source ID for the given content
     source_id = database.get_content_attribute(content_id, 'source_id')
@@ -103,18 +105,18 @@ def analyse_content(content_id: int) -> bool:
         try:
             analysis = service.analyse(requirement['prompt'], translated_text)
         except ValueError as err:
-            logging.error(f"The analysis service reported an error with the " \
-                    f"provided arguments: {err}")
+            logging.error(f"The analysis service reported an error with the "
+                          f"provided arguments: {err}")
             raise
         except AnalysisException as err:
-            logging.error(f"The analysis service encountered an " \
-                    f"irrecoverable error: {err}")
+            logging.error(f"The analysis service encountered an "
+                          f"irrecoverable error: {err}")
             raise
 
         logging.info(f"Analysis: '{analysis[:80]}..'")
 
         new_id = database.save_analysis_result(content_id,
-                requirement['req_id'], analysis)
+                                               requirement['req_id'], analysis)
         logging.info(f"Stored analysis result with ID {new_id}")
 
     logging.info("---------------------------------------------------------")

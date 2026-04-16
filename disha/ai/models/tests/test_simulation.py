@@ -1,14 +1,13 @@
 """Simulation tests."""
+from core.simulation_engine.simulator import Simulator, SimulationConfig
+from simulation.scenarios.scenario import ScenarioBuilder, ScheduledEvent, Entity as ScenarioEntity
+from simulation.monte_carlo.monte_carlo import MonteCarloSimulation
+from simulation.event_engine.events import Event, EventQueue, EventEngine
 import sys
 import os
 import unittest
 import numpy as np
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
-
-from simulation.event_engine.events import Event, EventQueue, EventEngine
-from simulation.monte_carlo.monte_carlo import MonteCarloSimulation
-from simulation.scenarios.scenario import ScenarioBuilder, ScheduledEvent, Entity as ScenarioEntity
-from core.simulation_engine.simulator import Simulator, SimulationConfig
 
 
 class TestSimulation(unittest.TestCase):
@@ -58,6 +57,7 @@ class TestSimulation(unittest.TestCase):
         sim = Simulator()
         sim.configure(SimulationConfig(max_steps=10, dt=0.1, seed=0, logging_interval=5))
         counter = {"n": 0}
+
         def system(state, dt):
             counter["n"] += 1
             state.metrics["count"] = counter["n"]

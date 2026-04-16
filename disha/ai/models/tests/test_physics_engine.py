@@ -1,14 +1,13 @@
 """Physics engine tests."""
+from physics_engine.quantum_inspired.superposition import QuantumState
+from physics_engine.constraints.constraint_solver import DistanceConstraint, ConstraintSolver
+from physics_engine.state_evolution.integrator import EulerIntegrator, RungeKutta4Integrator
+from physics_engine.classical.mechanics import PhysicsObject, ClassicalMechanicsEngine
 import sys
 import os
 import unittest
 import numpy as np
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
-
-from physics_engine.classical.mechanics import PhysicsObject, ClassicalMechanicsEngine
-from physics_engine.state_evolution.integrator import EulerIntegrator, RungeKutta4Integrator
-from physics_engine.constraints.constraint_solver import DistanceConstraint, ConstraintSolver
-from physics_engine.quantum_inspired.superposition import QuantumState
 
 
 class TestPhysicsEngine(unittest.TestCase):
@@ -51,6 +50,7 @@ class TestPhysicsEngine(unittest.TestCase):
     def test_euler_integrator(self):
         integrator = EulerIntegrator()
         state = np.array([0.0, 1.0])
+
         def deriv(s, t):
             return np.array([s[1], 0.0])
         new = integrator.step(state, deriv, 0.0, 0.1)
@@ -59,6 +59,7 @@ class TestPhysicsEngine(unittest.TestCase):
     def test_rk4_integrator(self):
         integrator = RungeKutta4Integrator()
         state = np.array([0.0])
+
         def deriv(s, t):
             return np.array([1.0])
         new = integrator.step(state, deriv, 0.0, 1.0)
@@ -75,12 +76,12 @@ class TestPhysicsEngine(unittest.TestCase):
         self.assertAlmostEqual(dist, 3.0, places=4)
 
     def test_quantum_state_measure(self):
-        qs = QuantumState({"up": 1+0j, "down": 0+0j}, name="test")
+        qs = QuantumState({"up": 1 + 0j, "down": 0 + 0j}, name="test")
         result = qs.measure(rng=np.random.default_rng(0))
         self.assertEqual(result, "up")
 
     def test_superposition_probabilities_sum_to_one(self):
-        qs = QuantumState({"a": 1+0j, "b": 1+0j, "c": 1+0j}, name="s")
+        qs = QuantumState({"a": 1 + 0j, "b": 1 + 0j, "c": 1 + 0j}, name="s")
         probs = qs.probabilities()
         self.assertAlmostEqual(sum(probs.values()), 1.0)
 

@@ -21,13 +21,20 @@ class OSINTFeedEmitter:
         self.producer = KafkaProducer()
         self.running = False
         self._mock_events = [
-            {"type": "vulnerability", "source": "CVE-Database", "severity": "CRITICAL", "description": "Unauthenticated RCE in popular VPN gateway."},
-            {"type": "leak", "source": "DarkWeb-Monitor", "severity": "HIGH", "description": "Credential dump found for major financial institution."},
-            {"type": "malware", "source": "threat-intel-pulse", "severity": "MEDIUM", "description": "New variant of 'QuantumStealer' observed in the wild."},
-            {"type": "market_volatility", "source": "Global-Markets-Feed", "severity": "HIGH", "description": "VIX Index spiking above 30. Major sell-off in emerging market tech stocks."},
-            {"type": "supply_chain", "source": "Logistics-Intel", "severity": "CRITICAL", "description": "Maritime trade disruption in the Suez Canal. Shipping delays predicted for SETU materials."},
-            {"type": "geopolitical", "source": "State-Intel-Brief", "severity": "CRITICAL", "description": "Escalation in regional conflict. Increased sovereign risk for Indo-Pacific trade corridors."},
-            {"type": "blockchain_theft", "source": "Chain-Watch", "severity": "CRITICAL", "description": "Large movement of funds from hacked exchange wallet."}
+            {"type": "vulnerability", "source": "CVE-Database", "severity": "CRITICAL",
+                "description": "Unauthenticated RCE in popular VPN gateway."},
+            {"type": "leak", "source": "DarkWeb-Monitor", "severity": "HIGH",
+                "description": "Credential dump found for major financial institution."},
+            {"type": "malware", "source": "threat-intel-pulse", "severity": "MEDIUM",
+                "description": "New variant of 'QuantumStealer' observed in the wild."},
+            {"type": "market_volatility", "source": "Global-Markets-Feed", "severity": "HIGH",
+                "description": "VIX Index spiking above 30. Major sell-off in emerging market tech stocks."},
+            {"type": "supply_chain", "source": "Logistics-Intel", "severity": "CRITICAL",
+                "description": "Maritime trade disruption in the Suez Canal. Shipping delays predicted for SETU materials."},
+            {"type": "geopolitical", "source": "State-Intel-Brief", "severity": "CRITICAL",
+                "description": "Escalation in regional conflict. Increased sovereign risk for Indo-Pacific trade corridors."},
+            {"type": "blockchain_theft", "source": "Chain-Watch", "severity": "CRITICAL",
+                "description": "Large movement of funds from hacked exchange wallet."}
         ]
 
     async def start(self):

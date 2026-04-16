@@ -11,22 +11,19 @@ Demonstrates multi-agent simulation with different behaviours.
 * Runs for 50 steps and prints agent states, interactions, and positions.
 """
 
+from world_model.world_manager.world import World
+from world_model.interactions.interaction import (
+    CommunicationInteraction,
+)
+from world_model.environments.environment import Environment
+from world_model.entities.entity import AgentEntity, Entity, EntityState
+import numpy as np
+from typing import List
 import sys
 import os
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
-
-from typing import List
-
-import numpy as np
-
-from world_model.entities.entity import AgentEntity, Entity, EntityState
-from world_model.environments.environment import Environment
-from world_model.interactions.interaction import (
-    CommunicationInteraction,
-)
-from world_model.world_manager.world import World
 
 
 # --- Agent behaviour functions ---

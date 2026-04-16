@@ -12,6 +12,7 @@ SERVICES = {
     "forecast": os.getenv("DISHA_FORECAST_URL", "http://localhost:8002/")
 }
 
+
 class AutoHeal:
     def __init__(self):
         self.client = httpx.AsyncClient(timeout=5.0)
@@ -30,11 +31,11 @@ class AutoHeal:
     async def self_heal(self, name):
         logger.info(f"Attempting self-healing for '{name}'...")
         self.heal_counts[name] += 1
-        
+
         # In a real Docker/K8s environment, this would call container restart APIs
         # For this demonstration, we simulate a restart
         logger.info(f"RESTART COMMAND SENT to container: disha-{name}-v6")
-        
+
         # Simulate wait for restart
         await asyncio.sleep(2)
         logger.info(f"Service '{name}' has been successfully RESTARTED (Attempt #{self.heal_counts[name]})")
@@ -46,8 +47,9 @@ class AutoHeal:
                 is_healthy = await self.check_health(name, url)
                 if not is_healthy:
                     await self.self_heal(name)
-            
-            await asyncio.sleep(10) # Check every 10 seconds
+
+            await asyncio.sleep(10)  # Check every 10 seconds
+
 
 if __name__ == "__main__":
     auto_heal = AutoHeal()

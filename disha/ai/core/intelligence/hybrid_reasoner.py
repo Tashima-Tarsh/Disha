@@ -33,14 +33,20 @@ log = structlog.get_logger(__name__)
 
 # Each rule: (condition_keywords, conclusion_template)
 _DEDUCTIVE_RULES: list[tuple[list[str], str]] = [
-    (["what", "is", "define", "explain", "describe"], "This is an information-retrieval request requiring a factual definition or explanation."),
-    (["how", "do", "can", "should", "implement", "create", "build"], "This is a procedural request requiring step-by-step guidance."),
+    (["what", "is", "define", "explain", "describe"],
+     "This is an information-retrieval request requiring a factual definition or explanation."),
+    (["how", "do", "can", "should", "implement", "create", "build"],
+     "This is a procedural request requiring step-by-step guidance."),
     (["why", "reason", "cause", "because"], "This is a causal-analysis request requiring explanation of underlying mechanisms."),
-    (["compare", "difference", "versus", "vs", "better"], "This is a comparative request requiring evaluation across multiple options."),
+    (["compare", "difference", "versus", "vs", "better"],
+     "This is a comparative request requiring evaluation across multiple options."),
     (["help", "assist", "support", "need"], "This is an assistance request requiring empathetic, action-oriented support."),
-    (["error", "bug", "fix", "problem", "issue", "fail"], "This is a debugging request requiring systematic root-cause analysis."),
-    (["predict", "forecast", "future", "will", "expect"], "This is a predictive request requiring probabilistic reasoning about future states."),
-    (["sentiment", "feel", "emotion", "mood", "opinion"], "This is a sentiment/opinion request requiring affective understanding."),
+    (["error", "bug", "fix", "problem", "issue", "fail"],
+     "This is a debugging request requiring systematic root-cause analysis."),
+    (["predict", "forecast", "future", "will", "expect"],
+     "This is a predictive request requiring probabilistic reasoning about future states."),
+    (["sentiment", "feel", "emotion", "mood", "opinion"],
+     "This is a sentiment/opinion request requiring affective understanding."),
 ]
 
 # ---------------------------------------------------------------------------

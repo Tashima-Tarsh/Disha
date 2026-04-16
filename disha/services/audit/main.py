@@ -7,6 +7,7 @@ app = FastAPI(title="DISHA Audit Log Service", version="6.0.0")
 
 LOG_FILE = "audit_log.jsonl"
 
+
 @app.post("/log")
 async def log_event(request: Request):
     data = await request.json()
@@ -17,11 +18,12 @@ async def log_event(request: Request):
         "details": data.get("details", {}),
         "status": data.get("status", "info")
     }
-    
+
     with open(LOG_FILE, "a") as f:
         f.write(json.dumps(log_entry) + "\n")
-    
+
     return {"status": "logged", "entry": log_entry}
+
 
 @app.get("/logs")
 async def get_logs(limit: int = 100):

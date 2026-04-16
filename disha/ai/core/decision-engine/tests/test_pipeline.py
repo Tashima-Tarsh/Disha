@@ -122,7 +122,7 @@ class TestCaseLawIngest:
         if not os.path.exists(src):
             pytest.skip("sample case-law data not present")
         with tempfile.NamedTemporaryFile(suffix=".txt", delete=False) as tmp_out, \
-             tempfile.NamedTemporaryFile(suffix=".json", delete=False) as tmp_meta:
+                tempfile.NamedTemporaryFile(suffix=".json", delete=False) as tmp_meta:
             out_path, meta_path = tmp_out.name, tmp_meta.name
         try:
             n = ingest(src, out_path, meta_path)

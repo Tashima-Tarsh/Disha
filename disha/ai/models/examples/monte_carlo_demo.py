@@ -10,17 +10,15 @@ Demonstrates Monte Carlo simulation techniques:
 Shows convergence behaviour and confidence intervals.
 """
 
+from simulation.monte_carlo.monte_carlo import (
+    MonteCarloSimulation,
+)
+import numpy as np
 import sys
 import os
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
-
-import numpy as np
-
-from simulation.monte_carlo.monte_carlo import (
-    MonteCarloSimulation,
-)
 
 
 def estimate_pi(rng: np.random.Generator) -> float:
@@ -139,7 +137,7 @@ def main() -> None:
     for i in range(len(counts)):
         bar_len = int(counts[i] / max(counts) * 30)
         bar = "█" * bar_len
-        print(f"    [{edges[i]:5.0f}-{edges[i+1]:5.0f}] {counts[i]:3d} {bar}")
+        print(f"    [{edges[i]:5.0f}-{edges[i + 1]:5.0f}] {counts[i]:3d} {bar}")
 
     print("\n[OK] Monte Carlo demo completed successfully!")
 

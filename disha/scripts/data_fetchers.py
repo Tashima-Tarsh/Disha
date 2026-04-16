@@ -23,7 +23,7 @@ import structlog
 
 logger = structlog.get_logger(__name__)
 
-#  Timeout and user-agent for all requests 
+#  Timeout and user-agent for all requests
 _TIMEOUT = 15
 _UA = "Disha-ContinuousTraining/1.0"
 
@@ -39,9 +39,9 @@ def _fetch_url(url: str, timeout: int = _TIMEOUT) -> str:
         return ""
 
 
-# 
+#
 # 1. RL Environment Data  Threat intelligence for investigation sims
-# 
+#
 
 @dataclass
 class ThreatScenario:
@@ -74,7 +74,7 @@ def fetch_abuse_ch_feodo() -> list[ThreatScenario]:
     # Group into scenarios of ~10 IPs each
     scenarios = []
     for i in range(0, len(ips), 10):
-        batch = ips[i : i + 10]
+        batch = ips[i: i + 10]
         scenarios.append(ThreatScenario(
             source="feodo_tracker",
             indicator_type="ip",
@@ -102,7 +102,7 @@ def fetch_urlhaus_recent() -> list[ThreatScenario]:
 
     scenarios = []
     for i in range(0, len(urls), 8):
-        batch = urls[i : i + 8]
+        batch = urls[i: i + 8]
         scenarios.append(ThreatScenario(
             source="urlhaus",
             indicator_type="url",
@@ -141,7 +141,7 @@ def fetch_threatfox_iocs() -> list[ThreatScenario]:
 
     for ioc_type, values in by_type.items():
         for i in range(0, len(values), 10):
-            batch = values[i : i + 10]
+            batch = values[i: i + 10]
             scenarios.append(ThreatScenario(
                 source="threatfox",
                 indicator_type=ioc_type,
@@ -164,9 +164,9 @@ def fetch_all_rl_data() -> list[ThreatScenario]:
     return all_scenarios
 
 
-# 
+#
 # 2. GNN Data  Entity relationship graphs from public sources
-# 
+#
 
 @dataclass
 class GraphDataset:
@@ -290,9 +290,9 @@ def build_graph_from_threats(scenarios: list[ThreatScenario], feature_dim: int =
     )
 
 
-# 
+#
 # 3. Decision Engine Data  Policy/legal/security scenarios
-# 
+#
 
 # Public scenario datasets built from templates combining real-world
 # topics.  Future iterations can pull from open datasets (e.g. GDELT,
@@ -403,9 +403,9 @@ def generate_advanced_scenarios(
     return scenarios
 
 
-# 
+#
 # 4. Fallback synthetic data generators (when network unavailable)
-# 
+#
 
 def generate_synthetic_threats(n: int = 100, seed: int = 42) -> list[ThreatScenario]:
     """Generate synthetic threat scenarios when network is unavailable."""
@@ -420,18 +420,18 @@ def generate_synthetic_threats(n: int = 100, seed: int = 42) -> list[ThreatScena
         num_indicators = rng.randint(3, 15)
 
         if itype == "ip":
-            indicators = [f"{rng.randint(1,255)}.{rng.randint(0,255)}.{rng.randint(0,255)}.{rng.randint(1,255)}"
-                         for _ in range(num_indicators)]
+            indicators = [f"{rng.randint(1, 255)}.{rng.randint(0, 255)}.{rng.randint(0, 255)}.{rng.randint(1, 255)}"
+                          for _ in range(num_indicators)]
         elif itype == "domain":
-            indicators = [f"malware-{rng.randint(1000,9999)}.evil-{rng.choice(['com','net','org','io'])}.example"
-                         for _ in range(num_indicators)]
+            indicators = [f"malware-{rng.randint(1000, 9999)}.evil-{rng.choice(['com', 'net', 'org', 'io'])}.example"
+                          for _ in range(num_indicators)]
         elif itype == "url":
-            indicators = [f"http://bad-{rng.randint(100,999)}.example.com/payload-{rng.randint(1,100)}"
-                         for _ in range(num_indicators)]
+            indicators = [f"http://bad-{rng.randint(100, 999)}.example.com/payload-{rng.randint(1, 100)}"
+                          for _ in range(num_indicators)]
         else:
             # SHA-256 used for synthetic data generation (not for cryptographic purposes)
-            indicators = [hashlib.sha256(f"malware-{rng.randint(0,100000)}".encode()).hexdigest()
-                         for _ in range(num_indicators)]
+            indicators = [hashlib.sha256(f"malware-{rng.randint(0, 100000)}".encode()).hexdigest()
+                          for _ in range(num_indicators)]
 
         scenarios.append(ThreatScenario(
             source=f"synthetic_{cat}",
@@ -444,9 +444,9 @@ def generate_synthetic_threats(n: int = 100, seed: int = 42) -> list[ThreatScena
     return scenarios
 
 
-# 
+#
 # 5. Open-Source Academic Data Fetchers
-# 
+#
 
 def fetch_arxiv_metadata(category: str = "cs.AI", max_results: int = 50) -> list[dict]:
     """Fetch recent arXiv paper metadata via Atom feed (open access, no API key).
@@ -555,14 +555,28 @@ def fetch_open_legal_data() -> list[dict]:
     """Fetch open legal/constitutional texts from public sources."""
     # Canonical legal knowledge (always available offline)
     legal_items = [
-        {"text": "We the People of the United States, in Order to form a more perfect Union, establish Justice, insure domestic Tranquility, provide for the common defence, promote the general Welfare, and secure the Blessings of Liberty", "type": "preamble", "source": "us_constitution"},
-        {"text": "Congress shall make no law respecting an establishment of religion, or prohibiting the free exercise thereof; or abridging the freedom of speech, or of the press", "type": "amendment_1", "source": "us_constitution"},
-        {"text": "The right of the people to be secure in their persons, houses, papers, and effects, against unreasonable searches and seizures, shall not be violated", "type": "amendment_4", "source": "us_constitution"},
-        {"text": "No person shall be deprived of life, liberty, or property, without due process of law", "type": "amendment_5", "source": "us_constitution"},
-        {"text": "All persons born or naturalised in the United States are citizens and entitled to equal protection of the laws", "type": "amendment_14", "source": "us_constitution"},
-        {"text": "Everyone has the right to life, liberty and security of person (UDHR Article 3)", "type": "universal_declaration", "source": "un_udhr"},
-        {"text": "No one shall be subjected to torture or to cruel, inhuman or degrading treatment (UDHR Article 5)", "type": "universal_declaration", "source": "un_udhr"},
-        {"text": "Everyone has the right to freedom of opinion and expression (UDHR Article 19)", "type": "universal_declaration", "source": "un_udhr"},
+        {"text": "We the People of the United States, in Order to form a more perfect Union, establish Justice, insure domestic Tranquility, provide for the common defence, promote the general Welfare, and secure the Blessings of Liberty",
+            "type": "preamble", "source": "us_constitution"},
+        {"text": "Congress shall make no law respecting an establishment of religion, or prohibiting the free exercise thereof; or abridging the freedom of speech, or of the press",
+            "type": "amendment_1", "source": "us_constitution"},
+        {"text": "The right of the people to be secure in their persons, houses, papers, and effects, against unreasonable searches and seizures, shall not be violated",
+            "type": "amendment_4", "source": "us_constitution"},
+        {"text": "No person shall be deprived of life, liberty, or property, without due process of law",
+            "type": "amendment_5", "source": "us_constitution"},
+        {"text": "All persons born or naturalised in the United States are citizens and entitled to equal protection of the laws",
+            "type": "amendment_14", "source": "us_constitution"},
+        {
+            "text": "Everyone has the right to life, liberty and security of person (UDHR Article 3)",
+            "type": "universal_declaration",
+            "source": "un_udhr"},
+        {
+            "text": "No one shall be subjected to torture or to cruel, inhuman or degrading treatment (UDHR Article 5)",
+            "type": "universal_declaration",
+            "source": "un_udhr"},
+        {
+            "text": "Everyone has the right to freedom of opinion and expression (UDHR Article 19)",
+            "type": "universal_declaration",
+            "source": "un_udhr"},
     ]
 
     logger.info("fetched_legal", items=len(legal_items))

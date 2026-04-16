@@ -49,6 +49,7 @@ except ImportError:  # pragma: no cover
 
     class BaseModel:  # type: ignore[no-redef]
         """Minimal Pydantic stub."""
+
         def __init__(self, **kwargs: Any) -> None:
             for k, v in kwargs.items():
                 setattr(self, k, v)

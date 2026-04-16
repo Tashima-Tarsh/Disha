@@ -30,9 +30,9 @@ logger = structlog.get_logger("threat_guardian")
 REPO_ROOT = Path(__file__).resolve().parents[2]
 
 
-# 
+#
 # Threat classification
-# 
+#
 
 class ThreatLevel(str, Enum):
     CRITICAL = "critical"
@@ -117,9 +117,9 @@ class GuardianReport:
         }
 
 
-# 
+#
 # Scanner modules
-# 
+#
 
 # Patterns for detecting leaked secrets
 _SECRET_PATTERNS = [
@@ -449,9 +449,9 @@ class SupplyChainScanner:
         return threats
 
 
-# 
+#
 # Threat Guardian (main orchestrator)
-# 
+#
 
 class ThreatGuardian:
     """Orchestrates all scanners and produces a unified threat report.
@@ -571,9 +571,9 @@ class ThreatGuardian:
         return "stable"
 
 
-# 
+#
 # CLI entry point
-# 
+#
 
 def main() -> None:
     import argparse
