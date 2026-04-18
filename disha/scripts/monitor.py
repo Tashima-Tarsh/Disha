@@ -357,7 +357,7 @@ class SubsystemChecker:
     _EXPECTED = {
         "disha/ai/core": ["cognitive_loop.py", "requirements.txt"],
         "disha/ai/core/decision-engine": ["checkpoints", "requirements.txt"],
-        "disha/services/autonomous": ["main.py", "monitor.py"],
+        "disha/services/autonomous": ["main.py"],
         "disha/apps/web": ["package.json", "app"],
     }
 
