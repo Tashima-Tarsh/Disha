@@ -5,6 +5,7 @@ import { useTheme } from "./ThemeProvider";
 import { useChatStore } from "@/lib/store";
 import { MODELS } from "@/lib/constants";
 import { NotificationCenter } from "@/components/notifications/NotificationCenter";
+import { SpaceLogo } from "./SpaceLogo";
 import { motion } from "framer-motion";
 
 export function Header() {
@@ -21,16 +22,9 @@ export function Header() {
   const nextTheme = theme === "dark" ? "light" : theme === "light" ? "system" : "dark";
 
   return (
-    <header className="flex items-center justify-between px-8 py-5 h-20 bg-card/40 backdrop-blur-xl border-b border-white/5 z-10 relative">
+    <header className="flex items-center justify-between px-8 py-5 h-20 bg-card/10 backdrop-blur-md border-b border-white/5 z-50 relative">
       <div className="flex items-center gap-6">
-        <div className="flex flex-col">
-          <span className="text-[10px] font-display tracking-[0.4em] text-primary uppercase mb-0.5 ml-0.5">
-            DISHA v5.0
-          </span>
-          <h1 className="text-sm font-display tracking-[0.2em] font-medium text-white uppercase">
-            Cognitive Hub
-          </h1>
-        </div>
+        <SpaceLogo />
       </div>
 
       <div className="flex items-center gap-8">

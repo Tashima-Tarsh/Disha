@@ -7,7 +7,13 @@ exclude =
     dist,
     node_modules,
     venv,
-    .venv
-    ai-platform/backend/tests
+    .venv,
+    env,
+    .env,
+    __pycache__,
+    node_modules,
+    build,
+    dist,
+    *.egg-info
 per-file-ignores =
     __init__.py: F401

@@ -1,11 +1,11 @@
 """Sentinel Defensive Agent - Elite cybersecurity defense for DISHA."""
 
 from typing import Any
-import structlog
+
 from app.agents.base_agent import BaseAgent
 from app.core.config import get_settings
 
-logger = structlog.get_logger(__name__)
+
 
 class SentinelAgent(BaseAgent):
     """Defensive cybersecurity agent focusing on threat detection, containment, and recovery."""

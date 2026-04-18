@@ -26,8 +26,8 @@ torch = pytest.importorskip("torch", reason="PyTorch not installed — skipping 
 # Repo root is 3 levels up from this file.
 _THIS = Path(__file__).resolve()
 _BACKEND = _THIS.parents[1]                    # ai-platform/backend
-_REPO_ROOT = _THIS.parents[3]                  # repo root (Disha/)
-_DECISION = _REPO_ROOT / "decision-engine"
+_REPO_ROOT = _THIS.parents[5]                  # repo root (Disha-main)
+_DECISION = _REPO_ROOT / "disha" / "ai" / "core" / "decision-engine"
 
 if str(_BACKEND) not in sys.path:
     sys.path.insert(0, str(_BACKEND))

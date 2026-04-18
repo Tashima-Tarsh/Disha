@@ -15,7 +15,7 @@ import structlog
 REPO_ROOT = Path(__file__).resolve().parents[2]
 BACKEND = REPO_ROOT / "disha" / "services" / "ai-platform" / "backend"
 DECISION_DIR = REPO_ROOT / "disha" / "ai" / "core" / "decision-engine"
-SCRIPTS_DIR = Path(__file__).resolve().parent
+SCRIPTS_DIR = REPO_ROOT / "disha" / "scripts"
 
 if str(BACKEND) not in sys.path:
     sys.path.insert(0, str(BACKEND))

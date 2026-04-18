@@ -47,15 +47,14 @@ const config: Config = {
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
 
-        // Direct Elite Tokens
-        midnight: "var(--color-bg-primary)",
-        pearl: "var(--color-text-primary)",
-        aurora: "var(--brand-aurora)",
-        royal: "var(--brand-royal)",
-        sunset: "var(--brand-sunset)",
-        gold: "var(--brand-gold)",
-        
-        glass: "var(--color-bg-elevated)",
+        // Futuristic Elite Tokens
+        obsidian: "#02040a",
+        "cyan-glow": "#00f2ff",
+        "indigo-pulse": "#6366f1",
+        "msey-purple": "#a855f7",
+        "sovereign-gold": "#fbbf24",
+        "ms-blue": "#00a4ef",
+        "ey-yellow": "#ffe600",
       },
 
       fontFamily: {
@@ -67,12 +66,16 @@ const config: Config = {
       boxShadow: {
         "glass-soft": "0 8px 32px 0 rgba(0, 0, 0, 0.37)",
         "aurora-glow": "0 0 40px rgba(79, 70, 229, 0.15)",
+        "cyan-pulse": "0 0 20px rgba(0, 242, 255, 0.3)",
+        "indigo-pulse": "0 0 20px rgba(99, 102, 241, 0.3)",
       },
 
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
+        "2xl": "1rem",
+        "3xl": "1.5rem",
       },
 
       animation: {
@@ -80,6 +83,7 @@ const config: Config = {
         "fade-out": "fadeOut 400ms ease-in forwards",
         "slide-up": "slideUp 600ms cubic-bezier(0.16, 1, 0.3, 1) forwards",
         "float-luxury": "aurora-float 20s ease-in-out infinite alternate",
+        "pulse-cyan": "pulse-cyan 2s infinite",
       },
 
       keyframes: {
@@ -93,6 +97,10 @@ const config: Config = {
         slideUp: {
           "0%": { transform: "translateY(20px)", opacity: "0" },
           "100%": { transform: "translateY(0)", opacity: "1" },
+        },
+        "pulse-cyan": {
+          "0%, 100%": { boxShadow: "0 0 10px rgba(0, 242, 255, 0.3)" },
+          "50%": { boxShadow: "0 0 25px rgba(0, 242, 255, 0.6)" },
         },
       },
     },

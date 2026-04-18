@@ -1,0 +1,33 @@
+{
+  "project": "DISHA v6.0.0",
+  "layers": {
+    "ux": {
+      "components": ["Web Command Center", "Mobile Guardian"],
+      "tech": ["React 19", "Next.js 16", "Tailwind CSS"]
+    },
+    "services": {
+      "central": "Service Registry",
+      "modules": [
+        {"name": "alerts", "role": "Notification Engine", "tech": "Python/FastAPI"},
+        {"name": "forecast", "role": "Resilience Predicting", "tech": "Python/FastAPI"},
+        {"name": "cyber", "role": "Sentinel Cyber-Defense", "tech": "Python/FastAPI"},
+        {"name": "audit", "role": "Immutable Decision Log", "tech": "Node.js/Bun"}
+      ]
+    },
+    "ai_core": {
+      "cognitive_loop": ["Perceive", "Attend", "Reason", "Deliberate", "Act", "Reflect", "Consolidate"],
+      "memory": ["Neo4j Graph", "ChromaDB Vector"],
+      "engines": ["Physics Engine", "Strategy Nexus"]
+    }
+  },
+  "patterns": {
+    "naming": "snake_case (Python), PascalCase (TS/JSX)",
+    "standards": "Biome, Flake8, Black",
+    "architecture": "Monorepo, Microservices, Event-driven (Kafka)"
+  },
+  "dependencies": {
+    "backend": ["Bun", "Python 3.13", "PyTorch", "FastAPI"],
+    "frontend": ["Next.js", "React", "Lucide Icons", "Framer Motion"],
+    "infrastructure": ["Docker", "Kubernetes", "Apache Kafka"]
+  }
+}
