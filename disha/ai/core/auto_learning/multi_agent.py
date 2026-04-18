@@ -1,15 +1,3 @@
-"""Multi-agent architecture for the GitHub auto-learning bot.
-
-Implements a controller that delegates tasks to specialised agents:
-    - DataCollectorAgent   : Gathers data from GitHub, arXiv, etc.
-    - QualityAnalystAgent  : Scores data quality (0–100)
-    - EmbeddingAgent       : Converts data to vector embeddings
-    - ReasoningAgent       : Multi-path problem decomposition
-    - KnowledgeManagerAgent: Manages the vector store / RAG pipeline
-
-The AgentOrchestrator coordinates all agents via an async-friendly
-message-passing protocol.
-"""
 
 from __future__ import annotations
 
@@ -22,22 +10,15 @@ from typing import Any, Dict, List, Optional
 
 logger = logging.getLogger(__name__)
 
-
-# ---------------------------------------------------------------------------
-# Message protocol
-# ---------------------------------------------------------------------------
 class MessageType(Enum):
-    """Types of inter-agent messages."""
 
     TASK = "task"
     RESULT = "result"
     ERROR = "error"
     STATUS = "status"
 
-
 @dataclass
 class AgentMessage:
-    """Typed message exchanged between agents."""
 
     sender: str
     receiver: str
@@ -51,12 +32,7 @@ class AgentMessage:
             raw = f"{self.sender}:{self.receiver}:{self.timestamp}"
             self.message_id = hashlib.sha256(raw.encode()).hexdigest()[:12]
 
-
-# ---------------------------------------------------------------------------
-# Base agent
-# ---------------------------------------------------------------------------
 class BaseAgent:
-    """Abstract base for all agents in the multi-agent system."""
 
     def __init__(self, name: str) -> None:
         self.name = name
@@ -77,7 +53,6 @@ class BaseAgent:
         return msg
 
     def process(self) -> List[AgentMessage]:
-        """Process all messages in inbox. Returns outgoing messages."""
         raise NotImplementedError
 
     def status(self) -> Dict[str, Any]:
@@ -87,19 +62,13 @@ class BaseAgent:
             "outbox_size": len(self._outbox),
         }
 
-
-# ---------------------------------------------------------------------------
-# Specialised agents
-# ---------------------------------------------------------------------------
 class DataCollectorAgent(BaseAgent):
-    """Collects data from various sources (GitHub, arXiv, feeds)."""
 
     def __init__(self) -> None:
         super().__init__("data_collector")
         self.collected: List[Dict[str, Any]] = []
 
     def collect_from_text(self, texts: List[str], source: str = "manual") -> List[Dict[str, Any]]:
-        """Ingest raw text data with source metadata."""
         items = []
         for text in texts:
             item = {
@@ -130,16 +99,7 @@ class DataCollectorAgent(BaseAgent):
                 )
         return results
 
-
 class QualityAnalystAgent(BaseAgent):
-    """Scores data quality on a 0–100 scale.
-
-    Scoring criteria:
-    - Text length and structure
-    - Source credibility (GitHub stars, citations, origin)
-    - Duplication check
-    - Content coherence heuristic
-    """
 
     def __init__(self) -> None:
         super().__init__("quality_analyst")
@@ -152,21 +112,18 @@ class QualityAnalystAgent(BaseAgent):
         }
 
     def score(self, item: Dict[str, Any]) -> Dict[str, Any]:
-        """Score a single data item. Returns item with 'quality_score' added."""
         text = item.get("text", "")
         source = item.get("source", "unknown")
         content_hash = item.get("content_hash", hashlib.sha256(text.encode()).hexdigest()[:16])
 
         score = 0.0
 
-        # 1. Duplication check (0 if duplicate)
         if content_hash in self._seen_hashes:
             item["quality_score"] = 0
             item["quality_reason"] = "duplicate"
             return item
         self._seen_hashes.add(content_hash)
 
-        # 2. Text length score (0–25)
         text_len = len(text.strip())
         if text_len >= 200:
             score += 25
@@ -175,22 +132,19 @@ class QualityAnalystAgent(BaseAgent):
         elif text_len >= 10:
             score += 5
 
-        # 3. Source credibility (0–25)
         source_key = source.lower().split("/")[0] if "/" in source else source.lower()
         credibility = self._source_weights.get(source_key, 0.3)
-        # Use optional stars/citations metadata
+
         stars = item.get("metadata", {}).get("stars", 0)
         citations = item.get("metadata", {}).get("citations", 0)
         cred_bonus = min(10, stars / 100 + citations / 10)
         score += 25 * credibility + cred_bonus
 
-        # 4. Structure score (0–25) — paragraphs, sentences, code blocks
         has_sentences = text.count(".") >= 2
         has_paragraphs = text.count("\n\n") >= 1
         has_code = "```" in text or "def " in text or "class " in text
         score += 8 * has_sentences + 8 * has_paragraphs + 9 * has_code
 
-        # 5. Coherence heuristic (0–25) — word diversity
         words = text.lower().split()
         unique_ratio = len(set(words)) / max(len(words), 1)
         score += 25 * min(unique_ratio, 1.0)
@@ -215,16 +169,13 @@ class QualityAnalystAgent(BaseAgent):
                 )
         return results
 
-
 class EmbeddingAgent(BaseAgent):
-    """Converts data to embeddings for vector storage."""
 
     def __init__(self, rag_pipeline: Any = None) -> None:
         super().__init__("embedding_agent")
         self._pipeline = rag_pipeline
 
     def embed_items(self, items: List[Dict[str, Any]]) -> Dict[str, Any]:
-        """Convert items to embeddings and store in RAG pipeline."""
         if self._pipeline is None:
             return {"status": "skipped", "reason": "No RAG pipeline configured"}
 
@@ -251,27 +202,15 @@ class EmbeddingAgent(BaseAgent):
                 )
         return results
 
-
 class ReasoningAgent(BaseAgent):
-    """Multi-path reasoning agent (Mythos-style).
-
-    For complex problems:
-    1. Decompose problem into sub-problems
-    2. Generate multiple solution paths
-    3. Evaluate each path
-    4. Select optimal approach
-    5. Validate with edge cases
-    """
 
     def __init__(self) -> None:
         super().__init__("reasoning_agent")
 
     def reason(self, problem: str, context: str = "") -> Dict[str, Any]:
-        """Apply structured reasoning to a problem."""
-        # Step 1: Decompose
+
         sub_problems = self._decompose(problem)
 
-        # Step 2–3: Generate and evaluate solution paths
         paths = []
         for sp in sub_problems:
             solutions = self._generate_solutions(sp, context)
@@ -283,10 +222,8 @@ class ReasoningAgent(BaseAgent):
                 "best": evaluated[0] if evaluated else None,
             })
 
-        # Step 4: Select optimal composite approach
         best_solutions = [p["best"] for p in paths if p["best"]]
 
-        # Step 5: Edge case validation
         edge_cases = self._identify_edge_cases(problem)
 
         return {
@@ -299,8 +236,7 @@ class ReasoningAgent(BaseAgent):
         }
 
     def _decompose(self, problem: str) -> List[str]:
-        """Break a problem into sub-problems."""
-        # Heuristic decomposition: split on connectives and enumerate
+
         parts = []
         sentences = problem.replace("?", ".").split(".")
         for s in sentences:
@@ -310,8 +246,7 @@ class ReasoningAgent(BaseAgent):
         return parts if parts else [problem]
 
     def _generate_solutions(self, sub_problem: str, context: str) -> List[Dict[str, Any]]:
-        """Generate candidate solutions for a sub-problem."""
-        # Generate multiple approach strategies
+
         approaches = [
             {"approach": "direct", "description": f"Directly address: {sub_problem}"},
             {"approach": "decomposed", "description": f"Further decompose: {sub_problem}"},
@@ -320,8 +255,7 @@ class ReasoningAgent(BaseAgent):
         return approaches
 
     def _evaluate_solution(self, solution: Dict[str, Any]) -> Dict[str, Any]:
-        """Evaluate a solution on multiple criteria."""
-        # Scoring heuristic based on approach type
+
         scores = {
             "direct": {"time_complexity": 8, "space_complexity": 9, "scalability": 6},
             "decomposed": {"time_complexity": 6, "space_complexity": 7, "scalability": 9},
@@ -333,7 +267,6 @@ class ReasoningAgent(BaseAgent):
         return {**solution, **criteria, "total_score": total}
 
     def _identify_edge_cases(self, problem: str) -> List[str]:
-        """Identify potential edge cases."""
         cases = ["Empty input", "Extremely large input", "Concurrent access"]
         if "data" in problem.lower():
             cases.append("Corrupted or malformed data")
@@ -342,11 +275,10 @@ class ReasoningAgent(BaseAgent):
         return cases
 
     def _compute_confidence(self, solutions: List[Dict[str, Any]]) -> float:
-        """Compute overall confidence in the selected approach."""
         if not solutions:
             return 0.0
         avg_score = sum(s.get("total_score", 0) for s in solutions) / len(solutions)
-        # Normalise to 0–1 range (max possible total_score is ~27)
+
         return round(min(avg_score / 27.0, 1.0), 3)
 
     def process(self) -> List[AgentMessage]:
@@ -362,9 +294,7 @@ class ReasoningAgent(BaseAgent):
                 )
         return results
 
-
 class KnowledgeManagerAgent(BaseAgent):
-    """Manages the knowledge base — temporary and permanent storage."""
 
     def __init__(self) -> None:
         super().__init__("knowledge_manager")
@@ -373,7 +303,6 @@ class KnowledgeManagerAgent(BaseAgent):
         self.rejected: List[Dict[str, Any]] = []
 
     def classify_and_store(self, items: List[Dict[str, Any]]) -> Dict[str, int]:
-        """Route items to permanent, temporary, or rejected based on quality score."""
         counts = {"permanent": 0, "temporary": 0, "rejected": 0}
 
         for item in items:
@@ -392,11 +321,9 @@ class KnowledgeManagerAgent(BaseAgent):
         return counts
 
     def get_approved_for_finetuning(self) -> List[Dict[str, Any]]:
-        """Return permanent-store items approved for fine-tuning aggregation."""
         return list(self.permanent_store)
 
     def promote_temporary(self, min_score: int = 80) -> int:
-        """Re-evaluate and promote temporary items scoring above threshold."""
         promoted = 0
         remaining = []
         for item in self.temporary_store:
@@ -433,15 +360,7 @@ class KnowledgeManagerAgent(BaseAgent):
                     )
         return results
 
-
-# ---------------------------------------------------------------------------
-# Orchestrator
-# ---------------------------------------------------------------------------
 class AgentOrchestrator:
-    """Central coordinator for all agents.
-
-    Manages agent registration, message routing, and pipeline execution.
-    """
 
     def __init__(self) -> None:
         self._agents: Dict[str, BaseAgent] = {}
@@ -452,7 +371,6 @@ class AgentOrchestrator:
         logger.info("agent_registered", name=agent.name)
 
     def route_message(self, message: AgentMessage) -> None:
-        """Route a message to the target agent."""
         target = self._agents.get(message.receiver)
         if target:
             target.receive(message)
@@ -461,13 +379,11 @@ class AgentOrchestrator:
             logger.warning("agent_not_found", receiver=message.receiver)
 
     def run_cycle(self) -> List[AgentMessage]:
-        """Run one processing cycle across all agents."""
         all_outgoing: List[AgentMessage] = []
         for agent in self._agents.values():
             outgoing = agent.process()
             all_outgoing.extend(outgoing)
 
-        # Route all outgoing messages
         for msg in all_outgoing:
             self.route_message(msg)
 
@@ -479,12 +395,7 @@ class AgentOrchestrator:
         source: str = "manual",
         rag_pipeline: Any = None,
     ) -> Dict[str, Any]:
-        """Run the full auto-learning pipeline end-to-end.
 
-        1. Collect data → 2. Score quality → 3. Classify & store
-        → 4. Embed approved items → 5. Return summary
-        """
-        # Ensure all agents are registered
         if "data_collector" not in self._agents:
             self.register(DataCollectorAgent())
         if "quality_analyst" not in self._agents:
@@ -499,25 +410,21 @@ class AgentOrchestrator:
         km = self._agents["knowledge_manager"]
         embedder = self._agents["embedding_agent"]
 
-        # Step 1: Collect
         if isinstance(collector, DataCollectorAgent):
             items = collector.collect_from_text(texts, source)
         else:
             items = [{"text": t, "source": source} for t in texts]
 
-        # Step 2: Score quality
         if isinstance(analyst, QualityAnalystAgent):
             scored_items = [analyst.score(item) for item in items]
         else:
             scored_items = items
 
-        # Step 3: Classify & store
         if isinstance(km, KnowledgeManagerAgent):
             classification = km.classify_and_store(scored_items)
         else:
             classification = {}
 
-        # Step 4: Embed approved items (score >= 60)
         approved = [i for i in scored_items if i.get("quality_score", 0) >= 60]
         embed_result = {}
         if approved and isinstance(embedder, EmbeddingAgent):

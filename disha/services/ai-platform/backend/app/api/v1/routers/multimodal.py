@@ -5,20 +5,17 @@ from app.api.deps import get_vision_agent, get_audio_agent, get_multimodal_fusio
 
 router = APIRouter()
 
-
 @router.post("/analyze/vision")
 async def analyze_vision(
     request: VisionAnalysisRequest,
     current_user: dict = Depends(get_current_user),
     vision_agent=Depends(get_vision_agent)
 ):
-    """Analyze an image for threat intelligence."""
     context = {
         "analysis_type": request.analysis_type,
         "image_data": request.image_data,
     }
     return await vision_agent.run(request.target, context)
-
 
 @router.post("/analyze/audio")
 async def analyze_audio(
@@ -26,14 +23,12 @@ async def analyze_audio(
     current_user: dict = Depends(get_current_user),
     audio_agent=Depends(get_audio_agent)
 ):
-    """Analyze audio for threat intelligence."""
     context = {
         "analysis_type": request.analysis_type,
         "audio_data": request.audio_data,
         "language": request.language,
     }
     return await audio_agent.run(request.target, context)
-
 
 @router.post("/analyze/multimodal")
 async def analyze_multimodal(
@@ -44,7 +39,6 @@ async def analyze_multimodal(
     audio_agent=Depends(get_audio_agent),
     multimodal_fusion=Depends(get_multimodal_fusion)
 ):
-    """Run fused multimodal analysis combining text, vision, and audio."""
     text_results, vision_results, audio_results = None, None, None
 
     if request.text_target or request.target:

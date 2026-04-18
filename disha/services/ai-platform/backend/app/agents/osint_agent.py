@@ -1,4 +1,3 @@
-"""OSINT Intelligence Agent - Gathers open-source intelligence data."""
 
 from typing import Any
 
@@ -7,9 +6,7 @@ import httpx
 from app.agents.base_agent import BaseAgent
 from app.core.config import get_settings
 
-
 class OSINTAgent(BaseAgent):
-    """Agent for gathering OSINT data from Shodan, SpiderFoot, and other sources."""
 
     def __init__(self):
         super().__init__(
@@ -19,27 +16,21 @@ class OSINTAgent(BaseAgent):
         self.settings = get_settings()
 
     async def execute(self, target: str, options: dict[str, Any] | None = None) -> dict[str, Any]:
-        """Gather OSINT data for the target."""
         options = options or {}
         results: dict[str, Any] = {"target": target, "sources": {}}
 
-        # Gather from all available sources
         if self.settings.SHODAN_API_KEY:
             results["sources"]["shodan"] = await self._query_shodan(target)
 
-        # DNS and WHOIS lookups (no API key required)
         results["sources"]["dns"] = await self._dns_lookup(target)
 
-        # SpiderFoot integration
         if self.settings.SPIDERFOOT_API_KEY:
             results["sources"]["spiderfoot"] = await self._query_spiderfoot(target)
 
-        # Extract entities from gathered data
         results["entities"] = self._extract_entities(results["sources"])
         return results
 
     async def _query_shodan(self, target: str) -> dict[str, Any]:
-        """Query Shodan API for host information."""
         try:
             async with httpx.AsyncClient(timeout=30.0) as client:
                 response = await client.get(
@@ -66,7 +57,6 @@ class OSINTAgent(BaseAgent):
             return {"error": str(e)}
 
     async def _dns_lookup(self, target: str) -> dict[str, Any]:
-        """Perform DNS lookup for a domain."""
         try:
             async with httpx.AsyncClient(timeout=15.0) as client:
                 response = await client.get(
@@ -86,12 +76,10 @@ class OSINTAgent(BaseAgent):
             return {"error": str(e)}
 
     async def _query_spiderfoot(self, target: str) -> dict[str, Any]:
-        """Query SpiderFoot for comprehensive OSINT data."""
-        # SpiderFoot wrapper - would connect to a running SpiderFoot instance
+
         return {"status": "configured", "target": target, "note": "SpiderFoot integration ready"}
 
     def _extract_entities(self, sources: dict[str, Any]) -> list[dict[str, Any]]:
-        """Extract structured entities from raw OSINT data."""
         entities = []
         shodan_data = sources.get("shodan", {})
 

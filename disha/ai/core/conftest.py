@@ -1,11 +1,8 @@
-"""
-pytest conftest: makes 'disha.ai.core' and 'cognitive_engine' importable.
-"""
 import importlib.util
 import sys
 from pathlib import Path
 
-_pkg_dir = Path(__file__).parent  # .../cognitive-engine/
+_pkg_dir = Path(__file__).parent
 
 if "cognitive_engine" not in sys.modules:
     spec = importlib.util.spec_from_file_location(

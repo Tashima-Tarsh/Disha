@@ -8,7 +8,6 @@ from app.core.config import get_settings
 
 logger = structlog.get_logger(__name__)
 
-
 class KnowledgeGraph:
     """Neo4j-based knowledge graph for entity intelligence."""
 
@@ -91,7 +90,6 @@ class KnowledgeGraph:
         """Get a subgraph around an entity."""
         try:
             driver = self._get_driver()
-            # Clamp depth to a safe range to prevent overly broad traversals
             safe_depth = max(1, min(depth, 5))
             with driver.session() as session:
                 result = session.run(

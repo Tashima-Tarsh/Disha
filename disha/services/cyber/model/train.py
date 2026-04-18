@@ -1,11 +1,3 @@
-"""
-Disha AI Detection Engine - Attack Classifier Training Pipeline
-
-Trains a binary (benign/malicious) and multi-class attack classifier
-using PyTorch. Supports structured JSON log inputs from honeypots.
-
-DEFENSIVE SIMULATION ONLY - For blue team research and training.
-"""
 
 import json
 import os
@@ -14,13 +6,7 @@ import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader, Dataset
 
-
 class AttackClassifier(nn.Module):
-    """Neural network for classifying honeypot log entries.
-
-    Supports binary classification (benign vs malicious) and
-    multi-class classification (brute_force, injection, bot, scan, benign).
-    """
 
     def __init__(self, input_dim: int, n_classes: int):
         super().__init__()
@@ -37,12 +23,7 @@ class AttackClassifier(nn.Module):
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         return self.net(x)
 
-
 class AnomalyDetector(nn.Module):
-    """Autoencoder for unsupervised anomaly detection.
-
-    High reconstruction error indicates anomalous behavior.
-    """
 
     def __init__(self, input_dim: int, latent_dim: int = 16):
         super().__init__()
@@ -62,8 +43,6 @@ class AnomalyDetector(nn.Module):
         decoded = self.decoder(encoded)
         return decoded
 
-
-# Attack type label mapping
 ATTACK_LABELS = {
     "benign": 0,
     "brute_force": 1,
@@ -74,12 +53,7 @@ ATTACK_LABELS = {
 
 LABEL_NAMES = {v: k for k, v in ATTACK_LABELS.items()}
 
-
 class HoneypotLogDataset(Dataset):
-    """Dataset for structured JSON honeypot logs.
-
-    Each log entry is featurized into a fixed-size tensor.
-    """
 
     FEATURE_DIM = 8
 
@@ -106,24 +80,14 @@ class HoneypotLogDataset(Dataset):
         ]
 
     def _featurize(self, entry: dict) -> torch.Tensor:
-        """Extract numerical features from a log entry.
-
-        Supports both Cowrie-style and OpenCanary-style log formats:
-        - Cowrie: ip, endpoint, method, payload, user_agent
-        - OpenCanary: src_host, logdata.PATH, logdata.USERAGENT, logtype
-        """
         logdata = entry.get("logdata", {}) or {}
 
-        # Normalize IP field across formats
         ip = str(entry.get("ip", entry.get("src_host", "")))
 
-        # Normalize path/endpoint field
         endpoint = str(entry.get("endpoint", logdata.get("PATH", "")))
 
-        # Normalize user agent field
         user_agent = str(entry.get("user_agent", logdata.get("USERAGENT", "")))
 
-        # Normalize payload (POST body, Redis CMD, FTP credentials)
         payload = str(
             entry.get("payload", logdata.get("CMD", logdata.get("USERNAME", "")))
         )
@@ -150,7 +114,6 @@ class HoneypotLogDataset(Dataset):
     def __getitem__(self, idx: int):
         return self.features[idx], self.labels[idx]
 
-
 def train_classifier(
     log_files: list[str],
     n_classes: int = 5,
@@ -158,7 +121,6 @@ def train_classifier(
     batch_size: int = 32,
     output_path: str = "attack_classifier.pt",
 ) -> None:
-    """Train the attack classifier and save the model."""
     dataset = HoneypotLogDataset(log_files)
 
     if len(dataset) == 0:
@@ -200,14 +162,12 @@ def train_classifier(
     torch.save(model.state_dict(), output_path)
     print(f"Model saved to {output_path}")
 
-
 def train_anomaly_detector(
     log_files: list[str],
     epochs: int = 30,
     batch_size: int = 32,
     output_path: str = "anomaly_detector.pt",
 ) -> None:
-    """Train the anomaly detection autoencoder."""
     dataset = HoneypotLogDataset(log_files)
 
     if len(dataset) == 0:
@@ -238,9 +198,7 @@ def train_anomaly_detector(
     torch.save(model.state_dict(), output_path)
     print(f"Anomaly detector saved to {output_path}")
 
-
 def _generate_synthetic_dataset(n_samples: int = 200) -> HoneypotLogDataset:
-    """Generate synthetic training data for bootstrapping."""
     import random
 
     samples = []
@@ -259,7 +217,6 @@ def _generate_synthetic_dataset(n_samples: int = 200) -> HoneypotLogDataset:
             "label": label,
         }
 
-        # Add attack-specific features
         if label == "injection":
             entry["payload"] = "' OR 1=1; SELECT * FROM users--"
         elif label == "brute_force":
@@ -281,7 +238,6 @@ def _generate_synthetic_dataset(n_samples: int = 200) -> HoneypotLogDataset:
     dataset.labels = [ATTACK_LABELS.get(s.get("label", "benign"), 0) for s in samples]
     return dataset
 
-
 def main():
     log_dir = os.environ.get("LOG_DIR", "/logs")
     log_files = [
@@ -293,13 +249,11 @@ def main():
     print("Disha AI Detection Engine - Training Pipeline")
     print("=" * 60)
 
-    # Train binary classifier
     print("\n[1/3] Training binary classifier (benign vs malicious)...")
     train_classifier(
         log_files, n_classes=2, epochs=10, output_path="attack_classifier_binary.pt"
     )
 
-    # Train multi-class classifier
     print("\n[2/3] Training multi-class attack classifier...")
     train_classifier(
         log_files,
@@ -308,14 +262,12 @@ def main():
         output_path="attack_classifier.pt",
     )
 
-    # Train anomaly detector
     print("\n[3/3] Training anomaly detector...")
     train_anomaly_detector(log_files, epochs=30, output_path="anomaly_detector.pt")
 
     print("\n" + "=" * 60)
     print("Training complete.")
     print("=" * 60)
-
 
 if __name__ == "__main__":
     main()

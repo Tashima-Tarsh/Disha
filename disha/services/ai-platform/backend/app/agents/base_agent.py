@@ -1,4 +1,3 @@
-"""Base agent class for all intelligence agents."""
 
 import uuid
 from abc import ABC, abstractmethod
@@ -8,9 +7,7 @@ import structlog
 
 logger = structlog.get_logger(__name__)
 
-
 class BaseAgent(ABC):
-    """Abstract base class for all intelligence agents."""
 
     def __init__(self, name: str, description: str):
         self.name = name
@@ -20,11 +17,9 @@ class BaseAgent(ABC):
 
     @abstractmethod
     async def execute(self, target: str, options: dict[str, Any] | None = None) -> dict[str, Any]:
-        """Execute the agent's primary task."""
         ...
 
     async def run(self, target: str, options: dict[str, Any] | None = None) -> dict[str, Any]:
-        """Run the agent with error handling and logging."""
         self.logger.info("agent_started", target=target)
         try:
             result = await self.execute(target, options or {})

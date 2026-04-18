@@ -9,12 +9,7 @@ from app.services.streaming.kafka_service import KafkaProducer
 
 logger = structlog.get_logger(__name__)
 
-
 class OSINTFeedEmitter:
-    """
-    Real-time OSINT Feed Emitter.
-    Simulates or fetches global intelligence events and publishes them to Kafka.
-    """
 
     def __init__(self):
         self.settings = get_settings()
@@ -38,7 +33,6 @@ class OSINTFeedEmitter:
         ]
 
     async def start(self):
-        """Start the emitter loop."""
         self.running = True
         logger.info("osint_emitter_started", simulation=self.settings.OSINT_STREAM_SIMULATION_ENABLED)
 
@@ -47,23 +41,20 @@ class OSINTFeedEmitter:
                 if self.settings.OSINT_STREAM_SIMULATION_ENABLED:
                     await self._emit_simulated_event()
                 else:
-                    # In production, this would poll real APIs
+
                     await self._emit_simulated_event()
 
-                # Randomized interval between 5 to 15 seconds for realism
                 await asyncio.sleep(random.uniform(5, 15))
             except Exception as e:
                 logger.error("osint_emitter_error", error=str(e))
                 await asyncio.sleep(10)
 
     async def stop(self):
-        """Stop the emitter loop."""
         self.running = False
         self.producer.close()
         logger.info("osint_emitter_stopped")
 
     async def _emit_simulated_event(self):
-        """Generate and publish a high-fidelity intelligence event."""
         event_template = random.choice(self._mock_events)
         event = {
             "event_id": f"evt-{int(time.time())}-{random.randint(1000, 9999)}",
@@ -75,7 +66,6 @@ class OSINTFeedEmitter:
             **event_template
         }
 
-        # Publish to Kafka (internal logic in KafkaProducer handles transport)
         success = await self.producer.publish_event(
             self.settings.KAFKA_TOPIC_OSINT_STREAM,
             event,
@@ -85,5 +75,5 @@ class OSINTFeedEmitter:
         if success:
             logger.debug("osint_event_emitted", event_id=event["event_id"], type=event["type"])
         else:
-            # Fallback log for local testing if Kafka is down
+
             logger.warning("osint_event_emitted_local_only", event_id=event["event_id"])

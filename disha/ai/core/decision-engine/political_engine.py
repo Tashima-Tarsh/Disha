@@ -1,9 +1,3 @@
-"""Political reasoning engine.
-
-Analyses a scenario through a political-strategy lens, evaluating power
-dynamics, stakeholder interests, coalition feasibility, and public
-perception.
-"""
 
 from __future__ import annotations
 
@@ -11,9 +5,7 @@ from typing import Any, Dict
 
 from utils.llm_wrapper import get_llm
 
-
 class PoliticalAgent:
-    """Agent that provides political-strategy analysis."""
 
     def __init__(self, llm: Any | None = None) -> None:
         self.llm = llm or get_llm()

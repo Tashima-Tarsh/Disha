@@ -1,9 +1,3 @@
-"""Optional OSINT client for RSS / JSON threat-intelligence feeds.
-
-This module is *opt-in*: it never fetches data unless explicitly constructed
-and called.  All network access uses ``urllib`` from the standard library so
-there are no extra dependencies.
-"""
 
 from __future__ import annotations
 
@@ -12,21 +6,7 @@ import urllib.request
 import xml.etree.ElementTree as ET
 from typing import Any, Dict, List, Optional
 
-
 class OSINTClient:
-    """Lightweight aggregator of open-source threat-intel feeds.
-
-    Parameters
-    ----------
-    feeds:
-        List of dicts describing each feed::
-
-            {"name": "Feed-Name", "url": "https://...", "type": "rss"|"json"}
-
-        If *None*, a small default set of public feeds is used.
-    timeout:
-        HTTP timeout in seconds.
-    """
 
     DEFAULT_FEEDS: List[Dict[str, str]] = [
         {
@@ -44,15 +24,13 @@ class OSINTClient:
         self.feeds = feeds if feeds is not None else self.DEFAULT_FEEDS
         self.timeout = timeout
 
-    # ------------------------------------------------------------------
     def fetch_all(self) -> List[Dict[str, Any]]:
-        """Fetch every configured feed and return structured indicators."""
         indicators: List[Dict[str, Any]] = []
         for feed in self.feeds:
             try:
                 items = self._fetch_feed(feed)
                 indicators.extend(items)
-            except Exception as exc:  # noqa: BLE001
+            except Exception as exc:
                 indicators.append(
                     {
                         "source": feed.get("name", "unknown"),
@@ -61,7 +39,6 @@ class OSINTClient:
                 )
         return indicators
 
-    # ------------------------------------------------------------------
     def _fetch_feed(self, feed: Dict[str, str]) -> List[Dict[str, Any]]:
         url = feed["url"]
         feed_type = feed.get("type", "json")
@@ -77,7 +54,6 @@ class OSINTClient:
             return self._parse_json(raw, name)
         return self._parse_text(raw, name)
 
-    # ------------------------------------------------------------------
     @staticmethod
     def _parse_rss(raw: str, source: str) -> List[Dict[str, Any]]:
         root = ET.fromstring(raw)

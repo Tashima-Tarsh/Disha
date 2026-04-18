@@ -1,13 +1,3 @@
-"""
-Cognitive Engine API — FastAPI routes.
-
-Exposes:
-  GET  /health              — liveness check
-  POST /process             — single-turn synchronous cognitive cycle
-  GET  /introspect/{sid}    — full reasoning trace for a session
-  WS   /cognitive/stream/{session_id}
-                            — real-time stage-by-stage event stream
-"""
 
 from __future__ import annotations
 
@@ -27,13 +17,9 @@ logger = structlog.get_logger("cognitive_api")
 router = APIRouter()
 _engine = CognitiveEngine()
 
-# ── REST schemas ───────────────────────────────────────────────────────────────
-
-
 class ProcessRequest(BaseModel):
     input: str
     session_id: Optional[str] = None
-
 
 class ProcessResponse(BaseModel):
     session_id: str
@@ -44,21 +30,12 @@ class ProcessResponse(BaseModel):
     reflection: Optional[dict]
     stage_durations: dict
 
-
-# ── REST endpoints ─────────────────────────────────────────────────────────────
-
-
 @router.get("/health")
 async def health():
     return {"status": "ok", "engine": "DISHA-MIND", "version": "1.0.0"}
 
-
 @router.post("/process", response_model=ProcessResponse)
 async def process_input(req: ProcessRequest):
-    """
-    Run a full 7-stage cognitive cycle synchronously.
-    Returns the completed CognitiveState as JSON.
-    """
     state = await _engine.process(req.input, session_id=req.session_id)
     return ProcessResponse(
         session_id=state.session_id,
@@ -70,20 +47,13 @@ async def process_input(req: ProcessRequest):
         stage_durations=state.stage_durations,
     )
 
-
 @router.get("/introspect/{session_id}")
 async def introspect(session_id: str):
-    """Return the full reasoning trace for a session."""
     return _engine.get_introspection_report(session_id)
-
 
 @router.get("/sessions")
 async def sessions():
     return {"session_ids": _engine.get_session_ids()}
-
-
-# ── WebSocket streaming ────────────────────────────────────────────────────────
-
 
 STAGE_ORDER = [
     "perceiving",
@@ -95,17 +65,8 @@ STAGE_ORDER = [
     "consolidating",
 ]
 
-
 @router.websocket("/cognitive/stream/{session_id}")
 async def cognitive_stream(websocket: WebSocket, session_id: str):
-    """
-    Stream each cognitive stage as it completes.
-
-    Client sends:  {"input": "...", "session_id": "..."}
-    Server emits:  {"stage": "perceiving", "data": {...}}  × 7 stages
-                   {"stage": "complete",   "data": {...}}
-                   {"stage": "error",      "data": {"error": "..."}}
-    """
     await websocket.accept()
     log = logger.bind(session=session_id)
     log.info("ws_connected")
@@ -120,7 +81,6 @@ async def cognitive_stream(websocket: WebSocket, session_id: str):
 
             sid = payload.get("session_id", session_id) or str(uuid.uuid4())
 
-            # Run cognitive cycle with per-stage callbacks
             await _stream_cognitive_cycle(websocket, user_input, sid)
 
     except WebSocketDisconnect:
@@ -132,12 +92,7 @@ async def cognitive_stream(websocket: WebSocket, session_id: str):
         except Exception:
             pass
 
-
 async def _stream_cognitive_cycle(ws: WebSocket, raw_input: str, session_id: str):
-    """
-    Run the full cognitive cycle and stream events after each stage.
-    Monkey-patches the engine's stage methods to intercept results mid-flight.
-    """
     import time
 
     from disha.ai.core.cognitive_loop import CognitiveState
@@ -170,12 +125,11 @@ async def _stream_cognitive_cycle(ws: WebSocket, raw_input: str, session_id: str
         duration = round(time.perf_counter() - t0, 4)
         state.stage_durations[internal_name] = duration
 
-        # Build stage payload
         payload = _stage_payload(stage_name, state)
         payload["duration"] = duration
 
         await ws.send_json({"stage": stage_name, "data": payload})
-        await asyncio.sleep(0)   # yield to event loop
+        await asyncio.sleep(0)
 
     _engine._traces.setdefault(session_id, []).append(state)
 
@@ -192,9 +146,7 @@ async def _stream_cognitive_cycle(ws: WebSocket, raw_input: str, session_id: str
         },
     })
 
-
 def _stage_payload(stage: str, state) -> dict:
-    """Extract the relevant fields from state for each stage event."""
     if stage == "perceiving":
         return {"intent": state.intent, "entities": state.entities, "uncertainty": state.uncertainty}
     if stage == "attending":

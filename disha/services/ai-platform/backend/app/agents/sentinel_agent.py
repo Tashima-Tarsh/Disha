@@ -7,7 +7,6 @@ from app.core.config import get_settings
 
 logger = structlog.get_logger(__name__)
 
-
 class SentinelAgent(BaseAgent):
     """Defensive cybersecurity agent focusing on threat detection, containment, and recovery."""
 
@@ -25,7 +24,7 @@ class SentinelAgent(BaseAgent):
             from langchain_openai import ChatOpenAI
             self._llm = ChatOpenAI(
                 model=self.settings.LLM_MODEL,
-                temperature=0.1,  # Low temperature for precise remediation
+                temperature=0.1,
                 api_key=self.settings.OPENAI_API_KEY,
             )
         return self._llm
@@ -35,9 +34,6 @@ class SentinelAgent(BaseAgent):
         options = options or {}
         signals = options.get("signals", [])
         context = options.get("context", "General infrastructure security monitoring.")
-
-        # In a real scenario, this agent would correlate events from the SecurityMiddleware
-        # and anomalies from the DetectionAgent.
 
         prompt = self._build_sentinel_prompt(target, signals, context)
         incident_report = await self._generate_report(prompt)

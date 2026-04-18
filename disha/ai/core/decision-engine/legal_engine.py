@@ -1,9 +1,3 @@
-"""Legal reasoning engine with FAISS-based retrieval.
-
-Prefers the FAISS retriever (``utils.retriever_faiss.FAISSRetriever``) for
-clause and case-law search; falls back to ``SimpleRetriever`` when the
-optional dependencies are missing.
-"""
 
 from __future__ import annotations
 
@@ -13,14 +7,12 @@ from typing import Any, Dict, List, Optional
 from utils.llm_wrapper import get_llm
 from utils.simple_retriever import SimpleRetriever
 
-# Try FAISS retriever; graceful fallback
 try:
     from utils.retriever_faiss import FAISSRetriever, faiss_available
 except ImportError:
 
-    def faiss_available() -> bool:  # type: ignore[misc]
+    def faiss_available() -> bool:
         return False
-
 
 _BASE = os.path.dirname(os.path.abspath(__file__))
 _DEFAULT_CLAUSE_INDEX = os.path.join(_BASE, "data", "index", "constitution.faiss")
@@ -28,12 +20,10 @@ _DEFAULT_CLAUSE_META = os.path.join(_BASE, "data", "index", "constitution_meta.j
 _DEFAULT_CASE_INDEX = os.path.join(_BASE, "data", "index", "case_law.faiss")
 _DEFAULT_CASE_META = os.path.join(_BASE, "data", "index", "case_law_meta.json")
 
-
 def _make_retriever(
     index_path: str,
     meta_path: str,
 ) -> SimpleRetriever | Any:
-    """Instantiate the best available retriever and load a pre-built index."""
     if faiss_available() and index_path.endswith(".faiss"):
         try:
             ret = FAISSRetriever()
@@ -42,9 +32,8 @@ def _make_retriever(
         except FileNotFoundError:
             pass
 
-    # Fallback — SimpleRetriever (keyword)
     sr = SimpleRetriever()
-    # For SimpleRetriever, index_path is a JSON file (not .faiss)
+
     json_index = index_path.replace(".faiss", ".json")
     try:
         sr.load_index(json_index, meta_path)
@@ -52,21 +41,7 @@ def _make_retriever(
         pass
     return sr
 
-
 class LegalAgent:
-    """Agent that analyses scenarios against constitutional provisions and
-    case-law precedents.
-
-    Parameters
-    ----------
-    clause_index / clause_meta:
-        Paths to the clause FAISS index & metadata.
-    case_index / case_meta:
-        Paths to the case-law FAISS index & metadata (optional).
-    llm:
-        An LLM instance (MockLLM, LlamaCppLLM, …).  ``get_llm()`` is used
-        when *None*.
-    """
 
     def __init__(
         self,
@@ -87,15 +62,12 @@ class LegalAgent:
         if os.path.exists(cm):
             self.case_retriever = _make_retriever(ci, cm)
 
-    # ------------------------------------------------------------------
     def analyze(self, scenario: str, top_k: int = 5) -> Dict[str, Any]:
-        """Return a structured legal analysis."""
         clause_hits = self.clause_retriever.query(scenario, top_k=top_k)
         case_hits: List[Dict] = []
         if self.case_retriever is not None:
             case_hits = self.case_retriever.query(scenario, top_k=top_k)
 
-        # Build prompt context
         clause_context = "\n".join(
             f"- Clause {h.get('id', '?')}: {h.get('text', '')[:200]}"
             for h in clause_hits

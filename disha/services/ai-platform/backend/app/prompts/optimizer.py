@@ -1,9 +1,3 @@
-"""
-Self-Improving Prompt Optimization Engine.
-
-Automatically evolves and optimizes prompts used by the reasoning agent
-through performance tracking, A/B testing, and gradient-free optimization.
-"""
 import time
 import uuid
 import random
@@ -14,10 +8,8 @@ import structlog
 
 logger = structlog.get_logger(__name__)
 
-
 @dataclass
 class PromptVariant:
-    """A single prompt template variant."""
     variant_id: str = field(default_factory=lambda: str(uuid.uuid4())[:8])
     template: str = ""
     version: int = 1
@@ -32,23 +24,10 @@ class PromptVariant:
 
     @property
     def confidence(self) -> float:
-        """Confidence based on number of uses (more uses = more reliable score)."""
         return min(self.uses / 20.0, 1.0)
 
-
 class PromptOptimizer:
-    """
-    Gradient-free prompt optimization using evolutionary strategies.
 
-    Maintains a population of prompt variants, tracks their performance,
-    and evolves better prompts through:
-    - A/B testing (Thompson sampling for exploration/exploitation)
-    - Mutation (small modifications to successful prompts)
-    - Crossover (combining elements from top prompts)
-    - Few-shot learning (injecting successful examples)
-    """
-
-    # Base prompt templates for different analysis types
     BASE_TEMPLATES = {
         "investigation": (
             "You are an elite intelligence analyst. Analyze the following data "
@@ -87,11 +66,10 @@ class PromptOptimizer:
 
     def __init__(self, population_size: int = 5):
         self.population_size = population_size
-        self.variants: dict = defaultdict(list)  # type -> [PromptVariant]
-        self.few_shot_examples: dict = defaultdict(list)  # type -> [(prompt, score)]
+        self.variants: dict = defaultdict(list)
+        self.few_shot_examples: dict = defaultdict(list)
         self._generation = 0
 
-        # Initialize with base templates
         for prompt_type, template in self.BASE_TEMPLATES.items():
             variant = PromptVariant(template=template, version=1)
             self.variants[prompt_type].append(variant)
@@ -103,32 +81,22 @@ class PromptOptimizer:
         data_summary: str,
         include_few_shot: bool = True,
     ) -> tuple:
-        """
-        Select and return the best prompt for the given task.
-
-        Uses Thompson sampling to balance exploration and exploitation.
-
-        Returns: (formatted_prompt, variant_id)
-        """
         variants = self.variants.get(prompt_type, [])
 
         if not variants:
-            # Fallback to investigation template
+
             template = self.BASE_TEMPLATES.get(prompt_type, self.BASE_TEMPLATES["investigation"])
             variant = PromptVariant(template=template)
             self.variants[prompt_type] = [variant]
             variants = [variant]
 
-        # Thompson sampling: sample from Beta distribution based on scores
         selected = self._thompson_select(variants)
 
-        # Build prompt
         prompt = selected.template.format(
             target=target,
             data_summary=data_summary,
         )
 
-        # Add few-shot examples if available
         if include_few_shot:
             examples = self._get_few_shot_examples(prompt_type)
             if examples:
@@ -148,7 +116,6 @@ class PromptOptimizer:
         return prompt, selected.variant_id
 
     def record_score(self, variant_id: str, score: float, prompt_type: str = ""):
-        """Record the performance score for a prompt variant."""
         for ptype, variants in self.variants.items():
             if prompt_type and ptype != prompt_type:
                 continue
@@ -167,7 +134,6 @@ class PromptOptimizer:
     def add_few_shot_example(
         self, prompt_type: str, example_input: str, example_output: str, score: float
     ):
-        """Add a successful example for few-shot learning."""
         examples = self.few_shot_examples[prompt_type]
         examples.append({
             "input": example_input[:500],
@@ -175,42 +141,33 @@ class PromptOptimizer:
             "score": score,
             "timestamp": time.time(),
         })
-        # Keep top examples by score, max 10
+
         examples.sort(key=lambda x: x["score"], reverse=True)
         self.few_shot_examples[prompt_type] = examples[:10]
 
     def evolve(self):
-        """
-        Run one generation of prompt evolution.
-
-        Mutates top-performing prompts and removes worst performers.
-        """
         self._generation += 1
 
         for prompt_type, variants in self.variants.items():
             if len(variants) < 2:
                 continue
 
-            # Sort by average score
             scored = [v for v in variants if v.uses >= 3]
             if not scored:
                 continue
 
             scored.sort(key=lambda v: v.avg_score, reverse=True)
 
-            # Mutate top performer
             if scored:
                 mutated = self._mutate(scored[0], prompt_type)
                 if mutated and len(variants) < self.population_size:
                     variants.append(mutated)
 
-            # Crossover top two
             if len(scored) >= 2:
                 child = self._crossover(scored[0], scored[1], prompt_type)
                 if child and len(variants) < self.population_size:
                     variants.append(child)
 
-            # Remove worst performer if at capacity
             if len(variants) > self.population_size:
                 worst = min(
                     [v for v in variants if v.uses >= 5],
@@ -223,7 +180,6 @@ class PromptOptimizer:
         logger.info("prompt_evolution_complete", generation=self._generation)
 
     def _thompson_select(self, variants: list) -> PromptVariant:
-        """Thompson sampling for variant selection."""
         if len(variants) == 1:
             return variants[0]
 
@@ -231,7 +187,7 @@ class PromptOptimizer:
         best_variant = variants[0]
 
         for variant in variants:
-            # Beta distribution approximation
+
             alpha = variant.total_score + 1.0
             beta_param = max(variant.uses - variant.total_score + 1.0, 1.0)
             sample = random.betavariate(
@@ -245,7 +201,6 @@ class PromptOptimizer:
         return best_variant
 
     def _mutate(self, parent: PromptVariant, prompt_type: str) -> Optional[PromptVariant]:
-        """Create a mutated copy of a prompt variant."""
         mutations = [
             ("Add specificity", "Be very specific and detailed in your analysis. "),
             ("Add urgency", "This is a time-sensitive investigation. Prioritize actionable intelligence. "),
@@ -274,12 +229,10 @@ class PromptOptimizer:
     def _crossover(
         self, parent1: PromptVariant, parent2: PromptVariant, prompt_type: str
     ) -> Optional[PromptVariant]:
-        """Create a child prompt from two parent prompts."""
-        # Split templates into sections (by newline groups)
+
         sections1 = parent1.template.split("\n\n")
         sections2 = parent2.template.split("\n\n")
 
-        # Take alternating sections from each parent
         child_sections = []
         for i in range(max(len(sections1), len(sections2))):
             if i % 2 == 0 and i < len(sections1):
@@ -298,12 +251,10 @@ class PromptOptimizer:
         return child
 
     def _get_few_shot_examples(self, prompt_type: str, max_examples: int = 3) -> list:
-        """Get top few-shot examples for a prompt type."""
         examples = self.few_shot_examples.get(prompt_type, [])
         return examples[:max_examples]
 
     def _inject_few_shot(self, prompt: str, examples: list) -> str:
-        """Inject few-shot examples into a prompt."""
         if not examples:
             return prompt
 
@@ -314,7 +265,6 @@ class PromptOptimizer:
         return prompt + example_text
 
     def get_metrics(self) -> dict:
-        """Get optimization metrics."""
         metrics = {
             "generation": self._generation,
             "prompt_types": {},

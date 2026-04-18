@@ -5,7 +5,6 @@ from typing import Any
 from app.agents.base_agent import BaseAgent
 from app.core.config import get_settings
 
-
 class GraphAgent(BaseAgent):
     """Agent for knowledge graph operations using Neo4j."""
 
@@ -41,10 +40,8 @@ class GraphAgent(BaseAgent):
         if relationships:
             stored_relationships = await self._store_relationships(relationships)
 
-        # Query related entities
         neighbors = await self._get_neighbors(target, depth=options.get("depth", 2))
 
-        # Get community structure
         communities = await self._detect_communities()
 
         return {
@@ -129,8 +126,6 @@ class GraphAgent(BaseAgent):
         """Get neighboring entities within a given depth."""
         try:
             driver = self._get_driver()
-            # Neo4j does not support parameterized relationship depth ranges,
-            # so we interpolate a validated integer directly into the query.
             safe_depth = max(1, min(int(depth), 5))
             query = f"""
                     MATCH (e:Entity)
@@ -159,7 +154,6 @@ class GraphAgent(BaseAgent):
         try:
             driver = self._get_driver()
             with driver.session() as session:
-                # Simple community detection using connected components
                 result = session.run(
                     """
                     MATCH (e:Entity)-[:RELATED_TO]-(neighbor:Entity)

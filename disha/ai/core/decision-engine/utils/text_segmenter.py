@@ -1,11 +1,3 @@
-"""Segment raw constitutional / legal text into one clause per line.
-
-Heuristics
-----------
-* Lines beginning with ``Article``, ``Section``, ``Clause``, or a numeric
-  pattern like ``1.``, ``(a)``, ``(i)`` are treated as clause boundaries.
-* Blank lines also act as separators.
-"""
 
 from __future__ import annotations
 
@@ -25,9 +17,7 @@ _CLAUSE_PATTERN = re.compile(
     re.IGNORECASE,
 )
 
-
 def segment(text: str) -> List[str]:
-    """Split *text* into clause segments and return as a list of strings."""
     lines = text.splitlines()
     clauses: List[str] = []
     current: List[str] = []
@@ -50,12 +40,7 @@ def segment(text: str) -> List[str]:
 
     return clauses
 
-
 def segment_file(input_path: str, output_path: str) -> int:
-    """Read *input_path*, segment, and write one clause per line to *output_path*.
-
-    Returns the number of clauses written.
-    """
     with open(input_path, "r", encoding="utf-8") as fh:
         text = fh.read()
 
@@ -66,7 +51,6 @@ def segment_file(input_path: str, output_path: str) -> int:
             fh.write(clause + "\n")
 
     return len(clauses)
-
 
 if __name__ == "__main__":
     import argparse

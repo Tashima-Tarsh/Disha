@@ -1,4 +1,3 @@
-"""Crypto Intelligence Agent - Tracks blockchain transactions."""
 
 from typing import Any
 
@@ -7,9 +6,7 @@ import httpx
 from app.agents.base_agent import BaseAgent
 from app.core.config import get_settings
 
-
 class CryptoAgent(BaseAgent):
-    """Agent for tracking and analyzing blockchain transactions."""
 
     def __init__(self):
         super().__init__(
@@ -19,7 +16,6 @@ class CryptoAgent(BaseAgent):
         self.settings = get_settings()
 
     async def execute(self, target: str, options: dict[str, Any] | None = None) -> dict[str, Any]:
-        """Analyze a blockchain address or transaction."""
         options = options or {}
         results: dict[str, Any] = {"target": target, "chain": "ethereum"}
 
@@ -33,7 +29,6 @@ class CryptoAgent(BaseAgent):
         return results
 
     async def _get_balance(self, address: str) -> dict[str, Any]:
-        """Get ETH balance for an address."""
         try:
             async with httpx.AsyncClient(timeout=30.0) as client:
                 response = await client.get(
@@ -57,7 +52,6 @@ class CryptoAgent(BaseAgent):
             return {"error": str(e)}
 
     async def _get_transactions(self, address: str, limit: int = 20) -> list[dict[str, Any]]:
-        """Get recent transactions for an address."""
         try:
             async with httpx.AsyncClient(timeout=30.0) as client:
                 response = await client.get(
@@ -95,7 +89,6 @@ class CryptoAgent(BaseAgent):
             return []
 
     async def _get_token_transfers(self, address: str) -> list[dict[str, Any]]:
-        """Get ERC-20 token transfers for an address."""
         try:
             async with httpx.AsyncClient(timeout=30.0) as client:
                 response = await client.get(
@@ -130,7 +123,6 @@ class CryptoAgent(BaseAgent):
             return []
 
     def _extract_entities(self, target: str, data: dict[str, Any]) -> list[dict[str, Any]]:
-        """Extract entities from blockchain data."""
         entities = [
             {
                 "id": f"wallet-{target}",
@@ -145,7 +137,6 @@ class CryptoAgent(BaseAgent):
             }
         ]
 
-        # Extract counterparty wallets from transactions
         seen_addresses: set[str] = set()
         for tx in data.get("transactions", []):
             for addr_field in ("from", "to"):
@@ -163,7 +154,6 @@ class CryptoAgent(BaseAgent):
         return entities
 
     def _analyze_risk(self, data: dict[str, Any]) -> dict[str, Any]:
-        """Perform basic risk analysis on blockchain data."""
         risk_factors = []
         risk_score = 0.0
 
@@ -172,7 +162,6 @@ class CryptoAgent(BaseAgent):
             risk_factors.append("High transaction volume")
             risk_score += 0.2
 
-        # Check for large value transfers
         large_txs = [tx for tx in transactions if tx.get("value_eth", 0) > 10]
         if large_txs:
             risk_factors.append(f"{len(large_txs)} large value transfers detected")

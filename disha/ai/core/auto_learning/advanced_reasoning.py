@@ -1,23 +1,3 @@
-"""Mythos-style advanced reasoning protocol.
-
-ADVANCED REASONING PROTOCOL:
-
-For complex problems:
-    1. Decompose problem
-    2. Generate multiple solution paths
-    3. Evaluate each path:
-       - Time complexity
-       - Space complexity
-       - Scalability
-    4. Select optimal approach
-    5. Validate with edge cases
-
-If ambiguity exists:
-    - Present multiple valid solutions
-    - Rank them
-
-Always prioritise: Correctness > Efficiency > Elegance
-"""
 
 from __future__ import annotations
 
@@ -30,12 +10,7 @@ from typing import Any, List, Optional
 
 logger = logging.getLogger(__name__)
 
-
-# ---------------------------------------------------------------------------
-# Data structures
-# ---------------------------------------------------------------------------
 class ComplexityClass(Enum):
-    """Standard algorithmic complexity classes."""
 
     O_1 = "O(1)"
     O_LOG_N = "O(log n)"
@@ -46,21 +21,18 @@ class ComplexityClass(Enum):
     O_2N = "O(2^n)"
     O_UNKNOWN = "unknown"
 
-
 @dataclass
 class SolutionEvaluation:
-    """Evaluation of a single solution path."""
 
     time_complexity: ComplexityClass = ComplexityClass.O_UNKNOWN
     space_complexity: ComplexityClass = ComplexityClass.O_UNKNOWN
-    scalability_score: float = 0.0  # 0–10
-    correctness_score: float = 0.0  # 0–10
-    efficiency_score: float = 0.0  # 0–10
-    elegance_score: float = 0.0  # 0–10
+    scalability_score: float = 0.0
+    correctness_score: float = 0.0
+    efficiency_score: float = 0.0
+    elegance_score: float = 0.0
 
     @property
     def weighted_score(self) -> float:
-        """Correctness > Efficiency > Elegance weighting."""
         return (
             self.correctness_score * 0.50
             + self.efficiency_score * 0.30
@@ -68,34 +40,28 @@ class SolutionEvaluation:
             + self.scalability_score * 0.10
         )
 
-
 @dataclass
 class SolutionPath:
-    """A candidate solution with its evaluation."""
 
     name: str
     description: str
-    approach: str  # "direct", "divide_and_conquer", "dynamic_programming", etc.
+    approach: str
     steps: List[str] = field(default_factory=list)
     evaluation: SolutionEvaluation = field(default_factory=SolutionEvaluation)
     edge_cases: List[str] = field(default_factory=list)
     assumptions: List[str] = field(default_factory=list)
     rank: int = 0
 
-
 @dataclass
 class SubProblem:
-    """A decomposed sub-problem from the original problem."""
 
     description: str
     dependencies: List[str] = field(default_factory=list)
     solutions: List[SolutionPath] = field(default_factory=list)
     selected_solution: Optional[SolutionPath] = None
 
-
 @dataclass
 class ReasoningResult:
-    """Complete result of the advanced reasoning protocol."""
 
     problem: str
     sub_problems: List[SubProblem] = field(default_factory=list)
@@ -113,10 +79,6 @@ class ReasoningResult:
             raw = f"{self.problem}:{time.time()}"
             self.reasoning_id = hashlib.sha256(raw.encode()).hexdigest()[:12]
 
-
-# ---------------------------------------------------------------------------
-# Complexity estimator
-# ---------------------------------------------------------------------------
 _COMPLEXITY_RANK = {
     ComplexityClass.O_1: 1,
     ComplexityClass.O_LOG_N: 2,
@@ -128,9 +90,7 @@ _COMPLEXITY_RANK = {
     ComplexityClass.O_UNKNOWN: 8,
 }
 
-
 def _estimate_complexity(approach: str) -> tuple:
-    """Heuristic: estimate time/space complexity from approach name."""
     lookup = {
         "direct": (ComplexityClass.O_N, ComplexityClass.O_1),
         "brute_force": (ComplexityClass.O_N2, ComplexityClass.O_N),
@@ -145,23 +105,8 @@ def _estimate_complexity(approach: str) -> tuple:
     }
     return lookup.get(approach, (ComplexityClass.O_UNKNOWN, ComplexityClass.O_UNKNOWN))
 
-
-# ---------------------------------------------------------------------------
-# Advanced Reasoning Engine
-# ---------------------------------------------------------------------------
 class AdvancedReasoningEngine:
-    """Mythos-style multi-path reasoning engine.
 
-    Protocol:
-        1. Decompose the problem into manageable sub-problems
-        2. Generate multiple solution paths for each sub-problem
-        3. Evaluate each path on complexity, scalability, correctness
-        4. Select the optimal approach
-        5. Validate against edge cases
-        6. If ambiguity exists, present ranked alternatives
-    """
-
-    # Canonical approach catalogue
     APPROACHES = [
         "direct",
         "divide_and_conquer",
@@ -174,16 +119,12 @@ class AdvancedReasoningEngine:
 
     def __init__(
         self,
-        context_retriever: Any = None,  # Optional RAG pipeline for context
+        context_retriever: Any = None,
     ) -> None:
         self._context_retriever = context_retriever
 
-    # ------------------------------------------------------------------
-    # Step 1: Decompose
-    # ------------------------------------------------------------------
     def decompose(self, problem: str) -> List[SubProblem]:
-        """Decompose a problem into sub-problems."""
-        # Heuristic decomposition based on sentence structure
+
         for sep in [".", "?", ";"]:
             problem = problem.replace(sep, sep + "|||")
         parts = [p.strip().rstrip("|||") for p in problem.split("|||") if p.strip()]
@@ -203,15 +144,10 @@ class AdvancedReasoningEngine:
         logger.info("problem_decomposed", count=len(sub_problems))
         return sub_problems
 
-    # ------------------------------------------------------------------
-    # Step 2: Generate solution paths
-    # ------------------------------------------------------------------
     def generate_solutions(self, sub_problem: SubProblem) -> List[SolutionPath]:
-        """Generate multiple solution paths for a sub-problem."""
         solutions = []
         desc = sub_problem.description.lower()
 
-        # Select applicable approaches based on problem characteristics
         applicable: List[str] = []
         if any(kw in desc for kw in ["search", "find", "locate", "lookup"]):
             applicable.extend(["binary_search", "direct", "heuristic"])
@@ -245,22 +181,15 @@ class AdvancedReasoningEngine:
 
         return solutions
 
-    # ------------------------------------------------------------------
-    # Step 3: Evaluate
-    # ------------------------------------------------------------------
     def evaluate_solution(self, solution: SolutionPath) -> SolutionPath:
-        """Evaluate a solution path on all criteria."""
         ev = solution.evaluation
 
-        # Time complexity scoring (lower rank = better)
         time_rank = _COMPLEXITY_RANK.get(ev.time_complexity, 8)
         ev.efficiency_score = max(0, 10 - time_rank)
 
-        # Space complexity scoring
         space_rank = _COMPLEXITY_RANK.get(ev.space_complexity, 8)
         ev.scalability_score = max(0, 10 - space_rank * 0.5)
 
-        # Correctness based on approach reliability
         correctness_map = {
             "direct": 9.0,
             "divide_and_conquer": 8.5,
@@ -275,7 +204,6 @@ class AdvancedReasoningEngine:
         }
         ev.correctness_score = correctness_map.get(solution.approach, 5.0)
 
-        # Elegance
         elegance_map = {
             "direct": 7.0,
             "divide_and_conquer": 9.0,
@@ -290,32 +218,22 @@ class AdvancedReasoningEngine:
 
         return solution
 
-    # ------------------------------------------------------------------
-    # Step 4: Select optimal
-    # ------------------------------------------------------------------
     def select_optimal(self, solutions: List[SolutionPath]) -> SolutionPath:
-        """Select the best solution path. Correctness > Efficiency > Elegance."""
         if not solutions:
             return SolutionPath(name="none", description="No solutions available", approach="none")
 
-        # Sort by weighted score (highest first)
         ranked = sorted(
             solutions,
             key=lambda s: s.evaluation.weighted_score,
             reverse=True,
         )
 
-        # Assign ranks
         for i, sol in enumerate(ranked):
             sol.rank = i + 1
 
         return ranked[0]
 
-    # ------------------------------------------------------------------
-    # Step 5: Edge case validation
-    # ------------------------------------------------------------------
     def identify_edge_cases(self, problem: str) -> List[str]:
-        """Identify potential edge cases for the problem."""
         cases = [
             "Empty or null input",
             "Single-element input",
@@ -348,28 +266,20 @@ class AdvancedReasoningEngine:
 
         return cases
 
-    # ------------------------------------------------------------------
-    # Step 6: Detect ambiguity
-    # ------------------------------------------------------------------
     def detect_ambiguity(self, solutions: List[SolutionPath]) -> bool:
-        """Check if multiple solutions are close in quality."""
         if len(solutions) < 2:
             return False
 
         scores = sorted(
             [s.evaluation.weighted_score for s in solutions], reverse=True
         )
-        # Ambiguous if top two scores are within 10% of each other
+
         if scores[0] == 0:
             return False
         diff = abs(scores[0] - scores[1]) / scores[0]
         return diff < 0.10
 
-    # ------------------------------------------------------------------
-    # Full reasoning pipeline
-    # ------------------------------------------------------------------
     def reason(self, problem: str) -> ReasoningResult:
-        """Execute the full advanced reasoning protocol."""
         start = time.time()
 
         if self._context_retriever is not None:
@@ -378,10 +288,8 @@ class AdvancedReasoningEngine:
             except Exception:
                 pass
 
-        # Step 1: Decompose
         sub_problems = self.decompose(problem)
 
-        # Steps 2–4: For each sub-problem, generate, evaluate, and select
         all_solutions: List[SolutionPath] = []
         for sp in sub_problems:
             solutions = self.generate_solutions(sp)
@@ -390,13 +298,10 @@ class AdvancedReasoningEngine:
             sp.selected_solution = self.select_optimal(evaluated)
             all_solutions.extend(evaluated)
 
-        # Global selection
         selected = self.select_optimal(all_solutions)
 
-        # Step 5: Edge cases
         edge_cases = self.identify_edge_cases(problem)
 
-        # Step 6: Ambiguity check
         ambiguous = self.detect_ambiguity(all_solutions)
         alternatives = []
         if ambiguous:
@@ -405,11 +310,10 @@ class AdvancedReasoningEngine:
                 key=lambda s: s.evaluation.weighted_score,
                 reverse=True,
             )
-            alternatives = ranked[:3]  # Top 3 alternatives
+            alternatives = ranked[:3]
 
         elapsed = time.time() - start
 
-        # Confidence
         if all_solutions:
             avg_weighted = sum(s.evaluation.weighted_score for s in all_solutions) / len(all_solutions)
             confidence = min(avg_weighted / 10.0, 1.0)
@@ -441,8 +345,7 @@ class AdvancedReasoningEngine:
     def reason_with_context(
         self, problem: str, context_texts: List[str]
     ) -> ReasoningResult:
-        """Reason with explicitly provided context."""
-        # Temporarily provide context via a simple wrapper
+
         class _TempRetriever:
             def query(self_, query: str, top_k: int = 3) -> list:
                 @dataclass
@@ -456,12 +359,8 @@ class AdvancedReasoningEngine:
         self._context_retriever = old
         return result
 
-    # ------------------------------------------------------------------
-    # Utility: format result as text
-    # ------------------------------------------------------------------
     @staticmethod
     def format_result(result: ReasoningResult) -> str:
-        """Format a reasoning result as human-readable text."""
         lines = [
             f"═══ REASONING RESULT [{result.reasoning_id}] ═══",
             f"Problem: {result.problem}",

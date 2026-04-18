@@ -1,13 +1,10 @@
-"""Reasoning Agent - Uses LLM for analysis and report generation."""
 
 from typing import Any
 
 from app.agents.base_agent import BaseAgent
 from app.core.config import get_settings
 
-
 class ReasoningAgent(BaseAgent):
-    """Agent that uses LLM to analyze data and generate intelligence reports."""
 
     def __init__(self):
         super().__init__(
@@ -18,7 +15,6 @@ class ReasoningAgent(BaseAgent):
         self._llm = None
 
     def _get_llm(self):
-        """Get or create LLM instance."""
         if self._llm is None:
             from langchain_openai import ChatOpenAI
             self._llm = ChatOpenAI(
@@ -29,18 +25,14 @@ class ReasoningAgent(BaseAgent):
         return self._llm
 
     async def execute(self, target: str, options: dict[str, Any] | None = None) -> dict[str, Any]:
-        """Analyze collected intelligence data and generate a report."""
         options = options or {}
         agent_results = options.get("agent_results", {})
         context = options.get("context", "")
 
-        # Build analysis prompt
         prompt = self._build_prompt(target, agent_results, context)
 
-        # Generate analysis using LLM
         analysis = await self._generate_analysis(prompt)
 
-        # Extract key findings
         risk_assessment = self._assess_risk(agent_results)
 
         return {
@@ -51,7 +43,6 @@ class ReasoningAgent(BaseAgent):
         }
 
     def _build_prompt(self, target: str, agent_results: dict[str, Any], context: str) -> str:
-        """Build the analysis prompt from collected data."""
         prompt_parts = [
             "You are an expert intelligence analyst. Analyze the following data and provide a comprehensive threat assessment report.",
             f"\n## Target: {target}",
@@ -77,7 +68,6 @@ class ReasoningAgent(BaseAgent):
         return "\n".join(prompt_parts)
 
     def _format_data(self, data: dict[str, Any]) -> str:
-        """Format data dictionary for LLM consumption."""
         import json
         try:
             return json.dumps(data, indent=2, default=str)[:3000]
@@ -85,7 +75,6 @@ class ReasoningAgent(BaseAgent):
             return str(data)[:3000]
 
     async def _generate_analysis(self, prompt: str) -> str:
-        """Generate analysis using the LLM."""
         try:
             llm = self._get_llm()
             response = await llm.ainvoke(prompt)
@@ -95,7 +84,6 @@ class ReasoningAgent(BaseAgent):
             return f"Analysis generation failed: {str(e)}. Please review raw data manually."
 
     def _assess_risk(self, agent_results: dict[str, Any]) -> dict[str, Any]:
-        """Assess overall risk from agent results."""
         risk_scores = []
         risk_factors = []
 
@@ -103,18 +91,15 @@ class ReasoningAgent(BaseAgent):
             if result.get("status") == "success":
                 data = result.get("data", {})
 
-                # Check for risk scores in the data
                 if "risk_analysis" in data:
                     score = data["risk_analysis"].get("risk_score", 0)
                     risk_scores.append(score)
                     risk_factors.extend(data["risk_analysis"].get("risk_factors", []))
 
-                # Check for anomalies
                 if "anomaly_count" in data and data["anomaly_count"] > 0:
                     risk_scores.append(min(data["anomaly_count"] * 0.2, 1.0))
                     risk_factors.append(f"{data['anomaly_count']} anomalies detected")
 
-                # Check entities for risk
                 for entity in data.get("entities", []):
                     if entity.get("risk_score", 0) > 0.5:
                         risk_scores.append(entity["risk_score"])

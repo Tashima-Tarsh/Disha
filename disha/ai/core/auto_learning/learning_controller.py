@@ -1,15 +1,3 @@
-"""Continuous learning controller with data quality scoring.
-
-Implements the controlled intelligence protocol:
-    - Validate source credibility (stars, citations, origin)
-    - Check for duplication
-    - Score data quality (0–100)
-    - Route: reject / temporary / permanent
-    - Convert to embeddings, store in vector DB (never retrain directly)
-    - Schedule fine-tuning only after human-approved dataset aggregation
-
-This module orchestrates the multi-agent system and RAG pipeline.
-"""
 
 from __future__ import annotations
 
@@ -23,17 +11,9 @@ from typing import Any, Dict, List, Optional
 
 logger = logging.getLogger(__name__)
 
-
-# ---------------------------------------------------------------------------
-# Quality thresholds (configurable)
-# ---------------------------------------------------------------------------
 REJECT_THRESHOLD = 60
 TEMPORARY_THRESHOLD = 80
 
-
-# ---------------------------------------------------------------------------
-# Source credibility database
-# ---------------------------------------------------------------------------
 DEFAULT_SOURCE_CREDIBILITY: Dict[str, float] = {
     "github": 0.75,
     "arxiv": 0.90,
@@ -43,40 +23,22 @@ DEFAULT_SOURCE_CREDIBILITY: Dict[str, float] = {
     "unknown": 0.20,
 }
 
-
-# ---------------------------------------------------------------------------
-# Data item
-# ---------------------------------------------------------------------------
 @dataclass
 class DataItem:
-    """A single data item to be evaluated and potentially stored."""
 
     text: str
     source: str = "unknown"
     metadata: Dict[str, Any] = field(default_factory=dict)
     content_hash: str = ""
     quality_score: int = -1
-    classification: str = ""  # "rejected", "temporary", "permanent"
+    classification: str = ""
     timestamp: float = field(default_factory=time.time)
 
     def __post_init__(self) -> None:
         if not self.content_hash:
             self.content_hash = hashlib.sha256(self.text.encode()).hexdigest()[:20]
 
-
-# ---------------------------------------------------------------------------
-# Quality scorer
-# ---------------------------------------------------------------------------
 class QualityScorer:
-    """Score data quality on a 0–100 scale.
-
-    Criteria:
-        1. Source credibility           (0–25)
-        2. Content length & structure   (0–25)
-        3. Deduplication                (0 if duplicate)
-        4. Word diversity / coherence   (0–25)
-        5. Metadata signals             (0–25)
-    """
 
     def __init__(
         self,
@@ -86,8 +48,7 @@ class QualityScorer:
         self._seen_hashes: set = set()
 
     def score(self, item: DataItem) -> int:
-        """Compute quality score (0–100) for a data item."""
-        # Duplicate check — immediate 0
+
         if item.content_hash in self._seen_hashes:
             return 0
         self._seen_hashes.add(item.content_hash)
@@ -95,7 +56,6 @@ class QualityScorer:
         total = 0.0
         text = item.text.strip()
 
-        # 1. Source credibility (0–25)
         base_key = item.source.lower().split("/")[0] if "/" in item.source else item.source.lower()
         cred = self._source_cred.get(base_key, 0.2)
         stars = item.metadata.get("stars", 0)
@@ -103,7 +63,6 @@ class QualityScorer:
         cred_bonus = min(5, stars / 200 + citations / 20)
         total += min(25, 25 * cred + cred_bonus)
 
-        # 2. Content length & structure (0–25)
         length = len(text)
         if length >= 500:
             total += 20
@@ -113,18 +72,16 @@ class QualityScorer:
             total += 8
         elif length >= 10:
             total += 3
-        # Structural bonus
+
         has_paragraphs = "\n\n" in text
         has_code = any(marker in text for marker in ["```", "def ", "class ", "import "])
         total += 3 * has_paragraphs + 2 * has_code
 
-        # 3. Word diversity / coherence (0–25)
         words = text.lower().split()
         if words:
             unique_ratio = len(set(words)) / len(words)
             total += 25 * min(unique_ratio, 1.0)
 
-        # 4. Metadata signals (0–25)
         meta_score = 0
         if item.metadata.get("verified", False):
             meta_score += 10
@@ -138,26 +95,7 @@ class QualityScorer:
 
         return min(round(total), 100)
 
-
-# ---------------------------------------------------------------------------
-# Learning controller
-# ---------------------------------------------------------------------------
 class LearningController:
-    """Continuous learning controller.
-
-    Workflow for new data:
-        1. Validate source credibility
-        2. Check for duplication
-        3. Score data quality (0–100)
-        4. IF score < 60 → reject
-           IF score 60–80 → temporary memory
-           IF score > 80 → permanent knowledge base
-        5. Convert approved data to embeddings
-        6. Store in vector database (retrievable via RAG)
-
-    Fine-tuning is **never** triggered automatically. It is only
-    scheduled after human-approved dataset aggregation.
-    """
 
     def __init__(
         self,
@@ -174,28 +112,20 @@ class LearningController:
         self._state_dir = Path(state_dir)
         self._state_dir.mkdir(parents=True, exist_ok=True)
 
-        # In-memory stores
         self.permanent_store: List[DataItem] = []
         self.temporary_store: List[DataItem] = []
         self.rejected_store: List[DataItem] = []
 
-        # Audit log
         self._audit_log: List[Dict[str, Any]] = []
 
-        # Fine-tuning queue (only populated on human approval)
         self._finetuning_queue: List[DataItem] = []
         self._finetuning_approved: bool = False
 
-    # ------------------------------------------------------------------
-    # Core pipeline
-    # ------------------------------------------------------------------
     def ingest(self, item: DataItem) -> Dict[str, Any]:
-        """Process a single data item through the learning pipeline."""
-        # Step 1–3: Score
+
         score = self._scorer.score(item)
         item.quality_score = score
 
-        # Step 4: Classify
         if score < self._reject_threshold:
             item.classification = "rejected"
             self.rejected_store.append(item)
@@ -206,7 +136,6 @@ class LearningController:
             item.classification = "permanent"
             self.permanent_store.append(item)
 
-        # Step 5–6: Embed approved items in vector DB
         embedded = False
         if item.classification in ("temporary", "permanent") and self._rag is not None:
             try:
@@ -226,7 +155,6 @@ class LearningController:
             except Exception as e:
                 logger.warning("embedding_failed", error=str(e))
 
-        # Audit
         entry = {
             "content_hash": item.content_hash,
             "source": item.source,
@@ -246,7 +174,6 @@ class LearningController:
         return entry
 
     def ingest_batch(self, items: List[DataItem]) -> Dict[str, Any]:
-        """Process multiple items through the pipeline."""
         results = [self.ingest(item) for item in items]
         summary = {
             "total": len(results),
@@ -264,22 +191,13 @@ class LearningController:
         source: str = "unknown",
         metadata: Optional[Dict[str, Any]] = None,
     ) -> Dict[str, Any]:
-        """Convenience method: ingest raw text strings."""
         items = [
             DataItem(text=t, source=source, metadata=metadata or {})
             for t in texts
         ]
         return self.ingest_batch(items)
 
-    # ------------------------------------------------------------------
-    # Fine-tuning management (human-approved only)
-    # ------------------------------------------------------------------
     def request_finetuning_approval(self) -> Dict[str, Any]:
-        """Generate a fine-tuning proposal for human review.
-
-        Does NOT start fine-tuning. Returns a summary of what would
-        be included in the training dataset.
-        """
         candidates = list(self.permanent_store)
         return {
             "candidate_count": len(candidates),
@@ -297,7 +215,6 @@ class LearningController:
         }
 
     def approve_finetuning(self, approved: bool = True) -> Dict[str, Any]:
-        """Approve or reject the fine-tuning proposal."""
         self._finetuning_approved = approved
         if approved:
             self._finetuning_queue = list(self.permanent_store)
@@ -313,10 +230,6 @@ class LearningController:
             return {"status": "rejected"}
 
     def get_finetuning_dataset(self) -> List[Dict[str, str]]:
-        """Export approved items as a fine-tuning dataset (JSONL format).
-
-        Only available after ``approve_finetuning(True)``.
-        """
         if not self._finetuning_approved or not self._finetuning_queue:
             return []
 
@@ -330,7 +243,6 @@ class LearningController:
         return dataset
 
     def export_finetuning_jsonl(self, output_path: str) -> int:
-        """Write the approved fine-tuning dataset to a JSONL file."""
         dataset = self.get_finetuning_dataset()
         if not dataset:
             return 0
@@ -343,11 +255,7 @@ class LearningController:
         logger.info("finetuning_exported", path=output_path, count=len(dataset))
         return len(dataset)
 
-    # ------------------------------------------------------------------
-    # Temporary store management
-    # ------------------------------------------------------------------
     def promote_temporary(self, min_score: int = 80) -> int:
-        """Promote temporary items to permanent if they meet the threshold."""
         promoted = 0
         remaining = []
         for item in self.temporary_store:
@@ -362,7 +270,6 @@ class LearningController:
         return promoted
 
     def cleanup_temporary(self, max_age_seconds: float = 86400 * 7) -> int:
-        """Remove temporary items older than max_age_seconds."""
         now = time.time()
         remaining = []
         removed = 0
@@ -374,11 +281,7 @@ class LearningController:
         self.temporary_store = remaining
         return removed
 
-    # ------------------------------------------------------------------
-    # State persistence
-    # ------------------------------------------------------------------
     def save_state(self, name: str = "controller") -> str:
-        """Persist controller state to disk."""
         state = {
             "permanent": [
                 {
@@ -413,7 +316,6 @@ class LearningController:
         return str(path)
 
     def load_state(self, name: str = "controller") -> bool:
-        """Load controller state from disk."""
         path = self._state_dir / f"{name}_state.json"
         if not path.exists():
             return False
@@ -430,9 +332,6 @@ class LearningController:
         self._audit_log = state.get("audit_log", [])
         return True
 
-    # ------------------------------------------------------------------
-    # Stats & audit
-    # ------------------------------------------------------------------
     def stats(self) -> Dict[str, Any]:
         return {
             "permanent_count": len(self.permanent_store),

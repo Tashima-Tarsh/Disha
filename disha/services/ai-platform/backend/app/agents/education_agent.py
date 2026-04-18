@@ -9,7 +9,6 @@ from app.core.config import get_settings
 
 logger = structlog.get_logger(__name__)
 
-
 class EducationAgent(BaseAgent):
     """Agent for cognitive tutoring, exam preparation, and conceptual explanations."""
 
@@ -28,7 +27,7 @@ class EducationAgent(BaseAgent):
             from langchain_openai import ChatOpenAI
             self._llm = ChatOpenAI(
                 model=self.settings.LLM_MODEL,
-                temperature=0.7,  # Slightly higher for creative teaching
+                temperature=0.7,
                 api_key=self.settings.OPENAI_API_KEY,
             )
         return self._llm
@@ -36,14 +35,12 @@ class EducationAgent(BaseAgent):
     async def execute(self, target: str, options: dict[str, Any] | None = None) -> dict[str, Any]:
         """Provide tutoring or conceptual explanations for a target topic."""
         options = options or {}
-        mode = options.get("mode", "teaching")  # teaching, exam_prep, summary
+        mode = options.get("mode", "teaching")
         query = target
 
-        # Step 1: Check educational knowledge base for specific context
         context_docs = await self.vector_store.query(query, n_results=3)
         context = "\n\n".join([d["document"] for d in context_docs]) if context_docs else ""
 
-        # Step 2: Generate educational response
         prompt = self._build_education_prompt(query, context, mode)
         tutorial = await self._generate_tutorial(prompt)
 
@@ -102,7 +99,6 @@ Context from Knowledge Base:
 
     def _extract_questions(self, text: str) -> list[str]:
         """Extract check questions from the generated text."""
-        # Simple extraction logic - find numbered questions at the end
         import re
         questions = re.findall(r"\d\.\s+(.*?\?)", text)
         return questions[:3]

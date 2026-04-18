@@ -1,9 +1,3 @@
-"""Ideology / ethical reasoning engine.
-
-Evaluates scenarios through multiple philosophical lenses (Gandhian,
-Marxist, Utilitarian, Rawlsian) to ensure no single ideology is
-privileged.
-"""
 
 from __future__ import annotations
 
@@ -11,9 +5,7 @@ from typing import Any, Dict
 
 from utils.llm_wrapper import get_llm
 
-
 class IdeologyAgent:
-    """Agent that provides multi-ideological ethical analysis."""
 
     def __init__(self, llm: Any | None = None) -> None:
         self.llm = llm or get_llm()
