@@ -6,6 +6,7 @@ import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader, Dataset
 
+
 class AttackClassifier(nn.Module):
 
     def __init__(self, input_dim: int, n_classes: int):
@@ -22,6 +23,7 @@ class AttackClassifier(nn.Module):
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         return self.net(x)
+
 
 class AnomalyDetector(nn.Module):
 
@@ -43,6 +45,7 @@ class AnomalyDetector(nn.Module):
         decoded = self.decoder(encoded)
         return decoded
 
+
 ATTACK_LABELS = {
     "benign": 0,
     "brute_force": 1,
@@ -52,6 +55,7 @@ ATTACK_LABELS = {
 }
 
 LABEL_NAMES = {v: k for k, v in ATTACK_LABELS.items()}
+
 
 class HoneypotLogDataset(Dataset):
 
@@ -114,6 +118,7 @@ class HoneypotLogDataset(Dataset):
     def __getitem__(self, idx: int):
         return self.features[idx], self.labels[idx]
 
+
 def train_classifier(
     log_files: list[str],
     n_classes: int = 5,
@@ -162,6 +167,7 @@ def train_classifier(
     torch.save(model.state_dict(), output_path)
     print(f"Model saved to {output_path}")
 
+
 def train_anomaly_detector(
     log_files: list[str],
     epochs: int = 30,
@@ -197,6 +203,7 @@ def train_anomaly_detector(
 
     torch.save(model.state_dict(), output_path)
     print(f"Anomaly detector saved to {output_path}")
+
 
 def _generate_synthetic_dataset(n_samples: int = 200) -> HoneypotLogDataset:
     import random
@@ -238,6 +245,7 @@ def _generate_synthetic_dataset(n_samples: int = 200) -> HoneypotLogDataset:
     dataset.labels = [ATTACK_LABELS.get(s.get("label", "benign"), 0) for s in samples]
     return dataset
 
+
 def main():
     log_dir = os.environ.get("LOG_DIR", "/logs")
     log_files = [
@@ -268,6 +276,7 @@ def main():
     print("\n" + "=" * 60)
     print("Training complete.")
     print("=" * 60)
+
 
 if __name__ == "__main__":
     main()

@@ -10,6 +10,7 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+
 class SimulatedResponse:
 
     def __init__(self):
@@ -26,6 +27,7 @@ class SimulatedResponse:
         logger.info("Action: %s | Details: %s", action, json.dumps(details))
         return entry
 
+
 class TarpitResponse(SimulatedResponse):
 
     def engage(self, attacker_ip: str, delay_seconds: float = 0.0) -> dict:
@@ -39,6 +41,7 @@ class TarpitResponse(SimulatedResponse):
             "tarpit",
             {"attacker_ip": attacker_ip, "delay_seconds": round(delay_seconds, 1)},
         )
+
 
 class FakeShellResponse(SimulatedResponse):
 
@@ -65,6 +68,7 @@ class FakeShellResponse(SimulatedResponse):
             },
         )
 
+
 class DecoyFilesystem(SimulatedResponse):
 
     DECOY_FILES = {
@@ -84,6 +88,7 @@ class DecoyFilesystem(SimulatedResponse):
                 "content": self.DECOY_FILES.get(filepath, "File not found"),
             },
         )
+
 
 class ContainmentZone(SimulatedResponse):
 
@@ -108,6 +113,7 @@ class ContainmentZone(SimulatedResponse):
 
     def is_contained(self, ip: str) -> bool:
         return ip in self.contained_ips
+
 
 class ResponseOrchestrator:
 
@@ -157,6 +163,7 @@ class ResponseOrchestrator:
 
         return actions
 
+
 def main():
     logger.info("=" * 60)
     logger.info("Disha Response Engine - Simulated Countermeasures")
@@ -197,6 +204,7 @@ def main():
             logger.info("  -> %s", json.dumps(action))
 
     logger.info("\nSimulation complete. All actions were virtual.")
+
 
 if __name__ == "__main__":
     main()

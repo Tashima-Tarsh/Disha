@@ -20,6 +20,7 @@ THREAT_FEEDS = [
 
 OUTPUT_DIR = os.environ.get("OUTPUT_DIR", "/logs")
 
+
 def fetch_blocklist() -> set:
     blocklist = set()
 
@@ -50,6 +51,7 @@ def fetch_blocklist() -> set:
 
     return blocklist
 
+
 def enrich_ip(ip: str) -> dict:
     try:
         resp = requests.get(
@@ -74,6 +76,7 @@ def enrich_ip(ip: str) -> dict:
 
     return {"ip": ip, "country": "Unknown", "enrichment_failed": True}
 
+
 def save_blocklist(blocklist: set) -> str:
     output_path = os.path.join(OUTPUT_DIR, "threat_blocklist.json")
     data = {
@@ -89,6 +92,7 @@ def save_blocklist(blocklist: set) -> str:
 
     logger.info("Blocklist saved: %s (%d IPs)", output_path, len(blocklist))
     return output_path
+
 
 def main():
     logger.info("=" * 60)
@@ -117,6 +121,7 @@ def main():
         logger.info("Enriched sample saved to %s", enriched_path)
 
     logger.info("\nThreat intelligence update complete.")
+
 
 if __name__ == "__main__":
     main()

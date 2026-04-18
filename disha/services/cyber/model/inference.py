@@ -12,6 +12,7 @@ from train import (
     HoneypotLogDataset,
 )
 
+
 def load_classifier(
     model_path: str, n_classes: int = 5
 ) -> AttackClassifier:
@@ -21,12 +22,14 @@ def load_classifier(
     model.eval()
     return model
 
+
 def load_anomaly_detector(model_path: str) -> AnomalyDetector:
     input_dim = HoneypotLogDataset.FEATURE_DIM
     model = AnomalyDetector(input_dim=input_dim)
     model.load_state_dict(torch.load(model_path, weights_only=True))
     model.eval()
     return model
+
 
 def classify(model: AttackClassifier, log_entry: dict) -> dict:
     dataset = HoneypotLogDataset.__new__(HoneypotLogDataset)
@@ -48,6 +51,7 @@ def classify(model: AttackClassifier, log_entry: dict) -> dict:
         },
     }
 
+
 def detect_anomaly(
     model: AnomalyDetector, log_entry: dict, threshold: float = 0.5
 ) -> dict:
@@ -63,6 +67,7 @@ def detect_anomaly(
         "reconstruction_error": round(error, 6),
         "threshold": threshold,
     }
+
 
 def analyze_log_entry(log_entry: dict, models: dict) -> dict:
     result = {"input": log_entry, "analysis": {}}
@@ -89,6 +94,7 @@ def analyze_log_entry(log_entry: dict, models: dict) -> dict:
 
     return result
 
+
 def _compute_threat_score(analysis: dict) -> int:
     score = 0.0
 
@@ -105,6 +111,7 @@ def _compute_threat_score(analysis: dict) -> int:
         score += 25
 
     return min(100, int(score))
+
 
 def main():
     model_dir = os.environ.get("MODEL_DIR", ".")
@@ -155,6 +162,7 @@ def main():
 
                 result = analyze_log_entry(entry, models)
                 print(f"    {json.dumps(result['analysis'], indent=2)}")
+
 
 if __name__ == "__main__":
     main()
