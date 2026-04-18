@@ -1,14 +1,3 @@
-"""RAG + FAISS pipeline for expandable knowledge retrieval.
-
-This module provides a unified Retrieval-Augmented Generation pipeline
-that converts incoming data to embeddings, stores them in a FAISS vector
-database, and makes them retrievable for downstream LLM augmentation.
-
-Dependencies (optional — graceful fallback when missing):
-    faiss-cpu >= 1.7
-    sentence-transformers >= 2.2
-    numpy >= 1.24
-"""
 
 from __future__ import annotations
 
@@ -22,42 +11,32 @@ from typing import Any, Dict, List, Optional
 
 logger = logging.getLogger(__name__)
 
-# ---------------------------------------------------------------------------
-# Optional dependency detection
-# ---------------------------------------------------------------------------
 try:
     import numpy as np
 
     _NP_AVAILABLE = True
-except ImportError:  # pragma: no cover
+except ImportError:
     _NP_AVAILABLE = False
 
 try:
-    import faiss  # type: ignore[import-untyped]
+    import faiss
 
     _FAISS_AVAILABLE = True
 except ImportError:
     _FAISS_AVAILABLE = False
 
 try:
-    from sentence_transformers import SentenceTransformer  # type: ignore[import-untyped]
+    from sentence_transformers import SentenceTransformer
 
     _ST_AVAILABLE = True
 except ImportError:
     _ST_AVAILABLE = False
 
-
 def dependencies_available() -> bool:
-    """Return True when FAISS + sentence-transformers + numpy are installed."""
     return _NP_AVAILABLE and _FAISS_AVAILABLE and _ST_AVAILABLE
 
-
-# ---------------------------------------------------------------------------
-# Data classes
-# ---------------------------------------------------------------------------
 @dataclass
 class Document:
-    """A single document with optional metadata."""
 
     text: str
     metadata: Dict[str, Any] = field(default_factory=dict)
@@ -67,22 +46,15 @@ class Document:
         if not self.doc_id:
             self.doc_id = hashlib.sha256(self.text.encode()).hexdigest()[:16]
 
-
 @dataclass
 class SearchResult:
-    """A single search result from the RAG pipeline."""
 
     text: str
     score: float
     metadata: Dict[str, Any] = field(default_factory=dict)
     doc_id: str = ""
 
-
-# ---------------------------------------------------------------------------
-# Lightweight fallback embedder (no external deps)
-# ---------------------------------------------------------------------------
 class _FallbackEmbedder:
-    """Simple hash-based embedder used when sentence-transformers is unavailable."""
 
     def __init__(self, dim: int = 64) -> None:
         self.dim = dim
@@ -96,20 +68,15 @@ class _FallbackEmbedder:
         vectors: List[List[float]] = []
         for text in texts:
             digest = hashlib.sha256(text.encode()).digest()
-            # Repeat digest bytes to fill `dim` floats
+
             raw = (digest * ((self.dim * 4 // len(digest)) + 1))[: self.dim * 4]
             floats = list(struct.unpack(f"{self.dim}f", raw))
-            # Normalise to unit vector
+
             norm = math.sqrt(sum(f * f for f in floats)) or 1.0
             vectors.append([f / norm for f in floats])
         return vectors
 
-
-# ---------------------------------------------------------------------------
-# In-memory fallback index (no FAISS)
-# ---------------------------------------------------------------------------
 class _FallbackIndex:
-    """Brute-force cosine-similarity index for environments without FAISS."""
 
     def __init__(self) -> None:
         self._vectors: List[List[float]] = []
@@ -135,7 +102,7 @@ class _FallbackIndex:
             norm_q = math.sqrt(sum(a * a for a in qvec)) or 1.0
             norm_v = math.sqrt(sum(b * b for b in vec)) or 1.0
             sim = dot / (norm_q * norm_v)
-            # Convert cosine similarity to L2-like distance (lower = better)
+
             dist = 1.0 - sim
             scores.append((dist, idx))
         scores.sort(key=lambda x: x[0])
@@ -144,22 +111,7 @@ class _FallbackIndex:
         indices = [[s[1] for s in top]]
         return distances, indices
 
-
-# ---------------------------------------------------------------------------
-# RAG Pipeline
-# ---------------------------------------------------------------------------
 class RAGPipeline:
-    """Retrieval-Augmented Generation pipeline backed by FAISS.
-
-    Parameters
-    ----------
-    model_name:
-        HuggingFace sentence-transformer model.
-    index_dir:
-        Directory for persisting FAISS indices and metadata.
-    embedding_dim:
-        Dimension override (auto-detected from model when possible).
-    """
 
     def __init__(
         self,
@@ -171,7 +123,6 @@ class RAGPipeline:
         self.index_dir = Path(index_dir)
         self.index_dir.mkdir(parents=True, exist_ok=True)
 
-        # Embedder
         if _ST_AVAILABLE:
             self._embedder = SentenceTransformer(model_name)
             embedding_dim = self._embedder.get_sentence_embedding_dimension() or embedding_dim
@@ -183,9 +134,8 @@ class RAGPipeline:
 
         self._embedding_dim = embedding_dim
 
-        # FAISS index
         if _FAISS_AVAILABLE and _NP_AVAILABLE:
-            self._index = faiss.IndexFlatIP(embedding_dim)  # Inner product (cosine after L2-norm)
+            self._index = faiss.IndexFlatIP(embedding_dim)
         else:
             logger.warning("FAISS not installed — using fallback brute-force index")
             self._index = _FallbackIndex()
@@ -193,14 +143,7 @@ class RAGPipeline:
         self._documents: List[Document] = []
         self._dedup_hashes: set = set()
 
-    # ------------------------------------------------------------------
-    # Ingestion
-    # ------------------------------------------------------------------
     def add_documents(self, documents: List[Document]) -> int:
-        """Add documents to the index, skipping duplicates.
-
-        Returns the number of newly added documents.
-        """
         new_docs: List[Document] = []
         new_texts: List[str] = []
 
@@ -219,12 +162,12 @@ class RAGPipeline:
 
         if _NP_AVAILABLE:
             embeddings = np.array(embeddings, dtype="float32")
-            # L2-normalise for cosine similarity via inner product
+
             norms = np.linalg.norm(embeddings, axis=1, keepdims=True)
             norms = np.where(norms == 0, 1.0, norms)
             embeddings = embeddings / norms
         else:
-            # Fallback: already normalised by _FallbackEmbedder
+
             pass
 
         self._index.add(embeddings)
@@ -236,18 +179,13 @@ class RAGPipeline:
     def add_texts(
         self, texts: List[str], metadatas: Optional[List[Dict[str, Any]]] = None
     ) -> int:
-        """Convenience wrapper: add raw text strings."""
         metadatas = metadatas or [{}] * len(texts)
         docs = [
             Document(text=t, metadata=m) for t, m in zip(texts, metadatas)
         ]
         return self.add_documents(docs)
 
-    # ------------------------------------------------------------------
-    # Retrieval
-    # ------------------------------------------------------------------
     def query(self, query_text: str, top_k: int = 5) -> List[SearchResult]:
-        """Retrieve the *top_k* most relevant documents for a query."""
         if self._index.ntotal == 0:
             return []
 
@@ -284,7 +222,6 @@ class RAGPipeline:
         return results
 
     def augmented_prompt(self, query: str, top_k: int = 5) -> str:
-        """Build a RAG-augmented prompt with retrieved context."""
         results = self.query(query, top_k=top_k)
         if not results:
             return query
@@ -301,18 +238,14 @@ class RAGPipeline:
             f"Answer:"
         )
 
-    # ------------------------------------------------------------------
-    # Persistence
-    # ------------------------------------------------------------------
     def save(self, name: str = "default") -> str:
-        """Persist the index and metadata to disk."""
         index_path = self.index_dir / f"{name}.index"
         meta_path = self.index_dir / f"{name}_meta.json"
 
         if _FAISS_AVAILABLE and hasattr(self._index, "ntotal"):
             faiss.write_index(self._index, str(index_path))
         else:
-            # Fallback: save vectors as JSON
+
             vectors = getattr(self._index, "_vectors", [])
             with open(str(index_path), "w", encoding="utf-8") as fh:
                 json.dump(vectors, fh)
@@ -334,7 +267,6 @@ class RAGPipeline:
         return str(index_path)
 
     def load(self, name: str = "default") -> bool:
-        """Load a previously saved index from disk."""
         index_path = self.index_dir / f"{name}.index"
         meta_path = self.index_dir / f"{name}_meta.json"
 
@@ -362,9 +294,6 @@ class RAGPipeline:
         logger.info("index_loaded", name=name, docs=len(self._documents))
         return True
 
-    # ------------------------------------------------------------------
-    # Stats
-    # ------------------------------------------------------------------
     @property
     def document_count(self) -> int:
         return len(self._documents)

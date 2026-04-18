@@ -1,9 +1,3 @@
-"""
-PPO Policy Network for RL-based investigation optimization.
-
-Implements Proximal Policy Optimization with a simple MLP policy
-that learns to select investigation actions based on current state.
-"""
 import numpy as np
 from typing import Optional
 import structlog
@@ -19,13 +13,7 @@ try:
 except ImportError:
     TORCH_AVAILABLE = False
 
-
 class PolicyNetwork:
-    """
-    PPO-based policy network for investigation action selection.
-
-    Falls back to heuristic policy if PyTorch is unavailable.
-    """
 
     def __init__(
         self,
@@ -70,7 +58,6 @@ class PolicyNetwork:
             self.optimizer = None
             logger.info("policy_network_initialized", backend="heuristic_fallback")
 
-        # Experience buffer for PPO updates
         self.states = []
         self.actions = []
         self.rewards = []
@@ -83,11 +70,6 @@ class PolicyNetwork:
         state: np.ndarray,
         valid_actions: Optional[list] = None,
     ) -> tuple:
-        """
-        Select action using current policy.
-
-        Returns: (action_index, log_probability)
-        """
         if not TORCH_AVAILABLE or self.actor is None:
             return self._heuristic_action(state, valid_actions)
 
@@ -96,7 +78,6 @@ class PolicyNetwork:
         with torch.no_grad():
             probs = self.actor(state_tensor).squeeze()
 
-        # Mask invalid actions
         if valid_actions is not None:
             mask = torch.zeros(self.action_dim)
             for a in valid_actions:
@@ -119,19 +100,16 @@ class PolicyNetwork:
         state: np.ndarray,
         valid_actions: Optional[list] = None,
     ) -> tuple:
-        """Fallback heuristic policy when PyTorch is unavailable."""
         agents_used = state[5:10] if len(state) >= 12 else [0] * 5
         _ = int(state[10] * 20) if len(state) >= 12 else 0
 
-        # Simple strategy: run each agent in order, then stop
         for i in range(5):
             if agents_used[i] < 0.5:
                 action = i
                 if valid_actions is None or action in valid_actions:
                     return action, 0.0
 
-        # All agents used, stop investigation
-        action = 7  # STOP_INVESTIGATION
+        action = 7
         if valid_actions and action not in valid_actions:
             action = valid_actions[0] if valid_actions else 0
 
@@ -146,7 +124,6 @@ class PolicyNetwork:
         value: float,
         done: bool,
     ):
-        """Store a transition for batch PPO update."""
         self.states.append(state)
         self.actions.append(action)
         self.rewards.append(reward)
@@ -155,16 +132,10 @@ class PolicyNetwork:
         self.dones.append(done)
 
     def update(self, epochs: int = 4) -> dict:
-        """
-        Run PPO update on collected experience.
-
-        Returns dict with training metrics.
-        """
         if not TORCH_AVAILABLE or len(self.states) == 0:
             self._clear_buffer()
             return {"status": "skipped", "reason": "no_torch_or_empty_buffer"}
 
-        # Compute discounted returns
         returns = []
         R = 0.0
         for reward, done in zip(reversed(self.rewards), reversed(self.dones)):
@@ -178,7 +149,6 @@ class PolicyNetwork:
         old_log_probs = torch.FloatTensor(self.log_probs)
         returns_t = torch.FloatTensor(returns)
 
-        # Normalize returns
         if len(returns_t) > 1:
             returns_t = (returns_t - returns_t.mean()) / (returns_t.std() + 1e-8)
 
@@ -193,7 +163,6 @@ class PolicyNetwork:
             values = self.critic(states).squeeze()
             advantages = returns_t - values.detach()
 
-            # PPO clipped objective
             ratio = torch.exp(new_log_probs - old_log_probs)
             surr1 = ratio * advantages
             surr2 = torch.clamp(ratio, 1 - self.clip_epsilon, 1 + self.clip_epsilon) * advantages
@@ -225,7 +194,6 @@ class PolicyNetwork:
         return metrics
 
     def _clear_buffer(self):
-        """Clear experience buffer."""
         self.states.clear()
         self.actions.clear()
         self.rewards.clear()
@@ -234,7 +202,6 @@ class PolicyNetwork:
         self.dones.clear()
 
     def get_value(self, state: np.ndarray) -> float:
-        """Get state value estimate from critic."""
         if not TORCH_AVAILABLE or self.critic is None:
             return 0.0
         with torch.no_grad():

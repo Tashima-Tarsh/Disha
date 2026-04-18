@@ -1,8 +1,3 @@
-"""Security / military strategy engine with optional OSINT integration.
-
-Produces a structured threat model with fields for threat actor, attack
-vector, impact, likelihood, and mitigations.
-"""
 
 from __future__ import annotations
 
@@ -11,18 +6,7 @@ from typing import Any, Dict, List, Optional
 from utils.llm_wrapper import get_llm
 from utils.osint import OSINTClient
 
-
 class SecurityAgent:
-    """Agent that analyses national-security and military-strategy scenarios.
-
-    Parameters
-    ----------
-    osint_client:
-        An optional ``OSINTClient`` instance.  When provided, its findings
-        are included in the analysis ``sources``.
-    llm:
-        LLM instance for generation.
-    """
 
     def __init__(
         self,
@@ -32,14 +16,12 @@ class SecurityAgent:
         self.llm = llm or get_llm()
         self.osint_client = osint_client
 
-    # ------------------------------------------------------------------
     def analyze(self, scenario: str) -> Dict[str, Any]:
-        """Return a structured threat-model analysis."""
         osint_findings: List[Dict[str, Any]] = []
         if self.osint_client is not None:
             try:
                 osint_findings = self.osint_client.fetch_all()
-            except Exception:  # noqa: BLE001
+            except Exception:
                 osint_findings = [{"source": "osint", "error": "fetch failed"}]
 
         osint_summary = ""

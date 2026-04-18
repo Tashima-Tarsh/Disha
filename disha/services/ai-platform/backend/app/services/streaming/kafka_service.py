@@ -1,4 +1,3 @@
-"""Kafka streaming service for event processing."""
 
 import json
 from typing import Any, Callable
@@ -9,16 +8,13 @@ from app.core.config import get_settings
 
 logger = structlog.get_logger(__name__)
 
-
 class KafkaProducer:
-    """Kafka event producer for publishing intelligence events."""
 
     def __init__(self):
         self.settings = get_settings()
         self._producer = None
 
     def _get_producer(self):
-        """Get or create Kafka producer."""
         if self._producer is None:
             from kafka import KafkaProducer as KP
             self._producer = KP(
@@ -29,7 +25,6 @@ class KafkaProducer:
         return self._producer
 
     async def publish_event(self, topic: str, event: dict[str, Any], key: str | None = None) -> bool:
-        """Publish an event to a Kafka topic."""
         try:
             producer = self._get_producer()
             producer.send(topic, value=event, key=key)
@@ -41,7 +36,6 @@ class KafkaProducer:
             return False
 
     async def publish_investigation_event(self, investigation_id: str, data: dict[str, Any]) -> bool:
-        """Publish an investigation event."""
         event = {
             "type": "investigation_result",
             "investigation_id": investigation_id,
@@ -54,7 +48,6 @@ class KafkaProducer:
         )
 
     async def publish_alert(self, alert: dict[str, Any]) -> bool:
-        """Publish an alert event."""
         return await self.publish_event(
             self.settings.KAFKA_TOPIC_ALERTS,
             alert,
@@ -62,14 +55,11 @@ class KafkaProducer:
         )
 
     def close(self):
-        """Close the producer."""
         if self._producer:
             self._producer.close()
             self._producer = None
 
-
 class KafkaConsumer:
-    """Kafka event consumer for processing intelligence events."""
 
     def __init__(self, topic: str, group_id: str = "intelligence-group"):
         self.settings = get_settings()
@@ -78,7 +68,6 @@ class KafkaConsumer:
         self._consumer = None
 
     def _get_consumer(self):
-        """Get or create Kafka consumer."""
         if self._consumer is None:
             from kafka import KafkaConsumer as KC
             self._consumer = KC(
@@ -92,7 +81,6 @@ class KafkaConsumer:
         return self._consumer
 
     async def consume(self, handler: Callable[[dict[str, Any]], Any], max_messages: int | None = None) -> None:
-        """Consume messages and process with handler."""
         try:
             consumer = self._get_consumer()
             count = 0
@@ -105,7 +93,6 @@ class KafkaConsumer:
             logger.error("consume_failed", topic=self.topic, error=str(e))
 
     def close(self):
-        """Close the consumer."""
         if self._consumer:
             self._consumer.close()
             self._consumer = None

@@ -1,22 +1,3 @@
-"""
-Self-Healing Monitor  auto-detects system issues and maintains health.
-
-Performs continuous health checks across all Disha subsystems:
-  - Python import validation (catches broken imports before runtime)
-  - Configuration consistency checks
-  - Dependency freshness auditing
-  - Checkpoint integrity verification
-  - Training pipeline health monitoring
-  - Docker service availability
-
-Automatically attempts recovery when safe to do so.
-
-Usage::
-
-    python scripts/self_heal/monitor.py              # one-shot health check
-    python scripts/self_heal/monitor.py --fix        # auto-repair what's fixable
-    python scripts/self_heal/monitor.py --json       # JSON output
-"""
 
 from __future__ import annotations
 
@@ -35,17 +16,14 @@ logger = structlog.get_logger("self_heal")
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 
-
 class HealthStatus(str, Enum):
     HEALTHY = "healthy"
     DEGRADED = "degraded"
     FAILING = "failing"
     UNKNOWN = "unknown"
 
-
 @dataclass
 class HealthCheck:
-    """Result of a single health check."""
     name: str
     status: HealthStatus
     message: str = ""
@@ -53,10 +31,8 @@ class HealthCheck:
     fixable: bool = False
     fixed: bool = False
 
-
 @dataclass
 class SystemHealth:
-    """Overall system health report."""
     timestamp: float = field(default_factory=time.time)
     checks: list[HealthCheck] = field(default_factory=list)
 
@@ -97,13 +73,7 @@ class SystemHealth:
             ],
         }
 
-
-#
-# Individual health checkers
-#
-
 class PythonImportChecker:
-    """Validates that all Python files parse without syntax errors."""
 
     def check(self, root: Path) -> HealthCheck:
         errors = []
@@ -132,9 +102,7 @@ class PythonImportChecker:
             details={"total_files": total},
         )
 
-
 class CheckpointIntegrityChecker:
-    """Verifies that training checkpoints are valid."""
 
     def check(self, root: Path) -> HealthCheck:
         checkpoint_dirs = [
@@ -151,7 +119,7 @@ class CheckpointIntegrityChecker:
             if not files:
                 results[dir_name] = "empty"
                 continue
-            # Check for valid JSON metrics
+
             metrics_ok = 0
             for f in ckpt_dir.glob("*.json"):
                 try:
@@ -169,14 +137,11 @@ class CheckpointIntegrityChecker:
             details=results,
         )
 
-
 class ConfigConsistencyChecker:
-    """Ensures configuration files are consistent across subsystems."""
 
     def check(self, root: Path) -> HealthCheck:
         issues = []
 
-        # Check that .gitignore has essential entries
         gitignore = root / ".gitignore"
         if gitignore.exists():
             content = gitignore.read_text()
@@ -184,7 +149,6 @@ class ConfigConsistencyChecker:
                 if entry not in content:
                     issues.append(f".gitignore missing: {entry}")
 
-        # Check server.json is valid JSON
         server_json = root / "server.json"
         if server_json.exists():
             try:
@@ -194,7 +158,6 @@ class ConfigConsistencyChecker:
             except json.JSONDecodeError:
                 issues.append("server.json is invalid JSON")
 
-        # Check all package.json files are valid
         for pkg in root.rglob("package.json"):
             if "node_modules" in str(pkg):
                 continue
@@ -203,7 +166,6 @@ class ConfigConsistencyChecker:
             except json.JSONDecodeError:
                 issues.append(f"Invalid package.json: {pkg.relative_to(root)}")
 
-        # Check all requirements.txt files exist where expected
         expected_req = [
             "disha/ai/core/requirements.txt",
             "disha/ai/core/decision-engine/requirements.txt",
@@ -227,9 +189,7 @@ class ConfigConsistencyChecker:
             message="All configurations consistent",
         )
 
-
 class WorkflowChecker:
-    """Validates GitHub Actions workflow files."""
 
     def check(self, root: Path) -> HealthCheck:
         workflows_dir = root / ".github" / "workflows"
@@ -246,7 +206,7 @@ class WorkflowChecker:
             total += 1
             try:
                 content = wf.read_text()
-                # Basic YAML validation (check for required keys)
+
                 if "on:" not in content and "on :" not in content:
                     issues.append(f"{wf.name}: missing 'on' trigger")
                 if "jobs:" not in content:
@@ -268,9 +228,7 @@ class WorkflowChecker:
             details={"total": total},
         )
 
-
 class KnowledgeBaseChecker:
-    """Validates knowledge base JSON files."""
 
     def check(self, root: Path) -> HealthCheck:
         kb_dir = root / "disha" / "ai" / "rag"
@@ -309,9 +267,7 @@ class KnowledgeBaseChecker:
             details={"total_files": total, "total_items": total_items},
         )
 
-
 class TrainingPipelineChecker:
-    """Validates the continuous training pipeline can be imported."""
 
     def check(self, root: Path) -> HealthCheck:
         scripts = [
@@ -328,7 +284,6 @@ class TrainingPipelineChecker:
                 details={"missing": missing},
             )
 
-        # Try to parse each script
         errors = []
         for script in scripts:
             try:
@@ -350,14 +305,12 @@ class TrainingPipelineChecker:
             message="All training scripts valid",
         )
 
-
 class SubsystemChecker:
-    """Verifies all major subsystems have expected structure."""
 
     _EXPECTED = {
         "disha/ai/core": ["cognitive_loop.py", "requirements.txt"],
         "disha/ai/core/decision-engine": ["checkpoints", "requirements.txt"],
-        "disha/services/autonomous": ["main.py", "monitor.py"],
+        "disha/services/autonomous": ["main.py"],
         "disha/apps/web": ["package.json", "app"],
     }
 
@@ -385,13 +338,7 @@ class SubsystemChecker:
             message="All subsystems structurally complete",
         )
 
-
-#
-# Self-Healing Monitor (orchestrator)
-#
-
 class SelfHealingMonitor:
-    """Orchestrates all health checkers, reports status, and auto-heals."""
 
     def __init__(self, root: Path | None = None):
         self.root = root or REPO_ROOT
@@ -406,7 +353,6 @@ class SelfHealingMonitor:
         ]
 
     def check_all(self) -> SystemHealth:
-        """Run all health checks."""
         health = SystemHealth()
         for checker in self.checkers:
             logger.info("health_check", checker=checker.__class__.__name__)
@@ -425,7 +371,6 @@ class SelfHealingMonitor:
         return health
 
     def heal(self, health: SystemHealth) -> int:
-        """Attempt to auto-fix fixable issues. Returns count of fixes."""
         fixed = 0
         for check in health.checks:
             if check.fixable and check.status != HealthStatus.HEALTHY:
@@ -438,15 +383,13 @@ class SelfHealingMonitor:
         return fixed
 
     def _attempt_fix(self, check: HealthCheck) -> bool:
-        """Attempt to fix a specific health check issue."""
         if check.name == "config_consistency":
             return self._fix_config_issues(check)
         return False
 
     def _fix_config_issues(self, check: HealthCheck) -> bool:
-        """Fix configuration consistency issues."""
         issues = check.details.get("issues", [])
-        # Entries that are directories (get trailing slash) vs files
+
         _DIR_ENTRIES = {"node_modules", "__pycache__", "dist", ".next", "venv", ".venv", "build"}
         fixed_any = False
         for issue in issues:
@@ -461,11 +404,6 @@ class SelfHealingMonitor:
                             f.write(f"\n{entry}{suffix}\n")
                         fixed_any = True
         return fixed_any
-
-
-#
-# CLI
-#
 
 def main() -> None:
     import argparse
@@ -487,18 +425,15 @@ def main() -> None:
     else:
         _print_health(health)
 
-    # Save report
     report_path = REPO_ROOT / "health_report.json"
     with open(report_path, "w") as f:
         json.dump(health.to_dict(), f, indent=2)
 
-    # Exit code
     if health.overall_status == HealthStatus.FAILING:
         sys.exit(2)
     elif health.overall_status == HealthStatus.DEGRADED:
         sys.exit(1)
     sys.exit(0)
-
 
 def _print_health(health: SystemHealth) -> None:
     status_emoji = {
@@ -520,7 +455,6 @@ def _print_health(health: SystemHealth) -> None:
         print(f"  {e} {check.name}: {check.message}{fixed_tag}")
 
     print(f"\n{'' * 60}\n")
-
 
 if __name__ == "__main__":
     main()

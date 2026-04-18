@@ -5,9 +5,7 @@ import os
 import sys
 from typing import Dict, Optional, Type
 
-
 class BaseLLMProvider(abc.ABC):
-    """Abstract base class for all LLM providers."""
 
     @abc.abstractmethod
     def __init__(self, **kwargs):
@@ -17,9 +15,7 @@ class BaseLLMProvider(abc.ABC):
     def generate(self, prompt: str, max_tokens: int = 256) -> str:
         pass
 
-
 class MockProvider(BaseLLMProvider):
-    """Deterministic mock provider for testing and CI."""
 
     def __init__(self, seed: int = 42, **kwargs):
         self.seed = seed
@@ -32,9 +28,7 @@ class MockProvider(BaseLLMProvider):
             "Cognitive defense status: Optimal."
         )
 
-
 class LlamaCppProvider(BaseLLMProvider):
-    """Local provider via llama-cpp-python."""
 
     def __init__(self, model_path: Optional[str] = None, seed: int = 42, **kwargs):
         try:
@@ -59,9 +53,7 @@ class LlamaCppProvider(BaseLLMProvider):
         )
         return output["choices"][0]["text"].strip()
 
-
 class AnthropicProvider(BaseLLMProvider):
-    """Cloud provider via Anthropic SDK."""
 
     def __init__(self, api_key: Optional[str] = None, model: str = "claude-3-5-sonnet-20241022", **kwargs):
         try:
@@ -86,9 +78,7 @@ class AnthropicProvider(BaseLLMProvider):
         )
         return "".join([b.text for b in message.content if hasattr(b, 'text')])
 
-
 class ModelRegistry:
-    """Central registry for LLM providers."""
 
     _providers: Dict[str, Type[BaseLLMProvider]] = {}
 
@@ -114,8 +104,6 @@ class ModelRegistry:
         provider_name = name.lower()
         return cls._providers.get(provider_name, cls._providers["mock"])
 
-
-# Register built-in providers
 ModelRegistry.register("mock", MockProvider)
 ModelRegistry.register("llama_cpp", LlamaCppProvider)
 ModelRegistry.register("llama-cpp", LlamaCppProvider)

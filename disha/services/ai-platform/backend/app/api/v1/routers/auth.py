@@ -4,14 +4,10 @@ from app.models.schemas import AuthRequest, AuthResponse
 
 router = APIRouter()
 
-
-# Simple in-memory user store for demo (replace with database in production)
 _demo_users: dict[str, dict[str, str]] = {}
-
 
 @router.post("/auth/register", response_model=AuthResponse)
 async def register(request: AuthRequest):
-    """Register a new user."""
     if request.email in _demo_users:
         raise HTTPException(status_code=400, detail="User already exists")
 
@@ -25,10 +21,8 @@ async def register(request: AuthRequest):
     token = create_access_token({"sub": user_id, "email": request.email})
     return AuthResponse(access_token=token, user_id=user_id)
 
-
 @router.post("/auth/login", response_model=AuthResponse)
 async def login(request: AuthRequest):
-    """Authenticate and get access token."""
     user = _demo_users.get(request.email)
     if not user or not verify_password(request.password, user["password_hash"]):
         raise HTTPException(

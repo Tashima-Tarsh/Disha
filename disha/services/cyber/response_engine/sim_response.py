@@ -1,11 +1,3 @@
-"""
-Disha Response Engine - Simulated Countermeasures
-
-Provides virtual-only defensive responses to detected attacks.
-All actions are simulated within containers — NO real-world impact.
-
-DEFENSIVE SIMULATION ONLY - No offensive actions.
-"""
 
 import json
 import logging
@@ -18,9 +10,7 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-
 class SimulatedResponse:
-    """Base class for simulated defensive responses."""
 
     def __init__(self):
         self.log_entries = []
@@ -36,9 +26,7 @@ class SimulatedResponse:
         logger.info("Action: %s | Details: %s", action, json.dumps(details))
         return entry
 
-
 class TarpitResponse(SimulatedResponse):
-    """Simulates a tarpit that slows down attacker interactions."""
 
     def engage(self, attacker_ip: str, delay_seconds: float = 0.0) -> dict:
         if delay_seconds <= 0:
@@ -46,16 +34,13 @@ class TarpitResponse(SimulatedResponse):
         logger.info(
             "Tarpit engaged for %s: delaying %.1fs", attacker_ip, delay_seconds
         )
-        # In production, this would add artificial delay to responses
-        # Here we just log the simulated delay
+
         return self._log_action(
             "tarpit",
             {"attacker_ip": attacker_ip, "delay_seconds": round(delay_seconds, 1)},
         )
 
-
 class FakeShellResponse(SimulatedResponse):
-    """Simulates a fake shell environment for attacker interaction logging."""
 
     FAKE_RESPONSES = {
         "ls": "Desktop  Documents  Downloads  .ssh  .bash_history",
@@ -80,9 +65,7 @@ class FakeShellResponse(SimulatedResponse):
             },
         )
 
-
 class DecoyFilesystem(SimulatedResponse):
-    """Simulates a decoy filesystem with fake sensitive files."""
 
     DECOY_FILES = {
         "/root/.ssh/id_rsa": "-----BEGIN FAKE RSA PRIVATE KEY-----\nNOT_A_REAL_KEY\n-----END FAKE RSA PRIVATE KEY-----",
@@ -102,13 +85,7 @@ class DecoyFilesystem(SimulatedResponse):
             },
         )
 
-
 class ContainmentZone(SimulatedResponse):
-    """Simulates a virtual containment zone for attackers.
-
-    In a real deployment, this would redirect attacker traffic
-    to an isolated sandbox. Here it logs the containment action.
-    """
 
     def __init__(self):
         super().__init__()
@@ -132,9 +109,7 @@ class ContainmentZone(SimulatedResponse):
     def is_contained(self, ip: str) -> bool:
         return ip in self.contained_ips
 
-
 class ResponseOrchestrator:
-    """Orchestrates simulated responses based on threat analysis."""
 
     def __init__(self):
         self.tarpit = TarpitResponse()
@@ -143,24 +118,20 @@ class ResponseOrchestrator:
         self.containment = ContainmentZone()
 
     def respond(self, analysis: dict) -> list[dict]:
-        """Determine and execute appropriate responses based on analysis."""
         actions = []
         threat_score = analysis.get("threat_score", 0)
         attacker_ip = analysis.get("input", {}).get("ip", "unknown")
         classification = analysis.get("analysis", {}).get("classification", {})
         attack_label = classification.get("label", "benign")
 
-        # Low threat: just log
         if threat_score < 20:
             logger.info("Low threat from %s (score: %d). Monitoring.", attacker_ip, threat_score)
             return actions
 
-        # Medium threat: engage tarpit
         if threat_score < 50:
             actions.append(self.tarpit.engage(attacker_ip))
             return actions
 
-        # High threat: full response
         if threat_score >= 50:
             actions.append(self.tarpit.engage(attacker_ip, delay_seconds=15.0))
 
@@ -176,7 +147,6 @@ class ResponseOrchestrator:
                     self.decoy_fs.serve_file(attacker_ip, "/root/.ssh/id_rsa")
                 )
 
-        # Critical threat: immediate containment
         if threat_score >= 80:
             if not self.containment.is_contained(attacker_ip):
                 actions.append(
@@ -187,9 +157,7 @@ class ResponseOrchestrator:
 
         return actions
 
-
 def main():
-    """Demo: Run simulated responses."""
     logger.info("=" * 60)
     logger.info("Disha Response Engine - Simulated Countermeasures")
     logger.info("SIMULATION ONLY - No real systems are affected")
@@ -197,7 +165,6 @@ def main():
 
     orchestrator = ResponseOrchestrator()
 
-    # Simulate responses for different threat levels
     test_analyses = [
         {
             "input": {"ip": "10.0.0.1"},
@@ -230,7 +197,6 @@ def main():
             logger.info("  -> %s", json.dumps(action))
 
     logger.info("\nSimulation complete. All actions were virtual.")
-
 
 if __name__ == "__main__":
     main()

@@ -1,4 +1,3 @@
-"""ChromaDB vector store for semantic memory and context retrieval."""
 
 import asyncio
 from typing import Any
@@ -9,9 +8,7 @@ from app.core.config import get_settings
 
 logger = structlog.get_logger(__name__)
 
-
 class VectorStore:
-    """ChromaDB-based vector store for embedding storage and retrieval."""
 
     def __init__(self, collection_name: str = "intelligence"):
         self.settings = get_settings()
@@ -20,7 +17,6 @@ class VectorStore:
         self._collection = None
 
     def _get_collection(self):
-        """Get or create the ChromaDB collection."""
         if self._collection is None:
             import chromadb
             self._client = chromadb.HttpClient(
@@ -39,11 +35,6 @@ class VectorStore:
         metadatas: list[dict[str, Any]] | None = None,
         ids: list[str] | None = None,
     ) -> bool:
-        """Store documents with embeddings in the vector store.
-
-        ChromaDB's HTTP client is synchronous; we offload to a thread pool
-        so the async event loop is never blocked.
-        """
         try:
             collection = self._get_collection()
             if ids is None:
@@ -69,11 +60,6 @@ class VectorStore:
         n_results: int = 5,
         where: dict[str, Any] | None = None,
     ) -> list[dict[str, Any]]:
-        """Query the vector store for similar documents.
-
-        Offloaded to a thread pool — ChromaDB's sync HTTP client must not
-        run on the event loop thread.
-        """
         try:
             collection = self._get_collection()
             params: dict[str, Any] = {
@@ -101,7 +87,6 @@ class VectorStore:
             return []
 
     async def store_investigation(self, investigation_id: str, summary: str, metadata: dict[str, Any]) -> bool:
-        """Store an investigation result for future context retrieval."""
         return await self.store(
             documents=[summary],
             metadatas=[{**metadata, "investigation_id": investigation_id}],
@@ -109,6 +94,5 @@ class VectorStore:
         )
 
     async def get_context(self, query: str, user_id: str | None = None, limit: int = 3) -> list[dict[str, Any]]:
-        """Retrieve relevant context for LLM reasoning."""
         where = {"user_id": user_id} if user_id else None
         return await self.query(query, n_results=limit, where=where)

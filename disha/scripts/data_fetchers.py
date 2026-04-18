@@ -1,12 +1,3 @@
-"""
-Open-source data fetchers for continuous training.
-
-Fetches real-world threat intelligence, cyber indicators, and
-knowledge data from public open-source feeds to use as training
-data for RL, GNN, and Decision Engine models.
-
-All sources are publicly available and require no API keys.
-"""
 
 from __future__ import annotations
 
@@ -23,13 +14,10 @@ import structlog
 
 logger = structlog.get_logger(__name__)
 
-#  Timeout and user-agent for all requests
 _TIMEOUT = 15
 _UA = "Disha-ContinuousTraining/1.0"
 
-
 def _fetch_url(url: str, timeout: int = _TIMEOUT) -> str:
-    """Fetch URL content as text. Returns empty string on failure."""
     try:
         req = urllib.request.Request(url, headers={"User-Agent": _UA})
         with urllib.request.urlopen(req, timeout=timeout) as resp:
@@ -38,24 +26,16 @@ def _fetch_url(url: str, timeout: int = _TIMEOUT) -> str:
         logger.warning("fetch_failed", url=url, error=str(exc))
         return ""
 
-
-#
-# 1. RL Environment Data  Threat intelligence for investigation sims
-#
-
 @dataclass
 class ThreatScenario:
-    """A threat scenario for RL environment episodes."""
     source: str
-    indicator_type: str  # ip, domain, hash, url
+    indicator_type: str
     indicators: list[str] = field(default_factory=list)
     risk_score: float = 0.5
     category: str = "unknown"
     timestamp: float = field(default_factory=time.time)
 
-
 def fetch_abuse_ch_feodo() -> list[ThreatScenario]:
-    """Fetch Feodo Tracker botnet C2 IP blocklist (abuse.ch)."""
     url = "https://feodotracker.abuse.ch/downloads/ipblocklist_recommended.txt"
     raw = _fetch_url(url)
     if not raw:
@@ -71,7 +51,6 @@ def fetch_abuse_ch_feodo() -> list[ThreatScenario]:
     if not ips:
         return []
 
-    # Group into scenarios of ~10 IPs each
     scenarios = []
     for i in range(0, len(ips), 10):
         batch = ips[i: i + 10]
@@ -86,9 +65,7 @@ def fetch_abuse_ch_feodo() -> list[ThreatScenario]:
     logger.info("fetched_feodo", indicators=len(ips), scenarios=len(scenarios))
     return scenarios
 
-
 def fetch_urlhaus_recent() -> list[ThreatScenario]:
-    """Fetch URLhaus recent malware URLs (abuse.ch)."""
     url = "https://urlhaus.abuse.ch/downloads/text_recent/"
     raw = _fetch_url(url)
     if not raw:
@@ -114,9 +91,7 @@ def fetch_urlhaus_recent() -> list[ThreatScenario]:
     logger.info("fetched_urlhaus", indicators=len(urls), scenarios=len(scenarios))
     return scenarios
 
-
 def fetch_threatfox_iocs() -> list[ThreatScenario]:
-    """Fetch ThreatFox recent IOCs (abuse.ch)."""
     url = "https://threatfox.abuse.ch/export/csv/recent/"
     raw = _fetch_url(url)
     if not raw:
@@ -133,7 +108,7 @@ def fetch_threatfox_iocs() -> list[ThreatScenario]:
                 indicators.append({"value": ioc_value, "type": ioc_type})
 
     scenarios = []
-    # Group by type
+
     by_type: dict[str, list[str]] = {}
     for ind in indicators:
         t = ind["type"]
@@ -153,9 +128,7 @@ def fetch_threatfox_iocs() -> list[ThreatScenario]:
     logger.info("fetched_threatfox", indicators=len(indicators), scenarios=len(scenarios))
     return scenarios
 
-
 def fetch_all_rl_data() -> list[ThreatScenario]:
-    """Fetch all open-source data for RL training."""
     all_scenarios: list[ThreatScenario] = []
     all_scenarios.extend(fetch_abuse_ch_feodo())
     all_scenarios.extend(fetch_urlhaus_recent())
@@ -163,38 +136,23 @@ def fetch_all_rl_data() -> list[ThreatScenario]:
     logger.info("rl_data_total", scenarios=len(all_scenarios))
     return all_scenarios
 
-
-#
-# 2. GNN Data  Entity relationship graphs from public sources
-#
-
 @dataclass
 class GraphDataset:
-    """A graph dataset for GNN training."""
-    node_features: np.ndarray  # (N, F)
-    edge_index: np.ndarray     # (2, E)
-    node_labels: np.ndarray    # (N,)
-    node_types: np.ndarray     # (N,)
+    node_features: np.ndarray
+    edge_index: np.ndarray
+    node_labels: np.ndarray
+    node_types: np.ndarray
     metadata: dict = field(default_factory=dict)
 
-
 def _hash_to_features(text: str, dim: int = 16) -> np.ndarray:
-    """Convert text to a deterministic feature vector via hashing."""
     h = hashlib.sha256(text.encode()).digest()
-    # Use bytes as pseudo-random features
+
     features = np.zeros(dim, dtype=np.float32)
     for i in range(min(dim, len(h))):
         features[i] = (h[i] / 255.0) - 0.5
     return features
 
-
 def build_graph_from_threats(scenarios: list[ThreatScenario], feature_dim: int = 16) -> GraphDataset:
-    """Build a graph from threat scenarios for GNN training.
-
-    Nodes = indicators + scenario sources.
-    Edges = indicator-belongs-to-scenario, co-occurrence.
-    Labels = risk category (4 classes).
-    """
     nodes: list[dict] = []
     node_map: dict[str, int] = {}
     edges_src: list[int] = []
@@ -203,7 +161,7 @@ def build_graph_from_threats(scenarios: list[ThreatScenario], feature_dim: int =
     category_to_label = {"botnet_c2": 0, "malware_distribution": 1, "ioc_feed": 2, "unknown": 3}
 
     for sc in scenarios:
-        # Source node
+
         src_key = f"source:{sc.source}:{sc.category}"
         if src_key not in node_map:
             idx = len(nodes)
@@ -232,14 +190,12 @@ def build_graph_from_threats(scenarios: list[ThreatScenario], feature_dim: int =
 
             ind_idx = node_map[ind_key]
 
-            # Edge: source -> indicator
             edges_src.append(src_idx)
             edges_dst.append(ind_idx)
-            # Reverse edge for undirected
+
             edges_src.append(ind_idx)
             edges_dst.append(src_idx)
 
-            # Co-occurrence edge to previous indicator in same scenario
             if prev_indicator_idx is not None:
                 edges_src.append(prev_indicator_idx)
                 edges_dst.append(ind_idx)
@@ -256,7 +212,6 @@ def build_graph_from_threats(scenarios: list[ThreatScenario], feature_dim: int =
             node_types=np.zeros(1, dtype=np.int64),
         )
 
-    # Build feature matrix
     type_map = {"source": 0, "ip": 1, "domain": 2, "url": 3, "hash": 4}
     node_features = np.zeros((len(nodes), feature_dim), dtype=np.float32)
     node_labels = np.zeros(len(nodes), dtype=np.int64)
@@ -267,7 +222,7 @@ def build_graph_from_threats(scenarios: list[ThreatScenario], feature_dim: int =
         if type_idx < feature_dim:
             node_features[i, type_idx] = 1.0
         node_features[i, 6] = node["risk"]
-        # Hash-based features
+
         hf = _hash_to_features(node["key"], dim=feature_dim - 7)
         node_features[i, 7:] = hf[: feature_dim - 7]
         node_labels[i] = node["label"]
@@ -288,15 +243,6 @@ def build_graph_from_threats(scenarios: list[ThreatScenario], feature_dim: int =
             "sources": list(set(sc.source for sc in scenarios)),
         },
     )
-
-
-#
-# 3. Decision Engine Data  Policy/legal/security scenarios
-#
-
-# Public scenario datasets built from templates combining real-world
-# topics.  Future iterations can pull from open datasets (e.g. GDELT,
-# ACLED, public legislative corpora).
 
 _ADVANCED_TEMPLATES = [
     "Evaluate the cybersecurity posture of {sector} after a {attack_type} targeting {target}.",
@@ -364,16 +310,10 @@ _ADVANCED_FILLS: dict[str, list[str]] = {
                 "crime prevention", "military intelligence", "disaster response"],
 }
 
-
 def generate_advanced_scenarios(
     n: int = 500,
     seed: int | None = None,
 ) -> list[dict]:
-    """Generate diverse training scenarios for the decision engine.
-
-    Each scenario has a ground-truth quality score based on complexity
-    indicators (number of placeholders filled, topic sensitivity).
-    """
     rng = np.random.RandomState(seed)
     scenarios = []
 
@@ -388,7 +328,6 @@ def generate_advanced_scenarios(
                 filled = filled.replace(placeholder, rng.choice(values), 1)
                 complexity += 1
 
-        # Ground-truth quality: higher complexity = higher quality potential
         base_quality = rng.beta(4 + complexity * 0.5, 3)
         gt_quality = float(np.clip(base_quality, 0.1, 0.95))
 
@@ -402,13 +341,7 @@ def generate_advanced_scenarios(
     logger.info("scenarios_generated", count=len(scenarios))
     return scenarios
 
-
-#
-# 4. Fallback synthetic data generators (when network unavailable)
-#
-
 def generate_synthetic_threats(n: int = 100, seed: int = 42) -> list[ThreatScenario]:
-    """Generate synthetic threat scenarios when network is unavailable."""
     rng = np.random.RandomState(seed)
     categories = ["botnet_c2", "malware_distribution", "ioc_feed", "unknown"]
     types = ["ip", "domain", "url", "hash"]
@@ -429,7 +362,7 @@ def generate_synthetic_threats(n: int = 100, seed: int = 42) -> list[ThreatScena
             indicators = [f"http://bad-{rng.randint(100, 999)}.example.com/payload-{rng.randint(1, 100)}"
                           for _ in range(num_indicators)]
         else:
-            # SHA-256 used for synthetic data generation (not for cryptographic purposes)
+
             indicators = [hashlib.sha256(f"malware-{rng.randint(0, 100000)}".encode()).hexdigest()
                           for _ in range(num_indicators)]
 
@@ -443,16 +376,7 @@ def generate_synthetic_threats(n: int = 100, seed: int = 42) -> list[ThreatScena
 
     return scenarios
 
-
-#
-# 5. Open-Source Academic Data Fetchers
-#
-
 def fetch_arxiv_metadata(category: str = "cs.AI", max_results: int = 50) -> list[dict]:
-    """Fetch recent arXiv paper metadata via Atom feed (open access, no API key).
-
-    Categories: cs.AI, cs.CR, math.CO, physics.gen-ph, quant-ph, etc.
-    """
     url = (
         f"https://export.arxiv.org/api/query?"
         f"search_query=cat:{category}&start=0&max_results={max_results}"
@@ -463,7 +387,7 @@ def fetch_arxiv_metadata(category: str = "cs.AI", max_results: int = 50) -> list
         return []
 
     papers = []
-    # Simple XML parsing without external dependencies
+
     entries = re.findall(r"<entry>(.*?)</entry>", raw, re.DOTALL)
     for entry in entries:
         title_m = re.search(r"<title>(.*?)</title>", entry, re.DOTALL)
@@ -481,16 +405,11 @@ def fetch_arxiv_metadata(category: str = "cs.AI", max_results: int = 50) -> list
     logger.info("fetched_arxiv", category=category, papers=len(papers))
     return papers
 
-
 def fetch_oeis_sequences(count: int = 30) -> list[dict]:
-    """Fetch integer sequences from OEIS (Online Encyclopedia of Integer Sequences).
-
-    Uses the OEIS plain-text search API.
-    """
     keywords = ["fibonacci", "prime", "catalan", "pascal", "euler", "bernoulli"]
     sequences = []
 
-    for kw in keywords[:3]:  # Limit to avoid rate limits
+    for kw in keywords[:3]:
         url = f"https://oeis.org/search?q={kw}&fmt=json"
         raw = _fetch_url(url, timeout=15)
         if not raw:
@@ -520,9 +439,7 @@ def fetch_oeis_sequences(count: int = 30) -> list[dict]:
     logger.info("fetched_oeis", sequences=len(sequences))
     return sequences
 
-
 def fetch_pubchem_elements(count: int = 30) -> list[dict]:
-    """Fetch chemical element data from PubChem (open, no key needed)."""
     elements = []
     url = "https://pubchem.ncbi.nlm.nih.gov/rest/pug/periodictable/JSON"
     raw = _fetch_url(url, timeout=20)
@@ -550,10 +467,8 @@ def fetch_pubchem_elements(count: int = 30) -> list[dict]:
     logger.info("fetched_pubchem", elements=len(elements))
     return elements
 
-
 def fetch_open_legal_data() -> list[dict]:
-    """Fetch open legal/constitutional texts from public sources."""
-    # Canonical legal knowledge (always available offline)
+
     legal_items = [
         {"text": "We the People of the United States, in Order to form a more perfect Union, establish Justice, insure domestic Tranquility, provide for the common defence, promote the general Welfare, and secure the Blessings of Liberty",
             "type": "preamble", "source": "us_constitution"},
@@ -582,9 +497,7 @@ def fetch_open_legal_data() -> list[dict]:
     logger.info("fetched_legal", items=len(legal_items))
     return legal_items
 
-
 def fetch_all_academic_data() -> dict[str, list[dict]]:
-    """Fetch all open-source academic data across domains."""
     return {
         "arxiv_ai": fetch_arxiv_metadata("cs.AI", max_results=20),
         "arxiv_crypto": fetch_arxiv_metadata("cs.CR", max_results=20),

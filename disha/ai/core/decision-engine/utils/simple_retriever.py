@@ -1,4 +1,3 @@
-"""Lightweight keyword-based retriever used when FAISS is not installed."""
 
 from __future__ import annotations
 
@@ -6,22 +5,18 @@ import json
 import os
 from typing import Dict, List
 
-
 class SimpleRetriever:
-    """Fallback retriever that uses simple keyword matching."""
 
     def __init__(self) -> None:
         self.documents: List[str] = []
         self.metadata: List[Dict] = []
 
-    # ------------------------------------------------------------------
     def build_index(
         self,
         input_path: str,
         index_path: str,
         metadata_path: str,
     ) -> None:
-        """Read one-clause-per-line file and persist as JSON."""
         with open(input_path, "r", encoding="utf-8") as fh:
             self.documents = [
                 line.strip() for line in fh if line.strip()
@@ -35,7 +30,6 @@ class SimpleRetriever:
             json.dump(self.metadata, fh)
 
     def load_index(self, index_path: str, metadata_path: str) -> None:
-        """Load previously persisted documents and metadata."""
         if not os.path.exists(index_path) or not os.path.exists(metadata_path):
             return
         with open(index_path, "r", encoding="utf-8") as fh:
@@ -44,7 +38,6 @@ class SimpleRetriever:
             self.metadata = json.load(fh)
 
     def query(self, query_text: str, top_k: int = 5) -> List[Dict]:
-        """Return documents whose text contains the most query tokens."""
         tokens = set(query_text.lower().split())
         scored = []
         for meta in self.metadata:

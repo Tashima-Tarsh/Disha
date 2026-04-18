@@ -5,12 +5,7 @@ from app.services.physics.md_engine import MDEngine
 
 logger = structlog.get_logger(__name__)
 
-
 class PhysicsAgent(BaseAgent):
-    """
-    DISHA Physics Agent.
-    Orchestrates molecular dynamics simulations and performs material stability analysis.
-    """
 
     def __init__(self):
         super().__init__(
@@ -26,23 +21,17 @@ class PhysicsAgent(BaseAgent):
         }
 
     async def execute(self, target: str, options: dict[str, Any] | None = None) -> dict[str, Any]:
-        """
-        Run a physics-based investigation on a material target.
-        """
         options = options or {}
         material = target.lower()
 
-        # Check if we have material properties
         params = self.material_db.get(material, self.material_db["argon"])
 
-        # Extract simulation parameters from options
         timesteps = options.get("timesteps", 500)
         n_atoms = options.get("n_atoms", 128)
         temperature = options.get("temperature", 1.0)
 
         logger.info("physics_simulation_starting", material=material, atoms=n_atoms, temp=temperature)
 
-        # Run simulation
         simulation_data = await self.engine.simulate(
             n_atoms=n_atoms,
             timesteps=timesteps,
@@ -50,7 +39,6 @@ class PhysicsAgent(BaseAgent):
             material_params=params
         )
 
-        # Perform stability analysis based on results
         drift = self._calculate_energy_drift(simulation_data["diagnostics"])
         stability_score = max(0.0, 1.0 - drift)
 
@@ -66,7 +54,6 @@ class PhysicsAgent(BaseAgent):
         }
 
     def _calculate_energy_drift(self, diagnostics: List[Dict]) -> float:
-        """Calculate the normalized energy drift to assess simulation stability."""
         if not diagnostics:
             return 1.0
 
@@ -83,7 +70,6 @@ class PhysicsAgent(BaseAgent):
         return abs((final - initial) / initial)
 
     def _get_atomic_entities(self, simulation_data: Dict) -> List[Dict]:
-        """Convert simulation state into standard DISHA entities for the Graph Agent."""
         return [{
             "id": f"material-sim-{simulation_data['n_atoms']}-atoms",
             "label": f"MD Ensemble ({simulation_data['n_atoms']} atoms)",

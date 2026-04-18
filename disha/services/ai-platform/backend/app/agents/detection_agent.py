@@ -1,4 +1,3 @@
-"""Detection Agent - Performs anomaly detection using PyOD."""
 
 from typing import Any
 
@@ -6,9 +5,7 @@ import numpy as np
 
 from app.agents.base_agent import BaseAgent
 
-
 class DetectionAgent(BaseAgent):
-    """Agent for detecting anomalies in intelligence data using PyOD."""
 
     def __init__(self):
         super().__init__(
@@ -17,7 +14,6 @@ class DetectionAgent(BaseAgent):
         )
 
     async def execute(self, target: str, options: dict[str, Any] | None = None) -> dict[str, Any]:
-        """Analyze data for anomalies."""
         options = options or {}
         data_points = options.get("data_points", [])
 
@@ -33,11 +29,9 @@ class DetectionAgent(BaseAgent):
         }
 
     def _detect_anomalies(self, data_points: list[dict[str, Any]]) -> list[dict[str, Any]]:
-        """Detect anomalies using statistical methods and PyOD."""
         try:
             from pyod.models.iforest import IForest
 
-            # Extract numerical features
             features = self._extract_features(data_points)
             if len(features) < 5:
                 return self._simple_anomaly_detection(data_points)
@@ -46,7 +40,6 @@ class DetectionAgent(BaseAgent):
             if feature_array.shape[1] == 0:
                 return []
 
-            # Use Isolation Forest for anomaly detection
             detector = IForest(contamination=0.1, random_state=42)
             detector.fit(feature_array)
 
@@ -55,7 +48,7 @@ class DetectionAgent(BaseAgent):
 
             anomalies = []
             for i, (label, score) in enumerate(zip(labels, scores)):
-                if label == 1:  # Anomaly
+                if label == 1:
                     anomalies.append({
                         "index": i,
                         "data": data_points[i] if i < len(data_points) else {},
@@ -73,8 +66,7 @@ class DetectionAgent(BaseAgent):
             return self._simple_anomaly_detection(data_points)
 
     def _extract_features(self, data_points: list[dict[str, Any]]) -> list[list[float]]:
-        """Extract numerical features from data points with uniform dimensions."""
-        # Collect all numeric keys across all data points for a consistent schema
+
         numeric_keys: list[str] = []
         for point in data_points:
             for key, value in point.items():
@@ -91,7 +83,6 @@ class DetectionAgent(BaseAgent):
         return features
 
     def _simple_anomaly_detection(self, data_points: list[dict[str, Any]]) -> list[dict[str, Any]]:
-        """Simple statistical anomaly detection fallback."""
         features = self._extract_features(data_points)
         if not features:
             return []
@@ -99,7 +90,7 @@ class DetectionAgent(BaseAgent):
         feature_array = np.array(features)
         mean = np.mean(feature_array, axis=0)
         std = np.std(feature_array, axis=0)
-        std = np.where(std == 0, 1, std)  # Avoid division by zero
+        std = np.where(std == 0, 1, std)
 
         anomalies = []
         for i, row in enumerate(feature_array):

@@ -1,16 +1,3 @@
-"""
-SemanticMemory — Concept Graph for the DISHA Cognitive Engine.
-
-Semantic memory stores long-term factual knowledge as a concept graph.
-Each concept has a definition, typed relationships to other concepts, source
-provenance, and a confidence score that slowly decays to model knowledge aging.
-
-Role in architecture:
-    SemanticMemory provides background world knowledge that enriches the
-    _attend phase. Important episodic episodes are periodically promoted into
-    semantic memory by the MemoryManager, allowing learned facts to persist
-    across sessions. BFS traversal enables multi-hop relational inference.
-"""
 
 from __future__ import annotations
 
@@ -28,22 +15,7 @@ log = structlog.get_logger(__name__)
 
 SEMANTIC_STORE_PATH = Path.home() / ".disha" / "semantic.json"
 
-
 class SemanticMemory:
-    """
-    Persistent concept graph with BFS traversal and confidence decay.
-
-    The graph is stored as a dict:
-        concept_name -> {
-            definition: str,
-            relationships: [{target, rel_type, confidence}],
-            sources: [str],
-            last_updated: float,
-            confidence: float,
-        }
-
-    Persists to ~/.disha/semantic.json.
-    """
 
     def __init__(self, store_path: Path | None = None) -> None:
         self._path = store_path or SEMANTIC_STORE_PATH
@@ -52,12 +24,7 @@ class SemanticMemory:
         self._loaded = False
         log.debug("semantic_memory.initialized", path=str(self._path))
 
-    # ------------------------------------------------------------------
-    # Lifecycle helpers
-    # ------------------------------------------------------------------
-
     async def _ensure_loaded(self) -> None:
-        """Lazy-load concept graph from disk."""
         if self._loaded:
             return
         async with self._lock:
@@ -82,7 +49,6 @@ class SemanticMemory:
             self._loaded = True
 
     async def _persist(self) -> None:
-        """Write graph to disk atomically."""
         try:
             self._path.parent.mkdir(parents=True, exist_ok=True)
             async with aiofiles.open(self._path, "w") as f:
@@ -91,10 +57,6 @@ class SemanticMemory:
         except Exception as exc:
             log.error("semantic_memory.persist_failed", error=str(exc))
 
-    # ------------------------------------------------------------------
-    # Public interface
-    # ------------------------------------------------------------------
-
     async def learn(
         self,
         concept: str,
@@ -102,24 +64,10 @@ class SemanticMemory:
         relationships: list[dict[str, Any]],
         source: str,
     ) -> None:
-        """
-        Add or update a concept in the graph.
-
-        If the concept already exists, the definition is updated (if non-empty),
-        new relationships are merged (deduped by target+rel_type), and the source
-        is added to the provenance list.
-
-        Args:
-            concept:       Concept name (key in graph).
-            definition:    Human-readable definition.
-            relationships: List of dicts: [{target, rel_type, confidence}].
-            source:        Provenance string (e.g. session_id or "bootstrap").
-        """
         await self._ensure_loaded()
 
         concept = concept.strip().lower()
 
-        # Validate and normalize relationships
         valid_rels: list[dict[str, Any]] = []
         for rel in relationships:
             if "target" in rel and "rel_type" in rel:
@@ -136,7 +84,7 @@ class SemanticMemory:
                 node = self._graph[concept]
                 if definition:
                     node["definition"] = definition
-                # Merge relationships (avoid duplicates by target+rel_type)
+
                 existing_keys = {
                     (r["target"], r["rel_type"]) for r in node.get("relationships", [])
                 }
@@ -146,7 +94,7 @@ class SemanticMemory:
                         node.setdefault("relationships", []).append(rel)
                         existing_keys.add(key)
                     else:
-                        # Update confidence if higher
+
                         for r in node["relationships"]:
                             if (r["target"], r["rel_type"]) == key:
                                 r["confidence"] = max(r["confidence"], rel["confidence"])
@@ -171,15 +119,6 @@ class SemanticMemory:
         )
 
     async def query(self, concept: str) -> dict[str, Any] | None:
-        """
-        Retrieve a concept node with its full relationship graph.
-
-        Args:
-            concept: The concept to look up.
-
-        Returns:
-            Concept dict or None if not found.
-        """
         await self._ensure_loaded()
         concept = concept.strip().lower()
         result = self._graph.get(concept)
@@ -187,16 +126,6 @@ class SemanticMemory:
         return result
 
     async def find_related(self, concept: str, depth: int = 2) -> list[dict[str, Any]]:
-        """
-        BFS traversal from a concept up to the given depth.
-
-        Args:
-            concept: Starting concept.
-            depth:   Maximum BFS depth (hops).
-
-        Returns:
-            List of related concept dicts, each augmented with 'name' and 'hops'.
-        """
         await self._ensure_loaded()
         concept = concept.strip().lower()
 
@@ -232,19 +161,6 @@ class SemanticMemory:
         return related
 
     async def infer(self, concept_a: str, concept_b: str) -> str | None:
-        """
-        Check whether a path exists between two concepts.
-
-        Uses BFS to find the shortest path. If found, returns a human-readable
-        description of the relationship chain. Returns None if disconnected.
-
-        Args:
-            concept_a: Source concept.
-            concept_b: Target concept.
-
-        Returns:
-            A string describing the relationship path, or None.
-        """
         await self._ensure_loaded()
         ca = concept_a.strip().lower()
         cb = concept_b.strip().lower()
@@ -254,7 +170,6 @@ class SemanticMemory:
         if ca == cb:
             return f"'{ca}' is identical to '{cb}'"
 
-        # BFS with path tracking
         queue: deque[tuple[str, list[tuple[str, str]]]] = deque([(ca, [])])
         visited: set[str] = {ca}
 
@@ -265,7 +180,7 @@ class SemanticMemory:
                 target = rel["target"]
                 new_path = path + [(rel["rel_type"], target)]
                 if target == cb:
-                    # Build human-readable inference
+
                     parts = [ca]
                     for rel_type, t in new_path:
                         parts.append(f"--[{rel_type}]--> {t}")
@@ -280,12 +195,6 @@ class SemanticMemory:
         return None
 
     def decay_confidence(self, factor: float = 0.999) -> None:
-        """
-        Slowly reduce the confidence of all concepts to model knowledge aging.
-
-        Args:
-            factor: Multiplicative decay per call. Default 0.999 (slow decay).
-        """
         count = 0
         for node in self._graph.values():
             node["confidence"] = max(0.0, node.get("confidence", 1.0) * factor)
@@ -293,7 +202,6 @@ class SemanticMemory:
         log.debug("semantic_memory.confidence_decayed", concepts=count, factor=factor)
 
     def stats(self) -> dict[str, Any]:
-        """Return summary statistics about the semantic graph."""
         if not self._graph:
             return {"total_concepts": 0, "total_relationships": 0, "avg_confidence": 0.0}
         total_rels = sum(len(n.get("relationships", [])) for n in self._graph.values())

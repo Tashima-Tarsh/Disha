@@ -1,14 +1,3 @@
-"""
-RL Training Script — trains the PPO policy on the InvestigationEnvironment.
-
-Generates synthetic investigation episodes, trains the PPO policy network,
-and saves a checkpoint to ``checkpoints/rl_policy.pt``.
-
-Usage::
-
-    python -m app.rl.train            # from ai-platform/backend/
-    python ai-platform/backend/app/rl/train.py   # from repo root
-"""
 
 from __future__ import annotations
 
@@ -19,26 +8,21 @@ from pathlib import Path
 import numpy as np
 import structlog
 
-# ── path fixup so the module works both ways ──────────────────────────
 _SCRIPT_DIR = Path(__file__).resolve().parent
 _BACKEND_ROOT = _SCRIPT_DIR.parents[1]
 if str(_BACKEND_ROOT) not in sys.path:
     sys.path.insert(0, str(_BACKEND_ROOT))
 
-from app.rl.environment import InvestigationEnvironment, ActionType  # noqa: E402
-from app.rl.policy import PolicyNetwork, TORCH_AVAILABLE             # noqa: E402
-from app.rl.experience_replay import ExperienceReplayBuffer          # noqa: E402
-from app.rl.reward import RewardComputer                             # noqa: E402
+from app.rl.environment import InvestigationEnvironment, ActionType
+from app.rl.policy import PolicyNetwork, TORCH_AVAILABLE
+from app.rl.experience_replay import ExperienceReplayBuffer
+from app.rl.reward import RewardComputer
 
 logger = structlog.get_logger(__name__)
 
-
-# ── Synthetic outcome generator ───────────────────────────────────────
 _RNG = np.random.RandomState(42)
 
-
 def _synthetic_outcome(action: int) -> dict:
-    """Return a plausible outcome dict for *action* using random noise."""
     if action >= 5:
         return {}
     base = {
@@ -48,7 +32,7 @@ def _synthetic_outcome(action: int) -> dict:
         "risk_score": float(np.clip(_RNG.normal(0.4, 0.2), 0.0, 1.0)),
         "time_taken": float(np.clip(_RNG.exponential(2.0), 0.5, 10.0)),
     }
-    # Different agents have different profiles
+
     if action == ActionType.RUN_OSINT:
         base["entities_found"] += int(_RNG.poisson(5))
     elif action == ActionType.RUN_CRYPTO:
@@ -61,19 +45,11 @@ def _synthetic_outcome(action: int) -> dict:
         base["anomalies_found"] += int(_RNG.binomial(1, 0.5))
     return base
 
-
-# ── Training loop ─────────────────────────────────────────────────────
-
-
 def train(
     num_episodes: int = 500,
     update_every: int = 20,
     checkpoint_dir: str | None = None,
 ) -> dict:
-    """Run PPO training on the investigation environment.
-
-    Returns a dict with final training metrics.
-    """
     if not TORCH_AVAILABLE:
         logger.warning("torch_not_available", msg="Training requires PyTorch")
         return {"status": "skipped", "reason": "torch_not_available"}
@@ -104,7 +80,6 @@ def train(
             outcome = _synthetic_outcome(action)
             next_state, reward, done, info = env.step(action, outcome or None)
 
-            # Store in both policy buffer and replay
             policy.store_transition(state, action, reward, log_prob, value, done)
             replay.add_step(state, action, reward, next_state, done, log_prob, value)
 
@@ -114,7 +89,6 @@ def train(
             if done:
                 break
 
-        # Compute episode-level reward via RewardComputer
         ep_result = {
             "entities": list(range(env.state.entities_found)),
             "anomalies": list(range(env.state.anomalies_found)),
@@ -125,7 +99,6 @@ def train(
         replay.end_episode(final_reward=final_r)
         episode_rewards.append(ep_reward)
 
-        # PPO update
         if ep % update_every == 0:
             metrics = policy.update(epochs=4)
             update_metrics.append(metrics)
@@ -138,8 +111,7 @@ def train(
                 loss=round(metrics.get("avg_loss", 0), 4),
             )
 
-    # ── Save checkpoint ───────────────────────────────────────────────
-    import torch  # available since TORCH_AVAILABLE is True
+    import torch
 
     ckpt_dir = Path(checkpoint_dir) if checkpoint_dir else (_BACKEND_ROOT / "checkpoints")
     ckpt_dir.mkdir(parents=True, exist_ok=True)
@@ -158,7 +130,6 @@ def train(
     )
     logger.info("checkpoint_saved", path=str(ckpt_path))
 
-    # Save training metrics
     metrics_path = ckpt_dir / "rl_training_metrics.json"
     summary = {
         "episodes_trained": num_episodes,
@@ -173,8 +144,6 @@ def train(
 
     return summary
 
-
-# ── CLI entry point ───────────────────────────────────────────────────
 if __name__ == "__main__":
     result = train()
     print(json.dumps(result, indent=2, default=str))

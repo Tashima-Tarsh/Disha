@@ -6,7 +6,6 @@ from app.api.deps import get_reward_computer, get_policy_network, get_prompt_opt
 
 router = APIRouter()
 
-
 @router.post("/feedback")
 async def submit_feedback(
     request: FeedbackRequest,
@@ -14,7 +13,6 @@ async def submit_feedback(
     reward_computer=Depends(get_reward_computer),
     policy_network=Depends(get_policy_network)
 ):
-    """Submit feedback on an investigation for RL training."""
     feedback = InvestigationFeedback(
         investigation_id=request.investigation_id,
         true_positive=request.true_positive,
@@ -34,25 +32,21 @@ async def submit_feedback(
         "policy_update": update_metrics,
     }
 
-
 @router.get("/rl/metrics")
 async def rl_metrics(
     current_user: dict = Depends(get_current_user),
     reward_computer=Depends(get_reward_computer),
     prompt_optimizer=Depends(get_prompt_optimizer)
 ):
-    """Get RL system metrics including reward tracking and policy status."""
     return {
         "reward_metrics": reward_computer.get_metrics(),
         "prompt_metrics": prompt_optimizer.get_metrics(),
     }
-
 
 @router.post("/rl/evolve-prompts")
 async def evolve_prompts(
     current_user: dict = Depends(get_current_user),
     prompt_optimizer=Depends(get_prompt_optimizer)
 ):
-    """Trigger one generation of prompt evolution."""
     prompt_optimizer.evolve()
     return prompt_optimizer.get_metrics()

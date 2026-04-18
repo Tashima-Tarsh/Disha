@@ -1,4 +1,3 @@
-"""Agent Orchestrator - Coordinates multi-agent intelligence gathering."""
 
 import asyncio
 import uuid
@@ -20,9 +19,7 @@ from app.agents.growth_agent import GrowthAgent
 
 logger = structlog.get_logger(__name__)
 
-
 class Orchestrator:
-    """Coordinates multiple intelligence agents and merges their outputs."""
 
     def __init__(self):
         self.osint_agent = OSINTAgent()
@@ -46,7 +43,6 @@ class Orchestrator:
         options: dict[str, Any] | None = None,
         user_id: str | None = None,
     ) -> dict[str, Any]:
-        """Run a full investigation pipeline on a target."""
         investigation_id = str(uuid.uuid4())
         options = options or {}
         self.logger.info(
@@ -57,10 +53,8 @@ class Orchestrator:
             user_id=user_id,
         )
 
-        # Phase 1: Data Collection (parallel)
         agent_results = await self._collect_data(target, investigation_type, options)
 
-        # Phase 2: Anomaly Detection
         all_entities = []
         for result in agent_results.values():
             if result.get("status") == "success":
@@ -72,7 +66,6 @@ class Orchestrator:
             )
             agent_results["detection"] = detection_result
 
-        # Phase 3: Knowledge Graph Storage
         relationships = self._build_relationships(all_entities)
         graph_result = await self.graph_agent.run(
             target,
@@ -80,14 +73,12 @@ class Orchestrator:
         )
         agent_results["graph"] = graph_result
 
-        # Phase 4: LLM Analysis
         reasoning_result = await self.reasoning_agent.run(
             target,
             {"agent_results": agent_results},
         )
         agent_results["reasoning"] = reasoning_result
 
-        # Phase 5: Compile results
         result = self._compile_results(investigation_id, target, investigation_type, agent_results)
 
         self.logger.info(
@@ -100,7 +91,6 @@ class Orchestrator:
     async def _collect_data(
         self, target: str, investigation_type: str, options: dict[str, Any]
     ) -> dict[str, Any]:
-        """Collect data from agents in parallel based on investigation type."""
         tasks = {}
 
         if investigation_type in ("osint", "full", "threat"):
@@ -141,14 +131,12 @@ class Orchestrator:
         return results
 
     def _build_relationships(self, entities: list[dict[str, Any]]) -> list[dict[str, Any]]:
-        """Build relationships between extracted entities."""
         relationships = []
         for i, entity in enumerate(entities):
             for j, other in enumerate(entities):
                 if i >= j:
                     continue
 
-                # Connect entities of related types
                 related = False
                 if entity["entity_type"] == "host" and other["entity_type"] == "domain":
                     related = True
@@ -179,7 +167,6 @@ class Orchestrator:
         investigation_type: str,
         agent_results: dict[str, Any],
     ) -> dict[str, Any]:
-        """Compile all agent results into a final investigation report."""
         all_entities = []
         all_anomalies = []
         risk_scores = []
@@ -220,7 +207,6 @@ class Orchestrator:
         depth: int = 2,
         user_id: str | None = None,
     ) -> list[dict[str, Any]]:
-        """Run investigations on multiple targets."""
         tasks = [
             self.investigate(
                 target, investigation_type=investigation_type, depth=depth, user_id=user_id

@@ -9,7 +9,6 @@ from app.services.physics.md_engine import MDEngine
 
 logger = structlog.get_logger(__name__)
 
-
 class NationalIntelligenceAgent(BaseAgent):
     """Orchestrator for National Intelligence missions (Disaster, Legal, Safety, Infrastructure)."""
 
@@ -35,12 +34,8 @@ class NationalIntelligenceAgent(BaseAgent):
     async def execute(self, target: str, options: dict[str, Any] | None = None) -> dict[str, Any]:
         """Synthesize national intelligence signals across multiple domains."""
         options = options or {}
-        project = options.get("project", "general")  # varuna, marg-safe, nyaya, setu, raksha
+        project = options.get("project", "general")
 
-        # In this phase, we delegate to specific project logic.
-        # Project VARUNA (Disaster Response) is our primary pilot.
-
-        # v5.3 Check for Multi-Physics Coupling results
         coupled_results = options.get("coupled_physics", "No active simulation")
 
         prompt = self._build_ni_prompt(target, project, options)
@@ -60,27 +55,21 @@ class NationalIntelligenceAgent(BaseAgent):
         infra_service = InfrastructureService()
         physics_engine = MDEngine()
 
-        # 1. Fetch environmental conditions (Real-time or simulated wind speed)
-        wind_speed = options.get("wind_speed_kmh", 180.0)  # Default to Cyclone speed
+        wind_speed = options.get("wind_speed_kmh", 180.0)
 
-        # 2. Get Bridge structural data
         asset_details = await infra_service.get_asset_details(target)
         if not asset_details:
             return {"status": "asset_not_found"}
 
-        # 3. Map Wind Load to Physics Force Vector
         load_vector = await infra_service.calculate_environmental_load_force(target, wind_speed)
 
-        # 4. Run Molecular Dynamics Stress Simulation
-        # We simulate the material response under the wind load
         simulation = await physics_engine.simulate(
             n_atoms=128,
             timesteps=300,
             external_stress=load_vector,
-            material_params={"epsilon": 4.5, "sigma": 0.8, "mass": 55.8}  # Iron/Steel
+            material_params={"epsilon": 4.5, "sigma": 0.8, "mass": 55.8}
         )
 
-        # 5. Evaluate Predictive Failure
         failure_analysis = await infra_service.evaluate_failure_risk(target, simulation.get("diagnostics", [])[-1] if simulation.get("diagnostics") else {})
 
         return {

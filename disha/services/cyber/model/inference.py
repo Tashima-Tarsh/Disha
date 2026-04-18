@@ -1,11 +1,3 @@
-"""
-Disha AI Detection Engine - Inference Pipeline
-
-Loads trained models and performs real-time classification
-and anomaly detection on new honeypot log entries.
-
-DEFENSIVE SIMULATION ONLY - For blue team research and training.
-"""
 
 import json
 import os
@@ -20,33 +12,23 @@ from train import (
     HoneypotLogDataset,
 )
 
-
 def load_classifier(
     model_path: str, n_classes: int = 5
 ) -> AttackClassifier:
-    """Load a trained attack classifier."""
     input_dim = HoneypotLogDataset.FEATURE_DIM
     model = AttackClassifier(input_dim=input_dim, n_classes=n_classes)
     model.load_state_dict(torch.load(model_path, weights_only=True))
     model.eval()
     return model
 
-
 def load_anomaly_detector(model_path: str) -> AnomalyDetector:
-    """Load a trained anomaly detector."""
     input_dim = HoneypotLogDataset.FEATURE_DIM
     model = AnomalyDetector(input_dim=input_dim)
     model.load_state_dict(torch.load(model_path, weights_only=True))
     model.eval()
     return model
 
-
 def classify(model: AttackClassifier, log_entry: dict) -> dict:
-    """Classify a single log entry.
-
-    Returns:
-        dict with 'label', 'confidence', and 'probabilities'
-    """
     dataset = HoneypotLogDataset.__new__(HoneypotLogDataset)
     features = dataset._featurize(log_entry).unsqueeze(0)
 
@@ -66,15 +48,9 @@ def classify(model: AttackClassifier, log_entry: dict) -> dict:
         },
     }
 
-
 def detect_anomaly(
     model: AnomalyDetector, log_entry: dict, threshold: float = 0.5
 ) -> dict:
-    """Detect anomalies using reconstruction error.
-
-    Returns:
-        dict with 'is_anomaly', 'reconstruction_error', 'threshold'
-    """
     dataset = HoneypotLogDataset.__new__(HoneypotLogDataset)
     features = dataset._featurize(log_entry).unsqueeze(0)
 
@@ -88,17 +64,7 @@ def detect_anomaly(
         "threshold": threshold,
     }
 
-
 def analyze_log_entry(log_entry: dict, models: dict) -> dict:
-    """Run full analysis pipeline on a log entry.
-
-    Args:
-        log_entry: Parsed JSON log entry
-        models: Dict with 'classifier', 'binary_classifier', 'anomaly_detector'
-
-    Returns:
-        Complete analysis result
-    """
     result = {"input": log_entry, "analysis": {}}
 
     if "classifier" in models:
@@ -118,15 +84,12 @@ def analyze_log_entry(log_entry: dict, models: dict) -> dict:
             models["anomaly_detector"], log_entry
         )
 
-    # Compute threat score (0-100)
     threat_score = _compute_threat_score(result["analysis"])
     result["analysis"]["threat_score"] = threat_score
 
     return result
 
-
 def _compute_threat_score(analysis: dict) -> int:
-    """Compute a composite threat score from analysis results."""
     score = 0.0
 
     if "binary" in analysis and analysis["binary"]["is_malicious"]:
@@ -143,15 +106,12 @@ def _compute_threat_score(analysis: dict) -> int:
 
     return min(100, int(score))
 
-
 def main():
-    """Run inference on log files."""
     model_dir = os.environ.get("MODEL_DIR", ".")
     log_dir = os.environ.get("LOG_DIR", "/logs")
 
     models = {}
 
-    # Load available models
     classifier_path = os.path.join(model_dir, "attack_classifier.pt")
     if os.path.exists(classifier_path):
         models["classifier"] = load_classifier(classifier_path, n_classes=5)
@@ -171,7 +131,6 @@ def main():
         print("No trained models found. Run train.py first.")
         sys.exit(1)
 
-    # Process log files
     log_files = [
         os.path.join(log_dir, "cowrie", "cowrie.json"),
         os.path.join(log_dir, "opencanary", "opencanary.log"),
@@ -196,7 +155,6 @@ def main():
 
                 result = analyze_log_entry(entry, models)
                 print(f"    {json.dumps(result['analysis'], indent=2)}")
-
 
 if __name__ == "__main__":
     main()

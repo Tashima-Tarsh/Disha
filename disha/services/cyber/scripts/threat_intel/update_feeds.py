@@ -1,11 +1,3 @@
-"""
-Disha Threat Intelligence - Feed Updater
-
-Downloads and aggregates IP blocklists from open threat
-intelligence feeds. Enriches IPs with geo-location and ASN data.
-
-DEFENSIVE SIMULATION ONLY.
-"""
 
 import json
 import logging
@@ -20,7 +12,6 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-# Open threat intelligence feed URLs
 THREAT_FEEDS = [
     "https://feodotracker.abuse.ch/downloads/ipblocklist.txt",
     "https://rules.emergingthreats.net/blockrules/compromised-ips.txt",
@@ -29,9 +20,7 @@ THREAT_FEEDS = [
 
 OUTPUT_DIR = os.environ.get("OUTPUT_DIR", "/logs")
 
-
 def fetch_blocklist() -> set:
-    """Fetch and aggregate IPs from threat intelligence feeds."""
     blocklist = set()
 
     for url in THREAT_FEEDS:
@@ -42,12 +31,12 @@ def fetch_blocklist() -> set:
 
             for line in resp.text.splitlines():
                 line = line.strip()
-                # Skip comments and empty lines
+
                 if not line or line.startswith("#") or line.startswith(";"):
                     continue
-                # Extract IP (first field, tab or space separated)
+
                 ip = line.split()[0] if line.split() else ""
-                # Basic IP validation
+
                 parts = ip.split(".")
                 if len(parts) == 4 and all(
                     p.isdigit() and 0 <= int(p) <= 255 for p in parts
@@ -61,9 +50,7 @@ def fetch_blocklist() -> set:
 
     return blocklist
 
-
 def enrich_ip(ip: str) -> dict:
-    """Enrich an IP with geo-location and ASN data using ip-api.com."""
     try:
         resp = requests.get(
             f"https://ip-api.com/json/{ip}",
@@ -87,9 +74,7 @@ def enrich_ip(ip: str) -> dict:
 
     return {"ip": ip, "country": "Unknown", "enrichment_failed": True}
 
-
 def save_blocklist(blocklist: set) -> str:
-    """Save aggregated blocklist to JSON."""
     output_path = os.path.join(OUTPUT_DIR, "threat_blocklist.json")
     data = {
         "updated_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
@@ -105,7 +90,6 @@ def save_blocklist(blocklist: set) -> str:
     logger.info("Blocklist saved: %s (%d IPs)", output_path, len(blocklist))
     return output_path
 
-
 def main():
     logger.info("=" * 60)
     logger.info("Disha Threat Intelligence - Feed Update")
@@ -116,7 +100,6 @@ def main():
 
     save_blocklist(blocklist)
 
-    # Enrich a sample of IPs (limit to avoid rate limiting)
     sample_size = min(5, len(blocklist))
     if sample_size > 0:
         sample_ips = sorted(blocklist)[:sample_size]
@@ -126,7 +109,7 @@ def main():
             info = enrich_ip(ip)
             enriched.append(info)
             logger.info("  %s -> %s, %s", ip, info.get("country"), info.get("asn"))
-            time.sleep(1)  # Rate limit courtesy
+            time.sleep(1)
 
         enriched_path = os.path.join(OUTPUT_DIR, "enriched_sample.json")
         with open(enriched_path, "w") as f:
@@ -134,7 +117,6 @@ def main():
         logger.info("Enriched sample saved to %s", enriched_path)
 
     logger.info("\nThreat intelligence update complete.")
-
 
 if __name__ == "__main__":
     main()

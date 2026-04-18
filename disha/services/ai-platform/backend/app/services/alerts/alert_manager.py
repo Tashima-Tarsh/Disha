@@ -1,4 +1,3 @@
-"""Alert management system with WebSocket broadcasting."""
 
 import uuid
 from datetime import datetime, timezone
@@ -11,27 +10,22 @@ from app.core.config import get_settings
 
 logger = structlog.get_logger(__name__)
 
-
 class ConnectionManager:
-    """Manages WebSocket connections for real-time alerts."""
 
     def __init__(self):
         self.active_connections: list[WebSocket] = []
 
     async def connect(self, websocket: WebSocket) -> None:
-        """Accept and register a WebSocket connection."""
         await websocket.accept()
         self.active_connections.append(websocket)
         logger.info("websocket_connected", total=len(self.active_connections))
 
     def disconnect(self, websocket: WebSocket) -> None:
-        """Remove a WebSocket connection."""
         if websocket in self.active_connections:
             self.active_connections.remove(websocket)
         logger.info("websocket_disconnected", total=len(self.active_connections))
 
     async def broadcast(self, message: dict[str, Any]) -> None:
-        """Broadcast a message to all connected clients."""
         disconnected = []
         for connection in self.active_connections:
             try:
@@ -42,9 +36,7 @@ class ConnectionManager:
         for conn in disconnected:
             self.disconnect(conn)
 
-
 class AlertManager:
-    """Manages alert creation, storage, and broadcasting."""
 
     def __init__(self, connection_manager: ConnectionManager):
         self.connection_manager = connection_manager
@@ -61,7 +53,6 @@ class AlertManager:
         entity_id: str | None = None,
         metadata: dict[str, Any] | None = None,
     ) -> dict[str, Any]:
-        """Create and broadcast a new alert."""
         alert = {
             "alert_id": str(uuid.uuid4()),
             "level": level,
@@ -77,14 +68,12 @@ class AlertManager:
         if len(self.alerts) > self.max_alerts:
             self.alerts = self.alerts[-self.max_alerts:]
 
-        # Broadcast to connected clients
         await self.connection_manager.broadcast({"type": "alert", "data": alert})
 
         logger.info("alert_created", alert_id=alert["alert_id"], level=level, title=title)
         return alert
 
     async def create_alerts_from_investigation(self, investigation: dict[str, Any]) -> list[dict[str, Any]]:
-        """Generate alerts from investigation results."""
         alerts = []
         risk_score = investigation.get("risk_score", 0)
 
@@ -107,7 +96,6 @@ class AlertManager:
             )
             alerts.append(alert)
 
-        # Alert for anomalies
         anomalies = investigation.get("anomalies", [])
         if anomalies:
             alert = await self.create_alert(
@@ -122,7 +110,6 @@ class AlertManager:
         return alerts
 
     def get_alerts(self, limit: int = 50, level: str | None = None) -> list[dict[str, Any]]:
-        """Get recent alerts, optionally filtered by level."""
         alerts = self.alerts
         if level:
             alerts = [a for a in alerts if a["level"] == level]

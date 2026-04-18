@@ -1,22 +1,3 @@
-"""LLaMA fine-tuning setup with LoRA / QLoRA support.
-
-This module provides a safe, human-approved fine-tuning pipeline:
-1. Dataset preparation and validation
-2. LoRA adapter configuration
-3. Training loop with checkpointing
-4. Model merging and export
-
-Fine-tuning is **never triggered automatically**. It is only run
-after human-approved dataset aggregation, following the continuous
-learning controller's protocol.
-
-Dependencies (optional — graceful fallback):
-    torch >= 2.0
-    transformers >= 4.35
-    peft >= 0.7
-    datasets >= 2.14
-    bitsandbytes >= 0.41  (for QLoRA 4-bit quantisation)
-"""
 
 from __future__ import annotations
 
@@ -29,9 +10,6 @@ from typing import Any, Dict, List, Optional
 
 logger = logging.getLogger(__name__)
 
-# ---------------------------------------------------------------------------
-# Optional dependency detection
-# ---------------------------------------------------------------------------
 _TORCH_AVAILABLE = False
 _TRANSFORMERS_AVAILABLE = False
 _PEFT_AVAILABLE = False
@@ -45,38 +23,31 @@ except ImportError:
     pass
 
 try:
-    import transformers  # type: ignore[import-untyped] # noqa: F401
+    import transformers
 
     _TRANSFORMERS_AVAILABLE = True
 except ImportError:
     pass
 
 try:
-    import peft  # type: ignore[import-untyped] # noqa: F401
+    import peft
 
     _PEFT_AVAILABLE = True
 except ImportError:
     pass
 
 try:
-    import bitsandbytes  # type: ignore[import-untyped]  # noqa: F401
+    import bitsandbytes
 
     _BNB_AVAILABLE = True
 except ImportError:
     pass
 
-
 def finetuning_deps_available() -> bool:
-    """Return True when core fine-tuning deps are installed."""
     return _TORCH_AVAILABLE and _TRANSFORMERS_AVAILABLE and _PEFT_AVAILABLE
 
-
-# ---------------------------------------------------------------------------
-# Configuration
-# ---------------------------------------------------------------------------
 @dataclass
 class LoRAConfig:
-    """LoRA / QLoRA adapter configuration."""
 
     r: int = 16
     lora_alpha: int = 32
@@ -86,12 +57,10 @@ class LoRAConfig:
     )
     bias: str = "none"
     task_type: str = "CAUSAL_LM"
-    use_qlora: bool = False  # Enable 4-bit QLoRA quantisation
-
+    use_qlora: bool = False
 
 @dataclass
 class TrainingConfig:
-    """Training hyperparameters."""
 
     output_dir: str = "checkpoints/llama-finetuned"
     num_train_epochs: int = 3
@@ -109,10 +78,8 @@ class TrainingConfig:
     seed: int = 42
     save_total_limit: int = 3
 
-
 @dataclass
 class DatasetConfig:
-    """Dataset preparation configuration."""
 
     train_file: str = ""
     eval_file: str = ""
@@ -121,20 +88,14 @@ class DatasetConfig:
         "### Input:\n{input}\n\n"
         "### Response:\n{output}"
     )
-    max_samples: int = 0  # 0 = no limit
+    max_samples: int = 0
 
-
-# ---------------------------------------------------------------------------
-# Dataset preparation
-# ---------------------------------------------------------------------------
 class DatasetPreparer:
-    """Validate and prepare training data from approved datasets."""
 
     REQUIRED_FIELDS = {"instruction", "output"}
 
     @staticmethod
     def validate_sample(sample: Dict[str, Any]) -> bool:
-        """Validate a single training sample has required fields."""
         if not isinstance(sample, dict):
             return False
         if not all(k in sample for k in DatasetPreparer.REQUIRED_FIELDS):
@@ -147,7 +108,6 @@ class DatasetPreparer:
 
     @staticmethod
     def load_jsonl(path: str) -> List[Dict[str, Any]]:
-        """Load and validate a JSONL dataset file."""
         samples: List[Dict[str, Any]] = []
         invalid_count = 0
 
@@ -180,7 +140,6 @@ class DatasetPreparer:
     def format_prompt(
         sample: Dict[str, Any], template: str = DatasetConfig().prompt_template
     ) -> str:
-        """Format a sample into a training prompt."""
         return template.format(
             instruction=sample.get("instruction", ""),
             input=sample.get("input", ""),
@@ -191,7 +150,6 @@ class DatasetPreparer:
     def prepare_dataset(
         config: DatasetConfig,
     ) -> Dict[str, List[Dict[str, str]]]:
-        """Prepare train and optional eval datasets."""
         result: Dict[str, List[Dict[str, str]]] = {"train": [], "eval": []}
 
         if config.train_file:
@@ -217,17 +175,7 @@ class DatasetPreparer:
         )
         return result
 
-
-# ---------------------------------------------------------------------------
-# Fine-tuning engine (mock-safe)
-# ---------------------------------------------------------------------------
 class LLaMAFineTuner:
-    """LLaMA fine-tuning engine with LoRA / QLoRA support.
-
-    All operations are safe for environments without GPU or full
-    dependencies — they return structured status dicts instead of
-    raising errors.
-    """
 
     def __init__(
         self,
@@ -243,7 +191,6 @@ class LLaMAFineTuner:
         self._trainer = None
 
     def check_environment(self) -> Dict[str, Any]:
-        """Check if the environment supports fine-tuning."""
         gpu_available = _TORCH_AVAILABLE and torch.cuda.is_available()
         return {
             "torch": _TORCH_AVAILABLE,
@@ -256,10 +203,6 @@ class LLaMAFineTuner:
         }
 
     def setup_model(self) -> Dict[str, Any]:
-        """Load base model and apply LoRA adapter.
-
-        Returns a status dict. Does **not** raise on missing deps.
-        """
         if not finetuning_deps_available():
             return {
                 "status": "skipped",
@@ -272,7 +215,6 @@ class LLaMAFineTuner:
 
         logger.info("loading_model", model=self.model_name_or_path)
 
-        # Quantisation config for QLoRA
         quant_config = None
         if self.lora_config.use_qlora and _BNB_AVAILABLE:
             quant_config = BitsAndBytesConfig(
@@ -297,11 +239,9 @@ class LLaMAFineTuner:
         if self._tokenizer.pad_token is None:
             self._tokenizer.pad_token = self._tokenizer.eos_token
 
-        # Prepare for k-bit training if using QLoRA
         if self.lora_config.use_qlora:
             self._model = prepare_model_for_kbit_training(self._model)
 
-        # Apply LoRA
         peft_config = LoraConfig(
             r=self.lora_config.r,
             lora_alpha=self.lora_config.lora_alpha,
@@ -335,13 +275,6 @@ class LLaMAFineTuner:
     def train(
         self, dataset: Dict[str, List[Dict[str, str]]]
     ) -> Dict[str, Any]:
-        """Run the fine-tuning loop.
-
-        Parameters
-        ----------
-        dataset:
-            Output from ``DatasetPreparer.prepare_dataset()``.
-        """
         if not finetuning_deps_available():
             return {"status": "skipped", "reason": "Missing dependencies"}
 
@@ -350,7 +283,6 @@ class LLaMAFineTuner:
 
         from transformers import Trainer, TrainingArguments
 
-        # Build HF dataset
         from datasets import Dataset as HFDataset
 
         train_ds = HFDataset.from_list(dataset["train"])
@@ -358,7 +290,6 @@ class LLaMAFineTuner:
             HFDataset.from_list(dataset["eval"]) if dataset.get("eval") else None
         )
 
-        # Tokenise
         def tokenize(batch: Dict) -> Dict:
             return self._tokenizer(
                 batch["text"],
@@ -412,7 +343,6 @@ class LLaMAFineTuner:
         return metrics
 
     def save_adapter(self, output_dir: Optional[str] = None) -> Dict[str, Any]:
-        """Save the LoRA adapter weights."""
         if self._model is None:
             return {"status": "error", "reason": "No model loaded"}
 
@@ -429,7 +359,6 @@ class LLaMAFineTuner:
         return {"status": "skipped", "reason": "PEFT not available"}
 
     def generate_training_config_file(self, output_path: str = "training_config.json") -> str:
-        """Export current configuration as a JSON file for reproducibility."""
         config = {
             "model_name_or_path": self.model_name_or_path,
             "lora": {

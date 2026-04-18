@@ -1,21 +1,9 @@
-#!/usr/bin/env python3
-"""CLI helper to build a FAISS index from a one-clause-per-line file.
-
-Usage
------
-::
-
-    python utils/build_faiss_index.py data/index/constitution_clauses.txt \\
-        --out data/index/constitution.faiss \\
-        --meta data/index/constitution_meta.json
-"""
 
 from __future__ import annotations
 
 import argparse
 import os
 import sys
-
 
 def main(argv: list[str] | None = None) -> None:
     parser = argparse.ArgumentParser(
@@ -41,7 +29,6 @@ def main(argv: list[str] | None = None) -> None:
     os.makedirs(os.path.dirname(args.out) or ".", exist_ok=True)
     os.makedirs(os.path.dirname(args.meta) or ".", exist_ok=True)
 
-    # Try FAISS retriever first, fall back to simple retriever
     try:
         from utils.retriever_faiss import FAISSRetriever
 
@@ -56,7 +43,6 @@ def main(argv: list[str] | None = None) -> None:
     retriever.build_index(args.input, args.out, args.meta)
     print(f"Index written to {args.out}")
     print(f"Metadata written to {args.meta}")
-
 
 if __name__ == "__main__":
     main()

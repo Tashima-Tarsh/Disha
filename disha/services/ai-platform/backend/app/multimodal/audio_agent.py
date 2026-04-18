@@ -1,10 +1,3 @@
-"""
-Audio Agent for multimodal intelligence analysis.
-
-Processes audio for threat intelligence: speech-to-text transcription,
-speaker identification, language detection, keyword spotting,
-and audio pattern analysis.
-"""
 import base64
 import io
 from typing import Optional
@@ -16,18 +9,7 @@ from app.core.config import get_settings
 
 logger = structlog.get_logger(__name__)
 
-
 class AudioAgent(BaseAgent):
-    """
-    Multimodal audio agent for speech and sound analysis.
-
-    Capabilities:
-    - Speech-to-text transcription (Whisper API)
-    - Language and accent detection
-    - Keyword spotting for threat indicators
-    - Speaker diarization (who said what)
-    - Audio event classification
-    """
 
     def __init__(self):
         super().__init__(
@@ -43,16 +25,6 @@ class AudioAgent(BaseAgent):
         return self._client
 
     async def execute(self, target: str, context: Optional[dict] = None) -> dict:
-        """
-        Analyze audio content for intelligence.
-
-        Args:
-            target: Audio file URL or identifier
-            context: Optional dict with:
-                - audio_data: base64-encoded audio bytes
-                - analysis_type: "transcribe" | "analyze" | "keywords"
-                - language: Expected language code (e.g., "en")
-        """
         context = context or {}
         analysis_type = context.get("analysis_type", "transcribe")
 
@@ -69,18 +41,16 @@ class AudioAgent(BaseAgent):
         results = {}
         entities = []
 
-        # Transcribe audio
         transcript = await self._transcribe(audio_data, context.get("language"))
         results["transcription"] = transcript
 
         if transcript.get("text"):
-            # Analyze transcript for threat intelligence
+
             if analysis_type in ("analyze", "keywords"):
                 analysis = await self._analyze_transcript(transcript["text"])
                 results["analysis"] = analysis
                 entities.extend(self._extract_entities(analysis))
 
-            # Keyword spotting
             keywords = self._spot_keywords(transcript["text"])
             results["keywords_detected"] = keywords
 
@@ -107,7 +77,6 @@ class AudioAgent(BaseAgent):
         }
 
     async def _fetch_audio(self, url: str) -> Optional[str]:
-        """Fetch audio from URL and convert to base64."""
         try:
             client = await self._get_client()
             response = await client.get(url)
@@ -120,11 +89,6 @@ class AudioAgent(BaseAgent):
     async def _transcribe(
         self, audio_base64: str, language: Optional[str] = None
     ) -> dict:
-        """
-        Transcribe audio using OpenAI Whisper API.
-
-        Returns dict with text, language, and duration.
-        """
         try:
             client = await self._get_client()
             api_key = self.settings.OPENAI_API_KEY
@@ -156,7 +120,6 @@ class AudioAgent(BaseAgent):
             return {"text": "", "error": str(e)}
 
     async def _analyze_transcript(self, text: str) -> dict:
-        """Use LLM to analyze transcript for threat intelligence."""
         try:
             client = await self._get_client()
             api_key = self.settings.OPENAI_API_KEY
@@ -198,7 +161,6 @@ class AudioAgent(BaseAgent):
             return {"analysis": None, "error": str(e)}
 
     def _spot_keywords(self, text: str) -> list:
-        """Detect threat-related keywords in transcript."""
         threat_keywords = [
             "attack", "exploit", "vulnerability", "breach", "malware",
             "ransomware", "phishing", "credential", "password", "bitcoin",
@@ -212,13 +174,11 @@ class AudioAgent(BaseAgent):
         return found
 
     def _extract_entities(self, analysis: dict) -> list:
-        """Extract entities from LLM analysis of transcript."""
         entities = []
         content = analysis.get("analysis", "")
         if not content:
             return entities
 
-        # The LLM analysis is a structured text; create entity for it
         entities.append({
             "id": f"audio_analysis_{hash(content[:100]) % 10**8}",
             "label": "Audio Intelligence",
@@ -233,7 +193,6 @@ class AudioAgent(BaseAgent):
         return entities
 
     def _compute_audio_risk(self, results: dict) -> float:
-        """Compute risk score from audio analysis."""
         risk = 0.0
 
         keywords = results.get("keywords_detected", [])
@@ -250,6 +209,5 @@ class AudioAgent(BaseAgent):
         return min(risk, 1.0)
 
     async def close(self):
-        """Clean up HTTP client."""
         if self._client and not self._client.is_closed:
             await self._client.aclose()

@@ -1,35 +1,24 @@
-"""Legal Knowledge Ingestion Pipeline - Fetches and processes legal documents."""
 
 import uuid
 from typing import Any
 import structlog
 from app.services.memory.vector_store import VectorStore
 
-
 logger = structlog.get_logger(__name__)
 
-
 class LegalPipeline:
-    """Pipeline for ingesting the Constitution of India and other legal texts."""
 
     def __init__(self):
         self.vector_store = VectorStore(collection_name="legal_knowledge")
         self.logger = logger.bind(service="legal_pipeline")
 
     async def run(self, source_url: str | None = None) -> dict[str, Any]:
-        """Run the full ingestion cycle."""
         self.logger.info("ingestion_started", source=source_url or "Official GoI Portals")
 
-        # Step 1: Fetch source
-        # In a real scenario, this would involve scraping legislative.gov.in
-        # For this execution, we'll implement a robust parser for a mock constitutional dataset
-        # to demonstrate the metadata tagging logic.
         raw_data = await self._fetch_constitutional_data(source_url)
 
-        # Step 2: Parse and Chunk
         chunks = self._chunk_data(raw_data)
 
-        # Step 3: Embed and Store
         success = await self.vector_store.store(
             documents=[c["content"] for c in chunks],
             metadatas=[c["metadata"] for c in chunks],
@@ -40,8 +29,7 @@ class LegalPipeline:
         return {"status": "success" if success else "failed", "chunks": len(chunks)}
 
     async def _fetch_constitutional_data(self, url: str | None) -> list[dict[str, Any]]:
-        """Fetch raw constitutional provisions."""
-        # This is a sample representation of the structured data fetched from Govt portals
+
         return [
             {
                 "article": "1",
@@ -74,7 +62,6 @@ class LegalPipeline:
         ]
 
     def _chunk_data(self, raw_data: list[dict[str, Any]]) -> list[dict[str, Any]]:
-        """Chunk the provisions and enrich with metadata."""
         chunks = []
         for item in raw_data:
             chunks.append({

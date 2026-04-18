@@ -1,20 +1,3 @@
-"""
-Decision Engine Training Script — trains a confidence calibration model.
-
-The multi-agent decision engine (political, legal, ideology, security)
-currently uses static confidence values.  This script:
-
-1. Generates synthetic training scenarios with known ground-truth ratings.
-2. Runs each scenario through all four agents (mock LLM).
-3. Trains a lightweight regression model that learns to calibrate the
-   final confidence score based on agent features.
-4. Saves the trained calibration model and scenario dataset.
-
-Usage::
-
-    DISHA_MODEL_PROVIDER=mock python decision-engine/train.py
-    cd decision-engine && DISHA_MODEL_PROVIDER=mock python train.py
-"""
 
 from __future__ import annotations
 
@@ -29,13 +12,9 @@ _SCRIPT_DIR = Path(__file__).resolve().parent
 if str(_SCRIPT_DIR) not in sys.path:
     sys.path.insert(0, str(_SCRIPT_DIR))
 
-# Force mock for training data generation
 os.environ.setdefault("DISHA_MODEL_PROVIDER", "mock")
 
-from main_decision_engine import DecisionEngine  # noqa: E402
-
-
-# ── Synthetic Scenario Generator ──────────────────────────────────────
+from main_decision_engine import DecisionEngine
 
 _SCENARIO_TEMPLATES = [
     "Should the government amend {article} to include {right}?",
@@ -73,9 +52,7 @@ _FILLS = {
     "treaty": ["the WTO framework", "bilateral agreements", "regional pacts", "UN resolutions"],
 }
 
-
 def _generate_scenarios(n: int = 200, seed: int = 42) -> list[dict]:
-    """Generate *n* synthetic scenarios with ground-truth quality scores."""
     rng = np.random.RandomState(seed)
     scenarios = []
     for i in range(n):
@@ -85,16 +62,12 @@ def _generate_scenarios(n: int = 200, seed: int = 42) -> list[dict]:
             placeholder = "{" + key + "}"
             if placeholder in filled:
                 filled = filled.replace(placeholder, rng.choice(values), 1)
-        # Ground-truth quality (simulated expert rating 0-1)
+
         gt_quality = float(np.clip(rng.beta(5, 3), 0.1, 0.95))
         scenarios.append({"text": filled, "ground_truth_quality": gt_quality, "id": i})
     return scenarios
 
-
-# ── Feature extractor ─────────────────────────────────────────────────
-
 def _extract_features(decision: dict) -> np.ndarray:
-    """Extract numeric features from a DecisionEngine.decide() result."""
     agent_results = decision.get("agent_results", {})
     features = []
     for agent_name in ("political", "legal", "ideology", "security"):
@@ -104,21 +77,13 @@ def _extract_features(decision: dict) -> np.ndarray:
         features.append(len(ar.get("inference_steps", [])))
         features.append(len(ar.get("recommendations", [])))
         features.append(len(ar.get("sources", [])))
-    # Overall stats
+
     features.append(decision.get("confidence", 0.0))
     features.append(len(decision.get("recommendations", [])))
     features.append(len(decision.get("sources", [])))
     return np.array(features, dtype=np.float32)
 
-
-# ── Calibration Model (lightweight numpy) ─────────────────────────────
-
 class CalibrationModel:
-    """Simple linear regression model for confidence calibration.
-
-    Trainable without heavy ML libraries — uses numpy least-squares.
-    Falls back to ridge regression for numerical stability.
-    """
 
     def __init__(self):
         self.weights: np.ndarray | None = None
@@ -127,32 +92,22 @@ class CalibrationModel:
         self.feature_std: np.ndarray | None = None
 
     def fit(self, X: np.ndarray, y: np.ndarray, alpha: float = 0.1) -> dict:
-        """Fit using ridge regression (closed-form).
 
-        Args:
-            X: (n_samples, n_features) feature matrix
-            y: (n_samples,) target quality scores
-            alpha: L2 regularisation strength
-        """
-        # Normalise features
         self.feature_mean = X.mean(axis=0)
         self.feature_std = X.std(axis=0) + 1e-8
         X_norm = (X - self.feature_mean) / self.feature_std
 
-        # Add bias column
         ones = np.ones((X_norm.shape[0], 1))
         X_aug = np.hstack([X_norm, ones])
 
-        # Ridge: w = (X'X + αI)^{-1} X'y
         XtX = X_aug.T @ X_aug
         reg = alpha * np.eye(XtX.shape[0])
-        reg[-1, -1] = 0  # Don't regularise bias
+        reg[-1, -1] = 0
         w = np.linalg.solve(XtX + reg, X_aug.T @ y)
 
         self.weights = w[:-1]
         self.bias = float(w[-1])
 
-        # Metrics
         preds = self.predict(X)
         mse = float(np.mean((preds - y) ** 2))
         mae = float(np.mean(np.abs(preds - y)))
@@ -161,7 +116,6 @@ class CalibrationModel:
         return {"mse": mse, "mae": mae, "r2": r2}
 
     def predict(self, X: np.ndarray) -> np.ndarray:
-        """Predict calibrated confidence scores."""
         if self.weights is None:
             return np.full(X.shape[0], 0.5)
         X_norm = (X - self.feature_mean) / self.feature_std
@@ -169,7 +123,6 @@ class CalibrationModel:
         return np.clip(raw, 0.0, 1.0)
 
     def to_dict(self) -> dict:
-        """Serialise to a JSON-safe dict."""
         return {
             "weights": self.weights.tolist() if self.weights is not None else None,
             "bias": self.bias,
@@ -179,7 +132,6 @@ class CalibrationModel:
 
     @classmethod
     def from_dict(cls, d: dict) -> "CalibrationModel":
-        """Deserialise from a dict."""
         m = cls()
         m.weights = np.array(d["weights"]) if d.get("weights") is not None else None
         m.bias = d.get("bias", 0.0)
@@ -187,14 +139,10 @@ class CalibrationModel:
         m.feature_std = np.array(d["feature_std"]) if d.get("feature_std") is not None else None
         return m
 
-
-# ── Main training loop ────────────────────────────────────────────────
-
 def train(
     num_scenarios: int = 200,
     checkpoint_dir: str | None = None,
 ) -> dict:
-    """Generate data, run the engine, train calibration, save results."""
     print("Generating synthetic scenarios…")
     scenarios = _generate_scenarios(num_scenarios)
 
@@ -215,7 +163,6 @@ def train(
     X = np.array(features_list)
     y = np.array(targets)
 
-    # Train/test split (80/20)
     split = int(0.8 * len(X))
     X_train, X_test = X[:split], X[split:]
     y_train, y_test = y[:split], y[split:]
@@ -225,14 +172,12 @@ def train(
     train_metrics = model.fit(X_train, y_train)
     print(f"  Train — MSE: {train_metrics['mse']:.4f}  MAE: {train_metrics['mae']:.4f}  R²: {train_metrics['r2']:.4f}")
 
-    # Test metrics
     test_preds = model.predict(X_test)
     test_mse = float(np.mean((test_preds - y_test) ** 2))
     test_mae = float(np.mean(np.abs(test_preds - y_test)))
     test_r2 = float(1 - np.sum((y_test - test_preds) ** 2) / (np.sum((y_test - np.mean(y_test)) ** 2) + 1e-8))
     print(f"  Test  — MSE: {test_mse:.4f}  MAE: {test_mae:.4f}  R²: {test_r2:.4f}")
 
-    # ── Save ──────────────────────────────────────────────────────────
     ckpt_dir = Path(checkpoint_dir) if checkpoint_dir else (_SCRIPT_DIR / "checkpoints")
     ckpt_dir.mkdir(parents=True, exist_ok=True)
 
@@ -241,7 +186,6 @@ def train(
         json.dump(model.to_dict(), f, indent=2)
     print(f"Calibration model saved → {model_path}")
 
-    # Save training dataset for reproducibility
     dataset_path = ckpt_dir / "training_scenarios.json"
     with open(dataset_path, "w") as f:
         json.dump(scenarios, f, indent=2)
@@ -260,7 +204,6 @@ def train(
     print(f"Metrics saved → {metrics_path}")
 
     return summary
-
 
 if __name__ == "__main__":
     result = train()

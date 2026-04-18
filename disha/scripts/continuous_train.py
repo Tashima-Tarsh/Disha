@@ -1,22 +1,3 @@
-#!/usr/bin/env python3
-"""
-Continuous Training Runner  fetches open-source data, trains all models,
-evaluates performance, and promotes improved checkpoints.
-
-Features:
-  - Open-source data ingestion (abuse.ch, OSINT feeds, synthetic enrichment)
-  - Incremental training that loads previous checkpoints and continues
-  - Model self-enhancement: auto hyperparameter tuning, curriculum learning
-  - Metric tracking across rounds with improvement gating
-  - Safe checkpoint promotion (only if metrics improve)
-
-Usage::
-
-    python scripts/continuous_train.py                    # full pipeline
-    python scripts/continuous_train.py --rounds 5         # 5 training rounds
-    python scripts/continuous_train.py --component rl     # RL only
-    python scripts/continuous_train.py --offline           # no network (synthetic only)
-"""
 
 from __future__ import annotations
 
@@ -31,11 +12,10 @@ from typing import Any
 import numpy as np
 import structlog
 
-#  Path setup
 REPO_ROOT = Path(__file__).resolve().parents[2]
-BACKEND = REPO_ROOT / "ai-platform" / "backend"
-DECISION_DIR = REPO_ROOT / "decision-engine"
-SCRIPTS_DIR = REPO_ROOT / "scripts"
+BACKEND = REPO_ROOT / "disha" / "services" / "ai-platform" / "backend"
+DECISION_DIR = REPO_ROOT / "disha" / "ai" / "core" / "decision-engine"
+SCRIPTS_DIR = Path(__file__).resolve().parent
 
 if str(BACKEND) not in sys.path:
     sys.path.insert(0, str(BACKEND))
@@ -48,17 +28,10 @@ os.environ.setdefault("DISHA_MODEL_PROVIDER", "mock")
 
 logger = structlog.get_logger("continuous_train")
 
-
-#
-# Hyperparameter schedules for self-enhancement
-#
-
 class HyperparamScheduler:
-    """Auto-tunes hyperparameters based on training metrics history."""
 
-    # Stagnation detection: if reward changes less than this fraction, boost LR
     STAGNATION_THRESHOLD = 0.01
-    # Minimum denominator to avoid division by zero
+
     EPSILON = 1e-8
 
     def __init__(self):
@@ -68,14 +41,13 @@ class HyperparamScheduler:
         self.history.append(metrics)
 
     def get_rl_params(self, round_num: int) -> dict:
-        """Return RL hyperparameters, adapting based on history."""
         base = {
-            "num_episodes": 300 + round_num * 100,  # More episodes each round
+            "num_episodes": 300 + round_num * 100,
             "update_every": 20,
             "hidden_dim": 128,
             "lr": 3e-4,
         }
-        # If reward is stagnating, increase exploration
+
         if len(self.history) >= 2:
             prev = self.history[-2].get("rl", {}).get("final_avg_reward", 0)
             curr = self.history[-1].get("rl", {}).get("final_avg_reward", 0)
@@ -85,14 +57,13 @@ class HyperparamScheduler:
         return base
 
     def get_gnn_params(self, round_num: int) -> dict:
-        """Return GNN hyperparameters, adapting based on history."""
         base = {
             "num_epochs_link": 150 + round_num * 50,
             "num_epochs_classify": 100 + round_num * 30,
             "lr": 0.005,
             "weight_decay": 1e-3,
         }
-        # If link loss is still high, boost epochs
+
         if self.history:
             last_loss = self.history[-1].get("gnn", {}).get("link_final_loss", 999)
             if last_loss > 1.3:
@@ -101,19 +72,12 @@ class HyperparamScheduler:
         return base
 
     def get_de_params(self, round_num: int) -> dict:
-        """Return Decision Engine hyperparameters."""
         return {
             "num_scenarios": 200 + round_num * 100,
-            "alpha": max(0.01, 0.1 - round_num * 0.01),  # Decrease regularisation
+            "alpha": max(0.01, 0.1 - round_num * 0.01),
         }
 
-
-#
-# Graph merging utility
-#
-
 def _merge_graphs(threat_graph, knowledge_graph: dict):
-    """Merge threat intelligence graph with knowledge graph for richer training."""
     from data_fetchers import GraphDataset
 
     tg_feats = threat_graph.node_features
@@ -126,7 +90,6 @@ def _merge_graphs(threat_graph, knowledge_graph: dict):
     kg_labels = knowledge_graph["node_labels"]
     kg_types = knowledge_graph["node_types"]
 
-    # Align feature dimensions
     tg_dim = tg_feats.shape[1]
     kg_dim = kg_feats.shape[1]
     if tg_dim != kg_dim:
@@ -140,18 +103,15 @@ def _merge_graphs(threat_graph, knowledge_graph: dict):
 
     offset = tg_feats.shape[0]
 
-    # Merge features
     merged_feats = np.concatenate([tg_feats, kg_feats], axis=0)
     merged_labels = np.concatenate([tg_labels, kg_labels], axis=0)
     merged_types = np.concatenate([tg_types, kg_types], axis=0)
 
-    # Offset knowledge graph edges
     if kg_edges.size > 0:
         kg_edges_offset = kg_edges + offset
     else:
         kg_edges_offset = kg_edges
 
-    # Merge edges
     if tg_edges.size > 0 and kg_edges_offset.size > 0:
         merged_edges = np.concatenate([tg_edges, kg_edges_offset], axis=1)
     elif tg_edges.size > 0:
@@ -177,18 +137,12 @@ def _merge_graphs(threat_graph, knowledge_graph: dict):
         },
     )
 
-
-#
-# Component trainers
-#
-
 def _train_rl(
     scenarios: list,
     params: dict,
     checkpoint_dir: Path,
     prev_checkpoint: Path | None = None,
 ) -> dict:
-    """Train RL policy on threat scenarios (incremental)."""
     try:
         import torch
     except ImportError:
@@ -211,7 +165,6 @@ def _train_rl(
         lr=params.get("lr", 3e-4),
     )
 
-    # Load previous checkpoint for incremental training
     if prev_checkpoint and prev_checkpoint.exists():
         ckpt = torch.load(prev_checkpoint, weights_only=True)
         if ckpt.get("hidden_dim", 64) == hidden_dim:
@@ -234,7 +187,6 @@ def _train_rl(
         replay.start_episode()
         ep_reward = 0.0
 
-        # Use real scenario data to shape outcomes
         scenario = scenarios[ep % len(scenarios)] if scenarios else None
 
         while True:
@@ -266,7 +218,6 @@ def _train_rl(
         if ep % update_every == 0:
             policy.update(epochs=4)
 
-    # Save checkpoint
     checkpoint_dir.mkdir(parents=True, exist_ok=True)
     ckpt_path = checkpoint_dir / "rl_policy.pt"
     torch.save({
@@ -291,9 +242,7 @@ def _train_rl(
     logger.info("rl_training_complete", **{k: round(v, 4) if isinstance(v, float) else v for k, v in metrics.items()})
     return metrics
 
-
 def _scenario_outcome(action: int, scenario, rng: np.random.RandomState) -> dict:
-    """Generate investigation outcome enriched by real threat data."""
     if action >= 5:
         return {}
 
@@ -305,25 +254,23 @@ def _scenario_outcome(action: int, scenario, rng: np.random.RandomState) -> dict
         "time_taken": float(np.clip(rng.exponential(2.0), 0.5, 10.0)),
     }
 
-    # Enrich from real scenario data
     if scenario is not None:
         num_indicators = len(getattr(scenario, "indicators", []))
         real_risk = getattr(scenario, "risk_score", 0.5)
 
-        if action == 0:  # OSINT
+        if action == 0:
             base["entities_found"] += min(num_indicators, 8)
             base["risk_score"] = max(base["risk_score"], real_risk * 0.8)
-        elif action == 1:  # CRYPTO
+        elif action == 1:
             base["anomalies_found"] += int(rng.binomial(2, real_risk))
-        elif action == 2:  # DETECTION
+        elif action == 2:
             base["risk_score"] = float(np.clip(base["risk_score"] + real_risk * 0.3, 0, 1))
-        elif action == 3:  # GRAPH
+        elif action == 3:
             base["relationships_found"] += int(num_indicators * 0.5)
-        elif action == 4:  # REASONING
+        elif action == 4:
             base["anomalies_found"] += int(rng.binomial(1, real_risk))
 
     return base
-
 
 def _train_gnn(
     graph_data,
@@ -331,7 +278,6 @@ def _train_gnn(
     checkpoint_dir: Path,
     prev_checkpoint: Path | None = None,
 ) -> dict:
-    """Train GNN on graph data (incremental)."""
     import importlib.util
     try:
         import torch
@@ -340,7 +286,6 @@ def _train_gnn(
 
     _GRAPH_DIR = BACKEND / "graph_ai"
 
-    # Load models directly to avoid __init__.py issues
     _models_spec = importlib.util.spec_from_file_location(
         "graph_ai.models", _GRAPH_DIR / "models.py"
     )
@@ -360,7 +305,6 @@ def _train_gnn(
 
     feature_dim = graph_data.node_features.shape[1]
 
-    # Link prediction
     trainer = GNNTrainer(
         in_features=feature_dim,
         hidden_dim=64,
@@ -368,7 +312,6 @@ def _train_gnn(
         learning_rate=params.get("lr", 0.005),
     )
 
-    # Load previous weights if available
     if prev_checkpoint and (prev_checkpoint / "gnn_link_predictor.pt").exists():
         try:
             ckpt = torch.load(prev_checkpoint / "gnn_link_predictor.pt", weights_only=True)
@@ -385,7 +328,6 @@ def _train_gnn(
         num_epochs=params.get("num_epochs_link", 200),
     )
 
-    # Node classification
     num_classes = int(graph_data.node_labels.max()) + 1
     classifier = GraphClassifier(in_channels=feature_dim, hidden_channels=64, num_classes=num_classes)
 
@@ -408,7 +350,6 @@ def _train_gnn(
     edge_idx = torch.LongTensor(graph_data.edge_index)
     labels = torch.LongTensor(graph_data.node_labels)
 
-    # Shuffled train/test split (80/20)
     num_nodes = len(labels)
     perm = torch.randperm(num_nodes, generator=torch.Generator().manual_seed(42))
     num_train = int(0.8 * num_nodes)
@@ -431,7 +372,6 @@ def _train_gnn(
         loss.backward()
         clf_optimizer.step()
 
-        # Early stopping based on test accuracy
         if epoch % 10 == 0:
             classifier.eval()
             with torch.no_grad():
@@ -450,7 +390,6 @@ def _train_gnn(
                 logger.info("gnn_early_stopping", epoch=epoch, best_test_acc=round(best_test_acc, 4))
                 break
 
-    # Restore best model
     if best_state is not None:
         classifier.load_state_dict(best_state)
 
@@ -461,7 +400,6 @@ def _train_gnn(
         train_acc = float((preds[train_mask] == labels[train_mask]).float().mean())
         test_acc = float((preds[test_mask] == labels[test_mask]).float().mean()) if test_mask.sum() > 0 else 0.0
 
-    # Save
     checkpoint_dir.mkdir(parents=True, exist_ok=True)
     torch.save({
         "encoder_state_dict": trainer.encoder.state_dict(),
@@ -490,7 +428,7 @@ def _train_gnn(
         "graph_nodes": graph_data.node_features.shape[0],
         "graph_edges": int(graph_data.edge_index.shape[1]) if graph_data.edge_index.size else 0,
     }
-    # Write metrics in the format expected by test_trained_models.py
+
     metrics_file = {
         "link_prediction": {
             "epochs": params.get("num_epochs_link", 200),
@@ -513,15 +451,13 @@ def _train_gnn(
     logger.info("gnn_training_complete", **{k: round(v, 4) if isinstance(v, float) else v for k, v in metrics.items()})
     return metrics
 
-
 def _train_decision_engine(
     scenarios: list[dict],
     params: dict,
     checkpoint_dir: Path,
 ) -> dict:
-    """Train decision engine calibration on enriched scenarios."""
     from main_decision_engine import DecisionEngine
-    # Import CalibrationModel and _extract_features from the existing train module
+
     de_train_path = DECISION_DIR / "train.py"
     import importlib.util
     spec = importlib.util.spec_from_file_location("de_train", de_train_path)
@@ -567,7 +503,7 @@ def _train_decision_engine(
         "test_mse": test_mse,
         "test_mae": test_mae,
     }
-    # Write metrics in the format expected by test_trained_models.py
+
     metrics_file = {
         "num_scenarios": len(scenarios),
         "train_size": split,
@@ -582,25 +518,19 @@ def _train_decision_engine(
     logger.info("de_training_complete", **{k: round(v, 4) if isinstance(v, float) else v for k, v in metrics.items()})
     return metrics
 
-
-#
-# Checkpoint promotion with improvement gating
-#
-
 def _should_promote(current: dict, previous: dict | None, component: str) -> bool:
-    """Decide if new checkpoint should replace the previous one."""
     if previous is None:
         return True
 
     if component == "rl":
         cur_reward = current.get("final_avg_reward", 0)
         prev_reward = previous.get("final_avg_reward", 0)
-        return cur_reward >= prev_reward * 0.95  # Allow 5% regression tolerance
+        return cur_reward >= prev_reward * 0.95
 
     if component == "gnn":
         cur_loss = current.get("link_final_loss", 999)
         prev_loss = previous.get("link_final_loss", 999)
-        return cur_loss <= prev_loss * 1.05  # Allow 5% regression
+        return cur_loss <= prev_loss * 1.05
 
     if component == "decision":
         cur_mse = current.get("test_mse", 999)
@@ -609,9 +539,7 @@ def _should_promote(current: dict, previous: dict | None, component: str) -> boo
 
     return True
 
-
 def _promote_checkpoint(staging_dir: Path, production_dir: Path, component: str):
-    """Copy staging checkpoint to production."""
     import shutil
 
     if not staging_dir.exists():
@@ -627,17 +555,11 @@ def _promote_checkpoint(staging_dir: Path, production_dir: Path, component: str)
 
     logger.info("checkpoint_promoted", component=component, src=str(staging_dir), dst=str(production_dir))
 
-
-#
-# Main continuous training loop
-#
-
 def run_continuous_training(
     rounds: int = 3,
     component: str | None = None,
     offline: bool = False,
 ) -> dict:
-    """Run multiple rounds of continuous training with self-enhancement."""
     from data_fetchers import (
         fetch_all_rl_data,
         generate_synthetic_threats,
@@ -653,17 +575,14 @@ def run_continuous_training(
     scheduler = HyperparamScheduler()
     round_results: list[dict] = []
 
-    # Production checkpoint dirs (where deployed models live)
     rl_prod_dir = BACKEND / "checkpoints"
     gnn_prod_dir = BACKEND / "checkpoints"
     de_prod_dir = DECISION_DIR / "checkpoints"
 
-    # Load previous metrics for improvement gating
     prev_rl_metrics = _load_metrics(rl_prod_dir / "rl_training_metrics.json")
     prev_gnn_metrics = _load_metrics(gnn_prod_dir / "gnn_training_metrics.json")
     prev_de_metrics = _load_metrics(de_prod_dir / "decision_training_metrics.json")
 
-    #  Load universal knowledge corpus once
     logger.info("loading_knowledge_corpus")
     knowledge_corpus = load_all_knowledge()
     logger.info("knowledge_corpus_loaded",
@@ -675,7 +594,6 @@ def run_continuous_training(
         t0 = time.time()
         round_metrics: dict[str, Any] = {"round": round_num}
 
-        #  1. Fetch fresh data
         logger.info("fetching_data", offline=offline)
         if offline:
             threat_scenarios = generate_synthetic_threats(n=150, seed=round_num * 42)
@@ -685,23 +603,20 @@ def run_continuous_training(
                 logger.warning("network_fetch_empty_fallback_to_synthetic")
                 threat_scenarios = generate_synthetic_threats(n=150, seed=round_num * 42)
 
-        # Build GNN graph from threat data + knowledge graph
         threat_graph = build_graph_from_threats(threat_scenarios)
 
-        # Build cross-domain knowledge graph and merge
         if component is None or component in ("gnn", "knowledge"):
             kg = build_knowledge_graph(knowledge_corpus, feature_dim=threat_graph.node_features.shape[1])
             graph_data = _merge_graphs(threat_graph, kg)
         else:
             graph_data = threat_graph
 
-        # Generate decision engine scenarios (original + cross-domain)
         de_count = scheduler.get_de_params(round_num)["num_scenarios"]
         de_scenarios = generate_advanced_scenarios(
             n=de_count // 2,
             seed=round_num * 17,
         )
-        # Add cross-domain knowledge scenarios
+
         cross_scenarios = generate_cross_domain_scenarios(
             knowledge_corpus,
             n=de_count // 2,
@@ -709,8 +624,6 @@ def run_continuous_training(
         )
         de_scenarios.extend(cross_scenarios)
 
-        #  2. Train each component
-        # Staging dir for this round
         staging = REPO_ROOT / "checkpoints_staging" / f"round_{round_num}"
 
         if component is None or component == "rl":
@@ -766,7 +679,6 @@ def run_continuous_training(
             else:
                 logger.warning("de_not_promoted", reason="regression")
 
-        #  3. Record for self-enhancement
         elapsed = time.time() - t0
         round_metrics["elapsed_seconds"] = round(elapsed, 1)
         scheduler.record(round_metrics)
@@ -774,7 +686,6 @@ def run_continuous_training(
 
         logger.info("round_complete", round=round_num, elapsed=f"{elapsed:.1f}s")
 
-    #  Final summary
     summary = {
         "total_rounds": rounds,
         "rounds": round_results,
@@ -793,7 +704,6 @@ def run_continuous_training(
         json.dump(summary, f, indent=2, default=str)
     logger.info("training_summary_saved", path=str(summary_path))
 
-    # Clean up staging dirs
     staging_root = REPO_ROOT / "checkpoints_staging"
     if staging_root.exists():
         import shutil
@@ -801,18 +711,11 @@ def run_continuous_training(
 
     return summary
 
-
 def _load_metrics(path: Path) -> dict | None:
-    """Load metrics JSON, returning None if not found."""
     if path.exists():
         with open(path) as f:
             return json.load(f)
     return None
-
-
-#
-# CLI
-#
 
 def main():
     parser = argparse.ArgumentParser(description="Continuous AI Training Pipeline")
@@ -832,7 +735,6 @@ def main():
     print("  CONTINUOUS TRAINING COMPLETE")
     print(f"{'=' * 60}")
 
-    # Show knowledge domains loaded
     kd = result.get("knowledge_domains", [])
     ki = result.get("knowledge_items_total", 0)
     if kd:
@@ -848,7 +750,6 @@ def main():
                   f"train_acc={r['gnn'].get('train_accuracy', 'N/A'):.4f}")
         if "decision" in r:
             print(f"    DE:  test_mse={r['decision'].get('test_mse', 'N/A'):.4f}")
-
 
 if __name__ == "__main__":
     main()
