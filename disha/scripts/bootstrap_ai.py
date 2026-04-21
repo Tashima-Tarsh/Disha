@@ -2,7 +2,7 @@ import json
 import os
 
 def bootstrap_data():
-    base_path = "disha/ai/core/decision-engine/data"
+    base_path = "disha/ai/core/decision_engine/data"
     raw_path = os.path.join(base_path, "raw")
     index_path = os.path.join(base_path, "index")
 

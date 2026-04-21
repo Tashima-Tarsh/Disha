@@ -27,7 +27,7 @@ torch = pytest.importorskip(
 _THIS = Path(__file__).resolve()
 _REPO_ROOT = _THIS.parents[5]
 _BACKEND = _REPO_ROOT / "disha" / "services" / "ai-platform" / "backend"
-_DECISION = _REPO_ROOT / "disha" / "ai" / "core" / "decision-engine"
+_DECISION = _REPO_ROOT / "disha" / "ai" / "core" / "decision_engine"
 
 for p in [str(_REPO_ROOT), str(_BACKEND / "app"), str(_BACKEND), str(_DECISION)]:
     if p not in sys.path:

@@ -4,11 +4,11 @@ on:
   push:
     branches: [main]
     paths:
-      - 'disha/ai/core/decision-engine/**'
+      - 'disha/ai/core/decision_engine/**'
   pull_request:
     branches: [main]
     paths:
-      - 'disha/ai/core/decision-engine/**'
+      - 'disha/ai/core/decision_engine/**'
 
 permissions:
   contents: read
@@ -29,16 +29,16 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install -r disha/ai/core/decision-engine/requirements.txt
+          pip install -r disha/ai/core/decision_engine/requirements.txt
 
       - name: Lint
         run: |
           pip install flake8
-          flake8 disha/ai/core/decision-engine/ --max-line-length=120 --ignore=E501,W503,W504
+          flake8 disha/ai/core/decision_engine/ --max-line-length=120 --ignore=E501,W503,W504
 
       - name: Run tests
         env:
           PYTHONPATH: ${{ github.workspace }}
         run: |
-          cd disha/ai/core/decision-engine
+          cd disha/ai/core/decision_engine
           python -m pytest tests/ -v --tb=short

@@ -30,7 +30,7 @@ on:
       - "disha/ai/rag/**"
       - "disha/services/ai-platform/backend/app/rl/train.py"
       - "disha/services/ai-platform/backend/app/core/graph_ai/train.py"
-      - "disha/ai/core/decision-engine/train.py"
+      - "disha/ai/core/decision_engine/train.py"
 
 permissions:
   contents: write
@@ -89,7 +89,7 @@ jobs:
           name: training-metrics-${{ github.run_number }}
           path: |
             disha/services/ai-platform/backend/checkpoints/*_metrics.json
-            disha/ai/core/decision-engine/checkpoints/*_metrics.json
+            disha/ai/core/decision_engine/checkpoints/*_metrics.json
             training_summary.json
           retention-days: 30
 
@@ -97,7 +97,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add disha/services/ai-platform/backend/checkpoints/*.json disha/ai/core/decision-engine/checkpoints/ training_summary.json || true
+          git add disha/services/ai-platform/backend/checkpoints/*.json disha/ai/core/decision_engine/checkpoints/ training_summary.json || true
           if git diff --staged --quiet; then
             echo "No metric changes to commit"
           else

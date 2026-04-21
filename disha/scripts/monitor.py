@@ -116,7 +116,7 @@ class CheckpointIntegrityChecker:
     def check(self, root: Path) -> HealthCheck:
         checkpoint_dirs = [
             root / "disha" / "ai" / "core" / "checkpoints",
-            root / "disha" / "ai" / "core" / "decision-engine" / "checkpoints",
+            root / "disha" / "ai" / "core" / "decision_engine" / "checkpoints",
         ]
         results = {}
         for ckpt_dir in checkpoint_dirs:
@@ -181,7 +181,7 @@ class ConfigConsistencyChecker:
 
         expected_req = [
             "disha/ai/core/requirements.txt",
-            "disha/ai/core/decision-engine/requirements.txt",
+            "disha/ai/core/decision_engine/requirements.txt",
             "disha/services/alerts/requirements.txt",
         ]
         for req in expected_req:
@@ -324,7 +324,7 @@ class TrainingPipelineChecker:
 class SubsystemChecker:
     _EXPECTED = {
         "disha/ai/core": ["cognitive_loop.py", "requirements.txt"],
-        "disha/ai/core/decision-engine": ["checkpoints", "requirements.txt"],
+        "disha/ai/core/decision_engine": ["checkpoints", "requirements.txt"],
         "disha/services/autonomous": ["main.py"],
         "disha/apps/web": ["package.json", "app"],
     }
