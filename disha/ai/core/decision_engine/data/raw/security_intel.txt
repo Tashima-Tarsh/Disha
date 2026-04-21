@@ -1,0 +1,5 @@
+CVE-2021-44228: Log4j Remote Code Execution vulnerability in JNDI features.
+T1059.001: PowerShell execution - Threat actors use PowerShell to execute malicious commands.
+MITRE ATT&CK: Persistence technique via Scheduled Tasks/Jobs.
+Indicators: 192.168.1.100 (Simulated C2), malicous-domain.top (Phishing).
+Zero Trust Principle: Never trust, always verify for all internal network traffic.

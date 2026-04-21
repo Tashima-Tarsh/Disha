@@ -3,11 +3,11 @@ from __future__ import annotations
 import os
 from typing import Any, Dict, List, Optional
 
-from utils.llm_wrapper import get_llm
-from utils.simple_retriever import SimpleRetriever
+from .utils.llm_wrapper import get_llm
+from .utils.simple_retriever import SimpleRetriever
 
 try:
-    from utils.retriever_faiss import FAISSRetriever, faiss_available
+    from .utils.retriever_faiss import FAISSRetriever, faiss_available
 except ImportError:
 
     def faiss_available() -> bool:

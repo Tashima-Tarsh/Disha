@@ -2,12 +2,12 @@ from __future__ import annotations
 
 from typing import Any, Dict, List, Optional
 
-from ideology_engine import IdeologyAgent
-from legal_engine import LegalAgent
-from political_engine import PoliticalAgent
-from security_engine import SecurityAgent
-from utils.llm_wrapper import get_llm
-from utils.osint import OSINTClient
+from .ideology_engine import IdeologyAgent
+from .legal_engine import LegalAgent
+from .political_engine import PoliticalAgent
+from .security_engine import SecurityAgent
+from .utils.llm_wrapper import get_llm
+from .utils.osint import OSINTClient
 
 _DEFAULT_WEIGHTS: Dict[str, float] = {
     "political": 0.25,

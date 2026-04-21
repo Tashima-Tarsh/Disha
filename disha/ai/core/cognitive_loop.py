@@ -11,6 +11,7 @@ from .agents.deliberation import AgentDeliberator
 from .intelligence.hybrid_reasoner import HybridReasoner
 from .intelligence.quantum_decision import QuantumDecisionEngine
 from .intelligence.goal_engine import GoalEngine
+from .decision_engine.main_decision_engine import DecisionEngine
 
 logger = structlog.get_logger("cognitive_loop")
 
@@ -23,6 +24,7 @@ class CognitiveState:
 
     intent: str = ""
     entities: list[str] = field(default_factory=list)
+    context: dict[str, Any] = field(default_factory=dict)
     uncertainty: float = 0.5
 
     working_memory: list[dict] = field(default_factory=list)
@@ -61,6 +63,7 @@ class CognitiveEngine:
         self.deliberator = AgentDeliberator()
         self.reasoner = HybridReasoner()
         self.decision_engine = QuantumDecisionEngine()
+        self.decision_nexus = DecisionEngine()
         self.goal_engine = GoalEngine()
 
         self._traces: dict[str, list[CognitiveState]] = {}
@@ -188,11 +191,18 @@ class CognitiveEngine:
         state.selected_hypothesis = best if isinstance(best, dict) else vars(best)
 
     async def _deliberate(self, state: CognitiveState) -> None:
-        result = await self.deliberator.deliberate(state)
+        # 1. Internal Multi-Agent Deliberation (Planner, Executor, Critic)
+        deliberation_result = await self.deliberator.deliberate(state)
+        state.agent_deliberations = deliberation_result.get("all_opinions", [])
 
-        state.agent_deliberations = result.get("all_opinions", [])
-        state.consensus = result.get("winner", {})
-        state.dissenting_view = result.get("dissenting_view")
+        # 2. Nexus-Level Multi-Agent Decision (Political, Legal, Security, Ideology)
+        nexus_result = self.decision_nexus.decide(state.raw_input)
+        state.consensus = {
+            **deliberation_result.get("winner", {}),
+            "nexus_analysis": nexus_result,
+            "recommendations": nexus_result.get("recommendations", []),
+        }
+        state.dissenting_view = deliberation_result.get("dissenting_view")
 
     async def _act(self, state: CognitiveState) -> None:
         hypothesis_conf = (

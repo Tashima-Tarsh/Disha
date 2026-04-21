@@ -12,6 +12,21 @@ class ReasoningAgent(BaseAgent):
         )
         self.settings = get_settings()
         self._llm = None
+        self._cognitive_engine = None
+
+    def _get_cognitive_engine(self):
+        if self._cognitive_engine is None:
+            # Import here to avoid circular dependencies and path issues at startup
+            import sys
+            import os
+            # Ensure the root 'disha' package is available
+            root_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../../../"))
+            if root_path not in sys.path:
+                sys.path.append(root_path)
+            
+            from disha.ai.core.cognitive_loop import CognitiveEngine
+            self._cognitive_engine = CognitiveEngine()
+        return self._cognitive_engine
 
     def _get_llm(self):
         if self._llm is None:
@@ -33,17 +48,23 @@ class ReasoningAgent(BaseAgent):
 
         prompt = self._build_prompt(target, agent_results, context)
 
-        analysis = await self._generate_analysis(prompt)
+        # High-Fidelity Cognitive Reasoning
+        cognitive_engine = self._get_cognitive_engine()
+        cognitive_state = await cognitive_engine.process(prompt)
+        
+        analysis = (cognitive_state.reflection or {}).get("summary") or cognitive_state.action.get("response")
+        if not analysis or len(analysis) < 10:
+            # Fallback to standard LLM analysis if cognitive loop is sparse
+            analysis = await self._generate_analysis(prompt)
 
         risk_assessment = self._assess_risk(agent_results)
 
         return {
             "target": target,
             "analysis": analysis,
+            "cognitive_nexus": cognitive_state.to_dict(),
             "risk_assessment": risk_assessment,
-            "summary": analysis[:500]
-            if analysis
-            else "Analysis could not be generated.",
+            "summary": analysis[:500] if analysis else "Analysis could not be generated.",
         }
 
     def _build_prompt(
