@@ -7,7 +7,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY train.py inference.py ./
 
-RUN adduser -D appuser
+RUN groupadd -r appuser && useradd -r -g appuser -m appuser
 USER appuser
 
 CMD ["python", "train.py"]

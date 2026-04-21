@@ -35,7 +35,9 @@ services:
     ports:
       - "3001:3001"
     environment:
+      # Use internal service name for server-side fetches, localhost for browser
       - NEXT_PUBLIC_API_URL=http://localhost:8000/api/v1
+      - NEXT_BACKEND_URL=http://ai-backend:8000/api/v1
       - NEXT_PUBLIC_WS_URL=ws://localhost:8000/api/v1/ws/alerts
       - NEXT_PUBLIC_QUANTUM_API_URL=http://localhost:8002
     depends_on:
@@ -43,7 +45,7 @@ services:
     networks:
       - disha-net
 
-  # ─── Cyber Defense Honeypots ───────────────────
+  # ─── Cyber Defense ──────────────────────────────
   cowrie:
     build: ./disha/services/cyber/honeypot/cowrie
     ports:
@@ -63,6 +65,14 @@ services:
     networks:
       - disha-net
 
+  dionaea:
+    build: ./disha/services/cyber/honeypot/dionaea
+    ports:
+      - "8082:80"
+      - "445:445"
+    networks:
+      - disha-net
+
   cyber-model-engine:
     build: ./disha/services/cyber/model
     volumes:
@@ -73,6 +83,22 @@ services:
     depends_on:
       - cowrie
       - opencanary
+    networks:
+      - disha-net
+
+  cyber-response-engine:
+    build: ./disha/services/cyber/response_engine
+    environment:
+      - AI_BACKEND_URL=http://ai-backend:8000/api/v1
+    depends_on:
+      - cyber-model-engine
+    networks:
+      - disha-net
+
+  threat-intel:
+    build: ./disha/services/cyber/scripts/threat_intel
+    environment:
+      - AI_BACKEND_URL=http://ai-backend:8000/api/v1
     networks:
       - disha-net
 
@@ -121,6 +147,7 @@ services:
     image: confluentinc/cp-zookeeper:7.6.0
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
     networks:
       - disha-net
 
@@ -129,7 +156,9 @@ services:
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
     depends_on:
       - zookeeper

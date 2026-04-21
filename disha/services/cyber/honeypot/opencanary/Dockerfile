@@ -21,7 +21,7 @@ COPY opencanary.conf /root/.opencanary.conf
 EXPOSE 8080 21 9418 6379
 
 # Run OpenCanary in dev (foreground) mode for Docker compatibility
-RUN adduser -D opencanary
+RUN groupadd -r opencanary && useradd -r -g opencanary -m opencanary
 USER opencanary
 
 CMD ["opencanaryd", "--dev"]
