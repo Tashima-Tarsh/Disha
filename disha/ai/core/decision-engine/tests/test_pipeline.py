@@ -17,10 +17,13 @@ import tempfile
 
 import pytest
 
-# Ensure the decision-engine directory is on sys.path so that modules are importable.
+# Ensure the decision-engine directory and repo root are on sys.path
 _ENGINE_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir))
-if _ENGINE_ROOT not in sys.path:
-    sys.path.insert(0, _ENGINE_ROOT)
+_REPO_ROOT = os.path.abspath(os.path.join(_ENGINE_ROOT, os.pardir, os.pardir, os.pardir)) # disha/ai/core -> disha/ai -> disha -> root
+
+for p in [_ENGINE_ROOT, _REPO_ROOT]:
+    if p not in sys.path:
+        sys.path.insert(0, p)
 
 # Force mock provider for deterministic behaviour
 os.environ.setdefault("DISHA_MODEL_PROVIDER", "mock")

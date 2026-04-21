@@ -5,7 +5,7 @@ from typing import Optional
 from disha.ai.core.api.registry import ModelRegistry
 
 try:
-    import llama_cpp
+    import llama_cpp  # noqa: F401
 
     _LLAMA_AVAILABLE = True
 except ImportError:

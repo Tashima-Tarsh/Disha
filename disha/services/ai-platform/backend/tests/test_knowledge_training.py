@@ -21,8 +21,12 @@ from pathlib import Path
 _THIS = Path(__file__).resolve()
 _REPO_ROOT = _THIS.parents[5]  # Disha-main
 _SCRIPTS = _REPO_ROOT / "disha" / "scripts"
-_BACKEND = _REPO_ROOT / "disha" / "services" / "ai-platform" / "backend"
+_BACKEND = _REPO_ROOT / "disha" / "services" / "ai-platform" / "backend" / "app"
 _DECISION = _REPO_ROOT / "disha" / "ai" / "core" / "decision-engine"
+
+# Ensure the package root is in path for "from disha.ai..." imports
+if str(_REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(_REPO_ROOT))
 
 for p in [str(_SCRIPTS), str(_BACKEND), str(_DECISION)]:
     if p not in sys.path:

@@ -22,22 +22,19 @@ except ImportError:
     pass
 
 try:
-    import transformers
-
+    import transformers  # noqa: F401
     _TRANSFORMERS_AVAILABLE = True
 except ImportError:
     pass
 
 try:
-    import peft
-
+    import peft  # noqa: F401
     _PEFT_AVAILABLE = True
 except ImportError:
     pass
 
 try:
-    import bitsandbytes
-
+    import bitsandbytes  # noqa: F401
     _BNB_AVAILABLE = True
 except ImportError:
     pass

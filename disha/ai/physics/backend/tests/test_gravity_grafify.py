@@ -7,8 +7,14 @@ from pathlib import Path
 
 import pytest
 
-# Allow imports from the backend directory
-sys.path.insert(0, str(Path(__file__).parent.parent))
+# Path setup
+_THIS = Path(__file__).resolve()
+_REPO_ROOT = _THIS.parents[5]  # disha/ai/physics/backend/tests -> disha/ai/physics/backend -> disha/ai/physics -> disha/ai -> disha -> root
+_BACKEND = _REPO_ROOT / "disha" / "ai" / "physics" / "backend"
+
+for p in [str(_REPO_ROOT), str(_BACKEND)]:
+    if p not in sys.path:
+        sys.path.insert(0, p)
 
 from engines.gravity_engine import GravityEngine, M_EARTH, R_EARTH, M_SUN  # noqa: E402
 from engines.grafify import Grafify  # noqa: E402

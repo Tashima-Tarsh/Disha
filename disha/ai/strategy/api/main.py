@@ -186,7 +186,7 @@ async def list_conflicts(
         ]
 
     total = len(results)
-    results = results[offset : offset + limit]
+    results = results[offset: offset + limit]
 
     return {
         "total": total,

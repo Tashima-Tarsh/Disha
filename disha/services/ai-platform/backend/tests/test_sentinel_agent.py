@@ -1,8 +1,14 @@
-import os
 import sys
+from pathlib import Path
 
-# Ensure backend module can be located in CI runners
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+# Path setup
+_THIS = Path(__file__).resolve()
+_REPO_ROOT = _THIS.parents[4]  # disha/services/ai-platform/backend/tests -> disha/services/ai-platform/backend -> disha/services/ai-platform -> disha/services -> disha -> root
+_BACKEND = _THIS.parents[1]
+
+for p in [str(_REPO_ROOT), str(_BACKEND)]:
+    if p not in sys.path:
+        sys.path.insert(0, p)
 
 import pytest  # noqa: E402
 from unittest.mock import AsyncMock, patch  # noqa: E402

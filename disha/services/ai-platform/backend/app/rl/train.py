@@ -1,21 +1,19 @@
 from __future__ import annotations
-
 import json
 import sys
 from pathlib import Path
-
 import numpy as np
 import structlog
-
-_SCRIPT_DIR = Path(__file__).resolve().parent
-_BACKEND_ROOT = _SCRIPT_DIR.parents[1]
-if str(_BACKEND_ROOT) not in sys.path:
-    sys.path.insert(0, str(_BACKEND_ROOT))
 
 from app.rl.environment import InvestigationEnvironment, ActionType
 from app.rl.policy import PolicyNetwork, TORCH_AVAILABLE
 from app.rl.experience_replay import ExperienceReplayBuffer
 from app.rl.reward import RewardComputer
+
+_SCRIPT_DIR = Path(__file__).resolve().parent
+_BACKEND_ROOT = _SCRIPT_DIR.parents[1]
+if str(_BACKEND_ROOT) not in sys.path:
+    sys.path.insert(0, str(_BACKEND_ROOT))
 
 logger = structlog.get_logger(__name__)
 

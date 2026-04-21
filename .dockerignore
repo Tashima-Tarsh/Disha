@@ -1,5 +1,10 @@
 # Dependencies (rebuilt in container)
 node_modules
+**/node_modules
+.venv
+**/.venv
+__pycache__
+**/*.pyc
 
 # Git metadata
 .git
@@ -8,6 +13,7 @@ node_modules
 
 # Build output (rebuilt in container)
 dist
+**/dist
 
 # Env files — never bake secrets into the image
 .env
@@ -16,12 +22,15 @@ dist
 
 # Logs and debug
 *.log
+**/logs/*.log
 npm-debug.log*
 bun-debug.log*
 
 # Test artifacts
 coverage
 .nyc_output
+.pytest_cache
+.ruff_cache
 
 # Editor / OS noise
 .DS_Store
@@ -29,10 +38,10 @@ Thumbs.db
 .vscode
 .idea
 
-# Docker context
-docker
-
 # AI checkpoints and data
-ai-platform/backend/checkpoints
+disha/services/ai-platform/backend/checkpoints
+disha/services/cyber/logs
 *.pt
 *.pth
+*.mlmodel
+*.h5

@@ -24,17 +24,14 @@ torch = pytest.importorskip(
 )
 
 # ── Path setup ────────────────────────────────────────────────────────
-# The test file lives at ai-platform/backend/tests/test_trained_models.py
-# Repo root is 3 levels up from this file.
 _THIS = Path(__file__).resolve()
-_BACKEND = _THIS.parents[1]  # ai-platform/backend
-_REPO_ROOT = _THIS.parents[5]  # repo root (Disha-main)
+_REPO_ROOT = _THIS.parents[5]
+_BACKEND = _REPO_ROOT / "disha" / "services" / "ai-platform" / "backend"
 _DECISION = _REPO_ROOT / "disha" / "ai" / "core" / "decision-engine"
 
-if str(_BACKEND) not in sys.path:
-    sys.path.insert(0, str(_BACKEND))
-if str(_DECISION) not in sys.path:
-    sys.path.insert(0, str(_DECISION))
+for p in [str(_REPO_ROOT), str(_BACKEND / "app"), str(_BACKEND), str(_DECISION)]:
+    if p not in sys.path:
+        sys.path.insert(0, p)
 
 os.environ.setdefault("DISHA_MODEL_PROVIDER", "mock")
 

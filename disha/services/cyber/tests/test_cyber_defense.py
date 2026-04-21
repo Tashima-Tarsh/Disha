@@ -11,9 +11,17 @@ import sys
 import tempfile
 import unittest
 
+from pathlib import Path
+
+# Path setup
+_THIS = Path(__file__).resolve()
+_REPO_ROOT = _THIS.parents[4]  # disha/services/cyber/tests -> disha/services/cyber -> disha/services -> disha -> root
+_CYBER = _REPO_ROOT / "disha" / "services" / "cyber"
+
 # Add parent dirs to path for imports
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "model"))
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "response_engine"))
+for p in [str(_REPO_ROOT), str(_CYBER / "model"), str(_CYBER / "response_engine")]:
+    if p not in sys.path:
+        sys.path.insert(0, p)
 
 
 class TestAttackClassifier(unittest.TestCase):
