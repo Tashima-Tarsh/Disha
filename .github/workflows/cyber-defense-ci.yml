@@ -25,20 +25,11 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Install dependencies
-        run: |
-          pip install flake8
-          pip install torch --index-url https://download.pytorch.org/whl/cpu
-          pip install scikit-learn numpy requests
+      - name: Install ruff
+        run: pip install ruff
 
-      - name: Lint model engine
-        run: flake8 disha/services/cyber/model/ --max-line-length=120 --ignore=E501
-
-      - name: Lint response engine
-        run: flake8 disha/services/cyber/response_engine/ --max-line-length=120 --ignore=E501
-
-      - name: Lint threat intel
-        run: flake8 disha/services/cyber/scripts/threat_intel/ --max-line-length=120 --ignore=E501
+      - name: Lint with ruff
+        run: ruff check disha/services/cyber/ --output-format=github
 
   test-python:
     name: Test Python Components
@@ -59,7 +50,7 @@ jobs:
       - name: Run tests
         run: |
           cd disha/services/cyber
-          python -m pytest test/ -v
+          python -m pytest tests/ -v
 
   validate-configs:
     name: Validate Configurations

@@ -5,11 +5,12 @@ from app.agents.physics_agent import PhysicsAgent
 
 router = APIRouter()
 
+
 @router.post("/simulate")
 async def run_molecular_simulation(
     material: str,
     options: Dict[str, Any] | None = None,
-    current_user: Dict = Depends(get_current_user)
+    current_user: Dict = Depends(get_current_user),
 ):
     try:
         agent = PhysicsAgent()
@@ -17,6 +18,7 @@ async def run_molecular_simulation(
         return results
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Simulation failed: {str(e)}")
+
 
 @router.get("/materials")
 async def get_supported_materials(current_user: Dict = Depends(get_current_user)):

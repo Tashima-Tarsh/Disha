@@ -35,16 +35,25 @@ class TestSolutionEvaluation:
     def test_weighted_score_priority(self):
         # Correctness > Efficiency > Elegance
         eval1 = SolutionEvaluation(
-            correctness_score=10, efficiency_score=5, elegance_score=5, scalability_score=5
+            correctness_score=10,
+            efficiency_score=5,
+            elegance_score=5,
+            scalability_score=5,
         )
         eval2 = SolutionEvaluation(
-            correctness_score=5, efficiency_score=10, elegance_score=10, scalability_score=5
+            correctness_score=5,
+            efficiency_score=10,
+            elegance_score=10,
+            scalability_score=5,
         )
         assert eval1.weighted_score > eval2.weighted_score
 
     def test_weighted_score_range(self):
         ev = SolutionEvaluation(
-            correctness_score=10, efficiency_score=10, elegance_score=10, scalability_score=10
+            correctness_score=10,
+            efficiency_score=10,
+            elegance_score=10,
+            scalability_score=10,
         )
         assert ev.weighted_score == pytest.approx(10.0)
 
@@ -126,13 +135,17 @@ class TestEvaluation:
                 name="sol1",
                 description="",
                 approach="brute_force",
-                evaluation=SolutionEvaluation(correctness_score=9.5, efficiency_score=3),
+                evaluation=SolutionEvaluation(
+                    correctness_score=9.5, efficiency_score=3
+                ),
             ),
             SolutionPath(
                 name="sol2",
                 description="",
                 approach="binary_search",
-                evaluation=SolutionEvaluation(correctness_score=9.5, efficiency_score=8),
+                evaluation=SolutionEvaluation(
+                    correctness_score=9.5, efficiency_score=8
+                ),
             ),
         ]
         for s in solutions:
@@ -174,11 +187,17 @@ class TestAmbiguityDetection:
         engine = AdvancedReasoningEngine()
         solutions = [
             SolutionPath(
-                name="a", description="", approach="",
-                evaluation=SolutionEvaluation(correctness_score=10, efficiency_score=10),
+                name="a",
+                description="",
+                approach="",
+                evaluation=SolutionEvaluation(
+                    correctness_score=10, efficiency_score=10
+                ),
             ),
             SolutionPath(
-                name="b", description="", approach="",
+                name="b",
+                description="",
+                approach="",
                 evaluation=SolutionEvaluation(correctness_score=2, efficiency_score=2),
             ),
         ]
@@ -188,15 +207,25 @@ class TestAmbiguityDetection:
         engine = AdvancedReasoningEngine()
         solutions = [
             SolutionPath(
-                name="a", description="", approach="",
+                name="a",
+                description="",
+                approach="",
                 evaluation=SolutionEvaluation(
-                    correctness_score=8, efficiency_score=7, elegance_score=7, scalability_score=7
+                    correctness_score=8,
+                    efficiency_score=7,
+                    elegance_score=7,
+                    scalability_score=7,
                 ),
             ),
             SolutionPath(
-                name="b", description="", approach="",
+                name="b",
+                description="",
+                approach="",
                 evaluation=SolutionEvaluation(
-                    correctness_score=7.8, efficiency_score=7.2, elegance_score=7.1, scalability_score=7.1
+                    correctness_score=7.8,
+                    efficiency_score=7.2,
+                    elegance_score=7.1,
+                    scalability_score=7.1,
                 ),
             ),
         ]
@@ -204,13 +233,22 @@ class TestAmbiguityDetection:
 
     def test_single_solution_no_ambiguity(self):
         engine = AdvancedReasoningEngine()
-        assert engine.detect_ambiguity([SolutionPath(name="a", description="", approach="")]) is False
+        assert (
+            engine.detect_ambiguity(
+                [SolutionPath(name="a", description="", approach="")]
+            )
+            is False
+        )
 
     def test_zero_scores_no_ambiguity(self):
         engine = AdvancedReasoningEngine()
         solutions = [
-            SolutionPath(name="a", description="", approach="", evaluation=SolutionEvaluation()),
-            SolutionPath(name="b", description="", approach="", evaluation=SolutionEvaluation()),
+            SolutionPath(
+                name="a", description="", approach="", evaluation=SolutionEvaluation()
+            ),
+            SolutionPath(
+                name="b", description="", approach="", evaluation=SolutionEvaluation()
+            ),
         ]
         assert engine.detect_ambiguity(solutions) is False
 
@@ -244,7 +282,10 @@ class TestFullPipeline:
         engine = AdvancedReasoningEngine()
         result = engine.reason_with_context(
             "Optimise the search algorithm",
-            context_texts=["Binary search is O(log n)", "Hash tables offer O(1) lookup"],
+            context_texts=[
+                "Binary search is O(log n)",
+                "Hash tables offer O(1) lookup",
+            ],
         )
         assert isinstance(result, ReasoningResult)
 

@@ -2,6 +2,7 @@
 Git sync utility — commits and pushes pending changes using subprocess
 for proper error handling and to avoid shell-injection risks.
 """
+
 import logging
 import subprocess
 from datetime import datetime, timezone

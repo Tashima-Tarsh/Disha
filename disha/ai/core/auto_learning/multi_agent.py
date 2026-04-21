@@ -1,4 +1,3 @@
-
 from __future__ import annotations
 
 import hashlib
@@ -10,16 +9,16 @@ from typing import Any, Dict, List, Optional
 
 logger = logging.getLogger(__name__)
 
-class MessageType(Enum):
 
+class MessageType(Enum):
     TASK = "task"
     RESULT = "result"
     ERROR = "error"
     STATUS = "status"
 
+
 @dataclass
 class AgentMessage:
-
     sender: str
     receiver: str
     msg_type: MessageType
@@ -32,8 +31,8 @@ class AgentMessage:
             raw = f"{self.sender}:{self.receiver}:{self.timestamp}"
             self.message_id = hashlib.sha256(raw.encode()).hexdigest()[:12]
 
-class BaseAgent:
 
+class BaseAgent:
     def __init__(self, name: str) -> None:
         self.name = name
         self._inbox: List[AgentMessage] = []
@@ -42,7 +41,9 @@ class BaseAgent:
     def receive(self, message: AgentMessage) -> None:
         self._inbox.append(message)
 
-    def send(self, receiver: str, msg_type: MessageType, payload: Dict[str, Any]) -> AgentMessage:
+    def send(
+        self, receiver: str, msg_type: MessageType, payload: Dict[str, Any]
+    ) -> AgentMessage:
         msg = AgentMessage(
             sender=self.name,
             receiver=receiver,
@@ -62,13 +63,15 @@ class BaseAgent:
             "outbox_size": len(self._outbox),
         }
 
-class DataCollectorAgent(BaseAgent):
 
+class DataCollectorAgent(BaseAgent):
     def __init__(self) -> None:
         super().__init__("data_collector")
         self.collected: List[Dict[str, Any]] = []
 
-    def collect_from_text(self, texts: List[str], source: str = "manual") -> List[Dict[str, Any]]:
+    def collect_from_text(
+        self, texts: List[str], source: str = "manual"
+    ) -> List[Dict[str, Any]]:
         items = []
         for text in texts:
             item = {
@@ -99,8 +102,8 @@ class DataCollectorAgent(BaseAgent):
                 )
         return results
 
-class QualityAnalystAgent(BaseAgent):
 
+class QualityAnalystAgent(BaseAgent):
     def __init__(self) -> None:
         super().__init__("quality_analyst")
         self._seen_hashes: set = set()
@@ -114,7 +117,9 @@ class QualityAnalystAgent(BaseAgent):
     def score(self, item: Dict[str, Any]) -> Dict[str, Any]:
         text = item.get("text", "")
         source = item.get("source", "unknown")
-        content_hash = item.get("content_hash", hashlib.sha256(text.encode()).hexdigest()[:16])
+        content_hash = item.get(
+            "content_hash", hashlib.sha256(text.encode()).hexdigest()[:16]
+        )
 
         score = 0.0
 
@@ -169,8 +174,8 @@ class QualityAnalystAgent(BaseAgent):
                 )
         return results
 
-class EmbeddingAgent(BaseAgent):
 
+class EmbeddingAgent(BaseAgent):
     def __init__(self, rag_pipeline: Any = None) -> None:
         super().__init__("embedding_agent")
         self._pipeline = rag_pipeline
@@ -188,7 +193,11 @@ class EmbeddingAgent(BaseAgent):
             for item in items
         ]
         added = self._pipeline.add_texts(texts, metadatas)
-        return {"status": "stored", "added": added, "total": self._pipeline.document_count}
+        return {
+            "status": "stored",
+            "added": added,
+            "total": self._pipeline.document_count,
+        }
 
     def process(self) -> List[AgentMessage]:
         results: List[AgentMessage] = []
@@ -197,13 +206,11 @@ class EmbeddingAgent(BaseAgent):
             if msg.msg_type == MessageType.TASK:
                 items = msg.payload.get("items", [])
                 result = self.embed_items(items)
-                results.append(
-                    self.send(msg.sender, MessageType.RESULT, result)
-                )
+                results.append(self.send(msg.sender, MessageType.RESULT, result))
         return results
 
-class ReasoningAgent(BaseAgent):
 
+class ReasoningAgent(BaseAgent):
     def __init__(self) -> None:
         super().__init__("reasoning_agent")
 
@@ -216,11 +223,13 @@ class ReasoningAgent(BaseAgent):
             solutions = self._generate_solutions(sp, context)
             evaluated = [self._evaluate_solution(s) for s in solutions]
             evaluated.sort(key=lambda x: x["total_score"], reverse=True)
-            paths.append({
-                "sub_problem": sp,
-                "solutions": evaluated,
-                "best": evaluated[0] if evaluated else None,
-            })
+            paths.append(
+                {
+                    "sub_problem": sp,
+                    "solutions": evaluated,
+                    "best": evaluated[0] if evaluated else None,
+                }
+            )
 
         best_solutions = [p["best"] for p in paths if p["best"]]
 
@@ -245,12 +254,20 @@ class ReasoningAgent(BaseAgent):
                 parts.append(s)
         return parts if parts else [problem]
 
-    def _generate_solutions(self, sub_problem: str, context: str) -> List[Dict[str, Any]]:
+    def _generate_solutions(
+        self, sub_problem: str, context: str
+    ) -> List[Dict[str, Any]]:
 
         approaches = [
             {"approach": "direct", "description": f"Directly address: {sub_problem}"},
-            {"approach": "decomposed", "description": f"Further decompose: {sub_problem}"},
-            {"approach": "analogical", "description": f"Apply known patterns to: {sub_problem}"},
+            {
+                "approach": "decomposed",
+                "description": f"Further decompose: {sub_problem}",
+            },
+            {
+                "approach": "analogical",
+                "description": f"Apply known patterns to: {sub_problem}",
+            },
         ]
         return approaches
 
@@ -258,11 +275,21 @@ class ReasoningAgent(BaseAgent):
 
         scores = {
             "direct": {"time_complexity": 8, "space_complexity": 9, "scalability": 6},
-            "decomposed": {"time_complexity": 6, "space_complexity": 7, "scalability": 9},
-            "analogical": {"time_complexity": 7, "space_complexity": 8, "scalability": 8},
+            "decomposed": {
+                "time_complexity": 6,
+                "space_complexity": 7,
+                "scalability": 9,
+            },
+            "analogical": {
+                "time_complexity": 7,
+                "space_complexity": 8,
+                "scalability": 8,
+            },
         }
         approach = solution.get("approach", "direct")
-        criteria = scores.get(approach, {"time_complexity": 5, "space_complexity": 5, "scalability": 5})
+        criteria = scores.get(
+            approach, {"time_complexity": 5, "space_complexity": 5, "scalability": 5}
+        )
         total = sum(criteria.values())
         return {**solution, **criteria, "total_score": total}
 
@@ -289,13 +316,11 @@ class ReasoningAgent(BaseAgent):
                 problem = msg.payload.get("problem", "")
                 context = msg.payload.get("context", "")
                 result = self.reason(problem, context)
-                results.append(
-                    self.send(msg.sender, MessageType.RESULT, result)
-                )
+                results.append(self.send(msg.sender, MessageType.RESULT, result))
         return results
 
-class KnowledgeManagerAgent(BaseAgent):
 
+class KnowledgeManagerAgent(BaseAgent):
     def __init__(self) -> None:
         super().__init__("knowledge_manager")
         self.permanent_store: List[Dict[str, Any]] = []
@@ -351,17 +376,15 @@ class KnowledgeManagerAgent(BaseAgent):
                 if action == "classify":
                     items = msg.payload.get("items", [])
                     counts = self.classify_and_store(items)
-                    results.append(
-                        self.send(msg.sender, MessageType.RESULT, counts)
-                    )
+                    results.append(self.send(msg.sender, MessageType.RESULT, counts))
                 elif action == "stats":
                     results.append(
                         self.send(msg.sender, MessageType.RESULT, self.stats())
                     )
         return results
 
-class AgentOrchestrator:
 
+class AgentOrchestrator:
     def __init__(self) -> None:
         self._agents: Dict[str, BaseAgent] = {}
         self._message_log: List[AgentMessage] = []

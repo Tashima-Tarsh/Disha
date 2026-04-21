@@ -57,9 +57,7 @@ class QuantumState:
 
         if amplitudes:
             self._labels = list(amplitudes.keys())
-            self._amplitudes = np.array(
-                list(amplitudes.values()), dtype=np.complex128
-            )
+            self._amplitudes = np.array(list(amplitudes.values()), dtype=np.complex128)
             self._normalize()
 
         logger.debug(
@@ -198,9 +196,7 @@ class QuantumState:
         self._amplitudes[:] = 0.0
         self._amplitudes[idx] = 1.0 + 0j
 
-        logger.info(
-            "QuantumState '%s' measured: collapsed to '%s'", self.name, result
-        )
+        logger.info("QuantumState '%s' measured: collapsed to '%s'", self.name, result)
         return result
 
     def entropy(self) -> float:
@@ -289,9 +285,7 @@ class SuperpositionManager:
         """All registered states."""
         return list(self._states.values())
 
-    def measure_all(
-        self, rng: Optional[np.random.Generator] = None
-    ) -> Dict[str, str]:
+    def measure_all(self, rng: Optional[np.random.Generator] = None) -> Dict[str, str]:
         """Measure all registered states and return the results.
 
         Returns

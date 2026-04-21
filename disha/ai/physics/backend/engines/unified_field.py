@@ -1,6 +1,7 @@
 """
 Unified Field Engine — fundamental forces and their unification history.
 """
+
 from __future__ import annotations
 
 import math
@@ -11,10 +12,10 @@ class UnifiedFieldEngine:
 
     # Running coupling constants (approximate, at relevant scales)
     _ALPHA_EM = 1 / 137.036  # at low energy
-    _ALPHA_W = 0.0338        # weak at M_Z
-    _ALPHA_S = 0.1179        # strong at M_Z
-    _G_N = 6.674e-11         # Newton's constant (SI)
-    _M_PLANCK = 1.221e19     # GeV
+    _ALPHA_W = 0.0338  # weak at M_Z
+    _ALPHA_S = 0.1179  # strong at M_Z
+    _G_N = 6.674e-11  # Newton's constant (SI)
+    _M_PLANCK = 1.221e19  # GeV
 
     def get_fundamental_forces(self) -> list[dict]:
         return [
@@ -25,7 +26,10 @@ class UnifiedFieldEngine:
                 "mediator": "Gluons (8 types)",
                 "range_m": 1e-15,
                 "relative_strength": 1.0,
-                "coupling_constant": {"alpha_s": self._ALPHA_S, "note": "at M_Z ~ 91 GeV"},
+                "coupling_constant": {
+                    "alpha_s": self._ALPHA_S,
+                    "note": "at M_Z ~ 91 GeV",
+                },
                 "acts_on": ["quarks", "gluons", "hadrons"],
                 "gauge_group": "SU(3)_c",
                 "color": "#ff2d78",
@@ -40,7 +44,10 @@ class UnifiedFieldEngine:
                 "mediator": "Photon (γ)",
                 "range_m": float("inf"),
                 "relative_strength": 1 / 137,
-                "coupling_constant": {"alpha": self._ALPHA_EM, "note": "fine structure constant"},
+                "coupling_constant": {
+                    "alpha": self._ALPHA_EM,
+                    "note": "fine structure constant",
+                },
                 "acts_on": ["charged particles", "photons"],
                 "gauge_group": "U(1)_em",
                 "color": "#00e5ff",
@@ -55,7 +62,10 @@ class UnifiedFieldEngine:
                 "mediator": "W±, Z⁰ bosons",
                 "range_m": 1e-18,
                 "relative_strength": 1e-6,
-                "coupling_constant": {"alpha_w": self._ALPHA_W, "note": "at M_W ~ 80 GeV"},
+                "coupling_constant": {
+                    "alpha_w": self._ALPHA_W,
+                    "note": "at M_W ~ 80 GeV",
+                },
                 "acts_on": ["quarks", "leptons", "neutrinos"],
                 "gauge_group": "SU(2)_L",
                 "color": "#bf5af2",
@@ -76,7 +86,10 @@ class UnifiedFieldEngine:
                 "color": "#ffd60a",
                 "description": "Weakest force but infinite range; dominates at macroscopic/cosmological scales.",
                 "unification_partner": "others at Planck scale ~10¹⁹ GeV",
-                "energy_scale_gev": {"relevant": 0.001, "unifies_above": self._M_PLANCK},
+                "energy_scale_gev": {
+                    "relevant": 0.001,
+                    "unifies_above": self._M_PLANCK,
+                },
             },
         ]
 
@@ -137,34 +150,44 @@ class UnifiedFieldEngine:
 
         if energy_scale_gev >= 100:
             active_unifications.append("electroweak")
-            unified_groups.append({
-                "name": "Electroweak",
-                "forces": ["electromagnetic", "weak"],
-                "gauge_group": "SU(2)_L × U(1)_Y",
-                "confirmed": True,
-            })
+            unified_groups.append(
+                {
+                    "name": "Electroweak",
+                    "forces": ["electromagnetic", "weak"],
+                    "gauge_group": "SU(2)_L × U(1)_Y",
+                    "confirmed": True,
+                }
+            )
 
         if energy_scale_gev >= 1e15:
             active_unifications.append("gut")
-            unified_groups.append({
-                "name": "Grand Unified (GUT)",
-                "forces": ["electromagnetic", "weak", "strong"],
-                "gauge_group": "SU(5) or SO(10)",
-                "confirmed": False,
-            })
+            unified_groups.append(
+                {
+                    "name": "Grand Unified (GUT)",
+                    "forces": ["electromagnetic", "weak", "strong"],
+                    "gauge_group": "SU(5) or SO(10)",
+                    "confirmed": False,
+                }
+            )
 
         if energy_scale_gev >= self._M_PLANCK * 0.1:
             active_unifications.append("toe")
-            unified_groups.append({
-                "name": "Theory of Everything",
-                "forces": ["electromagnetic", "weak", "strong", "gravity"],
-                "gauge_group": "Unknown (String / LQG)",
-                "confirmed": False,
-            })
+            unified_groups.append(
+                {
+                    "name": "Theory of Everything",
+                    "forces": ["electromagnetic", "weak", "strong", "gravity"],
+                    "gauge_group": "Unknown (String / LQG)",
+                    "confirmed": False,
+                }
+            )
 
         separated_forces = [f["name"] for f in forces]
         if "electroweak" in active_unifications:
-            separated_forces = [f for f in separated_forces if f not in ("Electromagnetic Force", "Weak Nuclear Force")]
+            separated_forces = [
+                f
+                for f in separated_forces
+                if f not in ("Electromagnetic Force", "Weak Nuclear Force")
+            ]
             separated_forces.append("Electroweak Force")
 
         return {

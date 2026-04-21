@@ -1,12 +1,11 @@
-
 import structlog
 from typing import Any
 from datetime import datetime, timezone
 
 logger = structlog.get_logger(__name__)
 
-class LearningLoop:
 
+class LearningLoop:
     def __init__(self):
         self.logger = logger.bind(service="learning_loop")
 
@@ -15,7 +14,7 @@ class LearningLoop:
         query: str,
         results_count: int,
         avg_distance: float,
-        user_id: str | None = None
+        user_id: str | None = None,
     ) -> None:
         is_knowledge_gap = results_count == 0 or avg_distance > 0.8
 
@@ -25,11 +24,10 @@ class LearningLoop:
             "avg_distance": avg_distance,
             "timestamp": datetime.now(timezone.utc).isoformat(),
             "user_id": user_id,
-            "is_knowledge_gap": is_knowledge_gap
+            "is_knowledge_gap": is_knowledge_gap,
         }
 
         if is_knowledge_gap:
-
             self.logger.warning("knowledge_gap_detected", **log_data)
             await self._trigger_knowledge_expansion(query)
         else:
@@ -39,6 +37,9 @@ class LearningLoop:
 
         self.logger.info("queueing_intelligence_expansion", query=query)
 
-    async def capture_feedback(self, investigation_id: str, feedback: dict[str, Any]) -> None:
-        self.logger.info("feedback_captured", investigation_id=investigation_id, **feedback)
-
+    async def capture_feedback(
+        self, investigation_id: str, feedback: dict[str, Any]
+    ) -> None:
+        self.logger.info(
+            "feedback_captured", investigation_id=investigation_id, **feedback
+        )

@@ -126,8 +126,10 @@ class ThermalBody:
             raise ValueError("Reference temperature must be positive")
         if self.temperature <= 0.0:
             return -math.inf
-        return self.mass * self.specific_heat * math.log(
-            self.temperature / reference_temperature
+        return (
+            self.mass
+            * self.specific_heat
+            * math.log(self.temperature / reference_temperature)
         )
 
     def __repr__(self) -> str:
@@ -184,9 +186,7 @@ class ThermodynamicsEngine:
     def remove_body(self, name: str) -> ThermalBody:
         """Remove and return the body identified by *name*."""
         body = self._bodies.pop(name)
-        keys_to_remove = [
-            k for k in self._conductances if name in k
-        ]
+        keys_to_remove = [k for k in self._conductances if name in k]
         for k in keys_to_remove:
             del self._conductances[k]
         logger.debug("Removed ThermalBody '%s'", name)
@@ -266,9 +266,7 @@ class ThermodynamicsEngine:
 
     def total_entropy(self, reference_temperature: float = 1.0) -> float:
         """Total entropy across all bodies (J/K)."""
-        return sum(
-            b.entropy(reference_temperature) for b in self._bodies.values()
-        )
+        return sum(b.entropy(reference_temperature) for b in self._bodies.values())
 
     def get_state(self) -> Dict[str, Dict[str, float]]:
         """Snapshot of temperatures and energies."""
@@ -287,9 +285,7 @@ class ThermodynamicsEngine:
 # ======================================================================
 
 
-def ideal_gas_pressure(
-    n_moles: float, temperature: float, volume: float
-) -> float:
+def ideal_gas_pressure(n_moles: float, temperature: float, volume: float) -> float:
     """Calculate pressure from the ideal gas law.
 
     .. math:: P = \\frac{n R T}{V}
@@ -315,9 +311,7 @@ def ideal_gas_pressure(
     return n_moles * GAS_CONSTANT * temperature / volume
 
 
-def ideal_gas_volume(
-    n_moles: float, temperature: float, pressure: float
-) -> float:
+def ideal_gas_volume(n_moles: float, temperature: float, pressure: float) -> float:
     """Calculate volume from the ideal gas law.
 
     .. math:: V = \\frac{n R T}{P}
@@ -341,9 +335,7 @@ def ideal_gas_volume(
     return n_moles * GAS_CONSTANT * temperature / pressure
 
 
-def ideal_gas_temperature(
-    n_moles: float, pressure: float, volume: float
-) -> float:
+def ideal_gas_temperature(n_moles: float, pressure: float, volume: float) -> float:
     """Calculate temperature from the ideal gas law.
 
     .. math:: T = \\frac{P V}{n R}

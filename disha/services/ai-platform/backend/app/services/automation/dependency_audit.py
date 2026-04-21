@@ -1,11 +1,10 @@
-
 import structlog
 from typing import Any
 
 logger = structlog.get_logger(__name__)
 
-class DependencyAudit:
 
+class DependencyAudit:
     def __init__(self, requirements_path: str = "requirements.txt"):
         self.requirements_path = requirements_path
         self.logger = logger.bind(service="dependency_audit")
@@ -14,7 +13,6 @@ class DependencyAudit:
         self.logger.info("audit_started", path=self.requirements_path)
 
         try:
-
             packages = self._parse_requirements()
 
             vulnerabilities = self._check_vulnerabilities(packages)
@@ -25,14 +23,18 @@ class DependencyAudit:
             elif any(v["level"] == "high" for v in vulnerabilities):
                 severity = "high"
 
-            self.logger.info("audit_completed", vulnerable_count=len(vulnerabilities), severity=severity)
+            self.logger.info(
+                "audit_completed",
+                vulnerable_count=len(vulnerabilities),
+                severity=severity,
+            )
 
             return {
                 "status": "success",
                 "packages_scanned": len(packages),
                 "vulnerabilities": vulnerabilities,
                 "overall_severity": severity,
-                "remediation": self._generate_remediation(vulnerabilities)
+                "remediation": self._generate_remediation(vulnerabilities),
             }
         except Exception as e:
             self.logger.error("audit_failed", error=str(e))
@@ -45,7 +47,6 @@ class DependencyAudit:
                 for line in f:
                     line = line.strip()
                     if line and not line.startswith("#"):
-
                         if "==" in line:
                             name, ver = line.split("==")
                         elif ">=" in line:
@@ -57,28 +58,34 @@ class DependencyAudit:
             self.logger.error("requirements_not_found")
         return packages
 
-    def _check_vulnerabilities(self, packages: list[dict[str, str]]) -> list[dict[str, Any]]:
+    def _check_vulnerabilities(
+        self, packages: list[dict[str, str]]
+    ) -> list[dict[str, Any]]:
         vulnerabilities = []
 
         threat_patterns = {
             "fastapi": {"min_safe": "0.100.0", "level": "high", "id": "SN-001"},
             "langchain": {"min_safe": "0.1.0", "level": "medium", "id": "SN-002"},
-            "uvicorn": {"min_safe": "0.20.0", "level": "critical", "id": "SN-003"}
+            "uvicorn": {"min_safe": "0.20.0", "level": "critical", "id": "SN-003"},
         }
 
         for pkg in packages:
             name = pkg["name"].lower()
             if name in threat_patterns:
-
-                if pkg["version"] != "latest" and pkg["version"] < threat_patterns[name]["min_safe"]:
-                    vulnerabilities.append({
-                        "package": pkg["name"],
-                        "installed": pkg["version"],
-                        "required": threat_patterns[name]["min_safe"],
-                        "level": threat_patterns[name]["level"],
-                        "threat_id": threat_patterns[name]["id"],
-                        "description": f"Vulnerable version of {pkg['name']} detected. Risk of RCE or DoS."
-                    })
+                if (
+                    pkg["version"] != "latest"
+                    and pkg["version"] < threat_patterns[name]["min_safe"]
+                ):
+                    vulnerabilities.append(
+                        {
+                            "package": pkg["name"],
+                            "installed": pkg["version"],
+                            "required": threat_patterns[name]["min_safe"],
+                            "level": threat_patterns[name]["level"],
+                            "threat_id": threat_patterns[name]["id"],
+                            "description": f"Vulnerable version of {pkg['name']} detected. Risk of RCE or DoS.",
+                        }
+                    )
 
         return vulnerabilities
 
@@ -88,5 +95,7 @@ class DependencyAudit:
 
         steps = ["Fix critical vulnerabilities by updating packages:"]
         for v in vulnerabilities:
-            steps.append(f"- Update {v['package']} from {v['installed']} to >= {v['required']}")
+            steps.append(
+                f"- Update {v['package']} from {v['installed']} to >= {v['required']}"
+            )
         return "\n".join(steps)

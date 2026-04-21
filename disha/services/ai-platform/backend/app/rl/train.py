@@ -1,4 +1,3 @@
-
 from __future__ import annotations
 
 import json
@@ -22,6 +21,7 @@ logger = structlog.get_logger(__name__)
 
 _RNG = np.random.RandomState(42)
 
+
 def _synthetic_outcome(action: int) -> dict:
     if action >= 5:
         return {}
@@ -44,6 +44,7 @@ def _synthetic_outcome(action: int) -> dict:
     elif action == ActionType.RUN_REASONING:
         base["anomalies_found"] += int(_RNG.binomial(1, 0.5))
     return base
+
 
 def train(
     num_episodes: int = 500,
@@ -113,7 +114,9 @@ def train(
 
     import torch
 
-    ckpt_dir = Path(checkpoint_dir) if checkpoint_dir else (_BACKEND_ROOT / "checkpoints")
+    ckpt_dir = (
+        Path(checkpoint_dir) if checkpoint_dir else (_BACKEND_ROOT / "checkpoints")
+    )
     ckpt_dir.mkdir(parents=True, exist_ok=True)
     ckpt_path = ckpt_dir / "rl_policy.pt"
 
@@ -143,6 +146,7 @@ def train(
     logger.info("metrics_saved", path=str(metrics_path))
 
     return summary
+
 
 if __name__ == "__main__":
     result = train()

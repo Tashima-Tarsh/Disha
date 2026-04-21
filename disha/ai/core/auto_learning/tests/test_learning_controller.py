@@ -25,7 +25,12 @@ class TestQualityScorer:
                 "The experimental results show significant improvements."
             ),
             source="arxiv",
-            metadata={"stars": 200, "citations": 50, "peer_reviewed": True, "verified": True},
+            metadata={
+                "stars": 200,
+                "citations": 50,
+                "peer_reviewed": True,
+                "verified": True,
+            },
         )
         score = scorer.score(item)
         assert score > 60
@@ -46,7 +51,9 @@ class TestQualityScorer:
 
     def test_score_range(self):
         scorer = QualityScorer()
-        item = DataItem(text="A moderately long text for scoring purposes.", source="github")
+        item = DataItem(
+            text="A moderately long text for scoring purposes.", source="github"
+        )
         score = scorer.score(item)
         assert 0 <= score <= 100
 
@@ -232,14 +239,18 @@ class TestLearningController:
 
         pipe = RAGPipeline(index_dir=str(tmp_path / "rag"), embedding_dim=64)
         ctrl = LearningController(rag_pipeline=pipe)
-        ctrl.ingest(DataItem(
-            text=(
-                "A comprehensive guide to neural network architectures including "
-                "feed-forward networks, convolutional networks, and recurrent networks. "
-                "Each architecture has specific strengths for different problem domains."
-            ),
-            source="arxiv",
-            metadata={"verified": True, "peer_reviewed": True, "citations": 50},
-        ))
+        ctrl.ingest(
+            DataItem(
+                text=(
+                    "A comprehensive guide to neural network architectures including "
+                    "feed-forward networks, convolutional networks, and recurrent networks. "
+                    "Each architecture has specific strengths for different problem domains."
+                ),
+                source="arxiv",
+                metadata={"verified": True, "peer_reviewed": True, "citations": 50},
+            )
+        )
         # Check that embedding happened
-        assert pipe.document_count >= 0  # May or may not have been embedded depending on score
+        assert (
+            pipe.document_count >= 0
+        )  # May or may not have been embedded depending on score

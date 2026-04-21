@@ -244,7 +244,10 @@ class SimAgent:
                         Action(
                             action_type="move",
                             target=None,
-                            parameters={"direction": direction, "speed": min(dist, 1.0)},
+                            parameters={
+                                "direction": direction,
+                                "speed": min(dist, 1.0),
+                            },
                             priority=3.0,
                         )
                     )
@@ -256,11 +259,13 @@ class SimAgent:
         actions.sort(key=lambda a: a.priority, reverse=True)
 
         # Store perception summary in memory
-        self.memory.append({
-            "event": "perception",
-            "n_entities": len(perception.entities),
-            "n_messages": len(perception.messages),
-        })
+        self.memory.append(
+            {
+                "event": "perception",
+                "n_entities": len(perception.entities),
+                "n_messages": len(perception.messages),
+            }
+        )
 
         return actions
 
@@ -288,27 +293,33 @@ class SimAgent:
                 )
                 speed = float(action.parameters.get("speed", 1.0))
                 self.position = self.position + direction * speed
-                results.append({
-                    "action": "move",
-                    "new_position": self.position.tolist(),
-                    "success": True,
-                })
+                results.append(
+                    {
+                        "action": "move",
+                        "new_position": self.position.tolist(),
+                        "success": True,
+                    }
+                )
             elif action.action_type == "reply":
                 bus: Optional[AgentCommunicationBus] = world.get("comm_bus")
                 content = action.parameters.get("content", "")
                 if bus is not None and action.target is not None:
                     bus.send_direct(self.id, action.target, content)
-                results.append({
-                    "action": "reply",
-                    "target": action.target,
-                    "success": bus is not None,
-                })
+                results.append(
+                    {
+                        "action": "reply",
+                        "target": action.target,
+                        "success": bus is not None,
+                    }
+                )
             else:
-                results.append({
-                    "action": action.action_type,
-                    "success": False,
-                    "reason": "unknown_action",
-                })
+                results.append(
+                    {
+                        "action": action.action_type,
+                        "success": False,
+                        "reason": "unknown_action",
+                    }
+                )
 
         return results
 
@@ -319,11 +330,13 @@ class SimAgent:
         perception cycle.
         """
         self.state = AgentState.COMMUNICATING
-        target_agent._inbox.append({
-            "sender_id": self.id,
-            "sender_name": self.name,
-            "content": message,
-        })
+        target_agent._inbox.append(
+            {
+                "sender_id": self.id,
+                "sender_name": self.name,
+                "content": message,
+            }
+        )
         logger.debug("Agent '%s' → '%s': %s", self.name, target_agent.name, message)
 
     def update(self, dt: float, world: Dict[str, Any]) -> List[Dict[str, Any]]:
@@ -386,11 +399,13 @@ class AgentCommunicationBus:
 
         sender = self._agents.get(sender_id)
         sender_name = sender.name if sender else "unknown"
-        recipient._inbox.append({
-            "sender_id": sender_id,
-            "sender_name": sender_name,
-            "content": content,
-        })
+        recipient._inbox.append(
+            {
+                "sender_id": sender_id,
+                "sender_name": sender_name,
+                "content": content,
+            }
+        )
         return True
 
     def broadcast(self, sender_id: str, content: str) -> int:
@@ -405,11 +420,13 @@ class AgentCommunicationBus:
         for aid, agent in self._agents.items():
             if aid == sender_id:
                 continue
-            agent._inbox.append({
-                "sender_id": sender_id,
-                "sender_name": sender_name,
-                "content": content,
-            })
+            agent._inbox.append(
+                {
+                    "sender_id": sender_id,
+                    "sender_name": sender_name,
+                    "content": content,
+                }
+            )
             count += 1
         logger.debug("CommBus: broadcast from %s reached %d agents", sender_id, count)
         return count
@@ -441,14 +458,21 @@ class AgentCommunicationBus:
                 continue
             agent = self._agents.get(aid)
             if agent is not None:
-                agent._inbox.append({
-                    "sender_id": sender_id,
-                    "sender_name": sender_name,
-                    "topic": topic,
-                    "content": content,
-                })
+                agent._inbox.append(
+                    {
+                        "sender_id": sender_id,
+                        "sender_name": sender_name,
+                        "topic": topic,
+                        "content": content,
+                    }
+                )
                 count += 1
-        logger.debug("CommBus: topic '%s' published by %s to %d subscribers", topic, sender_id, count)
+        logger.debug(
+            "CommBus: topic '%s' published by %s to %d subscribers",
+            topic,
+            sender_id,
+            count,
+        )
         return count
 
 
@@ -507,7 +531,9 @@ class MultiAgentSystem:
                 dist = float(np.linalg.norm(pos_i - pos_j))
                 if dist < tolerance:
                     # Nudge the second agent slightly
-                    offset = np.random.default_rng().uniform(-0.5, 0.5, size=pos_j.shape)
+                    offset = np.random.default_rng().uniform(
+                        -0.5, 0.5, size=pos_j.shape
+                    )
                     self.agents[aid_j].position = pos_j + offset
                     logger.debug(
                         "Conflict resolved: agent %s nudged away from %s",
@@ -536,10 +562,16 @@ class MultiAgentSystem:
 
         self._resolve_conflicts(all_results)
 
-        logger.info("MultiAgentSystem turn %d completed (%d agents)", self._turn, len(self.agents))
+        logger.info(
+            "MultiAgentSystem turn %d completed (%d agents)",
+            self._turn,
+            len(self.agents),
+        )
         return all_results
 
-    def run(self, n_turns: int, dt: float = 1.0) -> List[Dict[str, List[Dict[str, Any]]]]:
+    def run(
+        self, n_turns: int, dt: float = 1.0
+    ) -> List[Dict[str, List[Dict[str, Any]]]]:
         """Run *n_turns* of the multi-agent system.
 
         Args:

@@ -8,6 +8,7 @@ import structlog
 
 logger = structlog.get_logger(__name__)
 
+
 @dataclass
 class PromptVariant:
     variant_id: str = field(default_factory=lambda: str(uuid.uuid4())[:8])
@@ -26,8 +27,8 @@ class PromptVariant:
     def confidence(self) -> float:
         return min(self.uses / 20.0, 1.0)
 
-class PromptOptimizer:
 
+class PromptOptimizer:
     BASE_TEMPLATES = {
         "investigation": (
             "You are an elite intelligence analyst. Analyze the following data "
@@ -84,8 +85,9 @@ class PromptOptimizer:
         variants = self.variants.get(prompt_type, [])
 
         if not variants:
-
-            template = self.BASE_TEMPLATES.get(prompt_type, self.BASE_TEMPLATES["investigation"])
+            template = self.BASE_TEMPLATES.get(
+                prompt_type, self.BASE_TEMPLATES["investigation"]
+            )
             variant = PromptVariant(template=template)
             self.variants[prompt_type] = [variant]
             variants = [variant]
@@ -135,12 +137,14 @@ class PromptOptimizer:
         self, prompt_type: str, example_input: str, example_output: str, score: float
     ):
         examples = self.few_shot_examples[prompt_type]
-        examples.append({
-            "input": example_input[:500],
-            "output": example_output[:500],
-            "score": score,
-            "timestamp": time.time(),
-        })
+        examples.append(
+            {
+                "input": example_input[:500],
+                "output": example_output[:500],
+                "score": score,
+                "timestamp": time.time(),
+            }
+        )
 
         examples.sort(key=lambda x: x["score"], reverse=True)
         self.few_shot_examples[prompt_type] = examples[:10]
@@ -187,7 +191,6 @@ class PromptOptimizer:
         best_variant = variants[0]
 
         for variant in variants:
-
             alpha = variant.total_score + 1.0
             beta_param = max(variant.uses - variant.total_score + 1.0, 1.0)
             sample = random.betavariate(
@@ -200,13 +203,24 @@ class PromptOptimizer:
 
         return best_variant
 
-    def _mutate(self, parent: PromptVariant, prompt_type: str) -> Optional[PromptVariant]:
+    def _mutate(
+        self, parent: PromptVariant, prompt_type: str
+    ) -> Optional[PromptVariant]:
         mutations = [
             ("Add specificity", "Be very specific and detailed in your analysis. "),
-            ("Add urgency", "This is a time-sensitive investigation. Prioritize actionable intelligence. "),
-            ("Add structure", "Structure your response with clear headers and bullet points. "),
+            (
+                "Add urgency",
+                "This is a time-sensitive investigation. Prioritize actionable intelligence. ",
+            ),
+            (
+                "Add structure",
+                "Structure your response with clear headers and bullet points. ",
+            ),
             ("Add confidence", "For each finding, include a confidence percentage. "),
-            ("Add context", "Consider the broader threat landscape and known APT patterns. "),
+            (
+                "Add context",
+                "Consider the broader threat landscape and known APT patterns. ",
+            ),
         ]
 
         mutation_name, prefix = random.choice(mutations)
@@ -274,7 +288,9 @@ class PromptOptimizer:
             metrics["prompt_types"][prompt_type] = {
                 "variants": len(variants),
                 "total_uses": sum(v.uses for v in variants),
-                "best_score": max((v.avg_score for v in variants if v.uses > 0), default=0),
+                "best_score": max(
+                    (v.avg_score for v in variants if v.uses > 0), default=0
+                ),
                 "few_shot_examples": len(self.few_shot_examples.get(prompt_type, [])),
             }
 

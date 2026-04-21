@@ -27,13 +27,11 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Install flake8
-        run: pip install flake8
+      - name: Install ruff
+        run: pip install ruff
 
-      - name: Lint sentinel
-        run: flake8 disha/services/ai-platform/backend/app/agents/sentinel_agent.py --max-line-length=120 --ignore=E501,W503,W504
-      - name: Lint alert engine
-        run: flake8 disha/services/integrations/cyber-intelligence-platform/alerts/ --max-line-length=120 --ignore=E501,W503,W504
+      - name: Lint with ruff
+        run: ruff check disha/services/ai-platform/backend/app/agents/sentinel_agent.py disha/services/integrations/cyber-intelligence-platform/alerts/ --output-format=github
 
   test-sentinel:
     name: Test Sentinel

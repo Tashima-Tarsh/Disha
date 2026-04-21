@@ -24,6 +24,7 @@ logger = logging.getLogger(__name__)
 # Data classes
 # ---------------------------------------------------------------------------
 
+
 @dataclass
 class EnvironmentConditions:
     """Dynamic conditions that may change each tick.
@@ -38,7 +39,9 @@ class EnvironmentConditions:
         Normalised time in the range ``[0, 24)`` (hours).
     """
 
-    wind_vector: np.ndarray = field(default_factory=lambda: np.zeros(3, dtype=np.float64))
+    wind_vector: np.ndarray = field(
+        default_factory=lambda: np.zeros(3, dtype=np.float64)
+    )
     visibility: float = 1000.0
     time_of_day: float = 12.0
 
@@ -75,8 +78,12 @@ class Region:
     """
 
     name: str = "default"
-    bounds_min: np.ndarray = field(default_factory=lambda: np.zeros(3, dtype=np.float64))
-    bounds_max: np.ndarray = field(default_factory=lambda: np.ones(3, dtype=np.float64) * 100.0)
+    bounds_min: np.ndarray = field(
+        default_factory=lambda: np.zeros(3, dtype=np.float64)
+    )
+    bounds_max: np.ndarray = field(
+        default_factory=lambda: np.ones(3, dtype=np.float64) * 100.0
+    )
     properties: Dict[str, Any] = field(default_factory=dict)
 
     def contains(self, position: np.ndarray) -> bool:
@@ -98,7 +105,9 @@ class Region:
         return cls(
             name=data.get("name", "default"),
             bounds_min=np.array(data.get("bounds_min", [0, 0, 0]), dtype=np.float64),
-            bounds_max=np.array(data.get("bounds_max", [100, 100, 100]), dtype=np.float64),
+            bounds_max=np.array(
+                data.get("bounds_max", [100, 100, 100]), dtype=np.float64
+            ),
             properties=data.get("properties", {}),
         )
 
@@ -106,6 +115,7 @@ class Region:
 # ---------------------------------------------------------------------------
 # Environment
 # ---------------------------------------------------------------------------
+
 
 class Environment:
     """Top-level environment container.
@@ -182,8 +192,12 @@ class Environment:
         """
         rows, cols = self.terrain_resolution
         # Normalise world (x, y) → grid (col, row) — x maps to cols, y to rows
-        x_norm = (x - self.bounds_min[0]) / max(self.bounds_max[0] - self.bounds_min[0], 1e-9)
-        y_norm = (y - self.bounds_min[1]) / max(self.bounds_max[1] - self.bounds_min[1], 1e-9)
+        x_norm = (x - self.bounds_min[0]) / max(
+            self.bounds_max[0] - self.bounds_min[0], 1e-9
+        )
+        y_norm = (y - self.bounds_min[1]) / max(
+            self.bounds_max[1] - self.bounds_min[1], 1e-9
+        )
 
         # Clamp to [0, 1]
         x_norm = max(0.0, min(1.0, x_norm))
@@ -274,7 +288,9 @@ class Environment:
         env = cls(
             name=data.get("name", "default_env"),
             bounds_min=np.array(data.get("bounds_min", [0, 0, 0]), dtype=np.float64),
-            bounds_max=np.array(data.get("bounds_max", [100, 100, 100]), dtype=np.float64),
+            bounds_max=np.array(
+                data.get("bounds_max", [100, 100, 100]), dtype=np.float64
+            ),
             terrain_resolution=(resolution[0], resolution[1]),
             properties=data.get("properties"),
         )

@@ -111,9 +111,7 @@ class RungeKutta4Integrator(IntegratorBase):
         k3 = np.asarray(
             derivative_fn(state + 0.5 * dt * k2, t + 0.5 * dt), dtype=np.float64
         )
-        k4 = np.asarray(
-            derivative_fn(state + dt * k3, t + dt), dtype=np.float64
-        )
+        k4 = np.asarray(derivative_fn(state + dt * k3, t + dt), dtype=np.float64)
         new_state = state + (dt / 6.0) * (k1 + 2.0 * k2 + 2.0 * k3 + k4)
         logger.debug("RK4 step: t=%.6f -> %.6f", t, t + dt)
         return new_state

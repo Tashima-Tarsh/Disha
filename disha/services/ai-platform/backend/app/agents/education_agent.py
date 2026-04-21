@@ -9,6 +9,7 @@ from app.core.config import get_settings
 
 logger = structlog.get_logger(__name__)
 
+
 class EducationAgent(BaseAgent):
     """Agent for cognitive tutoring, exam preparation, and conceptual explanations."""
 
@@ -25,6 +26,7 @@ class EducationAgent(BaseAgent):
         """Get or create LLM instance."""
         if self._llm is None:
             from langchain_openai import ChatOpenAI
+
             self._llm = ChatOpenAI(
                 model=self.settings.LLM_MODEL,
                 temperature=0.7,
@@ -32,14 +34,18 @@ class EducationAgent(BaseAgent):
             )
         return self._llm
 
-    async def execute(self, target: str, options: dict[str, Any] | None = None) -> dict[str, Any]:
+    async def execute(
+        self, target: str, options: dict[str, Any] | None = None
+    ) -> dict[str, Any]:
         """Provide tutoring or conceptual explanations for a target topic."""
         options = options or {}
         mode = options.get("mode", "teaching")
         query = target
 
         context_docs = await self.vector_store.query(query, n_results=3)
-        context = "\n\n".join([d["document"] for d in context_docs]) if context_docs else ""
+        context = (
+            "\n\n".join([d["document"] for d in context_docs]) if context_docs else ""
+        )
 
         prompt = self._build_education_prompt(query, context, mode)
         tutorial = await self._generate_tutorial(prompt)
@@ -49,7 +55,7 @@ class EducationAgent(BaseAgent):
             "mode": mode,
             "tutorial": tutorial,
             "suggested_questions": self._extract_questions(tutorial),
-            "sources": [d["metadata"] for d in context_docs] if context_docs else []
+            "sources": [d["metadata"] for d in context_docs] if context_docs else [],
         }
 
     def _build_education_prompt(self, query: str, context: str, mode: str) -> str:
@@ -57,17 +63,17 @@ class EducationAgent(BaseAgent):
         mode_instructions = {
             "teaching": "Break down the concept into easy-to-understand parts using analogies.",
             "exam_prep": "Focus on key facts, potential questions, and memorization tips.",
-            "summary": "Provide a concise, high-level overview of the main points."
+            "summary": "Provide a concise, high-level overview of the main points.",
         }
 
         return f"""
 You are the DISHA Education Tutor, an intelligent and encouraging academic coach.
 Your goal is to help the user master: {query}
 
-{mode_instructions.get(mode, mode_instructions['teaching'])}
+{mode_instructions.get(mode, mode_instructions["teaching"])}
 
 Context from Knowledge Base:
-{context if context else 'General academic knowledge base.'}
+{context if context else "General academic knowledge base."}
 
 ### Instructions:
 1. Use clear, engaging language.
@@ -100,5 +106,6 @@ Context from Knowledge Base:
     def _extract_questions(self, text: str) -> list[str]:
         """Extract check questions from the generated text."""
         import re
+
         questions = re.findall(r"\d\.\s+(.*?\?)", text)
         return questions[:3]

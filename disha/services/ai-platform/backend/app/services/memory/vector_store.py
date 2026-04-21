@@ -1,4 +1,3 @@
-
 import asyncio
 from typing import Any
 
@@ -8,8 +7,8 @@ from app.core.config import get_settings
 
 logger = structlog.get_logger(__name__)
 
-class VectorStore:
 
+class VectorStore:
     def __init__(self, collection_name: str = "intelligence"):
         self.settings = get_settings()
         self.collection_name = collection_name
@@ -19,6 +18,7 @@ class VectorStore:
     def _get_collection(self):
         if self._collection is None:
             import chromadb
+
             self._client = chromadb.HttpClient(
                 host=self.settings.CHROMA_HOST,
                 port=self.settings.CHROMA_PORT,
@@ -39,6 +39,7 @@ class VectorStore:
             collection = self._get_collection()
             if ids is None:
                 import uuid
+
                 ids = [str(uuid.uuid4()) for _ in documents]
 
             _metas = metadatas or [{}] * len(documents)
@@ -48,7 +49,11 @@ class VectorStore:
                 metadatas=_metas,
                 ids=ids,
             )
-            logger.info("documents_stored", count=len(documents), collection=self.collection_name)
+            logger.info(
+                "documents_stored",
+                count=len(documents),
+                collection=self.collection_name,
+            )
             return True
         except Exception as e:
             logger.error("store_failed", error=str(e))
@@ -75,9 +80,15 @@ class VectorStore:
             for i in range(len(results["ids"][0])):
                 doc = {
                     "id": results["ids"][0][i],
-                    "document": results["documents"][0][i] if results["documents"] else "",
-                    "distance": results["distances"][0][i] if results["distances"] else 0,
-                    "metadata": results["metadatas"][0][i] if results["metadatas"] else {},
+                    "document": results["documents"][0][i]
+                    if results["documents"]
+                    else "",
+                    "distance": results["distances"][0][i]
+                    if results["distances"]
+                    else 0,
+                    "metadata": results["metadatas"][0][i]
+                    if results["metadatas"]
+                    else {},
                 }
                 documents.append(doc)
 
@@ -86,13 +97,17 @@ class VectorStore:
             logger.error("query_failed", error=str(e))
             return []
 
-    async def store_investigation(self, investigation_id: str, summary: str, metadata: dict[str, Any]) -> bool:
+    async def store_investigation(
+        self, investigation_id: str, summary: str, metadata: dict[str, Any]
+    ) -> bool:
         return await self.store(
             documents=[summary],
             metadatas=[{**metadata, "investigation_id": investigation_id}],
             ids=[investigation_id],
         )
 
-    async def get_context(self, query: str, user_id: str | None = None, limit: int = 3) -> list[dict[str, Any]]:
+    async def get_context(
+        self, query: str, user_id: str | None = None, limit: int = 3
+    ) -> list[dict[str, Any]]:
         where = {"user_id": user_id} if user_id else None
         return await self.query(query, n_results=limit, where=where)

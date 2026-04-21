@@ -8,6 +8,7 @@ def __getattr__(name: str):
     """Lazy import for GraphExporter (requires pydantic_settings)."""
     if name == "GraphExporter":
         from graph_ai.graph_exporter import GraphExporter
+
         return GraphExporter
     raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
 

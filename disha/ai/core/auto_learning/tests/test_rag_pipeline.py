@@ -92,11 +92,13 @@ class TestRAGPipeline:
 
     def test_query_returns_results(self, tmp_path):
         pipe = self._make_pipeline(str(tmp_path))
-        pipe.add_texts([
-            "Python is a programming language",
-            "Java is another programming language",
-            "The cat sat on the mat",
-        ])
+        pipe.add_texts(
+            [
+                "Python is a programming language",
+                "Java is another programming language",
+                "The cat sat on the mat",
+            ]
+        )
         results = pipe.query("programming", top_k=2)
         assert len(results) <= 2
         assert all(isinstance(r, SearchResult) for r in results)

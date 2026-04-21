@@ -44,12 +44,21 @@ try:
 except ImportError:
     _HAS_FAISS = False
 
-_SKIP_FAISS = pytest.mark.skipif(not _HAS_FAISS, reason="faiss-cpu or sentence-transformers not installed")
+_SKIP_FAISS = pytest.mark.skipif(
+    not _HAS_FAISS, reason="faiss-cpu or sentence-transformers not installed"
+)
 
 _DATA_DIR = os.path.join(os.path.dirname(__file__), os.pardir, "data", "raw")
 
 # ── Structured-output keys expected from every agent ──────────────────
-_REQUIRED_KEYS = {"summary", "premises", "inference_steps", "recommendations", "confidence", "sources"}
+_REQUIRED_KEYS = {
+    "summary",
+    "premises",
+    "inference_steps",
+    "recommendations",
+    "confidence",
+    "sources",
+}
 
 
 # ── LLM wrapper tests ────────────────────────────────────────────────
@@ -74,13 +83,7 @@ class TestLLMWrapper:
 # ── Text segmenter tests ─────────────────────────────────────────────
 class TestTextSegmenter:
     def test_segment_basic(self):
-        text = (
-            "Article 14\n"
-            "Equality before law.\n"
-            "\n"
-            "Article 21\n"
-            "Right to life.\n"
-        )
+        text = "Article 14\nEquality before law.\n\nArticle 21\nRight to life.\n"
         clauses = segment(text)
         assert len(clauses) == 2
         assert "Article 14" in clauses[0]
@@ -121,8 +124,10 @@ class TestCaseLawIngest:
         src = os.path.join(_DATA_DIR, "case_law.txt")
         if not os.path.exists(src):
             pytest.skip("sample case-law data not present")
-        with tempfile.NamedTemporaryFile(suffix=".txt", delete=False) as tmp_out, \
-                tempfile.NamedTemporaryFile(suffix=".json", delete=False) as tmp_meta:
+        with (
+            tempfile.NamedTemporaryFile(suffix=".txt", delete=False) as tmp_out,
+            tempfile.NamedTemporaryFile(suffix=".json", delete=False) as tmp_meta,
+        ):
             out_path, meta_path = tmp_out.name, tmp_meta.name
         try:
             n = ingest(src, out_path, meta_path)

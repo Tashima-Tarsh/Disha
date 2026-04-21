@@ -1,4 +1,3 @@
-
 from __future__ import annotations
 
 import json
@@ -31,26 +30,91 @@ _SCENARIO_TEMPLATES = [
 
 _FILLS = {
     "article": ["Article 14", "Article 19", "Article 21", "Article 25", "Article 32"],
-    "right": ["digital privacy", "data sovereignty", "AI oversight", "cyber rights", "environmental protection"],
-    "policy": ["uniform civil code", "digital ID mandate", "drone surveillance", "crypto regulation", "AI governance"],
-    "region": ["northern states", "coastal regions", "border areas", "metropolitan zones", "tribal territories"],
-    "event": ["military buildup", "cyber attack", "border incursion", "intelligence leak", "disinformation campaign"],
-    "border": ["the northern border", "the western frontier", "the maritime boundary", "the eastern corridor"],
-    "activity": ["encrypted communications", "financial transactions", "social media", "satellite imagery"],
+    "right": [
+        "digital privacy",
+        "data sovereignty",
+        "AI oversight",
+        "cyber rights",
+        "environmental protection",
+    ],
+    "policy": [
+        "uniform civil code",
+        "digital ID mandate",
+        "drone surveillance",
+        "crypto regulation",
+        "AI governance",
+    ],
+    "region": [
+        "northern states",
+        "coastal regions",
+        "border areas",
+        "metropolitan zones",
+        "tribal territories",
+    ],
+    "event": [
+        "military buildup",
+        "cyber attack",
+        "border incursion",
+        "intelligence leak",
+        "disinformation campaign",
+    ],
+    "border": [
+        "the northern border",
+        "the western frontier",
+        "the maritime boundary",
+        "the eastern corridor",
+    ],
+    "activity": [
+        "encrypted communications",
+        "financial transactions",
+        "social media",
+        "satellite imagery",
+    ],
     "threat": ["terrorism", "espionage", "sabotage", "insurgency", "radicalisation"],
     "freedom": ["movement", "expression", "assembly", "press", "religion"],
-    "crisis": ["a pandemic", "armed conflict", "civil unrest", "natural disaster", "economic collapse"],
-    "country": ["a neighbouring state", "a strategic partner", "an allied nation", "a regional power"],
+    "crisis": [
+        "a pandemic",
+        "armed conflict",
+        "civil unrest",
+        "natural disaster",
+        "economic collapse",
+    ],
+    "country": [
+        "a neighbouring state",
+        "a strategic partner",
+        "an allied nation",
+        "a regional power",
+    ],
     "issue": ["trade", "nuclear policy", "maritime rights", "climate action"],
-    "technology": ["facial recognition", "autonomous drones", "AI surveillance", "quantum computing"],
-    "purpose": ["border security", "law enforcement", "intelligence gathering", "disaster response"],
-    "bill": ["the Data Protection Bill", "the National Security Amendment", "the Digital Rights Act"],
+    "technology": [
+        "facial recognition",
+        "autonomous drones",
+        "AI surveillance",
+        "quantum computing",
+    ],
+    "purpose": [
+        "border security",
+        "law enforcement",
+        "intelligence gathering",
+        "disaster response",
+    ],
+    "bill": [
+        "the Data Protection Bill",
+        "the National Security Amendment",
+        "the Digital Rights Act",
+    ],
     "sector": ["defence", "healthcare", "education", "finance", "energy"],
     "movement": ["nationalism", "liberalism", "populism", "secularism"],
     "institution": ["judiciary", "parliament", "civil service", "media"],
     "trade": ["arms", "technology", "agricultural", "pharmaceutical"],
-    "treaty": ["the WTO framework", "bilateral agreements", "regional pacts", "UN resolutions"],
+    "treaty": [
+        "the WTO framework",
+        "bilateral agreements",
+        "regional pacts",
+        "UN resolutions",
+    ],
 }
+
 
 def _generate_scenarios(n: int = 200, seed: int = 42) -> list[dict]:
     rng = np.random.RandomState(seed)
@@ -66,6 +130,7 @@ def _generate_scenarios(n: int = 200, seed: int = 42) -> list[dict]:
         gt_quality = float(np.clip(rng.beta(5, 3), 0.1, 0.95))
         scenarios.append({"text": filled, "ground_truth_quality": gt_quality, "id": i})
     return scenarios
+
 
 def _extract_features(decision: dict) -> np.ndarray:
     agent_results = decision.get("agent_results", {})
@@ -83,8 +148,8 @@ def _extract_features(decision: dict) -> np.ndarray:
     features.append(len(decision.get("sources", [])))
     return np.array(features, dtype=np.float32)
 
-class CalibrationModel:
 
+class CalibrationModel:
     def __init__(self):
         self.weights: np.ndarray | None = None
         self.bias: float = 0.0
@@ -111,7 +176,9 @@ class CalibrationModel:
         preds = self.predict(X)
         mse = float(np.mean((preds - y) ** 2))
         mae = float(np.mean(np.abs(preds - y)))
-        r2 = float(1 - np.sum((y - preds) ** 2) / (np.sum((y - np.mean(y)) ** 2) + 1e-8))
+        r2 = float(
+            1 - np.sum((y - preds) ** 2) / (np.sum((y - np.mean(y)) ** 2) + 1e-8)
+        )
 
         return {"mse": mse, "mae": mae, "r2": r2}
 
@@ -126,8 +193,12 @@ class CalibrationModel:
         return {
             "weights": self.weights.tolist() if self.weights is not None else None,
             "bias": self.bias,
-            "feature_mean": self.feature_mean.tolist() if self.feature_mean is not None else None,
-            "feature_std": self.feature_std.tolist() if self.feature_std is not None else None,
+            "feature_mean": self.feature_mean.tolist()
+            if self.feature_mean is not None
+            else None,
+            "feature_std": self.feature_std.tolist()
+            if self.feature_std is not None
+            else None,
         }
 
     @classmethod
@@ -135,9 +206,14 @@ class CalibrationModel:
         m = cls()
         m.weights = np.array(d["weights"]) if d.get("weights") is not None else None
         m.bias = d.get("bias", 0.0)
-        m.feature_mean = np.array(d["feature_mean"]) if d.get("feature_mean") is not None else None
-        m.feature_std = np.array(d["feature_std"]) if d.get("feature_std") is not None else None
+        m.feature_mean = (
+            np.array(d["feature_mean"]) if d.get("feature_mean") is not None else None
+        )
+        m.feature_std = (
+            np.array(d["feature_std"]) if d.get("feature_std") is not None else None
+        )
         return m
+
 
 def train(
     num_scenarios: int = 200,
@@ -170,12 +246,18 @@ def train(
     print("Training calibration model…")
     model = CalibrationModel()
     train_metrics = model.fit(X_train, y_train)
-    print(f"  Train — MSE: {train_metrics['mse']:.4f}  MAE: {train_metrics['mae']:.4f}  R²: {train_metrics['r2']:.4f}")
+    print(
+        f"  Train — MSE: {train_metrics['mse']:.4f}  MAE: {train_metrics['mae']:.4f}  R²: {train_metrics['r2']:.4f}"
+    )
 
     test_preds = model.predict(X_test)
     test_mse = float(np.mean((test_preds - y_test) ** 2))
     test_mae = float(np.mean(np.abs(test_preds - y_test)))
-    test_r2 = float(1 - np.sum((y_test - test_preds) ** 2) / (np.sum((y_test - np.mean(y_test)) ** 2) + 1e-8))
+    test_r2 = float(
+        1
+        - np.sum((y_test - test_preds) ** 2)
+        / (np.sum((y_test - np.mean(y_test)) ** 2) + 1e-8)
+    )
     print(f"  Test  — MSE: {test_mse:.4f}  MAE: {test_mae:.4f}  R²: {test_r2:.4f}")
 
     ckpt_dir = Path(checkpoint_dir) if checkpoint_dir else (_SCRIPT_DIR / "checkpoints")
@@ -204,6 +286,7 @@ def train(
     print(f"Metrics saved → {metrics_path}")
 
     return summary
+
 
 if __name__ == "__main__":
     result = train()

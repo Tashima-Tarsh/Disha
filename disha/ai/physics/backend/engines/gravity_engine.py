@@ -4,6 +4,7 @@ Gravity Engine — gravitational physics computations and simulations.
 Covers Newtonian gravity, tidal forces, gravitational lensing,
 time dilation (GR), escape velocity, Roche limits, and N-body simulation.
 """
+
 from __future__ import annotations
 
 import logging
@@ -13,15 +14,15 @@ from typing import Any
 logger = logging.getLogger(__name__)
 
 # ── Physical constants (SI) ───────────────────────────────────────────────────
-G = 6.67430e-11           # gravitational constant (m³ kg⁻¹ s⁻²)
-C = 2.99792458e8          # speed of light (m/s)
-AU_M = 1.495978707e11     # astronomical unit (m)
-LY_M = 9.4607e15          # light-year (m)
-M_SUN = 1.989e30          # solar mass (kg)
-M_EARTH = 5.972e24        # Earth mass (kg)
-R_EARTH = 6.371e6         # Earth radius (m)
-M_MOON = 7.342e22         # Moon mass (kg)
-R_MOON = 1.737e6          # Moon radius (m)
+G = 6.67430e-11  # gravitational constant (m³ kg⁻¹ s⁻²)
+C = 2.99792458e8  # speed of light (m/s)
+AU_M = 1.495978707e11  # astronomical unit (m)
+LY_M = 9.4607e15  # light-year (m)
+M_SUN = 1.989e30  # solar mass (kg)
+M_EARTH = 5.972e24  # Earth mass (kg)
+R_EARTH = 6.371e6  # Earth radius (m)
+M_MOON = 7.342e22  # Moon mass (kg)
+R_MOON = 1.737e6  # Moon radius (m)
 
 # Preset celestial bodies for quick lookups
 _BODIES: dict[str, dict[str, float]] = {
@@ -43,9 +44,7 @@ class GravityEngine:
 
     # ── Public API ────────────────────────────────────────────────────────────
 
-    def gravitational_force(
-        self, m1: float, m2: float, r: float
-    ) -> dict[str, Any]:
+    def gravitational_force(self, m1: float, m2: float, r: float) -> dict[str, Any]:
         """Compute Newtonian gravitational force between two masses.
 
         Parameters
@@ -72,9 +71,12 @@ class GravityEngine:
             "formula": "F = G·m1·m2 / r²",
         }
 
-    def surface_gravity(self, body: str | None = None,
-                        mass: float | None = None,
-                        radius: float | None = None) -> dict[str, Any]:
+    def surface_gravity(
+        self,
+        body: str | None = None,
+        mass: float | None = None,
+        radius: float | None = None,
+    ) -> dict[str, Any]:
         """Compute surface gravitational acceleration (g) for a body."""
         if body:
             bd = _BODIES.get(body.lower())
@@ -98,9 +100,12 @@ class GravityEngine:
             "formula": "g = G·M / R²",
         }
 
-    def escape_velocity(self, body: str | None = None,
-                        mass: float | None = None,
-                        radius: float | None = None) -> dict[str, Any]:
+    def escape_velocity(
+        self,
+        body: str | None = None,
+        mass: float | None = None,
+        radius: float | None = None,
+    ) -> dict[str, Any]:
         """Compute escape velocity from the surface of a body."""
         if body:
             bd = _BODIES.get(body.lower())
@@ -122,8 +127,9 @@ class GravityEngine:
             "formula": "v_esc = √(2GM/R)",
         }
 
-    def orbital_velocity(self, central_mass: float,
-                         orbital_radius: float) -> dict[str, Any]:
+    def orbital_velocity(
+        self, central_mass: float, orbital_radius: float
+    ) -> dict[str, Any]:
         """Compute circular orbital velocity at a given radius."""
         if central_mass <= 0 or orbital_radius <= 0:
             return {"error": "Central mass and radius must be positive"}
@@ -138,9 +144,7 @@ class GravityEngine:
             "formula": "v_orb = √(GM/r)",
         }
 
-    def gravitational_time_dilation(
-        self, mass: float, radius: float
-    ) -> dict[str, Any]:
+    def gravitational_time_dilation(self, mass: float, radius: float) -> dict[str, Any]:
         """Compute gravitational time dilation factor (GR Schwarzschild).
 
         Returns the ratio t_surface / t_infinity — a clock on the surface
@@ -153,7 +157,7 @@ class GravityEngine:
         if radius <= r_s:
             return {
                 "error": "Radius is at or inside the Schwarzschild radius "
-                         "(black hole event horizon)",
+                "(black hole event horizon)",
                 "schwarzschild_radius_m": r_s,
             }
 
@@ -168,9 +172,7 @@ class GravityEngine:
             "formula": "√(1 − 2GM/(rc²))",
         }
 
-    def tidal_force(
-        self, M: float, r: float, delta_r: float
-    ) -> dict[str, Any]:
+    def tidal_force(self, M: float, r: float, delta_r: float) -> dict[str, Any]:
         """Compute tidal acceleration between two points separated by delta_r.
 
         Parameters
@@ -215,9 +217,7 @@ class GravityEngine:
             "formula": "d = R_p · (2ρ_p / ρ_s)^(1/3)",
         }
 
-    def gravitational_lensing(
-        self, M: float, r: float
-    ) -> dict[str, Any]:
+    def gravitational_lensing(self, M: float, r: float) -> dict[str, Any]:
         """Compute the Einstein deflection angle for light passing a mass.
 
         Parameters
@@ -290,11 +290,16 @@ class GravityEngine:
 
         # Record initial state
         for i in range(n):
-            trajectories[names[i]].append({
-                "step": 0, "t_s": 0.0,
-                "x_m": round(x[i], 2), "y_m": round(y[i], 2),
-                "vx_ms": round(vx[i], 4), "vy_ms": round(vy[i], 4),
-            })
+            trajectories[names[i]].append(
+                {
+                    "step": 0,
+                    "t_s": 0.0,
+                    "x_m": round(x[i], 2),
+                    "y_m": round(y[i], 2),
+                    "vx_ms": round(vx[i], 4),
+                    "vy_ms": round(vy[i], 4),
+                }
+            )
 
         # Leapfrog integration
         ax, ay = _accel(x, y)
@@ -318,11 +323,16 @@ class GravityEngine:
             sample_rate = max(1, steps // 200)
             if s % sample_rate == 0 or s == steps:
                 for i in range(n):
-                    trajectories[names[i]].append({
-                        "step": s, "t_s": round(s * dt, 2),
-                        "x_m": round(x[i], 2), "y_m": round(y[i], 2),
-                        "vx_ms": round(vx[i], 4), "vy_ms": round(vy[i], 4),
-                    })
+                    trajectories[names[i]].append(
+                        {
+                            "step": s,
+                            "t_s": round(s * dt, 2),
+                            "x_m": round(x[i], 2),
+                            "y_m": round(y[i], 2),
+                            "vx_ms": round(vx[i], 4),
+                            "vy_ms": round(vy[i], 4),
+                        }
+                    )
 
         return {
             "bodies": names,
@@ -337,8 +347,10 @@ class GravityEngine:
         """Return info about a known celestial body."""
         bd = _BODIES.get(body.lower())
         if not bd:
-            return {"error": f"Unknown body '{body}'",
-                    "available": list(_BODIES.keys())}
+            return {
+                "error": f"Unknown body '{body}'",
+                "available": list(_BODIES.keys()),
+            }
 
         mass = bd["mass"]
         radius = bd["radius"]
@@ -362,12 +374,14 @@ class GravityEngine:
             mass = bd["mass"]
             radius = bd["radius"]
             g = G * mass / radius**2
-            results.append({
-                "name": name.capitalize(),
-                "mass_kg": mass,
-                "radius_m": radius,
-                "surface_gravity_ms2": round(g, 6),
-            })
+            results.append(
+                {
+                    "name": name.capitalize(),
+                    "mass_kg": mass,
+                    "radius_m": radius,
+                    "surface_gravity_ms2": round(g, 6),
+                }
+            )
         return results
 
     def gravitational_potential_field(
@@ -397,11 +411,13 @@ class GravityEngine:
                 if r < extent_m * 0.02:
                     r = extent_m * 0.02  # avoid singularity
                 phi = -G * mass / r
-                field.append({
-                    "x_m": round(xi, 2),
-                    "y_m": round(yj, 2),
-                    "potential_Jkg": round(phi, 4),
-                })
+                field.append(
+                    {
+                        "x_m": round(xi, 2),
+                        "y_m": round(yj, 2),
+                        "potential_Jkg": round(phi, 4),
+                    }
+                )
 
         return {
             "mass_kg": mass,

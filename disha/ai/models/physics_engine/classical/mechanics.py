@@ -235,7 +235,7 @@ class ClassicalMechanicsEngine:
         for i in range(n):
             for j in range(i + 1, n):
                 r_vec: np.ndarray = objs[j].position - objs[i].position
-                dist_sq: float = float(np.dot(r_vec, r_vec)) + self.softening ** 2
+                dist_sq: float = float(np.dot(r_vec, r_vec)) + self.softening**2
                 dist: float = np.sqrt(dist_sq)
                 force_mag: float = self.G * objs[i].mass * objs[j].mass / dist_sq
                 force_dir: np.ndarray = r_vec / dist

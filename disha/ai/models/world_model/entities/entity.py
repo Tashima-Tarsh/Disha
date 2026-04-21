@@ -27,6 +27,7 @@ logger = logging.getLogger(__name__)
 # EntityState enum
 # ---------------------------------------------------------------------------
 
+
 class EntityState(Enum):
     """Lifecycle states an entity can occupy."""
 
@@ -38,6 +39,7 @@ class EntityState(Enum):
 # ---------------------------------------------------------------------------
 # Entity base class
 # ---------------------------------------------------------------------------
+
 
 class Entity:
     """Base class for every object that exists in the simulated world.
@@ -81,7 +83,9 @@ class Entity:
         self.state: EntityState = EntityState.ACTIVE
         self.created_at: float = time()
 
-        logger.debug("Entity created: %s (%s) [%s]", self.name, self.id, self.entity_type)
+        logger.debug(
+            "Entity created: %s (%s) [%s]", self.name, self.id, self.entity_type
+        )
 
     # -- Core API -----------------------------------------------------------
 
@@ -116,7 +120,9 @@ class Entity:
         if "set_velocity" in action:
             self.velocity = np.array(action["set_velocity"], dtype=np.float64)
         if "add_force" in action:
-            self.velocity = self.velocity + np.array(action["add_force"], dtype=np.float64)
+            self.velocity = self.velocity + np.array(
+                action["add_force"], dtype=np.float64
+            )
         if "set_state" in action:
             try:
                 self.state = EntityState(action["set_state"])
@@ -153,6 +159,7 @@ class Entity:
 # AgentEntity
 # ---------------------------------------------------------------------------
 
+
 class AgentEntity(Entity):
     """An autonomous entity that perceives the world and acts on goals.
 
@@ -172,7 +179,9 @@ class AgentEntity(Entity):
         self,
         name: str,
         goal: str = "",
-        behavior_fn: Optional[Callable[["AgentEntity", float, List[Entity]], None]] = None,
+        behavior_fn: Optional[
+            Callable[["AgentEntity", float, List[Entity]], None]
+        ] = None,
         perception_radius: float = 10.0,
         position: Optional[np.ndarray] = None,
         velocity: Optional[np.ndarray] = None,
@@ -214,7 +223,9 @@ class AgentEntity(Entity):
                 self.behavior_fn(self, dt, nearby_entities or [])
             except Exception:
                 logger.exception(
-                    "behavior_fn raised for agent %s (%s)", self.name, self.id,
+                    "behavior_fn raised for agent %s (%s)",
+                    self.name,
+                    self.id,
                 )
 
         # Physics integration (base class)
@@ -242,6 +253,7 @@ class AgentEntity(Entity):
 # ---------------------------------------------------------------------------
 # ObjectEntity
 # ---------------------------------------------------------------------------
+
 
 class ObjectEntity(Entity):
     """A passive physical object in the world.

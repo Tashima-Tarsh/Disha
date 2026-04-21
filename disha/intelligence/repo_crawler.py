@@ -8,8 +8,27 @@ def crawl_repo(root_dir):
     Excludes large binaries and ignored directories.
     """
     repo_data = []
-    ignored_dirs = {'.git', '.claude', 'node_modules', '__pycache__', '.next', 'dist', '.pytest_cache'}
-    allowed_extensions = {'.py', '.ts', '.tsx', '.md', '.json', '.yaml', '.yml', '.toml', '.css', '.html'}
+    ignored_dirs = {
+        ".git",
+        ".claude",
+        "node_modules",
+        "__pycache__",
+        ".next",
+        "dist",
+        ".pytest_cache",
+    }
+    allowed_extensions = {
+        ".py",
+        ".ts",
+        ".tsx",
+        ".md",
+        ".json",
+        ".yaml",
+        ".yml",
+        ".toml",
+        ".css",
+        ".html",
+    }
 
     root_path = Path(root_dir)
 
@@ -21,15 +40,17 @@ def crawl_repo(root_dir):
             file_path = Path(current_root) / file
             if file_path.suffix in allowed_extensions:
                 try:
-                    with open(file_path, 'r', encoding='utf-8') as f:
+                    with open(file_path, "r", encoding="utf-8") as f:
                         content = f.read()
 
-                    repo_data.append({
-                        "path": str(file_path.relative_to(root_path)),
-                        "type": file_path.suffix,
-                        "content": content,
-                        "size": file_path.stat().st_size
-                    })
+                    repo_data.append(
+                        {
+                            "path": str(file_path.relative_to(root_path)),
+                            "type": file_path.suffix,
+                            "content": content,
+                            "size": file_path.stat().st_size,
+                        }
+                    )
                 except Exception as e:
                     print(f"Error reading {file_path}: {e}")
 

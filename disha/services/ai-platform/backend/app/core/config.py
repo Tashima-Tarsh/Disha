@@ -1,12 +1,11 @@
-
 import secrets
 from functools import lru_cache
 
 from pydantic import field_validator
 from pydantic_settings import BaseSettings
 
-class Settings(BaseSettings):
 
+class Settings(BaseSettings):
     APP_NAME: str = "AI Intelligence Platform"
     APP_VERSION: str = "1.0.0"
     DEBUG: bool = False
@@ -45,10 +44,11 @@ class Settings(BaseSettings):
     def _require_secret_key(cls, v: str) -> str:
         if not v:
             import os
+
             if os.getenv("APP_ENV", "development").lower() == "production":
                 raise ValueError(
                     "SECRET_KEY must be set in production. "
-                    "Generate one with: python -c \"import secrets; print(secrets.token_hex(32))\""
+                    'Generate one with: python -c "import secrets; print(secrets.token_hex(32))"'
                 )
 
             return secrets.token_hex(32)
@@ -62,6 +62,7 @@ class Settings(BaseSettings):
     class Config:
         env_file = ".env"
         case_sensitive = True
+
 
 @lru_cache()
 def get_settings() -> Settings:

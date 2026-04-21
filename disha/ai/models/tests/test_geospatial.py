@@ -1,14 +1,17 @@
 """Geospatial tests."""
+
 from geospatial.tracking.tracker import ObjectTracker
 from geospatial.sensor_integration.sensor import Sensor, SensorType
 from geospatial.gis_processing.spatial_index import SpatialGrid, Point2D
 from geospatial.gis_processing.coordinate_system import (
-    GeoCoordinate, CoordinateTransformer,
+    GeoCoordinate,
+    CoordinateTransformer,
 )
 import sys
 import os
 import unittest
 import numpy as np
+
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 
@@ -39,9 +42,12 @@ class TestGeospatial(unittest.TestCase):
 
     def test_sensor_reading_generation(self):
         sensor = Sensor(
-            sensor_id="s1", sensor_type=SensorType.GPS,
-            position=np.array([0, 0, 0]), sensor_range=1000.0,
-            accuracy=1.0, seed=42,
+            sensor_id="s1",
+            sensor_type=SensorType.GPS,
+            position=np.array([0, 0, 0]),
+            sensor_range=1000.0,
+            accuracy=1.0,
+            seed=42,
         )
         target = np.array([100.0, 0.0, 0.0])
         reading = sensor.generate_reading(target, timestamp=1.0)

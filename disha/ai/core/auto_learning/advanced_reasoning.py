@@ -1,4 +1,3 @@
-
 from __future__ import annotations
 
 import hashlib
@@ -10,8 +9,8 @@ from typing import Any, List, Optional
 
 logger = logging.getLogger(__name__)
 
-class ComplexityClass(Enum):
 
+class ComplexityClass(Enum):
     O_1 = "O(1)"
     O_LOG_N = "O(log n)"
     O_N = "O(n)"
@@ -21,9 +20,9 @@ class ComplexityClass(Enum):
     O_2N = "O(2^n)"
     O_UNKNOWN = "unknown"
 
+
 @dataclass
 class SolutionEvaluation:
-
     time_complexity: ComplexityClass = ComplexityClass.O_UNKNOWN
     space_complexity: ComplexityClass = ComplexityClass.O_UNKNOWN
     scalability_score: float = 0.0
@@ -40,9 +39,9 @@ class SolutionEvaluation:
             + self.scalability_score * 0.10
         )
 
+
 @dataclass
 class SolutionPath:
-
     name: str
     description: str
     approach: str
@@ -52,17 +51,17 @@ class SolutionPath:
     assumptions: List[str] = field(default_factory=list)
     rank: int = 0
 
+
 @dataclass
 class SubProblem:
-
     description: str
     dependencies: List[str] = field(default_factory=list)
     solutions: List[SolutionPath] = field(default_factory=list)
     selected_solution: Optional[SolutionPath] = None
 
+
 @dataclass
 class ReasoningResult:
-
     problem: str
     sub_problems: List[SubProblem] = field(default_factory=list)
     all_solutions: List[SolutionPath] = field(default_factory=list)
@@ -79,6 +78,7 @@ class ReasoningResult:
             raw = f"{self.problem}:{time.time()}"
             self.reasoning_id = hashlib.sha256(raw.encode()).hexdigest()[:12]
 
+
 _COMPLEXITY_RANK = {
     ComplexityClass.O_1: 1,
     ComplexityClass.O_LOG_N: 2,
@@ -89,6 +89,7 @@ _COMPLEXITY_RANK = {
     ComplexityClass.O_2N: 7,
     ComplexityClass.O_UNKNOWN: 8,
 }
+
 
 def _estimate_complexity(approach: str) -> tuple:
     lookup = {
@@ -105,8 +106,8 @@ def _estimate_complexity(approach: str) -> tuple:
     }
     return lookup.get(approach, (ComplexityClass.O_UNKNOWN, ComplexityClass.O_UNKNOWN))
 
-class AdvancedReasoningEngine:
 
+class AdvancedReasoningEngine:
     APPROACHES = [
         "direct",
         "divide_and_conquer",
@@ -134,9 +135,7 @@ class AdvancedReasoningEngine:
             if len(part) < 5:
                 continue
             deps = [f"sub_{j}" for j in range(i) if j < i]
-            sub_problems.append(
-                SubProblem(description=part, dependencies=deps)
-            )
+            sub_problems.append(SubProblem(description=part, dependencies=deps))
 
         if not sub_problems:
             sub_problems = [SubProblem(description=problem)]
@@ -153,7 +152,9 @@ class AdvancedReasoningEngine:
             applicable.extend(["binary_search", "direct", "heuristic"])
         elif any(kw in desc for kw in ["sort", "order", "rank", "arrange"]):
             applicable.extend(["divide_and_conquer", "greedy", "iterative"])
-        elif any(kw in desc for kw in ["optimise", "optimize", "minimum", "maximum", "best"]):
+        elif any(
+            kw in desc for kw in ["optimise", "optimize", "minimum", "maximum", "best"]
+        ):
             applicable.extend(["dynamic_programming", "greedy", "heuristic"])
         elif any(kw in desc for kw in ["graph", "network", "path", "traverse"]):
             applicable.extend(["graph_traversal", "greedy", "dynamic_programming"])
@@ -220,7 +221,9 @@ class AdvancedReasoningEngine:
 
     def select_optimal(self, solutions: List[SolutionPath]) -> SolutionPath:
         if not solutions:
-            return SolutionPath(name="none", description="No solutions available", approach="none")
+            return SolutionPath(
+                name="none", description="No solutions available", approach="none"
+            )
 
         ranked = sorted(
             solutions,
@@ -270,9 +273,7 @@ class AdvancedReasoningEngine:
         if len(solutions) < 2:
             return False
 
-        scores = sorted(
-            [s.evaluation.weighted_score for s in solutions], reverse=True
-        )
+        scores = sorted([s.evaluation.weighted_score for s in solutions], reverse=True)
 
         if scores[0] == 0:
             return False
@@ -315,7 +316,9 @@ class AdvancedReasoningEngine:
         elapsed = time.time() - start
 
         if all_solutions:
-            avg_weighted = sum(s.evaluation.weighted_score for s in all_solutions) / len(all_solutions)
+            avg_weighted = sum(
+                s.evaluation.weighted_score for s in all_solutions
+            ) / len(all_solutions)
             confidence = min(avg_weighted / 10.0, 1.0)
         else:
             confidence = 0.0
@@ -351,6 +354,7 @@ class AdvancedReasoningEngine:
                 @dataclass
                 class _R:
                     text: str
+
                 return [_R(text=t) for t in context_texts[:top_k]]
 
         old = self._context_retriever
@@ -383,20 +387,24 @@ class AdvancedReasoningEngine:
 
         if result.selected_approach:
             sel = result.selected_approach
-            lines.extend([
-                "",
-                f"Selected approach: {sel.name}",
-                f"  Approach: {sel.approach}",
-                f"  Time: {sel.evaluation.time_complexity.value}",
-                f"  Space: {sel.evaluation.space_complexity.value}",
-                f"  Weighted score: {sel.evaluation.weighted_score:.2f}",
-            ])
+            lines.extend(
+                [
+                    "",
+                    f"Selected approach: {sel.name}",
+                    f"  Approach: {sel.approach}",
+                    f"  Time: {sel.evaluation.time_complexity.value}",
+                    f"  Space: {sel.evaluation.space_complexity.value}",
+                    f"  Weighted score: {sel.evaluation.weighted_score:.2f}",
+                ]
+            )
 
         if result.ambiguity_detected:
-            lines.extend([
-                "",
-                "⚠ Ambiguity detected — alternative solutions:",
-            ])
+            lines.extend(
+                [
+                    "",
+                    "⚠ Ambiguity detected — alternative solutions:",
+                ]
+            )
             for alt in result.alternative_solutions:
                 lines.append(
                     f"  #{alt.rank}: {alt.name} "

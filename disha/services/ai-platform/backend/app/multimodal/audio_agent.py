@@ -9,8 +9,8 @@ from app.core.config import get_settings
 
 logger = structlog.get_logger(__name__)
 
-class AudioAgent(BaseAgent):
 
+class AudioAgent(BaseAgent):
     def __init__(self):
         super().__init__(
             name="AudioAgent",
@@ -45,7 +45,6 @@ class AudioAgent(BaseAgent):
         results["transcription"] = transcript
 
         if transcript.get("text"):
-
             if analysis_type in ("analyze", "keywords"):
                 analysis = await self._analyze_transcript(transcript["text"])
                 results["analysis"] = analysis
@@ -54,18 +53,20 @@ class AudioAgent(BaseAgent):
             keywords = self._spot_keywords(transcript["text"])
             results["keywords_detected"] = keywords
 
-            entities.append({
-                "id": f"audio_{hash(transcript['text'][:100]) % 10**8}",
-                "label": "Audio Transcript",
-                "entity_type": "audio",
-                "properties": {
-                    "text_preview": transcript["text"][:500],
-                    "language": transcript.get("language", "unknown"),
-                    "duration": transcript.get("duration"),
-                    "keywords_found": len(keywords),
-                },
-                "risk_score": self._compute_audio_risk(results),
-            })
+            entities.append(
+                {
+                    "id": f"audio_{hash(transcript['text'][:100]) % 10**8}",
+                    "label": "Audio Transcript",
+                    "entity_type": "audio",
+                    "properties": {
+                        "text_preview": transcript["text"][:500],
+                        "language": transcript.get("language", "unknown"),
+                        "duration": transcript.get("duration"),
+                        "keywords_found": len(keywords),
+                    },
+                    "risk_score": self._compute_audio_risk(results),
+                }
+            )
 
         return {
             "agent": self.name,
@@ -162,11 +163,31 @@ class AudioAgent(BaseAgent):
 
     def _spot_keywords(self, text: str) -> list:
         threat_keywords = [
-            "attack", "exploit", "vulnerability", "breach", "malware",
-            "ransomware", "phishing", "credential", "password", "bitcoin",
-            "monero", "tor", "vpn", "proxy", "encrypted", "dark web",
-            "zero day", "backdoor", "rootkit", "botnet", "ddos",
-            "exfiltrate", "payload", "command and control", "c2",
+            "attack",
+            "exploit",
+            "vulnerability",
+            "breach",
+            "malware",
+            "ransomware",
+            "phishing",
+            "credential",
+            "password",
+            "bitcoin",
+            "monero",
+            "tor",
+            "vpn",
+            "proxy",
+            "encrypted",
+            "dark web",
+            "zero day",
+            "backdoor",
+            "rootkit",
+            "botnet",
+            "ddos",
+            "exfiltrate",
+            "payload",
+            "command and control",
+            "c2",
         ]
 
         text_lower = text.lower()
@@ -179,16 +200,18 @@ class AudioAgent(BaseAgent):
         if not content:
             return entities
 
-        entities.append({
-            "id": f"audio_analysis_{hash(content[:100]) % 10**8}",
-            "label": "Audio Intelligence",
-            "entity_type": "intelligence_report",
-            "properties": {
-                "summary": content[:500],
-                "source": "audio_analysis",
-            },
-            "risk_score": 0.0,
-        })
+        entities.append(
+            {
+                "id": f"audio_analysis_{hash(content[:100]) % 10**8}",
+                "label": "Audio Intelligence",
+                "entity_type": "intelligence_report",
+                "properties": {
+                    "summary": content[:500],
+                    "source": "audio_analysis",
+                },
+                "risk_score": 0.0,
+            }
+        )
 
         return entities
 
@@ -201,7 +224,12 @@ class AudioAgent(BaseAgent):
         analysis = results.get("analysis", {})
         content = (analysis.get("analysis") or "").lower()
 
-        high_risk_terms = ["critical", "immediate threat", "active attack", "breach confirmed"]
+        high_risk_terms = [
+            "critical",
+            "immediate threat",
+            "active attack",
+            "breach confirmed",
+        ]
         for term in high_risk_terms:
             if term in content:
                 risk += 0.15

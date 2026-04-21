@@ -6,6 +6,7 @@ Usage:
     python main.py "Phishing email detected" google.com
     echo "Ransomware alert" | python main.py
 """
+
 import logging
 import sys
 

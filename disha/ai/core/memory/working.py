@@ -1,4 +1,3 @@
-
 from __future__ import annotations
 
 import time
@@ -9,8 +8,8 @@ log = structlog.get_logger(__name__)
 
 MAX_SLOTS = 8
 
-class WorkingMemory:
 
+class WorkingMemory:
     def __init__(self) -> None:
         self._slots: list[dict[str, Any]] = []
         log.debug("working_memory.initialized", max_slots=MAX_SLOTS)
@@ -23,12 +22,15 @@ class WorkingMemory:
             "relevance": relevance,
             "source": item.get("source", "unknown"),
             "added_at": time.time(),
-            "metadata": {k: v for k, v in item.items() if k not in ("content", "source")},
+            "metadata": {
+                k: v for k, v in item.items() if k not in ("content", "source")
+            },
         }
 
         if len(self._slots) >= MAX_SLOTS:
-
-            min_idx = min(range(len(self._slots)), key=lambda i: self._slots[i]["relevance"])
+            min_idx = min(
+                range(len(self._slots)), key=lambda i: self._slots[i]["relevance"]
+            )
             evicted = self._slots.pop(min_idx)
             log.debug(
                 "working_memory.evicted",
@@ -78,7 +80,12 @@ class WorkingMemory:
 
     def stats(self) -> dict[str, Any]:
         if not self._slots:
-            return {"count": 0, "avg_relevance": 0.0, "max_relevance": 0.0, "min_relevance": 0.0}
+            return {
+                "count": 0,
+                "avg_relevance": 0.0,
+                "max_relevance": 0.0,
+                "min_relevance": 0.0,
+            }
         relevances = [s["relevance"] for s in self._slots]
         return {
             "count": len(self._slots),

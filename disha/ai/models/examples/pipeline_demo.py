@@ -48,10 +48,14 @@ def main() -> None:
     stage_log = []
 
     def before_hook(stage, data):
-        stage_log.append({"stage": stage.name, "event": "before", "keys": list(data.keys())})
+        stage_log.append(
+            {"stage": stage.name, "event": "before", "keys": list(data.keys())}
+        )
 
     def after_hook(stage, data):
-        stage_log.append({"stage": stage.name, "event": "after", "keys": list(data.keys())})
+        stage_log.append(
+            {"stage": stage.name, "event": "after", "keys": list(data.keys())}
+        )
 
     pipeline.before_stage(before_hook)
     pipeline.after_stage(after_hook)
@@ -70,7 +74,7 @@ def main() -> None:
             "angle_deg": 45,
             "gravity": g,
             "computed_range": v0**2 * np.sin(2 * angle_rad) / g,
-            "computed_max_height": (v0 * np.sin(angle_rad))**2 / (2 * g),
+            "computed_max_height": (v0 * np.sin(angle_rad)) ** 2 / (2 * g),
             "computed_flight_time": 2 * v0 * np.sin(angle_rad) / g,
             "text": f"{v0} * {v0} * 1.0 / {g}",
         },
@@ -81,8 +85,12 @@ def main() -> None:
     print("  Problem: Projectile motion")
     print(f"  v0 = {v0} m/s, angle = 45°, g = {g} m/s²")
     print(f"  Expected range: {input_data['raw_input']['computed_range']:.2f} m")
-    print(f"  Expected max height: {input_data['raw_input']['computed_max_height']:.2f} m")
-    print(f"  Expected flight time: {input_data['raw_input']['computed_flight_time']:.2f} s")
+    print(
+        f"  Expected max height: {input_data['raw_input']['computed_max_height']:.2f} m"
+    )
+    print(
+        f"  Expected flight time: {input_data['raw_input']['computed_flight_time']:.2f} s"
+    )
 
     # --- Run the pipeline ---
     print("\n--- Running Pipeline ---")
@@ -141,7 +149,9 @@ def main() -> None:
     # --- Stage execution log ---
     print("\n--- Pipeline Execution Log ---")
     for entry in stage_log:
-        print(f"  [{entry['event']:6s}] {entry['stage']:12s} | data keys: {entry['keys']}")
+        print(
+            f"  [{entry['event']:6s}] {entry['stage']:12s} | data keys: {entry['keys']}"
+        )
 
     print("\n[OK] Pipeline demo completed successfully!")
 

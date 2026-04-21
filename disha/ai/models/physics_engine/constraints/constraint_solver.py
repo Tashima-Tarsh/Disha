@@ -32,6 +32,7 @@ logger = logging.getLogger(__name__)
 # Duck-type protocol for objects with position and mass
 # ------------------------------------------------------------------
 
+
 class HasPositionAndMass(Protocol):
     """Structural sub-type for objects usable with constraints."""
 
@@ -42,6 +43,7 @@ class HasPositionAndMass(Protocol):
 # ------------------------------------------------------------------
 # Abstract Constraint
 # ------------------------------------------------------------------
+
 
 class Constraint(abc.ABC):
     """Abstract base class for a physics constraint.
@@ -65,6 +67,7 @@ class Constraint(abc.ABC):
 # ------------------------------------------------------------------
 # Distance Constraint
 # ------------------------------------------------------------------
+
 
 class DistanceConstraint(Constraint):
     """Maintain a fixed distance between two objects.
@@ -135,6 +138,7 @@ class DistanceConstraint(Constraint):
 # ------------------------------------------------------------------
 # Boundary Constraint
 # ------------------------------------------------------------------
+
 
 class BoundaryConstraint(Constraint):
     """Keep an object within an axis-aligned bounding box.
@@ -208,6 +212,7 @@ class BoundaryConstraint(Constraint):
 # ------------------------------------------------------------------
 # Constraint Solver
 # ------------------------------------------------------------------
+
 
 class ConstraintSolver:
     """Iterative constraint solver using Gauss–Seidel relaxation.

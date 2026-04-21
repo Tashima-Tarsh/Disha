@@ -5,6 +5,7 @@ Cyber Intelligence Dashboard — FastAPI service.
 /alerts  → live alert feed
 /        → HTML dashboard with Chart.js + Leaflet (OpenStreetMap)
 """
+
 import logging
 
 from fastapi import FastAPI

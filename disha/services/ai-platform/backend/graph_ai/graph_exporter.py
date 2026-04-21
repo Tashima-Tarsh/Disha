@@ -21,6 +21,7 @@ class GraphExporter:
         """Get or create Neo4j driver."""
         if self._driver is None:
             from neo4j import GraphDatabase
+
             self._driver = GraphDatabase.driver(
                 self.settings.NEO4J_URI,
                 auth=(self.settings.NEO4J_USER, self.settings.NEO4J_PASSWORD),
@@ -44,8 +45,12 @@ class GraphExporter:
                 nodes = [dict(record) for record in nodes_result]
 
                 if not nodes:
-                    return {"node_features": np.zeros((0, 16)), "edge_index": np.zeros(
-                        (2, 0), dtype=int), "node_ids": [], "node_map": {}}
+                    return {
+                        "node_features": np.zeros((0, 16)),
+                        "edge_index": np.zeros((2, 0), dtype=int),
+                        "node_ids": [],
+                        "node_map": {},
+                    }
 
                 # Create node ID mapping
                 node_map = {node["id"]: i for i, node in enumerate(nodes)}
@@ -65,7 +70,9 @@ class GraphExporter:
             # Build edge index
             edge_index = self._build_edge_index(edges, node_map)
 
-            logger.info("graph_exported", num_nodes=len(nodes), num_edges=edge_index.shape[1])
+            logger.info(
+                "graph_exported", num_nodes=len(nodes), num_edges=edge_index.shape[1]
+            )
 
             return {
                 "node_features": node_features,
@@ -77,15 +84,27 @@ class GraphExporter:
 
         except Exception as e:
             logger.error("graph_export_failed", error=str(e))
-            return {"node_features": np.zeros((0, 16)), "edge_index": np.zeros(
-                (2, 0), dtype=int), "node_ids": [], "node_map": {}}
+            return {
+                "node_features": np.zeros((0, 16)),
+                "edge_index": np.zeros((2, 0), dtype=int),
+                "node_ids": [],
+                "node_map": {},
+            }
 
-    def _build_features(self, nodes: list[dict[str, Any]], feature_dim: int = 16) -> np.ndarray:
+    def _build_features(
+        self, nodes: list[dict[str, Any]], feature_dim: int = 16
+    ) -> np.ndarray:
         """Build node feature matrix from entity properties."""
         features = np.zeros((len(nodes), feature_dim))
 
         # Entity type encoding
-        type_map = {"host": 0, "domain": 1, "wallet": 2, "dns_record": 3, "transaction": 4}
+        type_map = {
+            "host": 0,
+            "domain": 1,
+            "wallet": 2,
+            "dns_record": 3,
+            "transaction": 4,
+        }
 
         for i, node in enumerate(nodes):
             # One-hot encode entity type
@@ -105,7 +124,9 @@ class GraphExporter:
 
         return features
 
-    def _build_edge_index(self, edges: list[dict[str, Any]], node_map: dict[str, int]) -> np.ndarray:
+    def _build_edge_index(
+        self, edges: list[dict[str, Any]], node_map: dict[str, int]
+    ) -> np.ndarray:
         """Build edge index tensor from relationships."""
         if not edges:
             return np.zeros((2, 0), dtype=int)

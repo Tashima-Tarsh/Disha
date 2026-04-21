@@ -1,9 +1,9 @@
-
 from __future__ import annotations
 
 import argparse
 import os
 import sys
+
 
 def main(argv: list[str] | None = None) -> None:
     parser = argparse.ArgumentParser(
@@ -43,6 +43,7 @@ def main(argv: list[str] | None = None) -> None:
     retriever.build_index(args.input, args.out, args.meta)
     print(f"Index written to {args.out}")
     print(f"Metadata written to {args.meta}")
+
 
 if __name__ == "__main__":
     main()

@@ -37,16 +37,27 @@ def clean_data(df: pd.DataFrame) -> pd.DataFrame:
             median_val = df[col].median()
             missing_count = df[col].isna().sum()
             if missing_count > 0:
-                print(f"[Pipeline] Filling {missing_count} missing values in '{col}' with median={median_val}")
+                print(
+                    f"[Pipeline] Filling {missing_count} missing values in '{col}' with median={median_val}"
+                )
             df[col] = df[col].fillna(median_val)
 
     # Fill missing categorical columns with 'Unknown'
-    cat_cols = ["era", "region", "strategy_type", "terrain", "technology_level", "outcome"]
+    cat_cols = [
+        "era",
+        "region",
+        "strategy_type",
+        "terrain",
+        "technology_level",
+        "outcome",
+    ]
     for col in cat_cols:
         if col in df.columns:
             missing = df[col].isna().sum()
             if missing > 0:
-                print(f"[Pipeline] Filling {missing} missing values in '{col}' with 'Unknown'")
+                print(
+                    f"[Pipeline] Filling {missing} missing values in '{col}' with 'Unknown'"
+                )
             df[col] = df[col].fillna("Unknown")
             df[col] = df[col].str.strip()
 
@@ -59,7 +70,9 @@ def clean_data(df: pd.DataFrame) -> pd.DataFrame:
     # Ensure list fields are lists
     for list_col in ["key_tactics", "lessons", "notable_leaders"]:
         if list_col in df.columns:
-            df[list_col] = df[list_col].apply(lambda x: x if isinstance(x, list) else [])
+            df[list_col] = df[list_col].apply(
+                lambda x: x if isinstance(x, list) else []
+            )
 
     print(f"[Pipeline] Data cleaned. Shape: {df.shape}")
     return df
@@ -89,13 +102,15 @@ def engineer_features(df: pd.DataFrame):
     label_encoders[target_col] = le_target
 
     # Normalize numeric features
-    df["year_norm"] = (df["year"] - df["year"].min()) / (df["year"].max() - df["year"].min() + 1e-9)
+    df["year_norm"] = (df["year"] - df["year"].min()) / (
+        df["year"].max() - df["year"].min() + 1e-9
+    )
     df["duration_norm"] = (df["duration_days"] - df["duration_days"].min()) / (
         df["duration_days"].max() - df["duration_days"].min() + 1e-9
     )
-    df["casualties_norm"] = (df["casualties_estimate"] - df["casualties_estimate"].min()) / (
-        df["casualties_estimate"].max() - df["casualties_estimate"].min() + 1e-9
-    )
+    df["casualties_norm"] = (
+        df["casualties_estimate"] - df["casualties_estimate"].min()
+    ) / (df["casualties_estimate"].max() - df["casualties_estimate"].min() + 1e-9)
 
     # Force ratio proxy: log of casualties
     df["log_casualties"] = np.log1p(df["casualties_estimate"])
@@ -104,10 +119,13 @@ def engineer_features(df: pd.DataFrame):
     outcome_map = {"Victory": 1.0, "Draw": 0.5, "Defeat": 0.0}
     df["outcome_score"] = df["outcome"].map(outcome_map).fillna(0.5)
 
-    feature_cols = (
-        [col + "_enc" for col in categorical_features] +
-        ["year_norm", "duration_norm", "casualties_norm", "log_casualties", "outcome_score"]
-    )
+    feature_cols = [col + "_enc" for col in categorical_features] + [
+        "year_norm",
+        "duration_norm",
+        "casualties_norm",
+        "log_casualties",
+        "outcome_score",
+    ]
 
     X = df[feature_cols].values
     y = df["strategy_enc"].values
@@ -168,7 +186,9 @@ def print_stats(df: pd.DataFrame, metadata: dict):
     print(f"Strategy classes: {metadata['n_classes']}")
 
     print("\n--- Strategy Type Distribution ---")
-    for strategy, count in sorted(metadata["strategy_distribution"].items(), key=lambda x: -x[1]):
+    for strategy, count in sorted(
+        metadata["strategy_distribution"].items(), key=lambda x: -x[1]
+    ):
         bar = "█" * count
         print(f"  {strategy:<20} {bar} ({count})")
 
@@ -178,7 +198,9 @@ def print_stats(df: pd.DataFrame, metadata: dict):
         print(f"  {era:<20} {bar} ({count})")
 
     print("\n--- Region Distribution ---")
-    for region, count in sorted(metadata["region_distribution"].items(), key=lambda x: -x[1]):
+    for region, count in sorted(
+        metadata["region_distribution"].items(), key=lambda x: -x[1]
+    ):
         bar = "█" * count
         print(f"  {region:<20} {bar} ({count})")
 
@@ -189,9 +211,13 @@ def print_stats(df: pd.DataFrame, metadata: dict):
         print(f"  {outcome:<20} {bar} ({count})")
 
     print("\n--- Top 5 Largest Conflicts (by casualties) ---")
-    top5 = df.nlargest(5, "casualties_estimate")[["name", "year", "casualties_estimate"]]
+    top5 = df.nlargest(5, "casualties_estimate")[
+        ["name", "year", "casualties_estimate"]
+    ]
     for _, row in top5.iterrows():
-        print(f"  {row['name'][:40]:<40} ({int(row['year'])}) - {int(row['casualties_estimate']):,} casualties")
+        print(
+            f"  {row['name'][:40]:<40} ({int(row['year'])}) - {int(row['casualties_estimate']):,} casualties"
+        )
 
     print("=" * 60)
 
@@ -210,7 +236,9 @@ def run_pipeline():
 
     print(f"[Pipeline] Train/Test split: {len(X_train)}/{len(X_test)}")
 
-    metadata = save_processed(X_train, X_test, y_train, y_test, label_encoders, feature_cols, df_clean)
+    metadata = save_processed(
+        X_train, X_test, y_train, y_test, label_encoders, feature_cols, df_clean
+    )
     print_stats(df_clean, metadata)
 
     print("[Pipeline] Pipeline complete.")

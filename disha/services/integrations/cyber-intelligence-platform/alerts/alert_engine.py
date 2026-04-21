@@ -20,7 +20,14 @@ _seen_hashes: set[str] = set()
 
 # Severity keyword patterns for auto-classification
 _SEVERITY_KEYWORDS: dict[str, list[str]] = {
-    "critical": ["ransomware", "zero-day", "0day", "rce", "remote code execution", "rootkit"],
+    "critical": [
+        "ransomware",
+        "zero-day",
+        "0day",
+        "rce",
+        "remote code execution",
+        "rootkit",
+    ],
     "high": ["malware", "exploit", "backdoor", "c2", "command and control", "botnet"],
     "medium": ["phishing", "suspicious", "anomaly", "brute force", "scan"],
     "low": ["recon", "enumeration", "probe", "info leak"],
@@ -30,7 +37,11 @@ _SEVERITY_KEYWORDS: dict[str, list[str]] = {
 def _classify_severity(record: dict[str, Any]) -> str:
     """Classify alert severity from record type and text."""
     explicit = record.get("severity")
-    if explicit and isinstance(explicit, str) and explicit.upper() in ("CRITICAL", "HIGH", "MEDIUM", "LOW", "INFO"):
+    if (
+        explicit
+        and isinstance(explicit, str)
+        and explicit.upper() in ("CRITICAL", "HIGH", "MEDIUM", "LOW", "INFO")
+    ):
         return explicit.upper()
 
     text = (record.get("text", "") + " " + record.get("type", "")).lower()

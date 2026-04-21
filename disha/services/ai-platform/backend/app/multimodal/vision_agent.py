@@ -8,8 +8,8 @@ from app.core.config import get_settings
 
 logger = structlog.get_logger(__name__)
 
-class VisionAgent(BaseAgent):
 
+class VisionAgent(BaseAgent):
     def __init__(self):
         super().__init__(
             name="VisionAgent",
@@ -151,7 +151,6 @@ class VisionAgent(BaseAgent):
 
     async def _compute_visual_embedding(self, image_base64: str) -> Optional[list]:
         try:
-
             image_bytes = base64.b64decode(image_base64)
             import hashlib
             import numpy as np
@@ -173,16 +172,18 @@ class VisionAgent(BaseAgent):
         if not content:
             return entities
 
-        entities.append({
-            "id": f"image_{hash(content) % 10**8}",
-            "label": "Analyzed Image",
-            "entity_type": "image",
-            "properties": {
-                "analysis_summary": content[:500],
-                "model": analysis_result.get("model", "unknown"),
-            },
-            "risk_score": 0.0,
-        })
+        entities.append(
+            {
+                "id": f"image_{hash(content) % 10**8}",
+                "label": "Analyzed Image",
+                "entity_type": "image",
+                "properties": {
+                    "analysis_summary": content[:500],
+                    "model": analysis_result.get("model", "unknown"),
+                },
+                "risk_score": 0.0,
+            }
+        )
 
         return entities
 
@@ -193,9 +194,18 @@ class VisionAgent(BaseAgent):
         content = (analysis.get("analysis") or "").lower()
 
         threat_keywords = [
-            "malware", "phishing", "exploit", "vulnerability",
-            "suspicious", "threat", "attack", "compromise",
-            "credential", "password", "secret", "classified",
+            "malware",
+            "phishing",
+            "exploit",
+            "vulnerability",
+            "suspicious",
+            "threat",
+            "attack",
+            "compromise",
+            "credential",
+            "password",
+            "secret",
+            "classified",
         ]
 
         for keyword in threat_keywords:

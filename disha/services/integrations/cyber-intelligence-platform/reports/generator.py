@@ -3,6 +3,7 @@ Report generator — produces a .docx Cyber Intelligence Report.
 
 Requires: pip install python-docx
 """
+
 import logging
 import os
 from datetime import datetime, timezone

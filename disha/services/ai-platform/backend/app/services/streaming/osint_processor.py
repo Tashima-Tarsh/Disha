@@ -6,14 +6,14 @@ from app.api.deps import get_connection_manager
 
 logger = structlog.get_logger(__name__)
 
-class OSINTStreamProcessor:
 
+class OSINTStreamProcessor:
     def __init__(self):
         self.settings = get_settings()
         self.connection_manager = get_connection_manager()
         self.consumer = KafkaConsumer(
             topic=self.settings.KAFKA_TOPIC_OSINT_STREAM,
-            group_id="osint-processor-v5-1"
+            group_id="osint-processor-v5-1",
         )
         self.running = False
 
@@ -23,11 +23,7 @@ class OSINTStreamProcessor:
 
         while self.running:
             try:
-
-                await self.consumer.consume(
-                    handler=self.process_event,
-                    max_messages=10
-                )
+                await self.consumer.consume(handler=self.process_event, max_messages=10)
 
                 await asyncio.sleep(1)
             except Exception as e:
@@ -43,14 +39,21 @@ class OSINTStreamProcessor:
         event_id = event.get("event_id", "unknown")
 
         severity = event.get("severity", "LOW")
-        event["urgency"] = 100 if severity == "CRITICAL" else 75 if severity == "HIGH" else 50 if severity == "MEDIUM" else 25
+        event["urgency"] = (
+            100
+            if severity == "CRITICAL"
+            else 75
+            if severity == "HIGH"
+            else 50
+            if severity == "MEDIUM"
+            else 25
+        )
 
-        event["ui_display_type"] = "PULSE_ALERT" if severity in ["CRITICAL", "HIGH"] else "NEWS_FEED"
+        event["ui_display_type"] = (
+            "PULSE_ALERT" if severity in ["CRITICAL", "HIGH"] else "NEWS_FEED"
+        )
 
-        broadcast_msg = {
-            "type": "osint_pulse",
-            "data": event
-        }
+        broadcast_msg = {"type": "osint_pulse", "data": event}
 
         try:
             await self.connection_manager.broadcast_json(broadcast_msg)

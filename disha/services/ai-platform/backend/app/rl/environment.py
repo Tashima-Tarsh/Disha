@@ -3,6 +3,7 @@ from dataclasses import dataclass, field
 from typing import Optional
 from enum import IntEnum
 
+
 class ActionType(IntEnum):
     RUN_OSINT = 0
     RUN_CRYPTO = 1
@@ -12,6 +13,7 @@ class ActionType(IntEnum):
     INCREASE_DEPTH = 5
     DECREASE_DEPTH = 6
     STOP_INVESTIGATION = 7
+
 
 @dataclass
 class State:
@@ -25,16 +27,20 @@ class State:
     time_elapsed: float = 0.0
 
     def to_vector(self) -> np.ndarray:
-        return np.array([
-            self.entities_found / 100.0,
-            self.relationships_found / 100.0,
-            self.anomalies_found / 50.0,
-            self.current_risk_score,
-            self.investigation_depth / 5.0,
-            *[float(a) for a in self.agents_used],
-            self.step_count / 20.0,
-            self.time_elapsed / 300.0,
-        ], dtype=np.float32)
+        return np.array(
+            [
+                self.entities_found / 100.0,
+                self.relationships_found / 100.0,
+                self.anomalies_found / 50.0,
+                self.current_risk_score,
+                self.investigation_depth / 5.0,
+                *[float(a) for a in self.agents_used],
+                self.step_count / 20.0,
+                self.time_elapsed / 300.0,
+            ],
+            dtype=np.float32,
+        )
+
 
 @dataclass
 class Experience:
@@ -44,8 +50,8 @@ class Experience:
     next_state: np.ndarray
     done: bool
 
-class InvestigationEnvironment:
 
+class InvestigationEnvironment:
     STATE_DIM = 12
     ACTION_DIM = len(ActionType)
     MAX_STEPS = 20
@@ -66,7 +72,6 @@ class InvestigationEnvironment:
         info = {"action": ActionType(action).name}
 
         if outcome:
-
             prev_entities = self.state.entities_found
             prev_anomalies = self.state.anomalies_found
             prev_risk = self.state.current_risk_score
@@ -75,8 +80,7 @@ class InvestigationEnvironment:
             self.state.relationships_found += outcome.get("relationships_found", 0)
             self.state.anomalies_found += outcome.get("anomalies_found", 0)
             self.state.current_risk_score = max(
-                self.state.current_risk_score,
-                outcome.get("risk_score", 0.0)
+                self.state.current_risk_score, outcome.get("risk_score", 0.0)
             )
             self.state.time_elapsed += outcome.get("time_taken", 1.0)
 
@@ -108,7 +112,6 @@ class InvestigationEnvironment:
             else:
                 reward -= 0.1
         elif action == ActionType.STOP_INVESTIGATION:
-
             if self.state.entities_found > 0:
                 completeness = sum(self.state.agents_used) / 5.0
                 reward += completeness * 1.0

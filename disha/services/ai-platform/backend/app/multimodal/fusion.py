@@ -3,8 +3,8 @@ import structlog
 
 logger = structlog.get_logger(__name__)
 
-class MultimodalFusion:
 
+class MultimodalFusion:
     MODALITY_WEIGHTS = {
         "text": 0.4,
         "vision": 0.35,
@@ -92,7 +92,6 @@ class MultimodalFusion:
             label = entity.get("label", "").lower().strip()
 
             if label in seen:
-
                 existing = seen[label]
                 existing["risk_score"] = max(
                     existing.get("risk_score", 0),
@@ -134,12 +133,14 @@ class MultimodalFusion:
                 shared = labels1 & labels2
                 for label in shared:
                     if label:
-                        correlations.append({
-                            "entity": label,
-                            "modalities": [m1, m2],
-                            "type": "cross_modal_match",
-                            "confidence": 0.8,
-                        })
+                        correlations.append(
+                            {
+                                "entity": label,
+                                "modalities": [m1, m2],
+                                "type": "cross_modal_match",
+                                "confidence": 0.8,
+                            }
+                        )
 
         return correlations
 

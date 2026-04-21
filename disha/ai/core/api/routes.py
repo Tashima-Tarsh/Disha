@@ -1,4 +1,3 @@
-
 from __future__ import annotations
 
 import asyncio
@@ -17,9 +16,11 @@ logger = structlog.get_logger("cognitive_api")
 router = APIRouter()
 _engine = CognitiveEngine()
 
+
 class ProcessRequest(BaseModel):
     input: str
     session_id: Optional[str] = None
+
 
 class ProcessResponse(BaseModel):
     session_id: str
@@ -30,9 +31,11 @@ class ProcessResponse(BaseModel):
     reflection: Optional[dict]
     stage_durations: dict
 
+
 @router.get("/health")
 async def health():
     return {"status": "ok", "engine": "DISHA-MIND", "version": "1.0.0"}
+
 
 @router.post("/process", response_model=ProcessResponse)
 async def process_input(req: ProcessRequest):
@@ -47,13 +50,16 @@ async def process_input(req: ProcessRequest):
         stage_durations=state.stage_durations,
     )
 
+
 @router.get("/introspect/{session_id}")
 async def introspect(session_id: str):
     return _engine.get_introspection_report(session_id)
 
+
 @router.get("/sessions")
 async def sessions():
     return {"session_ids": _engine.get_session_ids()}
+
 
 STAGE_ORDER = [
     "perceiving",
@@ -64,6 +70,7 @@ STAGE_ORDER = [
     "reflecting",
     "consolidating",
 ]
+
 
 @router.websocket("/cognitive/stream/{session_id}")
 async def cognitive_stream(websocket: WebSocket, session_id: str):
@@ -92,6 +99,7 @@ async def cognitive_stream(websocket: WebSocket, session_id: str):
         except Exception:
             pass
 
+
 async def _stream_cognitive_cycle(ws: WebSocket, raw_input: str, session_id: str):
     import time
 
@@ -111,6 +119,7 @@ async def _stream_cognitive_cycle(ws: WebSocket, raw_input: str, session_id: str
     }
 
     import structlog
+
     log = structlog.get_logger("cognitive_stream").bind(session=session_id, turn=turn)
     log.info("stream_cycle_start", input_preview=raw_input[:80])
 
@@ -133,27 +142,38 @@ async def _stream_cognitive_cycle(ws: WebSocket, raw_input: str, session_id: str
 
     _engine._traces.setdefault(session_id, []).append(state)
 
-    await ws.send_json({
-        "stage": "complete",
-        "data": {
-            "session_id": session_id,
-            "turn": turn,
-            "intent": state.intent,
-            "confidence": state.confidence,
-            "action": state.action,
-            "reflection": state.reflection,
-            "stage_durations": state.stage_durations,
-        },
-    })
+    await ws.send_json(
+        {
+            "stage": "complete",
+            "data": {
+                "session_id": session_id,
+                "turn": turn,
+                "intent": state.intent,
+                "confidence": state.confidence,
+                "action": state.action,
+                "reflection": state.reflection,
+                "stage_durations": state.stage_durations,
+            },
+        }
+    )
+
 
 def _stage_payload(stage: str, state) -> dict:
     if stage == "perceiving":
-        return {"intent": state.intent, "entities": state.entities, "uncertainty": state.uncertainty}
+        return {
+            "intent": state.intent,
+            "entities": state.entities,
+            "uncertainty": state.uncertainty,
+        }
     if stage == "attending":
         return {
             "working_memory": [
-                {"content": str(m.get("content", ""))[:80], "relevance": m.get("relevance", 0)}
-                if isinstance(m, dict) else {"content": str(m)[:80], "relevance": 0.5}
+                {
+                    "content": str(m.get("content", ""))[:80],
+                    "relevance": m.get("relevance", 0),
+                }
+                if isinstance(m, dict)
+                else {"content": str(m)[:80], "relevance": 0.5}
                 for m in state.working_memory[:8]
             ],
             "recalled_episodes": len(state.recalled_episodes),

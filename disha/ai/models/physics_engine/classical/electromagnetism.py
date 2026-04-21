@@ -155,9 +155,7 @@ class ElectromagneticEngine:
     def add_particle(self, particle: ChargedParticle) -> None:
         """Register a charged particle."""
         if particle.name in self._particles:
-            raise ValueError(
-                f"Particle '{particle.name}' already exists in engine"
-            )
+            raise ValueError(f"Particle '{particle.name}' already exists in engine")
         self._particles[particle.name] = particle
         logger.debug("Added particle '%s'", particle.name)
 
@@ -209,7 +207,7 @@ class ElectromagneticEngine:
             Force vector on particle 1 in newtons.
         """
         r_vec = pos1 - pos2  # from 2 → 1
-        dist_sq = float(np.dot(r_vec, r_vec)) + softening ** 2
+        dist_sq = float(np.dot(r_vec, r_vec)) + softening**2
         dist = np.sqrt(dist_sq)
         force_mag = COULOMB_CONSTANT * q1 * q2 / dist_sq
         return force_mag * (r_vec / dist)
@@ -268,7 +266,7 @@ class ElectromagneticEngine:
         E = np.zeros(3, dtype=np.float64)
         for p in self._particles.values():
             r_vec = point - p.position
-            dist_sq = float(np.dot(r_vec, r_vec)) + self.softening ** 2
+            dist_sq = float(np.dot(r_vec, r_vec)) + self.softening**2
             dist = np.sqrt(dist_sq)
             E += COULOMB_CONSTANT * p.charge / dist_sq * (r_vec / dist)
         return E

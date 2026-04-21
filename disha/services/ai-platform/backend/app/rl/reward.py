@@ -7,6 +7,7 @@ import structlog
 
 logger = structlog.get_logger(__name__)
 
+
 @dataclass
 class InvestigationFeedback:
     investigation_id: str
@@ -17,8 +18,8 @@ class InvestigationFeedback:
     actionable_findings: int = 0
     time_to_resolution: Optional[float] = None
 
-class RewardComputer:
 
+class RewardComputer:
     DISCOVERY_WEIGHT = 0.3
     ACCURACY_WEIGHT = 0.3
     EFFICIENCY_WEIGHT = 0.2
@@ -36,7 +37,9 @@ class RewardComputer:
         risk_delta: float,
         time_taken: float,
     ) -> float:
-        discovery = (entities_found * 0.1 + anomalies_found * 0.5) * self.DISCOVERY_WEIGHT
+        discovery = (
+            entities_found * 0.1 + anomalies_found * 0.5
+        ) * self.DISCOVERY_WEIGHT
         risk_reward = risk_delta * 2.0 * self.ACCURACY_WEIGHT
         efficiency = -time_taken * 0.01 * self.EFFICIENCY_WEIGHT
 
@@ -54,8 +57,7 @@ class RewardComputer:
         risk_score = investigation_result.get("risk_score", 0.0)
 
         discovery_reward = (
-            len(entities) * 0.05 +
-            len(anomalies) * 0.3
+            len(entities) * 0.05 + len(anomalies) * 0.3
         ) * self.DISCOVERY_WEIGHT
 
         risk_reward = 0.0
@@ -111,7 +113,9 @@ class RewardComputer:
             "true_positive_rate": tp_count / max(total_labeled, 1),
             "false_positive_rate": fp_count / max(total_labeled, 1),
             "total_feedback": len(feedbacks),
-            "avg_user_rating": float(np.mean([
-                f.user_rating for f in feedbacks if f.user_rating is not None
-            ])) if any(f.user_rating is not None for f in feedbacks) else None,
+            "avg_user_rating": float(
+                np.mean([f.user_rating for f in feedbacks if f.user_rating is not None])
+            )
+            if any(f.user_rating is not None for f in feedbacks)
+            else None,
         }

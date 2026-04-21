@@ -92,7 +92,9 @@ def main() -> None:
     for n in [10, 50, 100, 200, 300, 400, 500]:
         if n <= len(raw):
             running_mean = np.mean(raw[:n])
-            print(f"    n={n:4d}: mean={running_mean:.6f} (err={abs(running_mean - np.pi):.6f})")
+            print(
+                f"    n={n:4d}: mean={running_mean:.6f} (err={abs(running_mean - np.pi):.6f})"
+            )
 
     # ===================================
     # Part 2: Project Risk Analysis

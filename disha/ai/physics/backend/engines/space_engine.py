@@ -2,6 +2,7 @@
 Space Engine — orbital mechanics, NASA APIs, and solar system data.
 Uses only numpy (no poliastro required).
 """
+
 from __future__ import annotations
 
 import json
@@ -14,6 +15,7 @@ logger = logging.getLogger(__name__)
 
 try:
     import httpx
+
     _HTTPX = True
 except Exception:
     _HTTPX = False
@@ -119,6 +121,7 @@ class SpaceEngine:
             return _FALLBACK_NEO
         try:
             from datetime import date, timedelta
+
             today = date.today().isoformat()
             end = (date.today() + timedelta(days=7)).isoformat()
             url = (
@@ -134,18 +137,38 @@ class SpaceEngine:
                 for neo in day_objects[:5]:
                     dia = neo.get("estimated_diameter", {}).get("kilometers", {})
                     approach = neo.get("close_approach_data", [{}])[0]
-                    neos.append({
-                        "id": neo.get("id", ""),
-                        "name": neo.get("name", ""),
-                        "estimated_diameter_km": {
-                            "min": round(dia.get("estimated_diameter_min", 0), 4),
-                            "max": round(dia.get("estimated_diameter_max", 0), 4),
-                        },
-                        "is_potentially_hazardous": neo.get("is_potentially_hazardous_asteroid", False),
-                        "close_approach_date": approach.get("close_approach_date", ""),
-                        "miss_distance_km": round(float(approach.get("miss_distance", {}).get("kilometers", 0)), 0),
-                        "relative_velocity_kms": round(float(approach.get("relative_velocity", {}).get("kilometers_per_second", 0)), 2),
-                    })
+                    neos.append(
+                        {
+                            "id": neo.get("id", ""),
+                            "name": neo.get("name", ""),
+                            "estimated_diameter_km": {
+                                "min": round(dia.get("estimated_diameter_min", 0), 4),
+                                "max": round(dia.get("estimated_diameter_max", 0), 4),
+                            },
+                            "is_potentially_hazardous": neo.get(
+                                "is_potentially_hazardous_asteroid", False
+                            ),
+                            "close_approach_date": approach.get(
+                                "close_approach_date", ""
+                            ),
+                            "miss_distance_km": round(
+                                float(
+                                    approach.get("miss_distance", {}).get(
+                                        "kilometers", 0
+                                    )
+                                ),
+                                0,
+                            ),
+                            "relative_velocity_kms": round(
+                                float(
+                                    approach.get("relative_velocity", {}).get(
+                                        "kilometers_per_second", 0
+                                    )
+                                ),
+                                2,
+                            ),
+                        }
+                    )
             return {
                 "element_count": raw.get("element_count", len(neos)),
                 "near_earth_objects": neos[:20],
@@ -168,11 +191,17 @@ class SpaceEngine:
 
             # Approximate eccentricities
             eccentricities = {
-                "mercury": 0.2056, "venus": 0.0068, "earth": 0.0167, "mars": 0.0934,
-                "jupiter": 0.0489, "saturn": 0.0565, "uranus": 0.0457, "neptune": 0.0113,
+                "mercury": 0.2056,
+                "venus": 0.0068,
+                "earth": 0.0167,
+                "mars": 0.0934,
+                "jupiter": 0.0489,
+                "saturn": 0.0565,
+                "uranus": 0.0457,
+                "neptune": 0.0113,
             }
             e = eccentricities.get(planet.lower(), 0.02)
-            b_km = a_km * math.sqrt(1 - e ** 2)
+            b_km = a_km * math.sqrt(1 - e**2)
 
             steps = min(duration_days, 365 * 2)
             step_days = duration_days / steps
@@ -186,16 +215,18 @@ class SpaceEngine:
                     E = M + e * math.sin(E)
                 x = a_km * (math.cos(E) - e)
                 y = b_km * math.sin(E)
-                r = math.sqrt(x ** 2 + y ** 2)
+                r = math.sqrt(x**2 + y**2)
                 v = math.sqrt(_GM_SUN * (2 / r - 1 / a_km))
-                positions.append({
-                    "day": round(t, 2),
-                    "x_au": round(x / _AU_KM, 6),
-                    "y_au": round(y / _AU_KM, 6),
-                    "z_au": 0.0,
-                    "r_au": round(r / _AU_KM, 6),
-                    "velocity_kms": round(v, 4),
-                })
+                positions.append(
+                    {
+                        "day": round(t, 2),
+                        "x_au": round(x / _AU_KM, 6),
+                        "y_au": round(y / _AU_KM, 6),
+                        "z_au": 0.0,
+                        "r_au": round(r / _AU_KM, 6),
+                        "velocity_kms": round(v, 4),
+                    }
+                )
 
             return {
                 "planet": pdata["name"],

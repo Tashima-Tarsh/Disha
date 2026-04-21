@@ -9,6 +9,7 @@ from app.core.config import get_settings
 
 logger = structlog.get_logger(__name__)
 
+
 class LegalAgent(BaseAgent):
     """Agent for constitutional research, citation-backed answers, and legal analysis."""
 
@@ -25,6 +26,7 @@ class LegalAgent(BaseAgent):
         """Get or create LLM instance."""
         if self._llm is None:
             from langchain_openai import ChatOpenAI
+
             self._llm = ChatOpenAI(
                 model=self.settings.LLM_MODEL,
                 temperature=0.0,
@@ -32,7 +34,9 @@ class LegalAgent(BaseAgent):
             )
         return self._llm
 
-    async def execute(self, target: str, options: dict[str, Any] | None = None) -> dict[str, Any]:
+    async def execute(
+        self, target: str, options: dict[str, Any] | None = None
+    ) -> dict[str, Any]:
         """Research constitutional provisions and provide cited analysis."""
         options = options or {}
         query = target
@@ -45,15 +49,17 @@ class LegalAgent(BaseAgent):
                 "query": query,
                 "analysis": "No specific constitutional provisions found for this query in the current knowledge base.",
                 "provisions": [],
-                "disclaimer": self._get_disclaimer()
+                "disclaimer": self._get_disclaimer(),
             }
 
-        context = "\n\n".join([
-            f"Source: {p['metadata'].get('source', 'Constitution of India')}\n"
-            f"Article/Section: {p['metadata'].get('article', 'N/A')}\n"
-            f"Content: {p['document']}"
-            for p in provisions
-        ])
+        context = "\n\n".join(
+            [
+                f"Source: {p['metadata'].get('source', 'Constitution of India')}\n"
+                f"Article/Section: {p['metadata'].get('article', 'N/A')}\n"
+                f"Content: {p['document']}"
+                for p in provisions
+            ]
+        )
 
         prompt = self._build_legal_prompt(query, context)
         analysis = await self._generate_analysis(prompt)
@@ -62,8 +68,12 @@ class LegalAgent(BaseAgent):
             "query": query,
             "analysis": analysis,
             "provisions": [p["metadata"] for p in provisions],
-            "citations": [p["metadata"].get("article") for p in provisions if p["metadata"].get("article")],
-            "disclaimer": self._get_disclaimer()
+            "citations": [
+                p["metadata"].get("article")
+                for p in provisions
+                if p["metadata"].get("article")
+            ],
+            "disclaimer": self._get_disclaimer(),
         }
 
     def _build_legal_prompt(self, query: str, context: str) -> str:

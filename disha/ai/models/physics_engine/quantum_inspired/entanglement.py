@@ -70,9 +70,7 @@ class EntangledPair:
     # Measurement
     # ------------------------------------------------------------------
 
-    def measure(
-        self, rng: Optional[np.random.Generator] = None
-    ) -> Tuple[str, str]:
+    def measure(self, rng: Optional[np.random.Generator] = None) -> Tuple[str, str]:
         """Measure state_a and collapse state_b according to the correlation.
 
         Parameters
@@ -96,9 +94,7 @@ class EntangledPair:
             outcome_b = self.state_b.measure(rng=rng)
 
         self.measurement_history.append((outcome_a, outcome_b))
-        logger.info(
-            "EntangledPair measured: A='%s', B='%s'", outcome_a, outcome_b
-        )
+        logger.info("EntangledPair measured: A='%s', B='%s'", outcome_a, outcome_b)
         return outcome_a, outcome_b
 
     @staticmethod
@@ -158,9 +154,7 @@ class EntangledPair:
         if not self.measurement_history:
             return 0.0
         correlated = sum(
-            1
-            for a, b in self.measurement_history
-            if self.correlation_map.get(a) == b
+            1 for a, b in self.measurement_history if self.correlation_map.get(a) == b
         )
         return correlated / len(self.measurement_history)
 

@@ -1,4 +1,3 @@
-
 from __future__ import annotations
 
 import asyncio
@@ -15,8 +14,8 @@ log = structlog.get_logger(__name__)
 
 EPISODIC_STORE_PATH = Path.home() / ".disha" / "episodic.json"
 
-class EpisodicMemory:
 
+class EpisodicMemory:
     def __init__(self, store_path: Path | None = None) -> None:
         self._path = store_path or EPISODIC_STORE_PATH
         self._episodes: list[dict[str, Any]] = []
@@ -105,7 +104,6 @@ class EpisodicMemory:
 
         scored: list[tuple[float, dict[str, Any]]] = []
         for ep in self._episodes:
-
             ep_text = f"{ep.get('what', '')} {ep.get('outcome', '')}".lower()
             ep_tokens = set(ep_text.split())
             overlap = len(query_tokens & ep_tokens) / max(len(query_tokens), 1)
@@ -122,7 +120,9 @@ class EpisodicMemory:
         return results
 
     def consolidate(self, min_importance: float = 0.7) -> list[dict[str, Any]]:
-        candidates = [ep for ep in self._episodes if ep.get("importance", 0) >= min_importance]
+        candidates = [
+            ep for ep in self._episodes if ep.get("importance", 0) >= min_importance
+        ]
         log.debug(
             "episodic_memory.consolidate",
             candidates=len(candidates),

@@ -1,4 +1,3 @@
-
 from __future__ import annotations
 
 import asyncio
@@ -76,11 +75,12 @@ _RISK_KEYWORDS: list[tuple[str, str]] = [
     (r"\bdeadline|urgent|emergency|immediately\b", "urgency_pressure"),
 ]
 
+
 async def _call_llm(prompt: str, role: str = "assistant") -> str:
     return ""
 
-class AgentDeliberator:
 
+class AgentDeliberator:
     def __init__(self) -> None:
         log.info("agent_deliberator.initialized")
 
@@ -164,9 +164,7 @@ class AgentDeliberator:
                 else f"[{action_type.upper()}] Process input using {intent} handling pipeline"
             )
         else:
-            immediate_action = (
-                f"[{action_type.upper()}] Process input using {intent} handling pipeline"
-            )
+            immediate_action = f"[{action_type.upper()}] Process input using {intent} handling pipeline"
 
         wm_richness = min(1.0, len(state.working_memory) / 8)
         hyp_conf = best_hyp.get("confidence", 0.6) if best_hyp else 0.6
@@ -230,14 +228,18 @@ class AgentDeliberator:
         base_confidence = max(0.1, min(0.99, base_confidence))
 
         all_concerns = risk_flags + [
-            s for s in quality_signals if s.startswith("insufficient") or s.startswith("empty")
+            s
+            for s in quality_signals
+            if s.startswith("insufficient") or s.startswith("empty")
         ]
 
         recommendation: str
         if base_confidence >= 0.7:
             recommendation = "APPROVE — quality checks passed, proceed with action"
         elif base_confidence >= 0.5:
-            recommendation = "CONDITIONAL_APPROVE — proceed with caution, monitor outcomes"
+            recommendation = (
+                "CONDITIONAL_APPROVE — proceed with caution, monitor outcomes"
+            )
         else:
             recommendation = "REJECT — insufficient confidence, request clarification"
 
@@ -270,14 +272,15 @@ class AgentDeliberator:
 
         critic_opinion = next((o for o in opinions if o.get("agent") == "critic"), None)
         if critic_opinion and critic_opinion.get("confidence", 1.0) < 0.5:
-
             log.warning(
                 "agent_deliberator.critic_veto",
                 confidence=critic_opinion.get("confidence"),
                 concerns=critic_opinion.get("concerns"),
             )
 
-            executor_opinion = next((o for o in opinions if o.get("agent") == "executor"), None)
+            executor_opinion = next(
+                (o for o in opinions if o.get("agent") == "executor"), None
+            )
             dissent = executor_opinion if executor_opinion else None
 
             total_weight = sum(o.get("confidence", 0.5) for o in opinions)
@@ -302,12 +305,16 @@ class AgentDeliberator:
         others = [o for o in opinions if o is not winner]
         dissent: dict[str, Any] | None = None
         if others:
-            dissent = max(others, key=lambda o: abs(o.get("confidence", 0.0) - winner_conf))
+            dissent = max(
+                others, key=lambda o: abs(o.get("confidence", 0.0) - winner_conf)
+            )
 
             if abs(dissent.get("confidence", 0.0) - winner_conf) < 0.1:
                 dissent = None
 
-        recommended_action = winner.get("action_type") or winner.get("recommendation", "respond")
+        recommended_action = winner.get("action_type") or winner.get(
+            "recommendation", "respond"
+        )
 
         return {
             "winner": winner,

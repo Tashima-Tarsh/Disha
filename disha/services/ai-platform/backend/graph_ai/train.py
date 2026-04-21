@@ -39,7 +39,8 @@ _models = importlib.util.module_from_spec(_models_spec)
 _models_spec.loader.exec_module(_models)
 
 _trainer_spec = importlib.util.spec_from_file_location(
-    "graph_ai.trainer", _SCRIPT_DIR / "trainer.py",
+    "graph_ai.trainer",
+    _SCRIPT_DIR / "trainer.py",
     submodule_search_locations=[],
 )
 # Patch sys.modules so trainer.py's `from graph_ai.models import ...` works
@@ -56,6 +57,7 @@ logger = structlog.get_logger(__name__)
 
 
 # ── Synthetic graph generator ─────────────────────────────────────────
+
 
 def _generate_synthetic_graph(
     num_nodes: int = 200,
@@ -124,6 +126,7 @@ def _generate_synthetic_graph(
 
 # ── Training ──────────────────────────────────────────────────────────
 
+
 def train(
     num_epochs_link: int = 200,
     num_epochs_classify: int = 150,
@@ -141,7 +144,9 @@ def train(
     )
 
     # ── 1. Link Prediction ────────────────────────────────────────────
-    trainer = GNNTrainer(in_features=16, hidden_dim=64, embedding_dim=32, learning_rate=0.005)
+    trainer = GNNTrainer(
+        in_features=16, hidden_dim=64, embedding_dim=32, learning_rate=0.005
+    )
     link_metrics = trainer.train_link_prediction(
         node_features=graph["node_features"],
         edge_index=graph["edge_index"],
@@ -152,12 +157,11 @@ def train(
     # Test link predictions on some pairs (relative to graph size)
     n = graph["num_nodes"]
     candidates = [(0, 1), (2, 3), (n // 20, n // 4), (n // 2, int(n * 0.75))]
-    valid_candidates = [
-        (s, d) for s, d in candidates
-        if s < n and d < n
-    ]
+    valid_candidates = [(s, d) for s, d in candidates if s < n and d < n]
     predictions = trainer.predict_links(
-        graph["node_features"], graph["edge_index"], valid_candidates,
+        graph["node_features"],
+        graph["edge_index"],
+        valid_candidates,
     )
 
     # Get learned embeddings
@@ -166,7 +170,9 @@ def train(
 
     # ── 2. Node Classification ────────────────────────────────────────
     classifier = GraphClassifier(in_channels=16, hidden_channels=64, num_classes=4)
-    clf_optimizer = torch.optim.Adam(classifier.parameters(), lr=0.01, weight_decay=5e-4)
+    clf_optimizer = torch.optim.Adam(
+        classifier.parameters(), lr=0.01, weight_decay=5e-4
+    )
 
     x = torch.FloatTensor(graph["node_features"])
     edge_idx = torch.LongTensor(graph["edge_index"])
@@ -201,7 +207,9 @@ def train(
             with torch.no_grad():
                 eval_logits = classifier(x, edge_idx)
                 eval_preds = eval_logits.argmax(dim=-1)
-                curr_test_acc = float((eval_preds[test_mask] == labels[test_mask]).float().mean())
+                curr_test_acc = float(
+                    (eval_preds[test_mask] == labels[test_mask]).float().mean()
+                )
             if curr_test_acc > best_test_acc:
                 best_test_acc = curr_test_acc
                 best_state = {k: v.clone() for k, v in classifier.state_dict().items()}
@@ -211,7 +219,9 @@ def train(
             classifier.train()
 
             if patience_counter >= patience:
-                logger.info("early_stopping", epoch=epoch, best_test_acc=round(best_test_acc, 4))
+                logger.info(
+                    "early_stopping", epoch=epoch, best_test_acc=round(best_test_acc, 4)
+                )
                 break
 
         if epoch % 30 == 0:
@@ -228,10 +238,14 @@ def train(
         preds = logits.argmax(dim=-1)
         train_acc = float((preds[train_mask] == labels[train_mask]).float().mean())
         test_acc = float((preds[test_mask] == labels[test_mask]).float().mean())
-    logger.info("classifier_eval", train_acc=round(train_acc, 4), test_acc=round(test_acc, 4))
+    logger.info(
+        "classifier_eval", train_acc=round(train_acc, 4), test_acc=round(test_acc, 4)
+    )
 
     # ── Save checkpoints ──────────────────────────────────────────────
-    ckpt_dir = Path(checkpoint_dir) if checkpoint_dir else (_BACKEND_ROOT / "checkpoints")
+    ckpt_dir = (
+        Path(checkpoint_dir) if checkpoint_dir else (_BACKEND_ROOT / "checkpoints")
+    )
     ckpt_dir.mkdir(parents=True, exist_ok=True)
 
     # Link prediction models

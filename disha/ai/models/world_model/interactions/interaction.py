@@ -27,6 +27,7 @@ logger = logging.getLogger(__name__)
 # Base Interaction
 # ---------------------------------------------------------------------------
 
+
 class Interaction:
     """Abstract base for all pairwise entity interactions.
 
@@ -106,6 +107,7 @@ class Interaction:
 # CollisionInteraction
 # ---------------------------------------------------------------------------
 
+
 class CollisionInteraction(Interaction):
     """Elastic or inelastic collision between two entities.
 
@@ -175,13 +177,17 @@ class CollisionInteraction(Interaction):
 
         logger.debug(
             "Collision resolved: %s ↔ %s  j=%.4f  e=%.2f",
-            source.name, target.name, j, self.restitution,
+            source.name,
+            target.name,
+            j,
+            self.restitution,
         )
 
 
 # ---------------------------------------------------------------------------
 # CommunicationInteraction
 # ---------------------------------------------------------------------------
+
 
 class CommunicationInteraction(Interaction):
     """Message exchange between two agent entities.
@@ -234,13 +240,15 @@ class CommunicationInteraction(Interaction):
             )
         else:
             logger.debug(
-                "Target %s has no observe method; message dropped.", target.name,
+                "Target %s has no observe method; message dropped.",
+                target.name,
             )
 
 
 # ---------------------------------------------------------------------------
 # ForceInteraction
 # ---------------------------------------------------------------------------
+
 
 class ForceInteraction(Interaction):
     """Apply a sustained force from source toward / away from target.
@@ -301,13 +309,17 @@ class ForceInteraction(Interaction):
 
         logger.debug(
             "Force applied: %s → %s  mag=%.2f  attract=%s",
-            source.name, target.name, self.force_magnitude, self.attractive,
+            source.name,
+            target.name,
+            self.force_magnitude,
+            self.attractive,
         )
 
 
 # ---------------------------------------------------------------------------
 # InteractionResolver
 # ---------------------------------------------------------------------------
+
 
 class InteractionResolver:
     """Collects interactions and resolves them each simulation tick.
@@ -364,7 +376,8 @@ class InteractionResolver:
                     on_collision(interaction)
             except Exception:
                 logger.exception(
-                    "Error resolving interaction %s", interaction.id,
+                    "Error resolving interaction %s",
+                    interaction.id,
                 )
 
             interaction.tick(dt)

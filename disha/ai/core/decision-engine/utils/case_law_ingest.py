@@ -1,9 +1,9 @@
-
 from __future__ import annotations
 
 import json
 import os
 from typing import Dict, List
+
 
 def parse_case_law(text: str) -> List[Dict]:
     blocks: List[List[str]] = []
@@ -26,6 +26,7 @@ def parse_case_law(text: str) -> List[Dict]:
         cases.append({"id": idx, "title": title, "text": summary})
     return cases
 
+
 def ingest(
     input_path: str,
     output_path: str,
@@ -47,6 +48,7 @@ def ingest(
         json.dump(cases, fh, indent=2)
 
     return len(cases)
+
 
 if __name__ == "__main__":
     import argparse

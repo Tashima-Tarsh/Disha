@@ -17,13 +17,18 @@ try:
         confusion_matrix,
         classification_report,
     )
+
     SKLEARN_AVAILABLE = True
 except ImportError:
     SKLEARN_AVAILABLE = False
 
 
-def evaluate_model(model, X_test: np.ndarray, y_test: np.ndarray,
-                   class_names: Optional[List[str]] = None) -> Dict[str, Any]:
+def evaluate_model(
+    model,
+    X_test: np.ndarray,
+    y_test: np.ndarray,
+    class_names: Optional[List[str]] = None,
+) -> Dict[str, Any]:
     """
     Evaluate a classifier on test data.
 
@@ -37,17 +42,16 @@ def evaluate_model(model, X_test: np.ndarray, y_test: np.ndarray,
     y_pred = model.predict(X_test)
 
     accuracy = float(accuracy_score(y_test, y_pred))
-    precision = float(precision_score(y_test, y_pred, average="weighted", zero_division=0))
+    precision = float(
+        precision_score(y_test, y_pred, average="weighted", zero_division=0)
+    )
     recall = float(recall_score(y_test, y_pred, average="weighted", zero_division=0))
     f1 = float(f1_score(y_test, y_pred, average="weighted", zero_division=0))
 
     cm = confusion_matrix(y_test, y_pred).tolist()
 
     report = classification_report(
-        y_test, y_pred,
-        target_names=class_names,
-        output_dict=True,
-        zero_division=0
+        y_test, y_pred, target_names=class_names, output_dict=True, zero_division=0
     )
 
     metrics = {
@@ -76,12 +80,16 @@ def plot_confusion_matrix(cm: List[List[int]], labels: List[str]) -> str:
 
     # Header
     lines.append("Predicted →")
-    header = "Actual ↓" + " " * (col_w - 8) + "".join(f"{str(lbl)[:col_w - 1]:>{col_w}}" for lbl in labels)
+    header = (
+        "Actual ↓"
+        + " " * (col_w - 8)
+        + "".join(f"{str(lbl)[: col_w - 1]:>{col_w}}" for lbl in labels)
+    )
     lines.append(header)
     lines.append("-" * len(header))
 
     for i in range(n):
-        row_label = f"{str(labels[i])[:col_w - 1]:>{col_w}}"
+        row_label = f"{str(labels[i])[: col_w - 1]:>{col_w}}"
         row_values = "".join(f"{cm_arr[i, j]:>{col_w}}" for j in range(n))
         # Highlight diagonal
         lines.append(row_label + row_values)
@@ -109,7 +117,9 @@ def analyze_strategy_patterns(data: List[Dict[str, Any]]) -> Dict[str, Any]:
         technology_advantage_impact, top_strategies_by_terrain
     """
     strategy_wins: Dict[str, List[int]] = defaultdict(list)
-    terrain_strategy_wins: Dict[str, Dict[str, List[int]]] = defaultdict(lambda: defaultdict(list))
+    terrain_strategy_wins: Dict[str, Dict[str, List[int]]] = defaultdict(
+        lambda: defaultdict(list)
+    )
     era_wins: Dict[str, List[int]] = defaultdict(list)
     region_wins: Dict[str, List[int]] = defaultdict(list)
     technology_wins: Dict[str, List[int]] = defaultdict(list)
@@ -150,10 +160,17 @@ def analyze_strategy_patterns(data: List[Dict[str, Any]]) -> Dict[str, Any]:
     top_by_terrain = {}
     for terrain, strats in terrain_strategy_wins.items():
         if strats:
-            best_strategy = max(strats.keys(), key=lambda s: sum(strats[s]) / len(strats[s]) if strats[s] else 0)
+            best_strategy = max(
+                strats.keys(),
+                key=lambda s: sum(strats[s]) / len(strats[s]) if strats[s] else 0,
+            )
             top_by_terrain[terrain] = {
                 "best_strategy": best_strategy,
-                "win_rate": round(sum(strats[best_strategy]) / len(strats[best_strategy]), 3) if strats[best_strategy] else 0.0,
+                "win_rate": round(
+                    sum(strats[best_strategy]) / len(strats[best_strategy]), 3
+                )
+                if strats[best_strategy]
+                else 0.0,
             }
 
     # Terrain effectiveness matrix
@@ -208,9 +225,13 @@ def generate_report(metrics: Dict[str, Any], patterns: Dict[str, Any]) -> str:
     if "random_forest" in metrics:
         rf = metrics["random_forest"]
         lines.append(f"  RandomForest Test Accuracy : {rf.get('test_accuracy', 'N/A')}")
-        lines.append(f"  5-Fold CV Mean Accuracy    : {rf.get('cv_mean', 'N/A')} ± {rf.get('cv_std', 'N/A')}")
+        lines.append(
+            f"  5-Fold CV Mean Accuracy    : {rf.get('cv_mean', 'N/A')} ± {rf.get('cv_std', 'N/A')}"
+        )
     if "mlp" in metrics:
-        lines.append(f"  MLP Test Accuracy          : {metrics['mlp'].get('test_accuracy', 'N/A')}")
+        lines.append(
+            f"  MLP Test Accuracy          : {metrics['mlp'].get('test_accuracy', 'N/A')}"
+        )
 
     lines.append("\n### DATASET OVERVIEW ###")
     ds = metrics.get("dataset", {})
@@ -224,17 +245,23 @@ def generate_report(metrics: Dict[str, Any], patterns: Dict[str, Any]) -> str:
 
     lines.append("\n### STRATEGY WIN RATES (Historical) ###")
     win_rates = patterns.get("strategy_win_rates", {})
-    sorted_strategies = sorted(win_rates.items(), key=lambda x: -x[1].get("win_rate", 0))
+    sorted_strategies = sorted(
+        win_rates.items(), key=lambda x: -x[1].get("win_rate", 0)
+    )
     for strategy, data in sorted_strategies:
         wr = data.get("win_rate", 0)
         total = data.get("total", 0)
         bar = "█" * int(wr * 20)
-        lines.append(f"  {strategy:<20} {bar:<20} {wr:.1%} ({data.get('wins', 0)}/{total})")
+        lines.append(
+            f"  {strategy:<20} {bar:<20} {wr:.1%} ({data.get('wins', 0)}/{total})"
+        )
 
     lines.append("\n### TOP STRATEGY BY TERRAIN ###")
     top_terrain = patterns.get("top_strategy_by_terrain", {})
     for terrain, info in sorted(top_terrain.items()):
-        lines.append(f"  {terrain:<15} → {info.get('best_strategy', 'N/A'):<20} ({info.get('win_rate', 0):.1%} win rate)")
+        lines.append(
+            f"  {terrain:<15} → {info.get('best_strategy', 'N/A'):<20} ({info.get('win_rate', 0):.1%} win rate)"
+        )
 
     lines.append("\n### ERA WIN RATES ###")
     era_rates = patterns.get("era_win_rates", {})
@@ -244,7 +271,9 @@ def generate_report(metrics: Dict[str, Any], patterns: Dict[str, Any]) -> str:
             data = era_rates[era]
             wr = data.get("win_rate", 0)
             bar = "█" * int(wr * 20)
-            lines.append(f"  {era:<20} {bar:<20} {wr:.1%} ({data.get('total', 0)} conflicts)")
+            lines.append(
+                f"  {era:<20} {bar:<20} {wr:.1%} ({data.get('total', 0)} conflicts)"
+            )
 
     lines.append("\n### AVERAGE CONFLICT DURATION BY OUTCOME ###")
     durations = patterns.get("avg_duration_by_outcome", {})

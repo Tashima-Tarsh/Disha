@@ -1,6 +1,7 @@
 """
 Suppressed Physics Engine — catalog and analysis of fringe/suppressed theories.
 """
+
 from __future__ import annotations
 
 import json
@@ -15,7 +16,9 @@ _KNOWLEDGE_DIR = Path(__file__).parent.parent / "knowledge"
 
 def _load_suppressed_json() -> dict:
     try:
-        with open(_KNOWLEDGE_DIR / "suppressed_physics.json", "r", encoding="utf-8") as f:
+        with open(
+            _KNOWLEDGE_DIR / "suppressed_physics.json", "r", encoding="utf-8"
+        ) as f:
             return json.load(f)
     except Exception:
         return {"theories": []}
@@ -40,8 +43,10 @@ class SuppressedPhysicsEngine:
         for theory in self._theories:
             if theory.get("id") == theory_id:
                 return self._enrich(theory)
-        return {"error": f"Theory '{theory_id}' not found",
-                "available": [t.get("id") for t in self._theories]}
+        return {
+            "error": f"Theory '{theory_id}' not found",
+            "available": [t.get("id") for t in self._theories],
+        }
 
     def analyze_theory(self, theory_text: str) -> dict:
         """Keyword-match text against known theories; return analysis."""
@@ -51,7 +56,11 @@ class SuppressedPhysicsEngine:
             text_lower = theory_text.lower()
             scores: dict[str, float] = {}
             for tid, keywords in self._keyword_map.items():
-                score = sum(1 for kw in keywords if re.search(r"\b" + re.escape(kw) + r"\b", text_lower))
+                score = sum(
+                    1
+                    for kw in keywords
+                    if re.search(r"\b" + re.escape(kw) + r"\b", text_lower)
+                )
                 if score > 0:
                     scores[tid] = score
 
@@ -71,7 +80,11 @@ class SuppressedPhysicsEngine:
 
             theory = next((t for t in self._theories if t.get("id") == best_id), {})
             all_matches = [
-                {"id": tid, "name": self._theory_name(tid), "score": round(v / total, 3)}
+                {
+                    "id": tid,
+                    "name": self._theory_name(tid),
+                    "score": round(v / total, 3),
+                }
                 for tid, v in sorted(scores.items(), key=lambda x: -x[1])
             ]
 
@@ -81,10 +94,15 @@ class SuppressedPhysicsEngine:
                 "confidence": confidence,
                 "status": theory.get("status", "unknown"),
                 "confidence_score": theory.get("confidence_score", 0.0),
-                "mainstream_view": theory.get("refutation", theory.get("mainstream_note", "No mainstream consensus noted.")),
+                "mainstream_view": theory.get(
+                    "refutation",
+                    theory.get("mainstream_note", "No mainstream consensus noted."),
+                ),
                 "alternative_view": theory.get("description", ""),
                 "key_proponents": theory.get("key_proponents", []),
-                "related_concepts": theory.get("claimed_effects", theory.get("variants", [])),
+                "related_concepts": theory.get(
+                    "claimed_effects", theory.get("variants", [])
+                ),
                 "all_matches": all_matches[:5],
                 "disclaimer": self._data.get("disclaimer", ""),
             }

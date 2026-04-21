@@ -4,13 +4,15 @@
 import logging
 import os
 import importlib
+
 # Third-party
 from celery import Celery, shared_task
+
 # Project
 from database import Database, connect_db
 from analysis_service import AnalysisService, AnalysisException
 
-app = Celery('analyse', broker='amqp://localhost', backend='rpc://')
+app = Celery("analyse", broker="amqp://localhost", backend="rpc://")
 
 # --------------------------------------------------------------------------- #
 
@@ -24,18 +26,21 @@ def load_analysis_services() -> None:
     Returns:
         None
     """
-    base_path = 'services/analysis'
+    base_path = "services/analysis"
     for filename in os.listdir(base_path):
-        if filename.endswith('.py') and \
-           filename != '__init__.py' and \
-           filename != '__pycache__':
+        if (
+            filename.endswith(".py")
+            and filename != "__init__.py"
+            and filename != "__pycache__"
+        ):
             module_name = filename[:-3]
             importlib.import_module(f"services.analysis.{module_name}")
+
 
 # --------------------------------------------------------------------------- #
 
 
-@shared_task(name='analyse_content')
+@shared_task(name="analyse_content")
 def analyse_content(content_id: int) -> bool:
     """
     Conduct analysis of a single Content entry using the respective analysis
@@ -68,15 +73,14 @@ def analyse_content(content_id: int) -> bool:
         raise
 
     # Retrieve the translated text to analyse
-    translated_text = database.get_content_attribute(content_id,
-                                                     'translated_text')
+    translated_text = database.get_content_attribute(content_id, "translated_text")
 
     # Retrieve the source ID for the given content
-    source_id = database.get_content_attribute(content_id, 'source_id')
+    source_id = database.get_content_attribute(content_id, "source_id")
     logging.info(f"Source ID: {source_id}")
 
     # Check whether analysis of content from this source is enabled
-    source_enabled = database.get_source_attribute(source_id, 'enabled')
+    source_enabled = database.get_source_attribute(source_id, "enabled")
     if not source_enabled:
         logging.info("Analysis is not enabled for this source, terminating!")
         return None
@@ -90,7 +94,7 @@ def analyse_content(content_id: int) -> bool:
         logging.info(f"Processing requirement '{requirement['name']}'..")
         logging.info(f"    LLM ID: {requirement['llm_id']}")
 
-        service_id = 'gpt3.5'
+        service_id = "gpt3.5"
 
         # Retrieve the analysis service assigned to this requirement
         service = AnalysisService.get_service(service_id)
@@ -103,25 +107,30 @@ def analyse_content(content_id: int) -> bool:
         # Attempt to execute the analysis - if anything fails, we'll re-raise
         # the exception so Celery can record it
         try:
-            analysis = service.analyse(requirement['prompt'], translated_text)
+            analysis = service.analyse(requirement["prompt"], translated_text)
         except ValueError as err:
-            logging.error(f"The analysis service reported an error with the "
-                          f"provided arguments: {err}")
+            logging.error(
+                f"The analysis service reported an error with the "
+                f"provided arguments: {err}"
+            )
             raise
         except AnalysisException as err:
-            logging.error(f"The analysis service encountered an "
-                          f"irrecoverable error: {err}")
+            logging.error(
+                f"The analysis service encountered an irrecoverable error: {err}"
+            )
             raise
 
         logging.info(f"Analysis: '{analysis[:80]}..'")
 
-        new_id = database.save_analysis_result(content_id,
-                                               requirement['req_id'], analysis)
+        new_id = database.save_analysis_result(
+            content_id, requirement["req_id"], analysis
+        )
         logging.info(f"Stored analysis result with ID {new_id}")
 
     logging.info("---------------------------------------------------------")
     logging.info("")
 
     return True
+
 
 # --------------------------------------------------------------------------- #

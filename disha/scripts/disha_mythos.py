@@ -1,4 +1,3 @@
-
 from __future__ import annotations
 
 import argparse
@@ -23,13 +22,18 @@ os.environ.setdefault("DISHA_MODEL_PROVIDER", "mock")
 
 logger = structlog.get_logger("disha_mythos")
 
+
 def _import_guardian():
     from threat_guardian import ThreatGuardian
+
     return ThreatGuardian
+
 
 def _import_monitor():
     from monitor import SelfHealingMonitor
+
     return SelfHealingMonitor
+
 
 def _import_model_hub():
 
@@ -40,15 +44,20 @@ def _import_model_hub():
         def ask(self, *args, **kwargs):
             class Resp:
                 ok = True
+
             return Resp()
 
         def available_providers(self):
             return []
+
     return HubStub
+
 
 def _import_knowledge_engine():
     from knowledge_engine import KnowledgeEngine
+
     return KnowledgeEngine
+
 
 def phase_protect(auto_fix: bool = True) -> dict:
     logger.info("phase_start", phase="PROTECT")
@@ -72,6 +81,7 @@ def phase_protect(auto_fix: bool = True) -> dict:
     logger.info("phase_complete", **result)
     return result
 
+
 def phase_heal(auto_fix: bool = True) -> dict:
     logger.info("phase_start", phase="HEAL")
     Monitor = _import_monitor()
@@ -93,6 +103,7 @@ def phase_heal(auto_fix: bool = True) -> dict:
     logger.info("phase_complete", **result)
     return result
 
+
 def phase_intelligence() -> dict:
     logger.info("phase_start", phase="INTELLIGENCE")
     Hub = _import_model_hub()
@@ -109,6 +120,7 @@ def phase_intelligence() -> dict:
     }
     logger.info("phase_complete", **result)
     return result
+
 
 def phase_learn() -> dict:
     logger.info("phase_start", phase="LEARN")
@@ -136,11 +148,12 @@ def phase_learn() -> dict:
     logger.info("phase_complete", **result)
     return result
 
+
 def phase_train(rounds: int = 1, offline: bool = True) -> dict:
     logger.info("phase_start", phase="TRAIN", rounds=rounds)
     try:
-
         import importlib.util
+
         spec = importlib.util.spec_from_file_location(
             "continuous_train", SCRIPTS_DIR / "continuous_train.py"
         )
@@ -165,6 +178,7 @@ def phase_train(rounds: int = 1, offline: bool = True) -> dict:
 
     logger.info("phase_complete", **result)
     return result
+
 
 def run_mythos(
     protect: bool = True,
@@ -201,6 +215,7 @@ def run_mythos(
 
     return summary
 
+
 def _print_summary(summary: dict) -> None:
     _SENSITIVE_TOKENS = ("secret", "token", "password", "key", "credential", "auth")
 
@@ -218,12 +233,13 @@ def _print_summary(summary: dict) -> None:
         if s.startswith("AKIA") and len(s) == 20:
             return True
         if s.count(".") == 2 and len(s) > 40:
-
             return True
 
         if len(s) >= 32 and all(c in "0123456789abcdefABCDEF" for c in s):
             return True
-        b64_chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=_-"
+        b64_chars = (
+            "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=_-"
+        )
         if len(s) >= 40 and all(c in b64_chars for c in s):
             return True
         return False
@@ -247,12 +263,28 @@ def _print_summary(summary: dict) -> None:
     ]
 
     _SAFE_KEYS = {
-        "phase", "system_health", "threats_found", "threats_neutralized",
-        "critical", "high", "scans", "overall_status", "score",
-        "checks_run", "issues_fixed", "details", "available_providers",
-        "total_providers", "test_response_ok", "domains_loaded",
-        "total_items", "training_pairs", "domain_breakdown",
-        "rounds_completed", "metrics", "status",
+        "phase",
+        "system_health",
+        "threats_found",
+        "threats_neutralized",
+        "critical",
+        "high",
+        "scans",
+        "overall_status",
+        "score",
+        "checks_run",
+        "issues_fixed",
+        "details",
+        "available_providers",
+        "total_providers",
+        "test_response_ok",
+        "domains_loaded",
+        "total_items",
+        "training_pairs",
+        "domain_breakdown",
+        "rounds_completed",
+        "metrics",
+        "status",
     }
 
     for phase_data in summary.get("phases", []):
@@ -284,18 +316,30 @@ def _print_summary(summary: dict) -> None:
 
     sys.stdout.write("\n".join(lines))
 
+
 def main() -> None:
     parser = argparse.ArgumentParser(
         description="Disha Mythos  Adaptive Learning, Protection & Intelligence",
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
-    parser.add_argument("--protect", action="store_true", help="Run threat scan & auto-fix")
-    parser.add_argument("--learn", action="store_true", help="Run knowledge aggregation")
+    parser.add_argument(
+        "--protect", action="store_true", help="Run threat scan & auto-fix"
+    )
+    parser.add_argument(
+        "--learn", action="store_true", help="Run knowledge aggregation"
+    )
     parser.add_argument("--train", action="store_true", help="Run continuous training")
-    parser.add_argument("--train-rounds", type=int, default=1, help="Training rounds (default: 1)")
+    parser.add_argument(
+        "--train-rounds", type=int, default=1, help="Training rounds (default: 1)"
+    )
     parser.add_argument("--all", action="store_true", help="Run all phases")
     parser.add_argument("--status", action="store_true", help="Quick status check only")
-    parser.add_argument("--offline", action="store_true", default=True, help="Offline training (synthetic data)")
+    parser.add_argument(
+        "--offline",
+        action="store_true",
+        default=True,
+        help="Offline training (synthetic data)",
+    )
     parser.add_argument("--json", action="store_true", help="JSON output")
     args = parser.parse_args()
 
@@ -303,11 +347,15 @@ def main() -> None:
         args.protect = True
 
     if args.status:
-
         summary = run_mythos(protect=True, learn=False, train=False)
     elif args.all:
-        summary = run_mythos(protect=True, learn=True, train=True,
-                             train_rounds=args.train_rounds, offline=args.offline)
+        summary = run_mythos(
+            protect=True,
+            learn=True,
+            train=True,
+            train_rounds=args.train_rounds,
+            offline=args.offline,
+        )
     else:
         summary = run_mythos(
             protect=args.protect,
@@ -332,6 +380,7 @@ def main() -> None:
         if phase_data.get("overall_status") == "failing":
             sys.exit(2)
     sys.exit(0)
+
 
 if __name__ == "__main__":
     main()

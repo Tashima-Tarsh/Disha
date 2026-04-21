@@ -1,4 +1,3 @@
-
 from __future__ import annotations
 
 import heapq
@@ -75,8 +74,8 @@ _DECOMPOSITION_TEMPLATES: dict[str, list[str]] = {
     ],
 }
 
-class _GoalEntry:
 
+class _GoalEntry:
     __slots__ = ("priority", "timestamp", "goal")
 
     def __init__(self, goal: dict[str, Any]) -> None:
@@ -94,8 +93,8 @@ class _GoalEntry:
             return False
         return self.goal["goal_id"] == other.goal["goal_id"]
 
-class GoalEngine:
 
+class GoalEngine:
     def __init__(self) -> None:
         self._heap: list[_GoalEntry] = []
         self._goals: dict[str, dict[str, Any]] = {}
@@ -181,7 +180,11 @@ class GoalEngine:
     def get_next_actionable(self) -> dict[str, Any] | None:
 
         pending_goals = sorted(
-            [g for g in self._goals.values() if g["status"] in (STATUS_PENDING, STATUS_ACTIVE)],
+            [
+                g
+                for g in self._goals.values()
+                if g["status"] in (STATUS_PENDING, STATUS_ACTIVE)
+            ],
             key=lambda g: (-g["priority"], g["created_at"]),
         )
 
@@ -215,7 +218,8 @@ class GoalEngine:
         goal["updated_at"] = time.time()
 
         unlocked = [
-            g for g in self._goals.values()
+            g
+            for g in self._goals.values()
             if goal_id in g.get("dependencies", []) and g["status"] == STATUS_BLOCKED
         ]
         for dependent in unlocked:
@@ -239,7 +243,8 @@ class GoalEngine:
         goal["updated_at"] = time.time()
 
         blocked = [
-            g for g in self._goals.values()
+            g
+            for g in self._goals.values()
             if goal_id in g.get("dependencies", [])
             and g["status"] in (STATUS_PENDING, STATUS_ACTIVE)
         ]
@@ -270,14 +275,16 @@ class GoalEngine:
             return {**goal, "dependents": dependents}
 
         root_ids = [
-            gid for gid, g in self._goals.items()
-            if not g.get("dependencies") or all(
-                dep not in self._goals for dep in g["dependencies"]
-            )
+            gid
+            for gid, g in self._goals.items()
+            if not g.get("dependencies")
+            or all(dep not in self._goals for dep in g["dependencies"])
         ]
 
         tree = {gid: _build_subtree(gid, set()) for gid in root_ids}
-        log.debug("goal_engine.tree_generated", roots=len(root_ids), total=len(self._goals))
+        log.debug(
+            "goal_engine.tree_generated", roots=len(root_ids), total=len(self._goals)
+        )
         return tree
 
     def get_all_goals(self) -> list[dict[str, Any]]:

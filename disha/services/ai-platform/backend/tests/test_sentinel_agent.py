@@ -2,7 +2,7 @@ import os
 import sys
 
 # Ensure backend module can be located in CI runners
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 import pytest  # noqa: E402
 from unittest.mock import AsyncMock, patch  # noqa: E402
@@ -27,7 +27,7 @@ async def test_sentinel_execution_with_mock_report(agent):
 
         result = await agent.execute(
             target=target_ip,
-            options={"signals": signals, "context": "Network segment B"}
+            options={"signals": signals, "context": "Network segment B"},
         )
 
         assert result["target"] == target_ip

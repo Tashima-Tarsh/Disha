@@ -2,6 +2,7 @@
 import logging
 import os
 import json
+
 # Project
 from translation_service import TranslationService
 from gpt_api import GPT, GPT3Turbo_16K
@@ -11,7 +12,7 @@ from gpt_api import GPT, GPT3Turbo_16K
 
 class GPTTranslate(TranslationService):
     def __init__(self):
-        super().__init__('gpt3.5')
+        super().__init__("gpt3.5")
 
     # ----------------------------------------------------------------------- #
 
@@ -19,7 +20,7 @@ class GPTTranslate(TranslationService):
         logging.info("GPTTranslate() received translation request")
 
         # Check existence of OpenAI API key and retrieve it
-        api_key = os.environ.get('OPENAI_API_KEY')
+        api_key = os.environ.get("OPENAI_API_KEY")
         if not api_key:
             logging.error("No OpenAI API key has been set as an env. var!")
             return None
@@ -28,11 +29,11 @@ class GPTTranslate(TranslationService):
         gpt = GPT(api_key, GPT3Turbo_16K())
 
         # Load the translate template as the system prompt
-        template = gpt.load_template('data/llm_templates/translate.txt')
+        template = gpt.load_template("data/llm_templates/translate.txt")
         gpt.add_prompt(template)
 
         # Add our translation request
-        gpt.add_prompt(json.dumps({'translate_to': 'English', 'message': text}))
+        gpt.add_prompt(json.dumps({"translate_to": "English", "message": text}))
 
         # Send off our GPT request
         response = gpt.execute()
@@ -41,7 +42,7 @@ class GPTTranslate(TranslationService):
             return None
 
         # Convert the response to a dict
-        response_json = json.loads(response['response'])
+        response_json = json.loads(response["response"])
         logging.debug(f"JSON response: {response_json}")
 
         # Parse the response
@@ -49,10 +50,11 @@ class GPTTranslate(TranslationService):
         logging.info(f"Raw translation JSON: {response['response']}")
 
         # Return only the translation and none of the metadata
-        data = json.loads(response['response'])
-        return data['translation']
+        data = json.loads(response["response"])
+        return data["translation"]
+
 
 # =========================================================================== #
 
 
-TranslationService.register('gpt3.5', GPTTranslate)
+TranslationService.register("gpt3.5", GPTTranslate)

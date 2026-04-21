@@ -1,15 +1,25 @@
 from fastapi import APIRouter, Depends
 from app.core.security import get_current_user
-from app.models.schemas import VisionAnalysisRequest, AudioAnalysisRequest, MultimodalRequest
-from app.api.deps import get_vision_agent, get_audio_agent, get_multimodal_fusion, get_orchestrator
+from app.models.schemas import (
+    VisionAnalysisRequest,
+    AudioAnalysisRequest,
+    MultimodalRequest,
+)
+from app.api.deps import (
+    get_vision_agent,
+    get_audio_agent,
+    get_multimodal_fusion,
+    get_orchestrator,
+)
 
 router = APIRouter()
+
 
 @router.post("/analyze/vision")
 async def analyze_vision(
     request: VisionAnalysisRequest,
     current_user: dict = Depends(get_current_user),
-    vision_agent=Depends(get_vision_agent)
+    vision_agent=Depends(get_vision_agent),
 ):
     context = {
         "analysis_type": request.analysis_type,
@@ -17,11 +27,12 @@ async def analyze_vision(
     }
     return await vision_agent.run(request.target, context)
 
+
 @router.post("/analyze/audio")
 async def analyze_audio(
     request: AudioAnalysisRequest,
     current_user: dict = Depends(get_current_user),
-    audio_agent=Depends(get_audio_agent)
+    audio_agent=Depends(get_audio_agent),
 ):
     context = {
         "analysis_type": request.analysis_type,
@@ -30,6 +41,7 @@ async def analyze_audio(
     }
     return await audio_agent.run(request.target, context)
 
+
 @router.post("/analyze/multimodal")
 async def analyze_multimodal(
     request: MultimodalRequest,
@@ -37,7 +49,7 @@ async def analyze_multimodal(
     orchestrator=Depends(get_orchestrator),
     vision_agent=Depends(get_vision_agent),
     audio_agent=Depends(get_audio_agent),
-    multimodal_fusion=Depends(get_multimodal_fusion)
+    multimodal_fusion=Depends(get_multimodal_fusion),
 ):
     text_results, vision_results, audio_results = None, None, None
 
@@ -52,11 +64,16 @@ async def analyze_multimodal(
 
     if request.image_url or request.image_data:
         img_target = request.image_url or request.target
-        vision_results = await vision_agent.run(img_target, {"analysis_type": "classify", "image_data": request.image_data})
+        vision_results = await vision_agent.run(
+            img_target, {"analysis_type": "classify", "image_data": request.image_data}
+        )
 
     if request.audio_url or request.audio_data:
         aud_target = request.audio_url or request.target
-        audio_results = await audio_agent.run(aud_target, {"analysis_type": "transcribe", "audio_data": request.audio_data})
+        audio_results = await audio_agent.run(
+            aud_target,
+            {"analysis_type": "transcribe", "audio_data": request.audio_data},
+        )
 
     return multimodal_fusion.fuse(
         text_results=text_results,

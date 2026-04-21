@@ -142,7 +142,10 @@ class Controller:
                     )
 
                     # Replan if auto_plan enabled
-                    if self._config.auto_plan and consecutive_failures < self._config.max_consecutive_failures:
+                    if (
+                        self._config.auto_plan
+                        and consecutive_failures < self._config.max_consecutive_failures
+                    ):
                         plan = self._planner.replan(
                             plan,
                             failed_task=completed_task,

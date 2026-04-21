@@ -3,20 +3,22 @@
 # Core
 import os
 import logging
+
 # Third-party
 from telethon import TelegramClient, events
 import telethon
 import requests
 from celery import Celery
+
 # Project
 from collector import Collector, CollectionException
 
-app = Celery(broker='amqp://localhost', backend='rpc://')
+app = Celery(broker="amqp://localhost", backend="rpc://")
 
 
 class TelegramCollector(Collector):
     def __init__(self):
-        super().__init__('telegram', 'Telegram Channel Monitor')
+        super().__init__("telegram", "Telegram Channel Monitor")
         self.api_id = None
         self.api_hash = None
         self.client = None
@@ -35,12 +37,12 @@ class TelegramCollector(Collector):
             CollectionException: If the API ID or API hash are not found
                 in the environment variables.
         """
-        self.api_id = os.environ.get('TELEGRAM_API_ID')
-        self.api_hash = os.environ.get('TELEGRAM_API_HASH')
+        self.api_id = os.environ.get("TELEGRAM_API_ID")
+        self.api_hash = os.environ.get("TELEGRAM_API_HASH")
         if not self.api_id or not self.api_hash:
             raise CollectionException("API ID or API hash were empty or missing!")
 
-        self.client = TelegramClient('data/anon', self.api_id, self.api_hash)
+        self.client = TelegramClient("data/anon", self.api_id, self.api_hash)
         self.client.on(events.NewMessage)(self.process_message)
 
     # ----------------------------------------------------------------------- #
@@ -66,14 +68,15 @@ class TelegramCollector(Collector):
         try:
             self.client.start()
         except telethon.errors.TelethonError as err:
-            raise CollectionException(f"Telethon specific error occurred: {err}") \
-                from err
+            raise CollectionException(
+                f"Telethon specific error occurred: {err}"
+            ) from err
         except requests.exceptions.ConnectionError as err:
-            raise CollectionException(f"Network connection error occurred: {err}") \
-                from err
+            raise CollectionException(
+                f"Network connection error occurred: {err}"
+            ) from err
         except Exception as err:
-            raise CollectionException(f"Unexpected error occurred: {err}") \
-                from err
+            raise CollectionException(f"Unexpected error occurred: {err}") from err
         logging.info("Connected successfully!")
 
         # Run initialisation code, retrieving chats etc.
@@ -95,10 +98,11 @@ class TelegramCollector(Collector):
         logging.info("Running Telegram initialisation..")
         async for dialog in self.client.iter_dialogs():
             if isinstance(dialog.entity, telethon.tl.types.Channel):
-                logging.info(f"Channel ID: {dialog.entity.id}, Name: {dialog.entity.title}")
+                logging.info(
+                    f"Channel ID: {dialog.entity.id}, Name: {dialog.entity.title}"
+                )
                 # TODO: Handle whatever error type we decide this returns
-                self.add_source(str(dialog.entity.id),
-                                str(dialog.entity.title))
+                self.add_source(str(dialog.entity.id), str(dialog.entity.title))
 
     # ----------------------------------------------------------------------- #
 
@@ -134,13 +138,14 @@ class TelegramCollector(Collector):
             # On occasion, messages can have zero text, only insert
             # if there's text
             if len(event.message.message):
-                content_id = self.add_content(str(sender.id),
-                                              event.message.date,
-                                              event.message.message,
-                                              {})
+                content_id = self.add_content(
+                    str(sender.id), event.message.date, event.message.message, {}
+                )
 
                 if content_id:
-                    app.send_task('translate_content', args=[content_id], queue="translation")
+                    app.send_task(
+                        "translate_content", args=[content_id], queue="translation"
+                    )
                 else:
                     logging.info("Not translating message as no source found")
 

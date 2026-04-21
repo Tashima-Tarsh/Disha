@@ -26,16 +26,11 @@ export function GlassCard({
     none: "hover:border-white/20"
   };
 
-  const Component = animate ? motion.div : "div";
-  const motionProps = animate ? {
-    initial: { opacity: 0, y: 20 },
-    animate: { opacity: 1, y: 0 },
-    transition: { duration: 0.5, ease: [0.16, 1, 0.3, 1] }
-  } : {};
-
   return (
-    <Component
-      {...motionProps}
+    <motion.div
+      initial={animate ? { opacity: 0, y: 20 } : false}
+      animate={animate ? { opacity: 1, y: 0 } : false}
+      transition={animate ? { duration: 0.5, ease: [0.16, 1, 0.3, 1] as [number, number, number, number] } : undefined}
       className={cn(
         "glass-premium rounded-3xl p-6 transition-all duration-500",
         hover && "hover:-translate-y-1 hover:bg-card/40",
@@ -45,12 +40,12 @@ export function GlassCard({
     >
       {/* Glossy Overlay */}
       <div className="absolute inset-0 rounded-3xl overflow-hidden pointer-events-none">
-        <div className="absolute top-0 left-0 w-full h-1/2 bg-gradient-to-b from-white/5 to-transparent opaicty-20" />
+        <div className="absolute top-0 left-0 w-full h-1/2 bg-gradient-to-b from-white/5 to-transparent opacity-20" />
       </div>
       
       <div className="relative z-10">
         {children}
       </div>
-    </Component>
+    </motion.div>
   );
 }

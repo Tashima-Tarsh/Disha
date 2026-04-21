@@ -173,7 +173,9 @@ class SearchFilesTool(BaseTool):
         start = time.monotonic()
         try:
             resolved = Path(path).resolve()
-            matches = sorted(str(p.relative_to(resolved)) for p in resolved.glob(pattern))
+            matches = sorted(
+                str(p.relative_to(resolved)) for p in resolved.glob(pattern)
+            )
             return ToolResult(
                 tool_name=self.name,
                 success=True,
@@ -204,10 +206,20 @@ class GrepTool(BaseTool):
         start = time.monotonic()
         try:
             result = subprocess.run(
-                ["grep", "-rn", "--include=*.py", "--include=*.ts",
-                 "--include=*.tsx", "--include=*.js", "--include=*.json",
-                 "--include=*.md", "--include=*.yaml", "--include=*.yml",
-                 pattern, path],
+                [
+                    "grep",
+                    "-rn",
+                    "--include=*.py",
+                    "--include=*.ts",
+                    "--include=*.tsx",
+                    "--include=*.js",
+                    "--include=*.json",
+                    "--include=*.md",
+                    "--include=*.yaml",
+                    "--include=*.yml",
+                    pattern,
+                    path,
+                ],
                 capture_output=True,
                 text=True,
                 timeout=self._config.command_timeout_seconds,
@@ -246,17 +258,21 @@ class RunCommandTool(BaseTool):
     description = "Execute a shell command and return its output."
 
     # Commands that are never allowed regardless of sandbox mode
-    _BLOCKED_COMMANDS = frozenset({
-        "rm -rf /", "rm -rf /*", "mkfs", "dd if=",
-        ":(){:|:&};:", "chmod -R 777 /",
-    })
+    _BLOCKED_COMMANDS = frozenset(
+        {
+            "rm -rf /",
+            "rm -rf /*",
+            "mkfs",
+            "dd if=",
+            ":(){:|:&};:",
+            "chmod -R 777 /",
+        }
+    )
 
     def __init__(self, config: ExecutorConfig) -> None:
         self._config = config
 
-    def execute(
-        self, *, command: str, cwd: str | None = None, **_: Any
-    ) -> ToolResult:
+    def execute(self, *, command: str, cwd: str | None = None, **_: Any) -> ToolResult:
         start = time.monotonic()
         for blocked in self._BLOCKED_COMMANDS:
             if blocked in command:
@@ -284,7 +300,9 @@ class RunCommandTool(BaseTool):
                 tool_name=self.name,
                 success=result.returncode == 0,
                 output=output,
-                error=f"Exit code: {result.returncode}" if result.returncode != 0 else None,
+                error=f"Exit code: {result.returncode}"
+                if result.returncode != 0
+                else None,
                 duration_ms=(time.monotonic() - start) * 1000,
                 metadata={"exit_code": result.returncode},
             )
@@ -323,7 +341,8 @@ class AnalyzeStructureTool(BaseTool):
             self._walk(root, root, lines, stats, 0, max_depth)
             summary = "\n".join(lines[:300])
             ext_summary = ", ".join(
-                f"{ext}: {count}" for ext, count in sorted(stats.items(), key=lambda x: -x[1])[:15]
+                f"{ext}: {count}"
+                for ext, count in sorted(stats.items(), key=lambda x: -x[1])[:15]
             )
             return ToolResult(
                 tool_name=self.name,

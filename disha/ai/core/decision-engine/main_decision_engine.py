@@ -1,4 +1,3 @@
-
 from __future__ import annotations
 
 from typing import Any, Dict, List, Optional
@@ -17,8 +16,8 @@ _DEFAULT_WEIGHTS: Dict[str, float] = {
     "security": 0.25,
 }
 
-class DecisionEngine:
 
+class DecisionEngine:
     def __init__(
         self,
         weights: Optional[Dict[str, float]] = None,
@@ -55,8 +54,7 @@ class DecisionEngine:
 
         total_weight = sum(self.weights.values())
         weighted_conf = sum(
-            results[k]["confidence"] * self.weights.get(k, 0.0)
-            for k in results
+            results[k]["confidence"] * self.weights.get(k, 0.0) for k in results
         ) / (total_weight or 1.0)
 
         all_sources: List[Dict[str, Any]] = []
@@ -73,15 +71,9 @@ class DecisionEngine:
 
         return {
             "summary": f"Multi-agent decision on: {scenario[:100]}",
-            "premises": [
-                p
-                for r in results.values()
-                for p in r.get("premises", [])
-            ],
+            "premises": [p for r in results.values() for p in r.get("premises", [])],
             "inference_steps": [
-                s
-                for r in results.values()
-                for s in r.get("inference_steps", [])
+                s for r in results.values() for s in r.get("inference_steps", [])
             ],
             "recommendations": all_recs,
             "confidence": round(weighted_conf, 4),

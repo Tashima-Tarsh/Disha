@@ -22,16 +22,86 @@ logger = logging.getLogger(__name__)
 
 # Historical success rates by strategy and terrain
 STRATEGY_EFFECTIVENESS: Dict[str, Dict[str, float]] = {
-    "Guerrilla": {"Mountains": 0.85, "Forest": 0.80, "Urban": 0.75, "Plains": 0.45, "Desert": 0.60, "Sea": 0.20},
-    "Conventional": {"Plains": 0.75, "Desert": 0.70, "Mountains": 0.45, "Forest": 0.50, "Urban": 0.55, "Sea": 0.40},
-    "Naval": {"Sea": 0.90, "Plains": 0.20, "Desert": 0.15, "Mountains": 0.10, "Forest": 0.15, "Urban": 0.30},
-    "Siege": {"Urban": 0.80, "Mountains": 0.60, "Plains": 0.50, "Desert": 0.45, "Forest": 0.40, "Sea": 0.20},
-    "Blitzkrieg": {"Plains": 0.85, "Desert": 0.80, "Forest": 0.50, "Mountains": 0.35, "Urban": 0.55, "Sea": 0.20},
-    "Attrition": {"Mountains": 0.70, "Forest": 0.65, "Urban": 0.75, "Plains": 0.60, "Desert": 0.55, "Sea": 0.40},
-    "Flanking": {"Plains": 0.80, "Desert": 0.75, "Forest": 0.55, "Mountains": 0.45, "Urban": 0.60, "Sea": 0.50},
-    "Deception": {"Urban": 0.80, "Forest": 0.75, "Mountains": 0.70, "Plains": 0.70, "Desert": 0.65, "Sea": 0.60},
-    "Psychological": {"Urban": 0.75, "Plains": 0.65, "Forest": 0.60, "Mountains": 0.55, "Desert": 0.60, "Sea": 0.50},
-    "Coalition": {"Plains": 0.75, "Desert": 0.70, "Sea": 0.70, "Mountains": 0.65, "Forest": 0.60, "Urban": 0.65},
+    "Guerrilla": {
+        "Mountains": 0.85,
+        "Forest": 0.80,
+        "Urban": 0.75,
+        "Plains": 0.45,
+        "Desert": 0.60,
+        "Sea": 0.20,
+    },
+    "Conventional": {
+        "Plains": 0.75,
+        "Desert": 0.70,
+        "Mountains": 0.45,
+        "Forest": 0.50,
+        "Urban": 0.55,
+        "Sea": 0.40,
+    },
+    "Naval": {
+        "Sea": 0.90,
+        "Plains": 0.20,
+        "Desert": 0.15,
+        "Mountains": 0.10,
+        "Forest": 0.15,
+        "Urban": 0.30,
+    },
+    "Siege": {
+        "Urban": 0.80,
+        "Mountains": 0.60,
+        "Plains": 0.50,
+        "Desert": 0.45,
+        "Forest": 0.40,
+        "Sea": 0.20,
+    },
+    "Blitzkrieg": {
+        "Plains": 0.85,
+        "Desert": 0.80,
+        "Forest": 0.50,
+        "Mountains": 0.35,
+        "Urban": 0.55,
+        "Sea": 0.20,
+    },
+    "Attrition": {
+        "Mountains": 0.70,
+        "Forest": 0.65,
+        "Urban": 0.75,
+        "Plains": 0.60,
+        "Desert": 0.55,
+        "Sea": 0.40,
+    },
+    "Flanking": {
+        "Plains": 0.80,
+        "Desert": 0.75,
+        "Forest": 0.55,
+        "Mountains": 0.45,
+        "Urban": 0.60,
+        "Sea": 0.50,
+    },
+    "Deception": {
+        "Urban": 0.80,
+        "Forest": 0.75,
+        "Mountains": 0.70,
+        "Plains": 0.70,
+        "Desert": 0.65,
+        "Sea": 0.60,
+    },
+    "Psychological": {
+        "Urban": 0.75,
+        "Plains": 0.65,
+        "Forest": 0.60,
+        "Mountains": 0.55,
+        "Desert": 0.60,
+        "Sea": 0.50,
+    },
+    "Coalition": {
+        "Plains": 0.75,
+        "Desert": 0.70,
+        "Sea": 0.70,
+        "Mountains": 0.65,
+        "Forest": 0.60,
+        "Urban": 0.65,
+    },
 }
 
 WEATHER_MODIFIERS: Dict[str, float] = {
@@ -147,6 +217,7 @@ RISK_FACTORS: Dict[str, List[str]] = {
 @dataclass
 class SimulationResult:
     """Result of a battle simulation."""
+
     victory_probability: float
     recommended_strategy: str
     alternative_strategies: List[Dict[str, Any]]
@@ -205,15 +276,25 @@ class HistoricalSimulationEngine:
         weather = scenario_params.get("weather", "Clear")
 
         # 1. Base effectiveness from historical data
-        attacker_base = STRATEGY_EFFECTIVENESS.get(attacker_strategy, {}).get(terrain, 0.5)
-        defender_base = STRATEGY_EFFECTIVENESS.get(defender_strategy, {}).get(terrain, 0.5)
+        attacker_base = STRATEGY_EFFECTIVENESS.get(attacker_strategy, {}).get(
+            terrain, 0.5
+        )
+        defender_base = STRATEGY_EFFECTIVENESS.get(defender_strategy, {}).get(
+            terrain, 0.5
+        )
 
         # 2. Strategy counter relationships
-        counter_modifier = STRATEGY_COUNTERS.get(attacker_strategy, {}).get(defender_strategy, 1.0)
+        counter_modifier = STRATEGY_COUNTERS.get(attacker_strategy, {}).get(
+            defender_strategy, 1.0
+        )
 
         # 3. Terrain multipliers
-        atk_terrain_mult = TERRAIN_MULTIPLIERS.get(attacker_strategy, {}).get(terrain, 1.0)
-        def_terrain_mult = TERRAIN_MULTIPLIERS.get(defender_strategy, {}).get(terrain, 1.0)
+        atk_terrain_mult = TERRAIN_MULTIPLIERS.get(attacker_strategy, {}).get(
+            terrain, 1.0
+        )
+        def_terrain_mult = TERRAIN_MULTIPLIERS.get(defender_strategy, {}).get(
+            terrain, 1.0
+        )
 
         # 4. Force ratio effect (logarithmic — asymptotic advantage)
         force_effect = 0.1 * math.log(max(force_ratio, 0.1))
@@ -232,22 +313,16 @@ class HistoricalSimulationEngine:
 
         # Compute attacker score
         attacker_score = (
-            attacker_base *
-            counter_modifier *
-            atk_terrain_mult *
-            weather_mod +
-            force_effect +
-            tech_effect +
-            supply_effect +
-            morale_effect
+            attacker_base * counter_modifier * atk_terrain_mult * weather_mod
+            + force_effect
+            + tech_effect
+            + supply_effect
+            + morale_effect
         )
 
         # Compute defender score (defender gets terrain bonus but no counter modifier advantage here)
         defender_score = (
-            defender_base *
-            def_terrain_mult *
-            weather_mod +
-            (1.0 - supply_lines) * 0.1
+            defender_base * def_terrain_mult * weather_mod + (1.0 - supply_lines) * 0.1
         )
 
         # Convert scores to probability using sigmoid
@@ -273,7 +348,9 @@ class HistoricalSimulationEngine:
             confidence_level = "High" if victory_prob <= 0.20 else "Moderate"
 
         # Find recommended strategy
-        best_strategy, alt_strategies = self._recommend_strategy(terrain, force_ratio, technology_gap)
+        best_strategy, alt_strategies = self._recommend_strategy(
+            terrain, force_ratio, technology_gap
+        )
 
         # Historical parallels
         parallels = self.find_historical_parallels(scenario_params)
@@ -282,7 +359,10 @@ class HistoricalSimulationEngine:
         risks = self.assess_risk(scenario_params)
 
         # Tactical advice for attacker
-        advice = TACTICAL_ADVICE.get(attacker_strategy, ["Adapt tactics to terrain and enemy", "Maintain flexibility"])
+        advice = TACTICAL_ADVICE.get(
+            attacker_strategy,
+            ["Adapt tactics to terrain and enemy", "Maintain flexibility"],
+        )
 
         # Strategy breakdown scores
         strategy_breakdown = {
@@ -316,7 +396,9 @@ class HistoricalSimulationEngine:
             strategy_breakdown=strategy_breakdown,
         )
 
-    def _recommend_strategy(self, terrain: str, force_ratio: float, technology_gap: float):
+    def _recommend_strategy(
+        self, terrain: str, force_ratio: float, technology_gap: float
+    ):
         """Find the best strategy for the given terrain and situation."""
         scores = {}
         for strategy, terrain_map in STRATEGY_EFFECTIVENESS.items():
@@ -353,17 +435,19 @@ class HistoricalSimulationEngine:
             if tech_level and conflict.get("technology_level") == tech_level:
                 score += 1
             if score >= 2:
-                parallels.append({
-                    "id": conflict.get("id"),
-                    "name": conflict.get("name"),
-                    "year": conflict.get("year"),
-                    "outcome": conflict.get("outcome"),
-                    "strategy_type": conflict.get("strategy_type"),
-                    "terrain": conflict.get("terrain"),
-                    "description": conflict.get("description", "")[:150],
-                    "lessons": conflict.get("lessons", [])[:2],
-                    "similarity_score": score,
-                })
+                parallels.append(
+                    {
+                        "id": conflict.get("id"),
+                        "name": conflict.get("name"),
+                        "year": conflict.get("year"),
+                        "outcome": conflict.get("outcome"),
+                        "strategy_type": conflict.get("strategy_type"),
+                        "terrain": conflict.get("terrain"),
+                        "description": conflict.get("description", "")[:150],
+                        "lessons": conflict.get("lessons", [])[:2],
+                        "similarity_score": score,
+                    }
+                )
 
         parallels.sort(key=lambda x: -x["similarity_score"])
         return parallels[:5]
@@ -380,99 +464,132 @@ class HistoricalSimulationEngine:
         weather = params.get("weather", "Clear")
 
         if supply_lines < 0.5:
-            risks.append({
-                "factor": "Supply Lines",
-                "level": "Critical",
-                "detail": RISK_FACTORS["supply_lines"][0],
-                "mitigation": "Secure supply routes before advancing; establish forward supply depots",
-            })
+            risks.append(
+                {
+                    "factor": "Supply Lines",
+                    "level": "Critical",
+                    "detail": RISK_FACTORS["supply_lines"][0],
+                    "mitigation": "Secure supply routes before advancing; establish forward supply depots",
+                }
+            )
             risk_level = "Critical"
         elif supply_lines < 0.7:
-            risks.append({
-                "factor": "Supply Lines",
-                "level": "High",
-                "detail": RISK_FACTORS["supply_lines"][1],
-                "mitigation": "Prioritize logistical protection and establish alternate supply routes",
-            })
+            risks.append(
+                {
+                    "factor": "Supply Lines",
+                    "level": "High",
+                    "detail": RISK_FACTORS["supply_lines"][1],
+                    "mitigation": "Prioritize logistical protection and establish alternate supply routes",
+                }
+            )
             if risk_level not in ("Critical",):
                 risk_level = "High"
 
         if morale < 0.4:
-            risks.append({
-                "factor": "Morale",
-                "level": "Critical",
-                "detail": RISK_FACTORS["morale"][1],
-                "mitigation": "Address soldier welfare, provide clear objectives, communicate progress",
-            })
+            risks.append(
+                {
+                    "factor": "Morale",
+                    "level": "Critical",
+                    "detail": RISK_FACTORS["morale"][1],
+                    "mitigation": "Address soldier welfare, provide clear objectives, communicate progress",
+                }
+            )
             risk_level = "Critical"
         elif morale < 0.6:
-            risks.append({
-                "factor": "Morale",
-                "level": "Moderate",
-                "detail": RISK_FACTORS["morale"][0],
-                "mitigation": "Rotate units, ensure rest and supply, improve leadership communication",
-            })
+            risks.append(
+                {
+                    "factor": "Morale",
+                    "level": "Moderate",
+                    "detail": RISK_FACTORS["morale"][0],
+                    "mitigation": "Rotate units, ensure rest and supply, improve leadership communication",
+                }
+            )
             if risk_level == "Low":
                 risk_level = "Moderate"
 
         if force_ratio < 0.7:
-            risks.append({
-                "factor": "Force Ratio",
-                "level": "High",
-                "detail": RISK_FACTORS["force_ratio"][0],
-                "mitigation": "Seek decisive terrain advantage; avoid attrition; use deception and mobility",
-            })
+            risks.append(
+                {
+                    "factor": "Force Ratio",
+                    "level": "High",
+                    "detail": RISK_FACTORS["force_ratio"][0],
+                    "mitigation": "Seek decisive terrain advantage; avoid attrition; use deception and mobility",
+                }
+            )
             if risk_level not in ("Critical",):
                 risk_level = "High"
 
         if technology_gap < -1.0:
-            risks.append({
-                "factor": "Technology",
-                "level": "High",
-                "detail": RISK_FACTORS["technology"][0],
-                "mitigation": "Compensate with terrain advantage, guerrilla tactics, and mass",
-            })
+            risks.append(
+                {
+                    "factor": "Technology",
+                    "level": "High",
+                    "detail": RISK_FACTORS["technology"][0],
+                    "mitigation": "Compensate with terrain advantage, guerrilla tactics, and mass",
+                }
+            )
             if risk_level not in ("Critical",):
                 risk_level = "High"
 
         if weather in ("Snow", "Storm"):
-            risks.append({
-                "factor": "Weather",
-                "level": "Moderate",
-                "detail": RISK_FACTORS["weather"][0],
-                "mitigation": "Adjust operational tempo for weather; ensure cold/wet weather equipment",
-            })
+            risks.append(
+                {
+                    "factor": "Weather",
+                    "level": "Moderate",
+                    "detail": RISK_FACTORS["weather"][0],
+                    "mitigation": "Adjust operational tempo for weather; ensure cold/wet weather equipment",
+                }
+            )
             if risk_level == "Low":
                 risk_level = "Moderate"
 
         if not risks:
-            risks.append({
-                "factor": "General",
-                "level": "Low",
-                "detail": "No critical risk factors identified. Maintain operational security.",
-                "mitigation": "Continue standard risk management procedures",
-            })
+            risks.append(
+                {
+                    "factor": "General",
+                    "level": "Low",
+                    "detail": "No critical risk factors identified. Maintain operational security.",
+                    "mitigation": "Continue standard risk management procedures",
+                }
+            )
 
         return {
             "overall_risk_level": risk_level,
             "risk_factors": risks,
-            "risk_score": self._compute_risk_score(supply_lines, morale, force_ratio, technology_gap, weather),
+            "risk_score": self._compute_risk_score(
+                supply_lines, morale, force_ratio, technology_gap, weather
+            ),
         }
 
     def _compute_risk_score(
-            self, supply: float, morale: float, force_ratio: float,
-            tech_gap: float, weather: str) -> float:
+        self,
+        supply: float,
+        morale: float,
+        force_ratio: float,
+        tech_gap: float,
+        weather: str,
+    ) -> float:
         """Compute a normalized risk score 0-1 (1=highest risk)."""
         supply_risk = max(0.0, 1.0 - supply)
         morale_risk = max(0.0, 1.0 - morale)
         force_risk = max(0.0, min(1.0, (1.0 - force_ratio) * 0.5 + 0.5))
         tech_risk = max(0.0, min(1.0, (-tech_gap + 2.0) / 4.0))
-        weather_risk = {"Clear": 0.0, "Rain": 0.2, "Snow": 0.4, "Storm": 0.6}.get(weather, 0.1)
+        weather_risk = {"Clear": 0.0, "Rain": 0.2, "Snow": 0.4, "Storm": 0.6}.get(
+            weather, 0.1
+        )
 
-        score = (supply_risk * 0.3 + morale_risk * 0.25 + force_risk * 0.2 + tech_risk * 0.15 + weather_risk * 0.1)
+        score = (
+            supply_risk * 0.3
+            + morale_risk * 0.25
+            + force_risk * 0.2
+            + tech_risk * 0.15
+            + weather_risk * 0.1
+        )
         return round(min(1.0, score), 3)
 
-    def compare_strategies(self, strategy_a: str, strategy_b: str, context: Dict[str, Any]) -> Dict[str, Any]:
+    def compare_strategies(
+        self, strategy_a: str, strategy_b: str, context: Dict[str, Any]
+    ) -> Dict[str, Any]:
         """
         Compare two strategies across all terrains and provide head-to-head analysis.
         """
@@ -489,7 +606,9 @@ class HistoricalSimulationEngine:
             terrain_comparison[t] = {
                 "strategy_a": round(a_score, 3),
                 "strategy_b": round(b_score, 3),
-                "advantage": strategy_a if a_score > b_score else (strategy_b if b_score > a_score else "Equal"),
+                "advantage": strategy_a
+                if a_score > b_score
+                else (strategy_b if b_score > a_score else "Equal"),
                 "gap": round(abs(a_score - b_score), 3),
             }
 
@@ -498,8 +617,12 @@ class HistoricalSimulationEngine:
         b_vs_a = STRATEGY_COUNTERS.get(strategy_b, {}).get(strategy_a, 1.0)
 
         # Historical performance
-        a_conflicts = [c for c in self.historical_data if c.get("strategy_type") == strategy_a]
-        b_conflicts = [c for c in self.historical_data if c.get("strategy_type") == strategy_b]
+        a_conflicts = [
+            c for c in self.historical_data if c.get("strategy_type") == strategy_a
+        ]
+        b_conflicts = [
+            c for c in self.historical_data if c.get("strategy_type") == strategy_b
+        ]
 
         a_wins = sum(1 for c in a_conflicts if c.get("outcome") == "Victory")
         b_wins = sum(1 for c in b_conflicts if c.get("outcome") == "Victory")
@@ -508,7 +631,9 @@ class HistoricalSimulationEngine:
         b_win_rate = b_wins / len(b_conflicts) if b_conflicts else 0.0
 
         head_to_head_winner = (
-            strategy_a if a_vs_b > b_vs_a else (strategy_b if b_vs_a > a_vs_b else "Equal")
+            strategy_a
+            if a_vs_b > b_vs_a
+            else (strategy_b if b_vs_a > a_vs_b else "Equal")
         )
 
         return {
@@ -525,19 +650,25 @@ class HistoricalSimulationEngine:
                     "total_conflicts": len(a_conflicts),
                     "victories": a_wins,
                     "win_rate": round(a_win_rate, 3),
-                    "best_terrain": max(a_terrain_scores, key=a_terrain_scores.get) if a_terrain_scores else "Unknown",
+                    "best_terrain": max(a_terrain_scores, key=a_terrain_scores.get)
+                    if a_terrain_scores
+                    else "Unknown",
                 },
                 strategy_b: {
                     "total_conflicts": len(b_conflicts),
                     "victories": b_wins,
                     "win_rate": round(b_win_rate, 3),
-                    "best_terrain": max(b_terrain_scores, key=b_terrain_scores.get) if b_terrain_scores else "Unknown",
+                    "best_terrain": max(b_terrain_scores, key=b_terrain_scores.get)
+                    if b_terrain_scores
+                    else "Unknown",
                 },
             },
             "tactical_advice_a": TACTICAL_ADVICE.get(strategy_a, []),
             "tactical_advice_b": TACTICAL_ADVICE.get(strategy_b, []),
             "current_terrain": terrain,
-            "terrain_winner": terrain_comparison.get(terrain, {}).get("advantage", "Unknown"),
+            "terrain_winner": terrain_comparison.get(terrain, {}).get(
+                "advantage", "Unknown"
+            ),
         }
 
     def get_predefined_scenario(self, scenario_name: str) -> Optional[Dict[str, Any]]:
@@ -563,6 +694,12 @@ if __name__ == "__main__":
     print(f"Tactical Advice: {result.tactical_advice[0]}")
 
     print("\n--- Strategy Comparison: Guerrilla vs Blitzkrieg ---")
-    comparison = engine.compare_strategies("Guerrilla", "Blitzkrieg", {"terrain": "Forest"})
-    print(f"Forest terrain winner: {comparison['terrain_comparison']['Forest']['advantage']}")
-    print(f"Historical win rates: Guerrilla={comparison['historical_performance']['Guerrilla']['win_rate']}")
+    comparison = engine.compare_strategies(
+        "Guerrilla", "Blitzkrieg", {"terrain": "Forest"}
+    )
+    print(
+        f"Forest terrain winner: {comparison['terrain_comparison']['Forest']['advantage']}"
+    )
+    print(
+        f"Historical win rates: Guerrilla={comparison['historical_performance']['Guerrilla']['win_rate']}"
+    )

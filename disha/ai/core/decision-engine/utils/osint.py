@@ -1,4 +1,3 @@
-
 from __future__ import annotations
 
 import json
@@ -6,8 +5,8 @@ import urllib.request
 import xml.etree.ElementTree as ET
 from typing import Any, Dict, List, Optional
 
-class OSINTClient:
 
+class OSINTClient:
     DEFAULT_FEEDS: List[Dict[str, str]] = [
         {
             "name": "Feodo-Tracker",

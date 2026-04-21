@@ -7,6 +7,7 @@ import structlog
 
 logger = structlog.get_logger(__name__)
 
+
 @dataclass
 class RankedEntity:
     entity_id: str
@@ -32,6 +33,7 @@ class RankedEntity:
             + self.centrality_score * 0.15
             + self.recency_score * 0.10
         )
+
 
 @dataclass
 class AgentReliability:
@@ -66,8 +68,8 @@ class AgentReliability:
         speed_factor = 1.0 / (1.0 + avg_time / 60.0)
         return self.f1_score * 0.8 + speed_factor * 0.2
 
-class IntelligenceRanker:
 
+class IntelligenceRanker:
     DECAY_HALF_LIFE = 86400.0
 
     PAGERANK_DAMPING = 0.85
@@ -165,9 +167,7 @@ class IntelligenceRanker:
 
         for entity in self.entities.values():
             age = now - entity.last_seen
-            entity.recency_score = math.exp(
-                -0.693 * age / self.DECAY_HALF_LIFE
-            )
+            entity.recency_score = math.exp(-0.693 * age / self.DECAY_HALF_LIFE)
 
         self.rankings_cache = None
 

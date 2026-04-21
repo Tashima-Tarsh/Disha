@@ -152,9 +152,11 @@ class ScenarioBuilder:
             duration=self._duration,
         )
         logger.info(
-            "Built scenario '%s' with %d entities and %d events", scenario.name, len(
-                scenario.entities), len(
-                scenario.events_schedule))
+            "Built scenario '%s' with %d entities and %d events",
+            scenario.name,
+            len(scenario.entities),
+            len(scenario.events_schedule),
+        )
         return scenario
 
 
@@ -177,7 +179,9 @@ class ScenarioRunner:
         self._current_time: float = 0.0
         self._event_index: int = 0
         self._results: List[Dict[str, Any]] = []
-        self._step_callback: Optional[Callable[[float, ScheduledEvent, Scenario], None]] = None
+        self._step_callback: Optional[
+            Callable[[float, ScheduledEvent, Scenario], None]
+        ] = None
         self._is_running: bool = False
 
     def load(self, scenario: Scenario) -> None:
@@ -190,7 +194,9 @@ class ScenarioRunner:
         self.reset()
         logger.info("Loaded scenario '%s'", scenario.name)
 
-    def on_step(self, callback: Callable[[float, ScheduledEvent, Scenario], None]) -> None:
+    def on_step(
+        self, callback: Callable[[float, ScheduledEvent, Scenario], None]
+    ) -> None:
         """Register a callback invoked on each event.
 
         Args:
@@ -211,7 +217,11 @@ class ScenarioRunner:
             raise RuntimeError("No scenario loaded")
 
         self._is_running = True
-        logger.info("Running scenario '%s' (duration=%f)", self._scenario.name, self._scenario.duration)
+        logger.info(
+            "Running scenario '%s' (duration=%f)",
+            self._scenario.name,
+            self._scenario.duration,
+        )
 
         schedule = self._scenario.events_schedule
         while self._event_index < len(schedule):
@@ -230,11 +240,17 @@ class ScenarioRunner:
                 "payload": event.payload,
             }
             self._results.append(result)
-            logger.debug("Processed event at t=%f: %s", self._current_time, event.event_type)
+            logger.debug(
+                "Processed event at t=%f: %s", self._current_time, event.event_type
+            )
             self._event_index += 1
 
         self._is_running = False
-        logger.info("Scenario '%s' complete: %d events processed", self._scenario.name, len(self._results))
+        logger.info(
+            "Scenario '%s' complete: %d events processed",
+            self._scenario.name,
+            len(self._results),
+        )
         return list(self._results)
 
     def get_results(self) -> List[Dict[str, Any]]:

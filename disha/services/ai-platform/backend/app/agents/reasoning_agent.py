@@ -1,11 +1,10 @@
-
 from typing import Any
 
 from app.agents.base_agent import BaseAgent
 from app.core.config import get_settings
 
-class ReasoningAgent(BaseAgent):
 
+class ReasoningAgent(BaseAgent):
     def __init__(self):
         super().__init__(
             name="ReasoningAgent",
@@ -17,6 +16,7 @@ class ReasoningAgent(BaseAgent):
     def _get_llm(self):
         if self._llm is None:
             from langchain_openai import ChatOpenAI
+
             self._llm = ChatOpenAI(
                 model=self.settings.LLM_MODEL,
                 temperature=self.settings.LLM_TEMPERATURE,
@@ -24,7 +24,9 @@ class ReasoningAgent(BaseAgent):
             )
         return self._llm
 
-    async def execute(self, target: str, options: dict[str, Any] | None = None) -> dict[str, Any]:
+    async def execute(
+        self, target: str, options: dict[str, Any] | None = None
+    ) -> dict[str, Any]:
         options = options or {}
         agent_results = options.get("agent_results", {})
         context = options.get("context", "")
@@ -39,10 +41,14 @@ class ReasoningAgent(BaseAgent):
             "target": target,
             "analysis": analysis,
             "risk_assessment": risk_assessment,
-            "summary": analysis[:500] if analysis else "Analysis could not be generated.",
+            "summary": analysis[:500]
+            if analysis
+            else "Analysis could not be generated.",
         }
 
-    def _build_prompt(self, target: str, agent_results: dict[str, Any], context: str) -> str:
+    def _build_prompt(
+        self, target: str, agent_results: dict[str, Any], context: str
+    ) -> str:
         prompt_parts = [
             "You are an expert intelligence analyst. Analyze the following data and provide a comprehensive threat assessment report.",
             f"\n## Target: {target}",
@@ -53,22 +59,27 @@ class ReasoningAgent(BaseAgent):
 
         for agent_name, result in agent_results.items():
             if result.get("status") == "success":
-                prompt_parts.append(f"\n## {agent_name} Findings:\n{self._format_data(result.get('data', {}))}")
+                prompt_parts.append(
+                    f"\n## {agent_name} Findings:\n{self._format_data(result.get('data', {}))}"
+                )
 
-        prompt_parts.extend([
-            "\n## Required Analysis:",
-            "1. Threat level assessment (LOW/MEDIUM/HIGH/CRITICAL)",
-            "2. Key findings and indicators of compromise",
-            "3. Connections between entities",
-            "4. Recommended actions",
-            "5. Confidence level of the assessment",
-            "\nProvide a structured, professional intelligence report.",
-        ])
+        prompt_parts.extend(
+            [
+                "\n## Required Analysis:",
+                "1. Threat level assessment (LOW/MEDIUM/HIGH/CRITICAL)",
+                "2. Key findings and indicators of compromise",
+                "3. Connections between entities",
+                "4. Recommended actions",
+                "5. Confidence level of the assessment",
+                "\nProvide a structured, professional intelligence report.",
+            ]
+        )
 
         return "\n".join(prompt_parts)
 
     def _format_data(self, data: dict[str, Any]) -> str:
         import json
+
         try:
             return json.dumps(data, indent=2, default=str)[:3000]
         except (TypeError, ValueError):
@@ -103,7 +114,9 @@ class ReasoningAgent(BaseAgent):
                 for entity in data.get("entities", []):
                     if entity.get("risk_score", 0) > 0.5:
                         risk_scores.append(entity["risk_score"])
-                        risk_factors.append(f"High-risk entity: {entity.get('label', 'unknown')}")
+                        risk_factors.append(
+                            f"High-risk entity: {entity.get('label', 'unknown')}"
+                        )
 
         overall_risk = max(risk_scores) if risk_scores else 0.0
 

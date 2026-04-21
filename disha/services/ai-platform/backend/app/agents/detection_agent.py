@@ -1,19 +1,20 @@
-
 from typing import Any
 
 import numpy as np
 
 from app.agents.base_agent import BaseAgent
 
-class DetectionAgent(BaseAgent):
 
+class DetectionAgent(BaseAgent):
     def __init__(self):
         super().__init__(
             name="DetectionAgent",
             description="Detects anomalies and outliers in intelligence data",
         )
 
-    async def execute(self, target: str, options: dict[str, Any] | None = None) -> dict[str, Any]:
+    async def execute(
+        self, target: str, options: dict[str, Any] | None = None
+    ) -> dict[str, Any]:
         options = options or {}
         data_points = options.get("data_points", [])
 
@@ -28,7 +29,9 @@ class DetectionAgent(BaseAgent):
             "anomaly_count": len(anomalies),
         }
 
-    def _detect_anomalies(self, data_points: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    def _detect_anomalies(
+        self, data_points: list[dict[str, Any]]
+    ) -> list[dict[str, Any]]:
         try:
             from pyod.models.iforest import IForest
 
@@ -49,17 +52,21 @@ class DetectionAgent(BaseAgent):
             anomalies = []
             for i, (label, score) in enumerate(zip(labels, scores)):
                 if label == 1:
-                    anomalies.append({
-                        "index": i,
-                        "data": data_points[i] if i < len(data_points) else {},
-                        "anomaly_score": float(score),
-                        "is_anomaly": True,
-                    })
+                    anomalies.append(
+                        {
+                            "index": i,
+                            "data": data_points[i] if i < len(data_points) else {},
+                            "anomaly_score": float(score),
+                            "is_anomaly": True,
+                        }
+                    )
 
             return sorted(anomalies, key=lambda x: x["anomaly_score"], reverse=True)
 
         except ImportError:
-            self.logger.warning("pyod_not_available", msg="Falling back to simple detection")
+            self.logger.warning(
+                "pyod_not_available", msg="Falling back to simple detection"
+            )
             return self._simple_anomaly_detection(data_points)
         except Exception as e:
             self.logger.error("anomaly_detection_failed", error=str(e))
@@ -82,7 +89,9 @@ class DetectionAgent(BaseAgent):
             features.append(row)
         return features
 
-    def _simple_anomaly_detection(self, data_points: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    def _simple_anomaly_detection(
+        self, data_points: list[dict[str, Any]]
+    ) -> list[dict[str, Any]]:
         features = self._extract_features(data_points)
         if not features:
             return []
@@ -97,11 +106,13 @@ class DetectionAgent(BaseAgent):
             z_scores = np.abs((row - mean) / std)
             max_z = float(np.max(z_scores))
             if max_z > 2.5:
-                anomalies.append({
-                    "index": i,
-                    "data": data_points[i] if i < len(data_points) else {},
-                    "anomaly_score": max_z,
-                    "is_anomaly": True,
-                })
+                anomalies.append(
+                    {
+                        "index": i,
+                        "data": data_points[i] if i < len(data_points) else {},
+                        "anomaly_score": max_z,
+                        "is_anomaly": True,
+                    }
+                )
 
         return sorted(anomalies, key=lambda x: x["anomaly_score"], reverse=True)

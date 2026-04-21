@@ -86,7 +86,9 @@ def save_state(state_dict: Dict[str, Any], filepath: Union[str, Path]) -> None:
     json_bytes = to_json(state_dict).encode("utf-8")
     with gzip.open(filepath, "wb") as fh:
         fh.write(json_bytes)
-    logger.info("State saved to %s (%d bytes compressed)", filepath, filepath.stat().st_size)
+    logger.info(
+        "State saved to %s (%d bytes compressed)", filepath, filepath.stat().st_size
+    )
 
 
 def load_state(filepath: Union[str, Path]) -> Dict[str, Any]:

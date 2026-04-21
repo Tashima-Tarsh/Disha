@@ -2,6 +2,7 @@
 import logging
 import os
 import json
+
 # Project
 from analysis_service import AnalysisService, AnalysisException
 from gpt_api import GPT, GPT3Turbo_16K
@@ -13,12 +14,13 @@ from openai import APIConnectionError, RateLimitError, APIStatusError
 class APICredentialsMissing(Exception):
     pass
 
+
 # =========================================================================== #
 
 
 class GPTAnalyse(AnalysisService):
     def __init__(self):
-        super().__init__('gpt3.5')
+        super().__init__("gpt3.5")
 
     # ----------------------------------------------------------------------- #
 
@@ -48,33 +50,34 @@ class GPTAnalyse(AnalysisService):
             raise ValueError("Content text must be a non-empty string")
 
         # Check existence of OpenAI API key and retrieve it
-        api_key = os.environ.get('OPENAI_API_KEY')
+        api_key = os.environ.get("OPENAI_API_KEY")
         if not api_key:
-            raise APICredentialsMissing("No OpenAI API key has been set as "
-                                        "an env. var!")
+            raise APICredentialsMissing(
+                "No OpenAI API key has been set as an env. var!"
+            )
 
         # Initialise GPT client
         gpt = GPT(api_key, GPT3Turbo_16K())
 
         # Load the translate template as the system prompt
         try:
-            template = gpt.load_template('data/llm_templates/analyse.txt')
+            template = gpt.load_template("data/llm_templates/analyse.txt")
         except FileNotFoundError as err:
             raise AnalysisException(f"Template file not found: {err}") from err
         except PermissionError as err:
-            raise AnalysisException(f"Permissions error loading template: "
-                                    f"{err}") from err
+            raise AnalysisException(
+                f"Permissions error loading template: {err}"
+            ) from err
         except OSError as err:
-            raise AnalysisException(f"General OS error loading template: "
-                                    f"{err}") from err
+            raise AnalysisException(
+                f"General OS error loading template: {err}"
+            ) from err
 
         # Load our template
         gpt.add_prompt(template)
 
         # Add our translation request
-        gpt.add_prompt(json.dumps(
-            {'requirement': prompt, 'text': content_text}
-        ))
+        gpt.add_prompt(json.dumps({"requirement": prompt, "text": content_text}))
 
         # Send off our GPT request
         # We'll handle specific exceptions raised by the OpenAI library, as
@@ -84,14 +87,13 @@ class GPTAnalyse(AnalysisService):
         try:
             response = gpt.execute()
         except APIConnectionError as err:
-            raise AnalysisException(f"OpenAI API connection error: {err}") \
-                from err
+            raise AnalysisException(f"OpenAI API connection error: {err}") from err
         except RateLimitError as err:
-            raise AnalysisException(f"OpenAI API rate limit error: {err}") \
-                from err
+            raise AnalysisException(f"OpenAI API rate limit error: {err}") from err
         except APIStatusError as err:
-            raise AnalysisException(f"OpenAI API status error (not 200 OK): "
-                                    f"{err}") from err
+            raise AnalysisException(
+                f"OpenAI API status error (not 200 OK): {err}"
+            ) from err
 
         # Attempt to parse GPT's response as JSON - regardless of the analysis
         # requirement, GPT is asked to provide its response in a pre-defined
@@ -99,18 +101,20 @@ class GPTAnalyse(AnalysisService):
         # ask for metadata in addition to the analysis itself in future. A JSON
         # response format lets us isolate the two.
         try:
-            response_json = json.loads(response['response'])
+            response_json = json.loads(response["response"])
         except json.JSONDecodeError as err:
             logging.error(f"GPT raw response: {response['response']}")
-            raise AnalysisException(f"GPT did not respond with valid JSON? "
-                                    f"Unable to parse: {err}") from err
+            raise AnalysisException(
+                f"GPT did not respond with valid JSON? Unable to parse: {err}"
+            ) from err
 
         # A success, hopefully! How much did it cost us?
         logging.info(f"Translation complete, cost: ${response['cost']}")
 
-        return response_json.get('analysis', {})
+        return response_json.get("analysis", {})
+
 
 # =========================================================================== #
 
 
-AnalysisService.register('gpt3.5', GPTAnalyse)
+AnalysisService.register("gpt3.5", GPTAnalyse)

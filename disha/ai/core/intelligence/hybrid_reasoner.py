@@ -1,4 +1,3 @@
-
 from __future__ import annotations
 
 import asyncio
@@ -11,35 +10,74 @@ import structlog
 log = structlog.get_logger(__name__)
 
 _DEDUCTIVE_RULES: list[tuple[list[str], str]] = [
-    (["what", "is", "define", "explain", "describe"],
-     "This is an information-retrieval request requiring a factual definition or explanation."),
-    (["how", "do", "can", "should", "implement", "create", "build"],
-     "This is a procedural request requiring step-by-step guidance."),
-    (["why", "reason", "cause", "because"], "This is a causal-analysis request requiring explanation of underlying mechanisms."),
-    (["compare", "difference", "versus", "vs", "better"],
-     "This is a comparative request requiring evaluation across multiple options."),
-    (["help", "assist", "support", "need"], "This is an assistance request requiring empathetic, action-oriented support."),
-    (["error", "bug", "fix", "problem", "issue", "fail"],
-     "This is a debugging request requiring systematic root-cause analysis."),
-    (["predict", "forecast", "future", "will", "expect"],
-     "This is a predictive request requiring probabilistic reasoning about future states."),
-    (["sentiment", "feel", "emotion", "mood", "opinion"],
-     "This is a sentiment/opinion request requiring affective understanding."),
+    (
+        ["what", "is", "define", "explain", "describe"],
+        "This is an information-retrieval request requiring a factual definition or explanation.",
+    ),
+    (
+        ["how", "do", "can", "should", "implement", "create", "build"],
+        "This is a procedural request requiring step-by-step guidance.",
+    ),
+    (
+        ["why", "reason", "cause", "because"],
+        "This is a causal-analysis request requiring explanation of underlying mechanisms.",
+    ),
+    (
+        ["compare", "difference", "versus", "vs", "better"],
+        "This is a comparative request requiring evaluation across multiple options.",
+    ),
+    (
+        ["help", "assist", "support", "need"],
+        "This is an assistance request requiring empathetic, action-oriented support.",
+    ),
+    (
+        ["error", "bug", "fix", "problem", "issue", "fail"],
+        "This is a debugging request requiring systematic root-cause analysis.",
+    ),
+    (
+        ["predict", "forecast", "future", "will", "expect"],
+        "This is a predictive request requiring probabilistic reasoning about future states.",
+    ),
+    (
+        ["sentiment", "feel", "emotion", "mood", "opinion"],
+        "This is a sentiment/opinion request requiring affective understanding.",
+    ),
 ]
 
 _INDUCTIVE_PATTERNS: list[tuple[re.Pattern[str], str]] = [
-    (re.compile(r"\b(always|never|every|all|none)\b", re.I), "universal_quantification"),
-    (re.compile(r"\b(sometimes|often|usually|frequently|rarely)\b", re.I), "probabilistic_claim"),
-    (re.compile(r"\b(increase|decrease|grow|shrink|trend|over time)\b", re.I), "temporal_trend"),
-    (re.compile(r"\b(similar|like|same|parallel|analogous)\b", re.I), "analogy_pattern"),
-    (re.compile(r"\b(if|when|unless|provided|given that)\b", re.I), "conditional_pattern"),
-    (re.compile(r"\b(example|instance|case|such as|e\.g\.)\b", re.I), "exemplification_pattern"),
+    (
+        re.compile(r"\b(always|never|every|all|none)\b", re.I),
+        "universal_quantification",
+    ),
+    (
+        re.compile(r"\b(sometimes|often|usually|frequently|rarely)\b", re.I),
+        "probabilistic_claim",
+    ),
+    (
+        re.compile(r"\b(increase|decrease|grow|shrink|trend|over time)\b", re.I),
+        "temporal_trend",
+    ),
+    (
+        re.compile(r"\b(similar|like|same|parallel|analogous)\b", re.I),
+        "analogy_pattern",
+    ),
+    (
+        re.compile(r"\b(if|when|unless|provided|given that)\b", re.I),
+        "conditional_pattern",
+    ),
+    (
+        re.compile(r"\b(example|instance|case|such as|e\.g\.)\b", re.I),
+        "exemplification_pattern",
+    ),
     (re.compile(r"\d+", re.I), "quantitative_data_present"),
-    (re.compile(r"\b(first|second|third|finally|then|next|lastly)\b", re.I), "sequential_structure"),
+    (
+        re.compile(r"\b(first|second|third|finally|then|next|lastly)\b", re.I),
+        "sequential_structure",
+    ),
 ]
 
-class HybridReasoner:
 
+class HybridReasoner:
     def __init__(self) -> None:
         log.info("hybrid_reasoner.initialized")
 
@@ -71,17 +109,22 @@ class HybridReasoner:
                 "chain_of_thought": [],
             }
 
-        sorted_h = sorted(hypotheses, key=lambda h: h.get("confidence", 0.0), reverse=True)
+        sorted_h = sorted(
+            hypotheses, key=lambda h: h.get("confidence", 0.0), reverse=True
+        )
         best = sorted_h[0]
 
         if len(sorted_h) > 1:
             gap = best["confidence"] - sorted_h[1]["confidence"]
             if gap < 0.05:
-
-                abductive_options = [h for h in sorted_h if h.get("mode") == "abductive"]
+                abductive_options = [
+                    h for h in sorted_h if h.get("mode") == "abductive"
+                ]
                 if abductive_options:
                     best = abductive_options[0]
-                    log.debug("hybrid_reasoner.coherence_tiebreak", selected="abductive")
+                    log.debug(
+                        "hybrid_reasoner.coherence_tiebreak", selected="abductive"
+                    )
 
         log.debug(
             "hybrid_reasoner.best_selected",
@@ -99,7 +142,9 @@ class HybridReasoner:
         best_rule_keywords: list[str] = []
 
         for keywords, conclusion in _DEDUCTIVE_RULES:
-            match_count = sum(1 for k in keywords if k in query_tokens or k in query_lower)
+            match_count = sum(
+                1 for k in keywords if k in query_tokens or k in query_lower
+            )
             if match_count > best_match_count:
                 best_match_count = match_count
                 best_conclusion = conclusion
@@ -191,7 +236,9 @@ class HybridReasoner:
 
     def _abductive(self, query: str, context: dict[str, Any]) -> dict[str, Any]:
 
-        query_words = [w.strip(".,!?:;\"'") for w in query.lower().split() if len(w) > 3]
+        query_words = [
+            w.strip(".,!?:;\"'") for w in query.lower().split() if len(w) > 3
+        ]
 
         entity_words: list[str] = []
         for ent in context.get("entities", []):

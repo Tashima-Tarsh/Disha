@@ -1,12 +1,11 @@
-
 from __future__ import annotations
 
 import json
 import os
 from typing import Dict, List
 
-class SimpleRetriever:
 
+class SimpleRetriever:
     def __init__(self) -> None:
         self.documents: List[str] = []
         self.metadata: List[Dict] = []
@@ -18,12 +17,8 @@ class SimpleRetriever:
         metadata_path: str,
     ) -> None:
         with open(input_path, "r", encoding="utf-8") as fh:
-            self.documents = [
-                line.strip() for line in fh if line.strip()
-            ]
-        self.metadata = [
-            {"id": i, "text": doc} for i, doc in enumerate(self.documents)
-        ]
+            self.documents = [line.strip() for line in fh if line.strip()]
+        self.metadata = [{"id": i, "text": doc} for i, doc in enumerate(self.documents)]
         with open(index_path, "w", encoding="utf-8") as fh:
             json.dump(self.documents, fh)
         with open(metadata_path, "w", encoding="utf-8") as fh:

@@ -152,7 +152,12 @@ class MonteCarloResults:
         max_change = float(np.max(relative_change))
 
         converged = max_change < tolerance
-        logger.debug("Convergence check: max_relative_change=%f tolerance=%f -> %s", max_change, tolerance, converged)
+        logger.debug(
+            "Convergence check: max_relative_change=%f tolerance=%f -> %s",
+            max_change,
+            tolerance,
+            converged,
+        )
         return converged
 
     @staticmethod
@@ -174,7 +179,9 @@ class MonteCarloResults:
         t = math.sqrt(-2.0 * math.log(1.0 - p))
         c0, c1, c2 = 2.515517, 0.802853, 0.010328
         d1, d2, d3 = 1.432788, 0.189269, 0.001308
-        return t - (c0 + c1 * t + c2 * t * t) / (1.0 + d1 * t + d2 * t * t + d3 * t * t * t)
+        return t - (c0 + c1 * t + c2 * t * t) / (
+            1.0 + d1 * t + d2 * t * t + d3 * t * t * t
+        )
 
 
 class MonteCarloSimulation:
@@ -211,16 +218,16 @@ class MonteCarloSimulation:
         self._seed: Optional[int] = seed
         logger.info(
             "MonteCarloSimulation created: n_iterations=%d seed=%s",
-            n_iterations, seed,
+            n_iterations,
+            seed,
         )
 
     def _generate_seeds(self) -> np.ndarray:
         """Generate deterministic per-iteration seeds from the base seed."""
         ss = np.random.SeedSequence(self._seed)
-        return np.array([
-            int(child.generate_state(1)[0])
-            for child in ss.spawn(self._n_iterations)
-        ])
+        return np.array(
+            [int(child.generate_state(1)[0]) for child in ss.spawn(self._n_iterations)]
+        )
 
     def run(self) -> MonteCarloResults:
         """Execute all iterations sequentially.
@@ -231,7 +238,9 @@ class MonteCarloSimulation:
         seeds = self._generate_seeds()
         results = np.empty(self._n_iterations, dtype=np.float64)
 
-        logger.info("Starting sequential Monte Carlo (%d iterations)", self._n_iterations)
+        logger.info(
+            "Starting sequential Monte Carlo (%d iterations)", self._n_iterations
+        )
         for i, seed in enumerate(seeds):
             rng = np.random.default_rng(int(seed))
             results[i] = self._simulation_fn(rng)
@@ -256,12 +265,15 @@ class MonteCarloSimulation:
 
         logger.info(
             "Starting parallel Monte Carlo (%d iterations, %d workers)",
-            self._n_iterations, n_workers,
+            self._n_iterations,
+            n_workers,
         )
         results = np.empty(self._n_iterations, dtype=np.float64)
 
         with ProcessPoolExecutor(max_workers=n_workers) as executor:
-            futures = {executor.submit(_run_single, a): idx for idx, a in enumerate(args)}
+            futures = {
+                executor.submit(_run_single, a): idx for idx, a in enumerate(args)
+            }
             for future in as_completed(futures):
                 idx = futures[future]
                 results[idx] = future.result()

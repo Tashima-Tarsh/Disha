@@ -133,11 +133,41 @@ def main() -> None:
 
     # Options for responding to the threat
     options = [
-        {"name": "Engage immediately", "effectiveness": 9, "risk": 8, "cost": 7, "speed": 10},
-        {"name": "Request identification", "effectiveness": 6, "risk": 3, "cost": 2, "speed": 5},
-        {"name": "Deploy countermeasures", "effectiveness": 7, "risk": 5, "cost": 6, "speed": 8},
-        {"name": "Evade and report", "effectiveness": 4, "risk": 2, "cost": 1, "speed": 9},
-        {"name": "Monitor passively", "effectiveness": 3, "risk": 1, "cost": 1, "speed": 3},
+        {
+            "name": "Engage immediately",
+            "effectiveness": 9,
+            "risk": 8,
+            "cost": 7,
+            "speed": 10,
+        },
+        {
+            "name": "Request identification",
+            "effectiveness": 6,
+            "risk": 3,
+            "cost": 2,
+            "speed": 5,
+        },
+        {
+            "name": "Deploy countermeasures",
+            "effectiveness": 7,
+            "risk": 5,
+            "cost": 6,
+            "speed": 8,
+        },
+        {
+            "name": "Evade and report",
+            "effectiveness": 4,
+            "risk": 2,
+            "cost": 1,
+            "speed": 9,
+        },
+        {
+            "name": "Monitor passively",
+            "effectiveness": 3,
+            "risk": 1,
+            "cost": 1,
+            "speed": 3,
+        },
     ]
 
     criteria_weights = {
@@ -154,13 +184,16 @@ def main() -> None:
 
     # --- TOPSIS analysis ---
     print("\n--- TOPSIS Analysis ---")
-    matrix = np.array([
-        [9, 8, 7, 10],
-        [6, 3, 2, 5],
-        [7, 5, 6, 8],
-        [4, 2, 1, 9],
-        [3, 1, 1, 3],
-    ], dtype=np.float64)
+    matrix = np.array(
+        [
+            [9, 8, 7, 10],
+            [6, 3, 2, 5],
+            [7, 5, 6, 8],
+            [4, 2, 1, 9],
+            [3, 1, 1, 3],
+        ],
+        dtype=np.float64,
+    )
 
     weights = np.array([0.35, 0.25, 0.15, 0.25])
     # effectiveness and speed are beneficial; risk and cost are not

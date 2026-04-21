@@ -9,6 +9,7 @@ from app.services.physics.md_engine import MDEngine
 
 logger = structlog.get_logger(__name__)
 
+
 class NationalIntelligenceAgent(BaseAgent):
     """Orchestrator for National Intelligence missions (Disaster, Legal, Safety, Infrastructure)."""
 
@@ -24,6 +25,7 @@ class NationalIntelligenceAgent(BaseAgent):
         """Get or create LLM instance."""
         if self._llm is None:
             from langchain_openai import ChatOpenAI
+
             self._llm = ChatOpenAI(
                 model=self.settings.LLM_MODEL,
                 temperature=0.2,
@@ -31,7 +33,9 @@ class NationalIntelligenceAgent(BaseAgent):
             )
         return self._llm
 
-    async def execute(self, target: str, options: dict[str, Any] | None = None) -> dict[str, Any]:
+    async def execute(
+        self, target: str, options: dict[str, Any] | None = None
+    ) -> dict[str, Any]:
         """Synthesize national intelligence signals across multiple domains."""
         options = options or {}
         project = options.get("project", "general")
@@ -47,10 +51,12 @@ class NationalIntelligenceAgent(BaseAgent):
             "ni_analysis": analysis,
             "coupled_physics": coupled_results,
             "is_national_intelligence": True,
-            "mission": f"PROJECT {project.upper()}"
+            "mission": f"PROJECT {project.upper()}",
         }
 
-    async def _perform_multi_physics_analysis(self, target: str, options: dict[str, Any]) -> dict[str, Any]:
+    async def _perform_multi_physics_analysis(
+        self, target: str, options: dict[str, Any]
+    ) -> dict[str, Any]:
         """Handshake between VARUNA (Environment) and SETU (Physics)."""
         infra_service = InfrastructureService()
         physics_engine = MDEngine()
@@ -61,24 +67,33 @@ class NationalIntelligenceAgent(BaseAgent):
         if not asset_details:
             return {"status": "asset_not_found"}
 
-        load_vector = await infra_service.calculate_environmental_load_force(target, wind_speed)
+        load_vector = await infra_service.calculate_environmental_load_force(
+            target, wind_speed
+        )
 
         simulation = await physics_engine.simulate(
             n_atoms=128,
             timesteps=300,
             external_stress=load_vector,
-            material_params={"epsilon": 4.5, "sigma": 0.8, "mass": 55.8}
+            material_params={"epsilon": 4.5, "sigma": 0.8, "mass": 55.8},
         )
 
-        failure_analysis = await infra_service.evaluate_failure_risk(target, simulation.get("diagnostics", [])[-1] if simulation.get("diagnostics") else {})
+        failure_analysis = await infra_service.evaluate_failure_risk(
+            target,
+            simulation.get("diagnostics", [])[-1]
+            if simulation.get("diagnostics")
+            else {},
+        )
 
         return {
             "environmental_load": f"{wind_speed} km/h Wind",
             "structural_response": simulation.get("status"),
-            "failure_prediction": failure_analysis
+            "failure_prediction": failure_analysis,
         }
 
-    def _build_ni_prompt(self, target: str, project: str, options: dict[str, Any]) -> str:
+    def _build_ni_prompt(
+        self, target: str, project: str, options: dict[str, Any]
+    ) -> str:
         """Build the National Intelligence analysis prompt."""
         return f"""
 You are the DISHA National Intelligence Platform Architect.
@@ -93,11 +108,11 @@ Analyze the following signals for the mission: PROJECT {project.upper()} ({targe
 
 ### User Request / Context:
 - Target: {target}
-- Input Data: {options.get('signals', 'Standard NDAP/OGD metrics')}
-- **Multi-Physics Coupling (SETU x VARUNA)**: {options.get('coupled_physics', 'No active simulation')}
-- **Sovereign Growth Metrics (RFPI)**: {options.get('growth_analysis', 'Strategic priority metrics')}
-- **Global Intelligence Sync (GVM)**: {options.get('growth_analysis', {}).get('global_context', 'Synchronized International Pulses')}
-- **Real-time Intelligence Pulse**: {options.get('stream_context', 'Active Live Intelligence Stream')}
+- Input Data: {options.get("signals", "Standard NDAP/OGD metrics")}
+- **Multi-Physics Coupling (SETU x VARUNA)**: {options.get("coupled_physics", "No active simulation")}
+- **Sovereign Growth Metrics (RFPI)**: {options.get("growth_analysis", "Strategic priority metrics")}
+- **Global Intelligence Sync (GVM)**: {options.get("growth_analysis", {}).get("global_context", "Synchronized International Pulses")}
+- **Real-time Intelligence Pulse**: {options.get("stream_context", "Active Live Intelligence Stream")}
 - Objective: Provide actionable, privacy-preserving insights for Indian authorities.
 
 ### Required Analysis Structure:

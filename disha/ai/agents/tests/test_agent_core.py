@@ -11,7 +11,13 @@ from pathlib import Path
 # ---------------------------------------------------------------------------
 # Import all modules under test
 # ---------------------------------------------------------------------------
-from agent_core.config import AgentConfig, ClaudeConfig, ControllerConfig, ExecutorConfig, MemoryConfig
+from agent_core.config import (
+    AgentConfig,
+    ClaudeConfig,
+    ControllerConfig,
+    ExecutorConfig,
+    MemoryConfig,
+)
 from agent_core.types import (
     AgentState,
     LogLevel,
@@ -394,12 +400,14 @@ class TestPlanner:
         mem = MemoryStore(MemoryConfig())
         planner = Planner(config, mem)
 
-        response = json.dumps({
-            "tasks": [
-                {"title": "Step 1", "description": "Do A", "priority": "high"},
-                {"title": "Step 2", "description": "Do B", "priority": "low"},
-            ]
-        })
+        response = json.dumps(
+            {
+                "tasks": [
+                    {"title": "Step 1", "description": "Do A", "priority": "high"},
+                    {"title": "Step 2", "description": "Do B", "priority": "low"},
+                ]
+            }
+        )
         tasks = planner._parse_claude_response(response)
         assert tasks is not None
         assert len(tasks) == 2

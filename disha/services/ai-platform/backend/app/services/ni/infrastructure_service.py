@@ -3,8 +3,8 @@ import structlog
 
 logger = structlog.get_logger(__name__)
 
-class InfrastructureService:
 
+class InfrastructureService:
     def __init__(self):
         self.logger = logger.bind(service="setu_service")
 
@@ -16,7 +16,7 @@ class InfrastructureService:
                 "material": "iron",
                 "design_load_kn": 5000,
                 "critical_strain_threshold": 0.02,
-                "status": "operational"
+                "status": "operational",
             },
             "Bandra-Worli Sea Link": {
                 "id": "SETU-MH-012",
@@ -25,7 +25,7 @@ class InfrastructureService:
                 "material": "iron",
                 "design_load_kn": 12000,
                 "critical_strain_threshold": 0.015,
-                "status": "monitoring"
+                "status": "monitoring",
             },
             "Howrah Bridge": {
                 "id": "SETU-WB-005",
@@ -34,14 +34,16 @@ class InfrastructureService:
                 "material": "iron",
                 "design_load_kn": 8000,
                 "critical_strain_threshold": 0.025,
-                "status": "heritage_maintenance"
-            }
+                "status": "heritage_maintenance",
+            },
         }
 
     async def get_asset_details(self, name: str) -> Dict[str, Any] | None:
         return self.assets.get(name)
 
-    async def calculate_environmental_load_force(self, asset_name: str, wind_speed_kmh: float) -> List[float]:
+    async def calculate_environmental_load_force(
+        self, asset_name: str, wind_speed_kmh: float
+    ) -> List[float]:
         asset = await self.get_asset_details(asset_name)
         if not asset:
             return [0.0, 0.0, 0.0]
@@ -53,7 +55,9 @@ class InfrastructureService:
 
         return [force_magnitude, 0.0, 0.0]
 
-    async def evaluate_failure_risk(self, asset_name: str, md_diagnostic: Dict[str, Any]) -> Dict[str, Any]:
+    async def evaluate_failure_risk(
+        self, asset_name: str, md_diagnostic: Dict[str, Any]
+    ) -> Dict[str, Any]:
         asset = await self.get_asset_details(asset_name)
         if not asset:
             return {"status": "unknown", "risk_score": 0.0}
@@ -69,7 +73,15 @@ class InfrastructureService:
         return {
             "asset_id": asset["id"],
             "failure_probability": risk_score,
-            "status": "CRITICAL_FAILURE" if risk_score >= 0.9 else "VULNERABLE" if risk_score > 0.4 else "STABLE",
+            "status": "CRITICAL_FAILURE"
+            if risk_score >= 0.9
+            else "VULNERABLE"
+            if risk_score > 0.4
+            else "STABLE",
             "threshold_exceeded": risk_score >= 0.9,
-            "recommendation": "IMMEDIATE EVACUATION" if risk_score >= 0.9 else "STRUCTURAL INSPECTION REQUIRED" if risk_score > 0.4 else "MONITORING"
+            "recommendation": "IMMEDIATE EVACUATION"
+            if risk_score >= 0.9
+            else "STRUCTURAL INSPECTION REQUIRED"
+            if risk_score > 0.4
+            else "MONITORING",
         }

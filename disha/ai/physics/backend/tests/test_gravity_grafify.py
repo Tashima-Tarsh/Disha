@@ -1,4 +1,5 @@
 """Tests for the Gravity Engine and Grafify modules."""
+
 from __future__ import annotations
 
 import sys
@@ -16,6 +17,7 @@ from engines.grafify import Grafify  # noqa: E402
 # ═══════════════════════════════════════════════════════════════════════════════
 # GravityEngine tests
 # ═══════════════════════════════════════════════════════════════════════════════
+
 
 class TestGravitationalForce:
     def setup_method(self):
@@ -218,6 +220,7 @@ class TestPotentialField:
 # ═══════════════════════════════════════════════════════════════════════════════
 # Grafify tests
 # ═══════════════════════════════════════════════════════════════════════════════
+
 
 class TestGrafifyForceVsDistance:
     def setup_method(self):

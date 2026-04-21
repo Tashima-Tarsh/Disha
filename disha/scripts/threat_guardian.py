@@ -1,4 +1,3 @@
-
 from __future__ import annotations
 
 import json
@@ -16,12 +15,14 @@ logger = structlog.get_logger("threat_guardian")
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 
+
 class ThreatLevel(str, Enum):
     CRITICAL = "critical"
     HIGH = "high"
     MEDIUM = "medium"
     LOW = "low"
     INFO = "info"
+
 
 class ThreatCategory(str, Enum):
     SECRET_LEAK = "secret_leak"
@@ -35,6 +36,7 @@ class ThreatCategory(str, Enum):
     CODE_QUALITY = "code_quality"
     SYSTEM_HEALTH = "system_health"
 
+
 @dataclass
 class Threat:
     category: ThreatCategory
@@ -47,6 +49,7 @@ class Threat:
     remediation: str = ""
     auto_fixable: bool = False
     neutralized: bool = False
+
 
 @dataclass
 class GuardianReport:
@@ -93,6 +96,7 @@ class GuardianReport:
             "threats": threats_list,
         }
 
+
 _SECRET_PATTERNS = [
     (r"(?:sk-ant-)[a-zA-Z0-9\-_]{20,}", "Anthropic API key"),
     (r"(?:sk-)[a-zA-Z0-9]{20,}", "OpenAI API key"),
@@ -107,18 +111,60 @@ _SECRET_PATTERNS = [
 ]
 
 _SCAN_EXCLUDE = {
-    "node_modules", ".git", "__pycache__", ".venv", "venv",
-    "dist", "build", ".next", ".tox", "*.pyc", "*.whl",
-    "bun.lock", "package-lock.json", "*.png", "*.jpg",
-    "*.gif", "*.ico", "*.woff", "*.woff2", "*.ttf",
-    "*.eot", "*.svg", "*.mp4", "*.zip", "*.tar.gz",
+    "node_modules",
+    ".git",
+    "__pycache__",
+    ".venv",
+    "venv",
+    "dist",
+    "build",
+    ".next",
+    ".tox",
+    "*.pyc",
+    "*.whl",
+    "bun.lock",
+    "package-lock.json",
+    "*.png",
+    "*.jpg",
+    "*.gif",
+    "*.ico",
+    "*.woff",
+    "*.woff2",
+    "*.ttf",
+    "*.eot",
+    "*.svg",
+    "*.mp4",
+    "*.zip",
+    "*.tar.gz",
 }
 
 _TEXT_EXTENSIONS = {
-    ".py", ".ts", ".tsx", ".js", ".jsx", ".json", ".yml", ".yaml",
-    ".toml", ".cfg", ".ini", ".env", ".sh", ".bash", ".md", ".txt",
-    ".html", ".css", ".go", ".rs", ".java", ".rb", ".php", ".sql",
+    ".py",
+    ".ts",
+    ".tsx",
+    ".js",
+    ".jsx",
+    ".json",
+    ".yml",
+    ".yaml",
+    ".toml",
+    ".cfg",
+    ".ini",
+    ".env",
+    ".sh",
+    ".bash",
+    ".md",
+    ".txt",
+    ".html",
+    ".css",
+    ".go",
+    ".rs",
+    ".java",
+    ".rb",
+    ".php",
+    ".sql",
 }
+
 
 def _should_scan(path: Path) -> bool:
     for part in path.parts:
@@ -126,20 +172,32 @@ def _should_scan(path: Path) -> bool:
             return False
     return path.suffix in _TEXT_EXTENSIONS
 
-class SecretScanner:
 
+class SecretScanner:
     _FALSE_POSITIVE_PATHS = {
-        "_test.go", "_test.py", "test_", "tests/", ".example",
-        "config_test", "README", "docs/", ".md",
-        "docker-compose", "launch.json",
+        "_test.go",
+        "_test.py",
+        "test_",
+        "tests/",
+        ".example",
+        "config_test",
+        "README",
+        "docs/",
+        ".md",
+        "docker-compose",
+        "launch.json",
         "threat_guardian.py",
     }
 
     _DUMMY_PREFIXES = [
-        "sk-ant-abcdef", "sk-1234", "AIzaSyC1", "AKIAIOSFODNN",
+        "sk-ant-abcdef",
+        "sk-1234",
+        "AIzaSyC1",
+        "AKIAIOSFODNN",
         "postgres://user:password@localhost",
         "postgres://postgres:postgres@",
-        "postgres://test", "mongodb+srv://test",
+        "postgres://test",
+        "mongodb+srv://test",
     ]
 
     def _is_likely_false_positive(self, path: Path, root: Path, matched: str) -> bool:
@@ -173,21 +231,23 @@ class SecretScanner:
                         continue
 
                     line_num = content[: match.start()].count("\n") + 1
-                    threats.append(Threat(
-                        category=ThreatCategory.SECRET_LEAK,
-                        level=ThreatLevel.CRITICAL,
-                        title=f"Potential {name} detected",
-                        description=f"Found potential {name} in {path.relative_to(root)}",
-                        file_path=str(path.relative_to(root)),
-                        line_number=line_num,
-                        evidence=matched_text[:8] + "..." + matched_text[-4:],
-                        remediation=f"Remove the secret and rotate the {name}.",
-                        auto_fixable=False,
-                    ))
+                    threats.append(
+                        Threat(
+                            category=ThreatCategory.SECRET_LEAK,
+                            level=ThreatLevel.CRITICAL,
+                            title=f"Potential {name} detected",
+                            description=f"Found potential {name} in {path.relative_to(root)}",
+                            file_path=str(path.relative_to(root)),
+                            line_number=line_num,
+                            evidence=matched_text[:8] + "..." + matched_text[-4:],
+                            remediation=f"Remove the secret and rotate the {name}.",
+                            auto_fixable=False,
+                        )
+                    )
         return threats
 
-class MergeConflictScanner:
 
+class MergeConflictScanner:
     _OPEN = re.compile(r"^<{7}\s")
     _MID = re.compile(r"^={7}$")
     _CLOSE = re.compile(r"^>{7}\s")
@@ -207,33 +267,37 @@ class MergeConflictScanner:
             has_close = any(self._CLOSE.match(line) for line in lines)
             for i, line in enumerate(lines, 1):
                 if self._OPEN.match(line) or self._CLOSE.match(line):
-                    threats.append(Threat(
-                        category=ThreatCategory.MERGE_CONFLICT,
-                        level=ThreatLevel.HIGH,
-                        title="Merge conflict marker found",
-                        description=f"Unresolved merge conflict in {path.relative_to(root)}:{i}",
-                        file_path=str(path.relative_to(root)),
-                        line_number=i,
-                        evidence=line[:80],
-                        remediation="Resolve the merge conflict and remove markers.",
-                        auto_fixable=False,
-                    ))
+                    threats.append(
+                        Threat(
+                            category=ThreatCategory.MERGE_CONFLICT,
+                            level=ThreatLevel.HIGH,
+                            title="Merge conflict marker found",
+                            description=f"Unresolved merge conflict in {path.relative_to(root)}:{i}",
+                            file_path=str(path.relative_to(root)),
+                            line_number=i,
+                            evidence=line[:80],
+                            remediation="Resolve the merge conflict and remove markers.",
+                            auto_fixable=False,
+                        )
+                    )
                 elif self._MID.match(line) and (has_open or has_close):
-                    threats.append(Threat(
-                        category=ThreatCategory.MERGE_CONFLICT,
-                        level=ThreatLevel.HIGH,
-                        title="Merge conflict marker found",
-                        description=f"Unresolved merge conflict in {path.relative_to(root)}:{i}",
-                        file_path=str(path.relative_to(root)),
-                        line_number=i,
-                        evidence=line[:80],
-                        remediation="Resolve the merge conflict and remove markers.",
-                        auto_fixable=False,
-                    ))
+                    threats.append(
+                        Threat(
+                            category=ThreatCategory.MERGE_CONFLICT,
+                            level=ThreatLevel.HIGH,
+                            title="Merge conflict marker found",
+                            description=f"Unresolved merge conflict in {path.relative_to(root)}:{i}",
+                            file_path=str(path.relative_to(root)),
+                            line_number=i,
+                            evidence=line[:80],
+                            remediation="Resolve the merge conflict and remove markers.",
+                            auto_fixable=False,
+                        )
+                    )
         return threats
 
-class DependencyScanner:
 
+class DependencyScanner:
     _VULN_PATTERNS_PY = {
         "requests": (r"requests[=<>~!]*([0-9.]+)", "2.31.0", "CVE-2023-32681"),
         "urllib3": (r"urllib3[=<>~!]*([0-9.]+)", "2.0.7", "CVE-2023-45803"),
@@ -254,15 +318,17 @@ class DependencyScanner:
                 if match:
                     installed = match.group(1) if match.lastindex else ""
                     if installed and self._version_lt(installed, min_ver):
-                        threats.append(Threat(
-                            category=ThreatCategory.DEPENDENCY_VULN,
-                            level=ThreatLevel.HIGH,
-                            title=f"Vulnerable {pkg} version {installed}",
-                            description=f"{pkg}=={installed} is affected by {cve}",
-                            file_path=str(req_file.relative_to(root)),
-                            remediation=f"Upgrade {pkg} to >= {min_ver}.",
-                            auto_fixable=True,
-                        ))
+                        threats.append(
+                            Threat(
+                                category=ThreatCategory.DEPENDENCY_VULN,
+                                level=ThreatLevel.HIGH,
+                                title=f"Vulnerable {pkg} version {installed}",
+                                description=f"{pkg}=={installed} is affected by {cve}",
+                                file_path=str(req_file.relative_to(root)),
+                                remediation=f"Upgrade {pkg} to >= {min_ver}.",
+                                auto_fixable=True,
+                            )
+                        )
         return threats
 
     @staticmethod
@@ -274,16 +340,22 @@ class DependencyScanner:
         except ValueError:
             return False
 
+
 class InjectionScanner:
-
     _PATTERNS = [
-
-        (r'f"[^"]*(?:SELECT|INSERT|UPDATE|DELETE|DROP)\s', "Potential SQL injection via f-string"),
-        (r"f'[^']*(?:SELECT|INSERT|UPDATE|DELETE|DROP)\s", "Potential SQL injection via f-string"),
-
+        (
+            r'f"[^"]*(?:SELECT|INSERT|UPDATE|DELETE|DROP)\s',
+            "Potential SQL injection via f-string",
+        ),
+        (
+            r"f'[^']*(?:SELECT|INSERT|UPDATE|DELETE|DROP)\s",
+            "Potential SQL injection via f-string",
+        ),
         (r"os\.system\(.*\+", "Potential command injection via os.system"),
-        (r"subprocess\.(?:call|run|Popen)\([^)]*shell\s*=\s*True", "Shell=True subprocess call"),
-
+        (
+            r"subprocess\.(?:call|run|Popen)\([^)]*shell\s*=\s*True",
+            "Shell=True subprocess call",
+        ),
         (r"\beval\(\s*(?:input|request|args)", "Eval on user input"),
         (r"\bexec\(\s*(?:input|request|args)", "Exec on user input"),
     ]
@@ -300,35 +372,39 @@ class InjectionScanner:
             for pattern, desc in self._PATTERNS:
                 for match in re.finditer(pattern, content, re.IGNORECASE):
                     line_num = content[: match.start()].count("\n") + 1
-                    threats.append(Threat(
-                        category=ThreatCategory.INJECTION_RISK,
-                        level=ThreatLevel.HIGH,
-                        title=desc,
-                        description=f"{desc} at {path.relative_to(root)}:{line_num}",
-                        file_path=str(path.relative_to(root)),
-                        line_number=line_num,
-                        evidence=match.group()[:80],
-                        remediation="Use parameterized queries or safe APIs.",
-                    ))
+                    threats.append(
+                        Threat(
+                            category=ThreatCategory.INJECTION_RISK,
+                            level=ThreatLevel.HIGH,
+                            title=desc,
+                            description=f"{desc} at {path.relative_to(root)}:{line_num}",
+                            file_path=str(path.relative_to(root)),
+                            line_number=line_num,
+                            evidence=match.group()[:80],
+                            remediation="Use parameterized queries or safe APIs.",
+                        )
+                    )
         return threats
 
-class ConfigDriftScanner:
 
+class ConfigDriftScanner:
     def scan(self, root: Path) -> list[Threat]:
         threats: list[Threat] = []
 
         for env_file in root.rglob(".env"):
             if "node_modules" in str(env_file) or ".example" in env_file.name:
                 continue
-            threats.append(Threat(
-                category=ThreatCategory.CONFIG_DRIFT,
-                level=ThreatLevel.HIGH,
-                title=f".env file found: {env_file.relative_to(root)}",
-                description="Environment file may contain secrets and should not be committed.",
-                file_path=str(env_file.relative_to(root)),
-                remediation="Add .env to .gitignore and remove from version control.",
-                auto_fixable=True,
-            ))
+            threats.append(
+                Threat(
+                    category=ThreatCategory.CONFIG_DRIFT,
+                    level=ThreatLevel.HIGH,
+                    title=f".env file found: {env_file.relative_to(root)}",
+                    description="Environment file may contain secrets and should not be committed.",
+                    file_path=str(env_file.relative_to(root)),
+                    remediation="Add .env to .gitignore and remove from version control.",
+                    auto_fixable=True,
+                )
+            )
 
         gitignore = root / ".gitignore"
         if gitignore.exists():
@@ -336,15 +412,17 @@ class ConfigDriftScanner:
             essentials = ["node_modules", ".env", "__pycache__", "dist", ".next"]
             for item in essentials:
                 if item not in content:
-                    threats.append(Threat(
-                        category=ThreatCategory.CONFIG_DRIFT,
-                        level=ThreatLevel.MEDIUM,
-                        title=f"Missing .gitignore entry: {item}",
-                        description=f"{item} is not in .gitignore  may leak build artifacts.",
-                        file_path=".gitignore",
-                        remediation=f"Add {item} to .gitignore.",
-                        auto_fixable=True,
-                    ))
+                    threats.append(
+                        Threat(
+                            category=ThreatCategory.CONFIG_DRIFT,
+                            level=ThreatLevel.MEDIUM,
+                            title=f"Missing .gitignore entry: {item}",
+                            description=f"{item} is not in .gitignore  may leak build artifacts.",
+                            file_path=".gitignore",
+                            remediation=f"Add {item} to .gitignore.",
+                            auto_fixable=True,
+                        )
+                    )
 
         for compose in root.rglob("docker-compose*.yml"):
             if "node_modules" in str(compose):
@@ -354,19 +432,21 @@ class ConfigDriftScanner:
             except (OSError, PermissionError):
                 continue
             if "privileged: true" in content:
-                threats.append(Threat(
-                    category=ThreatCategory.PERMISSION_ESCALATION,
-                    level=ThreatLevel.HIGH,
-                    title="Privileged Docker container",
-                    description=f"Privileged mode in {compose.relative_to(root)}",
-                    file_path=str(compose.relative_to(root)),
-                    remediation="Remove privileged: true unless absolutely necessary.",
-                ))
+                threats.append(
+                    Threat(
+                        category=ThreatCategory.PERMISSION_ESCALATION,
+                        level=ThreatLevel.HIGH,
+                        title="Privileged Docker container",
+                        description=f"Privileged mode in {compose.relative_to(root)}",
+                        file_path=str(compose.relative_to(root)),
+                        remediation="Remove privileged: true unless absolutely necessary.",
+                    )
+                )
 
         return threats
 
-class SupplyChainScanner:
 
+class SupplyChainScanner:
     def scan(self, root: Path) -> list[Threat]:
         threats: list[Threat] = []
 
@@ -381,22 +461,26 @@ class SupplyChainScanner:
                 for match in re.finditer(r"uses:\s+([^\s]+)@([^\s]+)", content):
                     ref = match.group(2)
 
-                    if not re.match(r"^[0-9a-f]{40}$", ref) and not re.match(r"^v?\d+", ref):
+                    if not re.match(r"^[0-9a-f]{40}$", ref) and not re.match(
+                        r"^v?\d+", ref
+                    ):
                         line_num = content[: match.start()].count("\n") + 1
-                        threats.append(Threat(
-                            category=ThreatCategory.SUPPLY_CHAIN,
-                            level=ThreatLevel.MEDIUM,
-                            title=f"Unpinned GitHub Action: {match.group(1)}",
-                            description=f"Action {match.group(1)}@{ref} uses branch ref instead of SHA or version tag.",
-                            file_path=str(wf.relative_to(root)),
-                            line_number=line_num,
-                            remediation="Pin to a specific SHA or version tag (e.g., @v4).",
-                        ))
+                        threats.append(
+                            Threat(
+                                category=ThreatCategory.SUPPLY_CHAIN,
+                                level=ThreatLevel.MEDIUM,
+                                title=f"Unpinned GitHub Action: {match.group(1)}",
+                                description=f"Action {match.group(1)}@{ref} uses branch ref instead of SHA or version tag.",
+                                file_path=str(wf.relative_to(root)),
+                                line_number=line_num,
+                                remediation="Pin to a specific SHA or version tag (e.g., @v4).",
+                            )
+                        )
 
         return threats
 
-class ThreatGuardian:
 
+class ThreatGuardian:
     def __init__(self, root: Path | None = None):
         self.root = root or REPO_ROOT
         self.scanners = [
@@ -421,12 +505,14 @@ class ThreatGuardian:
                 logger.info("scan_complete", scanner=name, threats_found=len(threats))
             except Exception as exc:
                 logger.error("scan_failed", scanner=name, error=str(exc))
-                report.threats.append(Threat(
-                    category=ThreatCategory.SYSTEM_HEALTH,
-                    level=ThreatLevel.MEDIUM,
-                    title=f"Scanner {name} failed",
-                    description=str(exc),
-                ))
+                report.threats.append(
+                    Threat(
+                        category=ThreatCategory.SYSTEM_HEALTH,
+                        level=ThreatLevel.MEDIUM,
+                        title=f"Scanner {name} failed",
+                        description=str(exc),
+                    )
+                )
 
         report.system_health = self._calculate_health(report)
         self._history.append(report)
@@ -459,7 +545,15 @@ class ThreatGuardian:
             return False
         entry = match.group(1)
 
-        _DIR_ENTRIES = {"node_modules", "__pycache__", "dist", ".next", "venv", ".venv", "build"}
+        _DIR_ENTRIES = {
+            "node_modules",
+            "__pycache__",
+            "dist",
+            ".next",
+            "venv",
+            ".venv",
+            "build",
+        }
         suffix = "/" if entry in _DIR_ENTRIES else ""
         try:
             content = gitignore.read_text()
@@ -500,15 +594,24 @@ class ThreatGuardian:
             return "degrading"
         return "stable"
 
+
 def main() -> None:
     import argparse
 
     parser = argparse.ArgumentParser(description="Disha Adaptive Threat Guardian")
-    parser.add_argument("--scan", action="store_true", help="Run a full scan and report")
-    parser.add_argument("--neutralize", action="store_true", help="Auto-fix fixable threats")
+    parser.add_argument(
+        "--scan", action="store_true", help="Run a full scan and report"
+    )
+    parser.add_argument(
+        "--neutralize", action="store_true", help="Auto-fix fixable threats"
+    )
     parser.add_argument("--json", action="store_true", help="Output JSON report")
-    parser.add_argument("--daemon", action="store_true", help="Run as background daemon")
-    parser.add_argument("--interval", type=int, default=3600, help="Daemon scan interval (seconds)")
+    parser.add_argument(
+        "--daemon", action="store_true", help="Run as background daemon"
+    )
+    parser.add_argument(
+        "--interval", type=int, default=3600, help="Daemon scan interval (seconds)"
+    )
     args = parser.parse_args()
 
     guardian = ThreatGuardian()
@@ -539,6 +642,7 @@ def main() -> None:
             sys.exit(1)
         sys.exit(0)
 
+
 def _sanitize_for_output(text: str) -> str:
     if not text:
         return text
@@ -557,20 +661,27 @@ def _sanitize_for_output(text: str) -> str:
         redacted = redacted[:500] + "...<truncated>"
     return redacted
 
+
 def _print_report(report: GuardianReport, as_json: bool = False) -> None:
 
     safe_threats = []
     for t in report.threats:
         is_secret = t.category == ThreatCategory.SECRET_LEAK
-        safe_threats.append({
-            "level": str(t.level.value),
-            "category": str(t.category.value),
-            "title": "[SECRET FINDING REDACTED]" if is_secret else str(t.title),
-            "description": "[details redacted]" if is_secret else str(t.description),
-            "file": Path(t.file_path).name if (t.file_path and is_secret) else t.file_path,
-            "line": t.line_number if not is_secret else None,
-            "neutralized": t.neutralized,
-        })
+        safe_threats.append(
+            {
+                "level": str(t.level.value),
+                "category": str(t.category.value),
+                "title": "[SECRET FINDING REDACTED]" if is_secret else str(t.title),
+                "description": "[details redacted]"
+                if is_secret
+                else str(t.description),
+                "file": Path(t.file_path).name
+                if (t.file_path and is_secret)
+                else t.file_path,
+                "line": t.line_number if not is_secret else None,
+                "neutralized": t.neutralized,
+            }
+        )
 
     safe_summary = {
         "timestamp": float(report.timestamp),
@@ -578,7 +689,9 @@ def _print_report(report: GuardianReport, as_json: bool = False) -> None:
         "threat_counts": {
             "critical": int(report.critical_count),
             "high": int(report.high_count),
-            "medium": int(sum(1 for t in report.threats if t.level == ThreatLevel.MEDIUM)),
+            "medium": int(
+                sum(1 for t in report.threats if t.level == ThreatLevel.MEDIUM)
+            ),
             "low": int(sum(1 for t in report.threats if t.level == ThreatLevel.LOW)),
             "info": int(sum(1 for t in report.threats if t.level == ThreatLevel.INFO)),
         },
@@ -587,23 +700,30 @@ def _print_report(report: GuardianReport, as_json: bool = False) -> None:
         "threats": safe_threats,
     }
     if as_json:
-
         json_safe_out = {
             "timestamp": float(report.timestamp),
             "system_health": float(report.system_health),
             "threat_counts": {
                 "critical": int(report.critical_count),
                 "high": int(report.high_count),
-                "medium": int(sum(1 for t in report.threats if t.level == ThreatLevel.MEDIUM)),
-                "low": int(sum(1 for t in report.threats if t.level == ThreatLevel.LOW)),
-                "info": int(sum(1 for t in report.threats if t.level == ThreatLevel.INFO)),
+                "medium": int(
+                    sum(1 for t in report.threats if t.level == ThreatLevel.MEDIUM)
+                ),
+                "low": int(
+                    sum(1 for t in report.threats if t.level == ThreatLevel.LOW)
+                ),
+                "info": int(
+                    sum(1 for t in report.threats if t.level == ThreatLevel.INFO)
+                ),
             },
             "total_threats": int(len(report.threats)),
         }
         sys.stdout.write(json.dumps(json_safe_out, indent=2) + "\n")
         return
 
-    health_emoji = "" if report.system_health > 0.8 else "" if report.system_health > 0.5 else ""
+    health_emoji = (
+        "" if report.system_health > 0.8 else "" if report.system_health > 0.5 else ""
+    )
 
     lines: list[str] = [
         f"\n{'' * 60}",
@@ -613,14 +733,22 @@ def _print_report(report: GuardianReport, as_json: bool = False) -> None:
     ]
 
     counts = safe_summary["threat_counts"]
-    for level, emoji in [("critical", ""), ("high", ""), ("medium", ""), ("low", ""), ("info", "")]:
+    for level, emoji in [
+        ("critical", ""),
+        ("high", ""),
+        ("medium", ""),
+        ("low", ""),
+        ("info", ""),
+    ]:
         if counts[level]:
             lines.append(f"  {emoji} {level.capitalize():10s} {counts[level]}")
 
     for entry in safe_threats:
         status = " NEUTRALIZED" if entry["neutralized"] else "  ACTIVE"
         level_emoji = {"critical": "", "high": "", "medium": "", "low": "", "info": ""}
-        lines.append(f"\n  {level_emoji.get(entry['level'], '')} [{entry['level'].upper()}] {entry['title']}")
+        lines.append(
+            f"\n  {level_emoji.get(entry['level'], '')} [{entry['level'].upper()}] {entry['title']}"
+        )
         lines.append(f"     {entry['description']}")
         if entry.get("file"):
             loc = str(entry["file"])
@@ -633,6 +761,7 @@ def _print_report(report: GuardianReport, as_json: bool = False) -> None:
 
     safe_lines = [_sanitize_for_output(line) for line in lines]
     sys.stdout.write("\n".join(safe_lines))
+
 
 if __name__ == "__main__":
     main()

@@ -1,4 +1,3 @@
-
 from __future__ import annotations
 
 import asyncio
@@ -15,8 +14,8 @@ log = structlog.get_logger(__name__)
 
 SEMANTIC_STORE_PATH = Path.home() / ".disha" / "semantic.json"
 
-class SemanticMemory:
 
+class SemanticMemory:
     def __init__(self, store_path: Path | None = None) -> None:
         self._path = store_path or SEMANTIC_STORE_PATH
         self._graph: dict[str, dict[str, Any]] = {}
@@ -94,10 +93,11 @@ class SemanticMemory:
                         node.setdefault("relationships", []).append(rel)
                         existing_keys.add(key)
                     else:
-
                         for r in node["relationships"]:
                             if (r["target"], r["rel_type"]) == key:
-                                r["confidence"] = max(r["confidence"], rel["confidence"])
+                                r["confidence"] = max(
+                                    r["confidence"], rel["confidence"]
+                                )
                 if source not in node.get("sources", []):
                     node.setdefault("sources", []).append(source)
                 node["last_updated"] = time.time()
@@ -180,7 +180,6 @@ class SemanticMemory:
                 target = rel["target"]
                 new_path = path + [(rel["rel_type"], target)]
                 if target == cb:
-
                     parts = [ca]
                     for rel_type, t in new_path:
                         parts.append(f"--[{rel_type}]--> {t}")
@@ -203,7 +202,11 @@ class SemanticMemory:
 
     def stats(self) -> dict[str, Any]:
         if not self._graph:
-            return {"total_concepts": 0, "total_relationships": 0, "avg_confidence": 0.0}
+            return {
+                "total_concepts": 0,
+                "total_relationships": 0,
+                "avg_confidence": 0.0,
+            }
         total_rels = sum(len(n.get("relationships", [])) for n in self._graph.values())
         confidences = [n.get("confidence", 1.0) for n in self._graph.values()]
         return {

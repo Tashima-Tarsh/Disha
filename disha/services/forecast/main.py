@@ -27,16 +27,20 @@ async def generate_forecast(request: ForecastRequest):
         "flood_risk": round(random.uniform(0.1, 0.9), 2),
         "crime_probability": round(random.uniform(0.05, 0.4), 2),
         "heatwave_index": round(random.uniform(20, 45), 1),
-        "traffic_congestion": random.choice(["Low", "Moderate", "High", "Severe"])
+        "traffic_congestion": random.choice(["Low", "Moderate", "High", "Severe"]),
     }
 
     return {
         "region": request.region,
         "forecast_timestamp": datetime.datetime.now().isoformat(),
         "risks": risks,
-        "recommendation": "Monitor critical infrastructure" if risks["flood_risk"] > 0.7 else "Normal awareness"
+        "recommendation": "Monitor critical infrastructure"
+        if risks["flood_risk"] > 0.7
+        else "Normal awareness",
     }
+
 
 if __name__ == "__main__":
     import uvicorn
+
     uvicorn.run(app, host="0.0.0.0", port=8002)

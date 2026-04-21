@@ -1,4 +1,3 @@
-
 from __future__ import annotations
 
 import json
@@ -15,15 +14,16 @@ logger = structlog.get_logger(__name__)
 REPO_ROOT = Path(__file__).resolve().parents[2]
 
 _KNOWLEDGE_DIRS = {
-    "physics": REPO_ROOT / "quantum-physics" / "backend" / "knowledge",
-    "mathematics": REPO_ROOT / "knowledge-base" / "mathematics",
-    "computing": REPO_ROOT / "knowledge-base" / "computing",
-    "chemistry": REPO_ROOT / "knowledge-base" / "chemistry",
-    "law": REPO_ROOT / "knowledge-base" / "law",
-    "innovation": REPO_ROOT / "knowledge-base" / "innovation",
-    "cybersecurity": REPO_ROOT / "knowledge-base" / "cybersecurity",
-    "history": REPO_ROOT / "historical-strategy" / "data",
+    "physics": REPO_ROOT / "disha" / "ai" / "physics" / "backend" / "knowledge",
+    "mathematics": REPO_ROOT / "disha" / "ai" / "rag" / "mathematics",
+    "computing": REPO_ROOT / "disha" / "ai" / "rag" / "computing",
+    "chemistry": REPO_ROOT / "disha" / "ai" / "rag" / "chemistry",
+    "law": REPO_ROOT / "disha" / "ai" / "rag" / "law",
+    "innovation": REPO_ROOT / "disha" / "ai" / "rag" / "innovation",
+    "cybersecurity": REPO_ROOT / "disha" / "ai" / "rag" / "cybersecurity",
+    "history": REPO_ROOT / "disha" / "ai" / "strategy" / "data",
 }
+
 
 @dataclass
 class KnowledgeItem:
@@ -35,10 +35,12 @@ class KnowledgeItem:
     difficulty: float = 0.5
     cross_references: list[str] = field(default_factory=list)
 
+
 @dataclass
 class KnowledgeCorpus:
     items: list[KnowledgeItem] = field(default_factory=list)
     domain_counts: dict[str, int] = field(default_factory=dict)
+
 
 def _load_json_safe(path: Path) -> dict | list:
     try:
@@ -47,6 +49,7 @@ def _load_json_safe(path: Path) -> dict | list:
     except Exception as e:
         logger.warning("json_load_failed", path=str(path), error=str(e))
         return {}
+
 
 def _extract_text_recursive(obj: Any, depth: int = 0) -> list[str]:
     texts = []
@@ -61,6 +64,7 @@ def _extract_text_recursive(obj: Any, depth: int = 0) -> list[str]:
         for v in obj.values():
             texts.extend(_extract_text_recursive(v, depth + 1))
     return texts
+
 
 def _extract_concepts(obj: Any) -> list[str]:
     concepts = []
@@ -80,6 +84,7 @@ def _extract_concepts(obj: Any) -> list[str]:
                 concepts.append(obj[k])
     return concepts
 
+
 def _extract_physics(data: dict) -> list[KnowledgeItem]:
     items = []
     domain_name = data.get("domain", "Physics")
@@ -90,14 +95,16 @@ def _extract_physics(data: dict) -> list[KnowledgeItem]:
         desc = theory.get("description", "")
         name = theory.get("name", "Unknown")
 
-        items.append(KnowledgeItem(
-            domain="physics",
-            topic=f"{domain_name}: {name}",
-            text=f"{name}: {desc}",
-            concepts=concepts,
-            equations=equations,
-            difficulty=0.6,
-        ))
+        items.append(
+            KnowledgeItem(
+                domain="physics",
+                topic=f"{domain_name}: {name}",
+                text=f"{name}: {desc}",
+                concepts=concepts,
+                equations=equations,
+                difficulty=0.6,
+            )
+        )
 
     for topic in data.get("topics", []):
         name = topic.get("name", topic.get("id", "Unknown"))
@@ -109,16 +116,19 @@ def _extract_physics(data: dict) -> list[KnowledgeItem]:
         else:
             equations = []
 
-        items.append(KnowledgeItem(
-            domain="physics",
-            topic=f"{domain_name}: {name}",
-            text=f"{name}: {desc}",
-            concepts=[str(c) for c in concepts_raw],
-            equations=equations,
-            difficulty=0.7,
-        ))
+        items.append(
+            KnowledgeItem(
+                domain="physics",
+                topic=f"{domain_name}: {name}",
+                text=f"{name}: {desc}",
+                concepts=[str(c) for c in concepts_raw],
+                equations=equations,
+                difficulty=0.7,
+            )
+        )
 
     return items
+
 
 def _extract_chemistry(data: dict) -> list[KnowledgeItem]:
     items = []
@@ -139,42 +149,51 @@ def _extract_chemistry(data: dict) -> list[KnowledgeItem]:
         if apps:
             text += f", applications: {', '.join(apps)}"
 
-        items.append(KnowledgeItem(
-            domain="chemistry",
-            topic=f"Element: {name} ({symbol})",
-            text=text,
-            concepts=[name, symbol, cat] + apps,
-            difficulty=0.3 if z <= 20 else 0.6,
-        ))
+        items.append(
+            KnowledgeItem(
+                domain="chemistry",
+                topic=f"Element: {name} ({symbol})",
+                text=text,
+                concepts=[name, symbol, cat] + apps,
+                difficulty=0.3 if z <= 20 else 0.6,
+            )
+        )
 
     for btype in data.get("bonding", {}).get("types", []):
-        items.append(KnowledgeItem(
-            domain="chemistry",
-            topic=f"Chemical Bonding: {btype}",
-            text=f"Chemical bond type: {btype}",
-            concepts=[btype],
-            difficulty=0.4,
-        ))
+        items.append(
+            KnowledgeItem(
+                domain="chemistry",
+                topic=f"Chemical Bonding: {btype}",
+                text=f"Chemical bond type: {btype}",
+                concepts=[btype],
+                difficulty=0.4,
+            )
+        )
 
     for rtype in data.get("reactions", {}).get("types", []):
-        items.append(KnowledgeItem(
-            domain="chemistry",
-            topic=f"Reaction: {rtype}",
-            text=f"Chemical reaction type: {rtype}",
-            concepts=[rtype],
-            difficulty=0.4,
-        ))
+        items.append(
+            KnowledgeItem(
+                domain="chemistry",
+                topic=f"Reaction: {rtype}",
+                text=f"Chemical reaction type: {rtype}",
+                concepts=[rtype],
+                difficulty=0.4,
+            )
+        )
 
     for fg in data.get("organic_chemistry", {}).get("functional_groups", []):
-        items.append(KnowledgeItem(
-            domain="chemistry",
-            topic=f"Organic: {fg}",
-            text=f"Organic chemistry functional group: {fg}",
-            concepts=[fg],
-            difficulty=0.5,
-        ))
+        items.append(
+            KnowledgeItem(
+                domain="chemistry",
+                topic=f"Organic: {fg}",
+                text=f"Organic chemistry functional group: {fg}",
+                concepts=[fg],
+                difficulty=0.5,
+            )
+        )
 
     return items
+
 
 def _extract_mathematics(data: dict) -> list[KnowledgeItem]:
     items = []
@@ -182,50 +201,61 @@ def _extract_mathematics(data: dict) -> list[KnowledgeItem]:
         name = branch.get("name", "Mathematics")
         branch.get("id", "")
 
-        for theorem in branch.get("key_theorems", branch.get("fundamental_theorems", [])):
-            items.append(KnowledgeItem(
-                domain="mathematics",
-                topic=f"Math/{name}",
-                text=theorem if isinstance(theorem, str) else str(theorem),
-                concepts=[name],
-                difficulty=0.7,
-            ))
+        for theorem in branch.get(
+            "key_theorems", branch.get("fundamental_theorems", [])
+        ):
+            items.append(
+                KnowledgeItem(
+                    domain="mathematics",
+                    topic=f"Math/{name}",
+                    text=theorem if isinstance(theorem, str) else str(theorem),
+                    concepts=[name],
+                    difficulty=0.7,
+                )
+            )
 
         concepts = branch.get("key_concepts", branch.get("concepts", []))
         if concepts:
-            items.append(KnowledgeItem(
-                domain="mathematics",
-                topic=f"Math/{name}: Concepts",
-                text=f"{name} core concepts: {', '.join(str(c) for c in concepts[:10])}",
-                concepts=[str(c) for c in concepts],
-                difficulty=0.5,
-            ))
+            items.append(
+                KnowledgeItem(
+                    domain="mathematics",
+                    topic=f"Math/{name}: Concepts",
+                    text=f"{name} core concepts: {', '.join(str(c) for c in concepts[:10])}",
+                    concepts=[str(c) for c in concepts],
+                    difficulty=0.5,
+                )
+            )
 
         for dist in branch.get("distributions", []):
             if isinstance(dist, dict):
                 dname = dist.get("name", "")
                 pdf = dist.get("pdf", dist.get("pmf", ""))
-                items.append(KnowledgeItem(
-                    domain="mathematics",
-                    topic=f"Math/Probability: {dname}",
-                    text=f"{dname} distribution: {pdf}",
-                    equations=[pdf] if pdf else [],
-                    difficulty=0.6,
-                ))
+                items.append(
+                    KnowledgeItem(
+                        domain="mathematics",
+                        topic=f"Math/Probability: {dname}",
+                        text=f"{dname} distribution: {pdf}",
+                        equations=[pdf] if pdf else [],
+                        difficulty=0.6,
+                    )
+                )
 
         for struct in branch.get("key_structures", []):
             if isinstance(struct, dict):
                 sname = struct.get("name", "")
                 sdef = struct.get("definition", "")
-                items.append(KnowledgeItem(
-                    domain="mathematics",
-                    topic=f"Math/Algebra: {sname}",
-                    text=f"{sname}: {sdef}",
-                    concepts=[sname],
-                    difficulty=0.7,
-                ))
+                items.append(
+                    KnowledgeItem(
+                        domain="mathematics",
+                        topic=f"Math/Algebra: {sname}",
+                        text=f"{sname}: {sdef}",
+                        concepts=[sname],
+                        difficulty=0.7,
+                    )
+                )
 
     return items
+
 
 def _extract_computing(data: dict) -> list[KnowledgeItem]:
     items = []
@@ -235,58 +265,69 @@ def _extract_computing(data: dict) -> list[KnowledgeItem]:
         for algo in branch.get("sorting", []):
             if isinstance(algo, dict):
                 aname = algo.get("name", "")
-                items.append(KnowledgeItem(
-                    domain="computing",
-                    topic=f"Computing/Algorithms: {aname}",
-                    text=f"Sorting algorithm {aname}: avg {algo.get('avg', '?')}, worst {algo.get('worst', '?')}",
-                    concepts=[aname],
-                    difficulty=0.5,
-                ))
+                items.append(
+                    KnowledgeItem(
+                        domain="computing",
+                        topic=f"Computing/Algorithms: {aname}",
+                        text=f"Sorting algorithm {aname}: avg {algo.get('avg', '?')}, worst {algo.get('worst', '?')}",
+                        concepts=[aname],
+                        difficulty=0.5,
+                    )
+                )
 
         for ds in branch.get("data_structures", []):
             if isinstance(ds, dict):
                 dname = ds.get("name", "")
-                items.append(KnowledgeItem(
-                    domain="computing",
-                    topic=f"Computing/Data Structures: {dname}",
-                    text=f"Data structure {dname}: access {ds.get('access', '?')}, insert {ds.get('insert', '?')}",
-                    concepts=[dname],
-                    difficulty=0.5,
-                ))
+                items.append(
+                    KnowledgeItem(
+                        domain="computing",
+                        topic=f"Computing/Data Structures: {dname}",
+                        text=f"Data structure {dname}: access {ds.get('access', '?')}, insert {ds.get('insert', '?')}",
+                        concepts=[dname],
+                        difficulty=0.5,
+                    )
+                )
 
         for cls in branch.get("complexity_classes", []):
-            items.append(KnowledgeItem(
-                domain="computing",
-                topic=f"Computing/Complexity: {cls}",
-                text=f"Complexity class {cls}",
-                concepts=[cls],
-                difficulty=0.8,
-            ))
+            items.append(
+                KnowledgeItem(
+                    domain="computing",
+                    topic=f"Computing/Complexity: {cls}",
+                    text=f"Complexity class {cls}",
+                    concepts=[cls],
+                    difficulty=0.8,
+                )
+            )
 
         for subfield in branch.get("sub_fields", []):
             if isinstance(subfield, dict):
                 sf_name = subfield.get("name", "")
                 algos = subfield.get("algorithms", subfield.get("architectures", []))
-                items.append(KnowledgeItem(
-                    domain="computing",
-                    topic=f"Computing/AI: {sf_name}",
-                    text=f"{sf_name}: {', '.join(str(a) for a in algos[:8])}",
-                    concepts=[str(a) for a in algos],
-                    difficulty=0.6,
-                ))
+                items.append(
+                    KnowledgeItem(
+                        domain="computing",
+                        topic=f"Computing/AI: {sf_name}",
+                        text=f"{sf_name}: {', '.join(str(a) for a in algos[:8])}",
+                        concepts=[str(a) for a in algos],
+                        difficulty=0.6,
+                    )
+                )
 
         for lang in branch.get("major_languages", []):
             if isinstance(lang, dict):
                 lname = lang.get("name", "")
-                items.append(KnowledgeItem(
-                    domain="computing",
-                    topic=f"Computing/Language: {lname}",
-                    text=f"Programming language {lname}: {lang.get('paradigm', '')}, {lang.get('typing', '')}",
-                    concepts=[lname],
-                    difficulty=0.4,
-                ))
+                items.append(
+                    KnowledgeItem(
+                        domain="computing",
+                        topic=f"Computing/Language: {lname}",
+                        text=f"Programming language {lname}: {lang.get('paradigm', '')}, {lang.get('typing', '')}",
+                        concepts=[lname],
+                        difficulty=0.4,
+                    )
+                )
 
     return items
+
 
 def _extract_law(data: dict) -> list[KnowledgeItem]:
     items = []
@@ -295,46 +336,57 @@ def _extract_law(data: dict) -> list[KnowledgeItem]:
         if isinstance(const, dict):
             country = const.get("country", "Unknown")
             features = const.get("features", [])
-            items.append(KnowledgeItem(
-                domain="law",
-                topic=f"Law/Constitution: {country}",
-                text=f"Constitution of {country} ({const.get('year', '?')}): {', '.join(features)}",
-                concepts=features,
-                difficulty=0.6,
-            ))
+            items.append(
+                KnowledgeItem(
+                    domain="law",
+                    topic=f"Law/Constitution: {country}",
+                    text=f"Constitution of {country} ({const.get('year', '?')}): {', '.join(features)}",
+                    concepts=features,
+                    difficulty=0.6,
+                )
+            )
 
-    for right in data.get("constitutional_frameworks", {}).get("fundamental_rights", []):
-        items.append(KnowledgeItem(
-            domain="law",
-            topic=f"Law/Rights: {right}",
-            text=f"Fundamental right: {right}",
-            concepts=[right],
-            difficulty=0.4,
-        ))
+    for right in data.get("constitutional_frameworks", {}).get(
+        "fundamental_rights", []
+    ):
+        items.append(
+            KnowledgeItem(
+                domain="law",
+                topic=f"Law/Rights: {right}",
+                text=f"Fundamental right: {right}",
+                concepts=[right],
+                difficulty=0.4,
+            )
+        )
 
     for ideo in data.get("political_theory", {}).get("ideologies", []):
         if isinstance(ideo, dict):
             name = ideo.get("name", "")
             principles = ideo.get("principles", [])
             thinkers = ideo.get("key_thinkers", [])
-            items.append(KnowledgeItem(
-                domain="law",
-                topic=f"Politics/Ideology: {name}",
-                text=f"{name}: principles include {', '.join(principles)}. Key thinkers: {', '.join(thinkers)}",
-                concepts=principles + thinkers,
-                difficulty=0.5,
-            ))
+            items.append(
+                KnowledgeItem(
+                    domain="law",
+                    topic=f"Politics/Ideology: {name}",
+                    text=f"{name}: principles include {', '.join(principles)}. Key thinkers: {', '.join(thinkers)}",
+                    concepts=principles + thinkers,
+                    difficulty=0.5,
+                )
+            )
 
     for framework in data.get("cyber_law", {}).get("frameworks", []):
-        items.append(KnowledgeItem(
-            domain="law",
-            topic=f"Law/Cyber: {framework}",
-            text=f"Cyber law framework: {framework}",
-            concepts=[framework],
-            difficulty=0.6,
-        ))
+        items.append(
+            KnowledgeItem(
+                domain="law",
+                topic=f"Law/Cyber: {framework}",
+                text=f"Cyber law framework: {framework}",
+                concepts=[framework],
+                difficulty=0.6,
+            )
+        )
 
     return items
+
 
 def _extract_cybersecurity(data: dict) -> list[KnowledgeItem]:
     items = []
@@ -344,31 +396,39 @@ def _extract_cybersecurity(data: dict) -> list[KnowledgeItem]:
             name = phase.get("name", "")
             tools = phase.get("tools", [])
             techniques = phase.get("techniques", [])
-            items.append(KnowledgeItem(
-                domain="cybersecurity",
-                topic=f"CyberSec/Hacking Phase {phase.get('phase', '?')}: {name}",
-                text=f"Ethical hacking phase: {name}. Tools: {', '.join(tools[:5])}. Techniques: {', '.join(techniques[:5])}",
-                concepts=tools + techniques,
-                difficulty=0.6,
-            ))
+            items.append(
+                KnowledgeItem(
+                    domain="cybersecurity",
+                    topic=f"CyberSec/Hacking Phase {phase.get('phase', '?')}: {name}",
+                    text=f"Ethical hacking phase: {name}. Tools: {', '.join(tools[:5])}. Techniques: {', '.join(techniques[:5])}",
+                    concepts=tools + techniques,
+                    difficulty=0.6,
+                )
+            )
 
     for vuln in data.get("attack_frameworks", {}).get("owasp_top_10", []):
-        items.append(KnowledgeItem(
-            domain="cybersecurity",
-            topic=f"CyberSec/OWASP: {vuln}",
-            text=f"OWASP vulnerability: {vuln}",
-            concepts=[vuln],
-            difficulty=0.5,
-        ))
+        items.append(
+            KnowledgeItem(
+                domain="cybersecurity",
+                topic=f"CyberSec/OWASP: {vuln}",
+                text=f"OWASP vulnerability: {vuln}",
+                concepts=[vuln],
+                difficulty=0.5,
+            )
+        )
 
-    for tactic in data.get("attack_frameworks", {}).get("mitre_attack", {}).get("tactics", []):
-        items.append(KnowledgeItem(
-            domain="cybersecurity",
-            topic=f"CyberSec/MITRE: {tactic}",
-            text=f"MITRE ATT&CK tactic: {tactic}",
-            concepts=[tactic],
-            difficulty=0.5,
-        ))
+    for tactic in (
+        data.get("attack_frameworks", {}).get("mitre_attack", {}).get("tactics", [])
+    ):
+        items.append(
+            KnowledgeItem(
+                domain="cybersecurity",
+                topic=f"CyberSec/MITRE: {tactic}",
+                text=f"MITRE ATT&CK tactic: {tactic}",
+                concepts=[tactic],
+                difficulty=0.5,
+            )
+        )
 
     for category, tools_data in data.get("hacking_tools_categories", {}).items():
         if isinstance(tools_data, dict):
@@ -376,15 +436,18 @@ def _extract_cybersecurity(data: dict) -> list[KnowledgeItem]:
                 if isinstance(tool_list, list):
                     for tool in tool_list:
                         if isinstance(tool, str):
-                            items.append(KnowledgeItem(
-                                domain="cybersecurity",
-                                topic=f"CyberSec/Tool: {tool}",
-                                text=f"Security tool {tool} ({category}/{subcategory})",
-                                concepts=[tool, category, subcategory],
-                                difficulty=0.5,
-                            ))
+                            items.append(
+                                KnowledgeItem(
+                                    domain="cybersecurity",
+                                    topic=f"CyberSec/Tool: {tool}",
+                                    text=f"Security tool {tool} ({category}/{subcategory})",
+                                    concepts=[tool, category, subcategory],
+                                    difficulty=0.5,
+                                )
+                            )
 
     return items
+
 
 def _extract_innovation(data: dict) -> list[KnowledgeItem]:
     items = []
@@ -392,41 +455,52 @@ def _extract_innovation(data: dict) -> list[KnowledgeItem]:
     for rocket in data.get("space_technologies", {}).get("launch_systems", []):
         if isinstance(rocket, dict):
             name = rocket.get("name", "")
-            items.append(KnowledgeItem(
-                domain="innovation",
-                topic=f"Space/Launch: {name}",
-                text=f"Launch system {name}: {rocket.get('type', '')}, payload to LEO: {rocket.get('payload_leo_kg', '?')}kg, reusable: {rocket.get('reusable', '?')}",
-                concepts=[name],
-                difficulty=0.5,
-            ))
+            items.append(
+                KnowledgeItem(
+                    domain="innovation",
+                    topic=f"Space/Launch: {name}",
+                    text=f"Launch system {name}: {rocket.get('type', '')}, payload to LEO: {rocket.get('payload_leo_kg', '?')}kg, reusable: {rocket.get('reusable', '?')}",
+                    concepts=[name],
+                    difficulty=0.5,
+                )
+            )
 
     for category, tech_data in data.get("emerging_technologies", {}).items():
         if isinstance(tech_data, dict):
             for sub_key, sub_val in tech_data.items():
                 if isinstance(sub_val, list):
                     for item_val in sub_val[:5]:
-                        text = str(item_val) if isinstance(item_val, str) else json.dumps(item_val)
+                        text = (
+                            str(item_val)
+                            if isinstance(item_val, str)
+                            else json.dumps(item_val)
+                        )
                         if len(text) > 5:
-                            items.append(KnowledgeItem(
-                                domain="innovation",
-                                topic=f"Innovation/{category}: {sub_key}",
-                                text=text,
-                                concepts=[category, sub_key],
-                                difficulty=0.6,
-                            ))
+                            items.append(
+                                KnowledgeItem(
+                                    domain="innovation",
+                                    topic=f"Innovation/{category}: {sub_key}",
+                                    text=text,
+                                    concepts=[category, sub_key],
+                                    difficulty=0.6,
+                                )
+                            )
 
     for field_name, problems in data.get("future_research_frontiers", {}).items():
         if isinstance(problems, list):
             for problem in problems:
-                items.append(KnowledgeItem(
-                    domain="innovation",
-                    topic=f"Future/{field_name}: {problem}",
-                    text=f"Research frontier in {field_name}: {problem}",
-                    concepts=[problem, field_name],
-                    difficulty=0.9,
-                ))
+                items.append(
+                    KnowledgeItem(
+                        domain="innovation",
+                        topic=f"Future/{field_name}: {problem}",
+                        text=f"Research frontier in {field_name}: {problem}",
+                        concepts=[problem, field_name],
+                        difficulty=0.9,
+                    )
+                )
 
     return items
+
 
 def _extract_history(data: list | dict) -> list[KnowledgeItem]:
     items = []
@@ -445,15 +519,18 @@ def _extract_history(data: list | dict) -> list[KnowledgeItem]:
         text = f"{name} ({battle.get('year', '?')}): {desc}"
         concepts = tactics + lessons + [strategy, terrain]
 
-        items.append(KnowledgeItem(
-            domain="history",
-            topic=f"History/Battle: {name}",
-            text=text,
-            concepts=[c for c in concepts if c],
-            difficulty=0.5,
-        ))
+        items.append(
+            KnowledgeItem(
+                domain="history",
+                topic=f"History/Battle: {name}",
+                text=text,
+                concepts=[c for c in concepts if c],
+                difficulty=0.5,
+            )
+        )
 
     return items
+
 
 _EXTRACTORS = {
     "physics": _extract_physics,
@@ -466,12 +543,15 @@ _EXTRACTORS = {
     "history": _extract_history,
 }
 
+
 def load_all_knowledge() -> KnowledgeCorpus:
     corpus = KnowledgeCorpus()
 
     for domain_name, knowledge_dir in _KNOWLEDGE_DIRS.items():
         if not knowledge_dir.exists():
-            logger.warning("knowledge_dir_missing", domain=domain_name, path=str(knowledge_dir))
+            logger.warning(
+                "knowledge_dir_missing", domain=domain_name, path=str(knowledge_dir)
+            )
             continue
 
         extractor = _EXTRACTORS.get(domain_name)
@@ -494,8 +574,13 @@ def load_all_knowledge() -> KnowledgeCorpus:
         corpus.domain_counts[domain_name] = count
         logger.info("knowledge_loaded", domain=domain_name, items=count)
 
-    logger.info("total_knowledge_loaded", total_items=len(corpus.items), domains=len(corpus.domain_counts))
+    logger.info(
+        "total_knowledge_loaded",
+        total_items=len(corpus.items),
+        domains=len(corpus.domain_counts),
+    )
     return corpus
+
 
 def _text_to_features(text: str, dim: int = 32) -> np.ndarray:
     h = hashlib.sha256(text.encode()).digest()
@@ -508,11 +593,18 @@ def _text_to_features(text: str, dim: int = 32) -> np.ndarray:
         features[-1] = min(len(text.split()) / 100.0, 1.0)
     return features
 
+
 _DOMAIN_IDS = {
-    "physics": 0, "mathematics": 1, "computing": 2,
-    "chemistry": 3, "law": 4, "cybersecurity": 5,
-    "innovation": 6, "history": 7,
+    "physics": 0,
+    "mathematics": 1,
+    "computing": 2,
+    "chemistry": 3,
+    "law": 4,
+    "cybersecurity": 5,
+    "innovation": 6,
+    "history": 7,
 }
+
 
 def build_knowledge_graph(corpus: KnowledgeCorpus, feature_dim: int = 32) -> dict:
     nodes: list[dict] = []
@@ -524,13 +616,15 @@ def build_knowledge_graph(corpus: KnowledgeCorpus, feature_dim: int = 32) -> dic
         key = f"domain:{domain}"
         idx = len(nodes)
         node_map[key] = idx
-        nodes.append({
-            "key": key,
-            "domain": domain,
-            "type": "domain_hub",
-            "label": did,
-            "difficulty": 0.5,
-        })
+        nodes.append(
+            {
+                "key": key,
+                "domain": domain,
+                "type": "domain_hub",
+                "label": did,
+                "difficulty": 0.5,
+            }
+        )
 
     concept_nodes: dict[str, int] = {}
 
@@ -541,13 +635,15 @@ def build_knowledge_graph(corpus: KnowledgeCorpus, feature_dim: int = 32) -> dic
 
         idx = len(nodes)
         node_map[item_key] = idx
-        nodes.append({
-            "key": item_key,
-            "domain": item.domain,
-            "type": "knowledge_item",
-            "label": _DOMAIN_IDS.get(item.domain, 7),
-            "difficulty": item.difficulty,
-        })
+        nodes.append(
+            {
+                "key": item_key,
+                "domain": item.domain,
+                "type": "knowledge_item",
+                "label": _DOMAIN_IDS.get(item.domain, 7),
+                "difficulty": item.difficulty,
+            }
+        )
 
         domain_hub = node_map.get(f"domain:{item.domain}")
         if domain_hub is not None:
@@ -560,13 +656,15 @@ def build_knowledge_graph(corpus: KnowledgeCorpus, feature_dim: int = 32) -> dic
                 c_idx = len(nodes)
                 concept_nodes[c_key] = c_idx
                 node_map[c_key] = c_idx
-                nodes.append({
-                    "key": c_key,
-                    "domain": item.domain,
-                    "type": "concept",
-                    "label": _DOMAIN_IDS.get(item.domain, 7),
-                    "difficulty": item.difficulty,
-                })
+                nodes.append(
+                    {
+                        "key": c_key,
+                        "domain": item.domain,
+                        "type": "concept",
+                        "label": _DOMAIN_IDS.get(item.domain, 7),
+                        "difficulty": item.difficulty,
+                    }
+                )
 
             c_idx = concept_nodes[c_key]
             edges_src.extend([idx, c_idx])
@@ -579,7 +677,6 @@ def build_knowledge_graph(corpus: KnowledgeCorpus, feature_dim: int = 32) -> dic
     type_map = {"domain_hub": 0, "knowledge_item": 1, "concept": 2}
 
     for i, node in enumerate(nodes):
-
         did = _DOMAIN_IDS.get(node["domain"], 7)
         if did < feature_dim:
             node_features[i, did] = 1.0
@@ -592,17 +689,23 @@ def build_knowledge_graph(corpus: KnowledgeCorpus, feature_dim: int = 32) -> dic
             node_features[i, 11] = node.get("difficulty", 0.5)
 
         hf = _text_to_features(node["key"], dim=feature_dim - 12)
-        node_features[i, 12:] = hf[:feature_dim - 12]
+        node_features[i, 12:] = hf[: feature_dim - 12]
 
         node_labels[i] = node["label"]
         node_types_arr[i] = tid
 
-    edge_index = np.array([edges_src, edges_dst], dtype=np.int64) if edges_src else np.zeros((2, 0), dtype=np.int64)
+    edge_index = (
+        np.array([edges_src, edges_dst], dtype=np.int64)
+        if edges_src
+        else np.zeros((2, 0), dtype=np.int64)
+    )
 
-    logger.info("knowledge_graph_built",
-                nodes=len(nodes),
-                edges=edge_index.shape[1] if edge_index.size else 0,
-                domains=len(_DOMAIN_IDS))
+    logger.info(
+        "knowledge_graph_built",
+        nodes=len(nodes),
+        edges=edge_index.shape[1] if edge_index.size else 0,
+        domains=len(_DOMAIN_IDS),
+    )
 
     return {
         "node_features": node_features,
@@ -617,6 +720,7 @@ def build_knowledge_graph(corpus: KnowledgeCorpus, feature_dim: int = 32) -> dic
             "feature_dim": feature_dim,
         },
     }
+
 
 def generate_cross_domain_scenarios(
     corpus: KnowledgeCorpus,
@@ -650,7 +754,11 @@ def generate_cross_domain_scenarios(
     for i in range(n):
         template = _CROSS_TEMPLATES[i % len(_CROSS_TEMPLATES)]
 
-        d1, d2 = rng.choice(domains, size=2, replace=False) if len(domains) >= 2 else (domains[0], domains[0])
+        d1, d2 = (
+            rng.choice(domains, size=2, replace=False)
+            if len(domains) >= 2
+            else (domains[0], domains[0])
+        )
         item1 = rng.choice(by_domain[d1]) if by_domain[d1] else None
         item2 = rng.choice(by_domain[d2]) if by_domain[d2] else None
 
@@ -661,23 +769,28 @@ def generate_cross_domain_scenarios(
         c2 = rng.choice(item2.concepts) if item2.concepts else item2.topic
 
         text = template.format(
-            domain1=d1, domain2=d2,
-            concept1=c1, concept2=c2,
+            domain1=d1,
+            domain2=d2,
+            concept1=c1,
+            concept2=c2,
         )
 
         complexity = 2 + (1 if d1 != d2 else 0) + len(item1.concepts[:3]) * 0.1
         gt_quality = float(np.clip(rng.beta(4 + complexity * 0.5, 3), 0.1, 0.95))
 
-        scenarios.append({
-            "text": text,
-            "ground_truth_quality": gt_quality,
-            "complexity": complexity,
-            "domains": [d1, d2],
-            "id": i,
-        })
+        scenarios.append(
+            {
+                "text": text,
+                "ground_truth_quality": gt_quality,
+                "complexity": complexity,
+                "domains": [d1, d2],
+                "id": i,
+            }
+        )
 
     logger.info("cross_domain_scenarios_generated", count=len(scenarios))
     return scenarios
+
 
 def generate_knowledge_rl_scenarios(
     corpus: KnowledgeCorpus,
@@ -692,13 +805,15 @@ def generate_knowledge_rl_scenarios(
         num_clues = rng.randint(3, 8)
         related = [c for c in item.concepts[:num_clues]]
 
-        scenarios.append({
-            "domain": item.domain,
-            "topic": item.topic,
-            "clues": related,
-            "difficulty": item.difficulty,
-            "risk_score": float(rng.beta(2, 5)),
-            "id": i,
-        })
+        scenarios.append(
+            {
+                "domain": item.domain,
+                "topic": item.topic,
+                "clues": related,
+                "difficulty": item.difficulty,
+                "risk_score": float(rng.beta(2, 5)),
+                "id": i,
+            }
+        )
 
     return scenarios

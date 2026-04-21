@@ -32,7 +32,9 @@ class GNNTrainer:
         self.link_predictor = LinkPredictor(embedding_dim)
 
         self.encoder_optimizer = optim.Adam(self.encoder.parameters(), lr=learning_rate)
-        self.predictor_optimizer = optim.Adam(self.link_predictor.parameters(), lr=learning_rate)
+        self.predictor_optimizer = optim.Adam(
+            self.link_predictor.parameters(), lr=learning_rate
+        )
 
     def train_link_prediction(
         self,
@@ -113,15 +115,19 @@ class GNNTrainer:
                         z[src_idx].unsqueeze(0),
                         z[dst_idx].unsqueeze(0),
                     )
-                    predictions.append({
-                        "source": src_idx,
-                        "target": dst_idx,
-                        "probability": float(prob.item()),
-                    })
+                    predictions.append(
+                        {
+                            "source": src_idx,
+                            "target": dst_idx,
+                            "probability": float(prob.item()),
+                        }
+                    )
 
         return sorted(predictions, key=lambda p: p["probability"], reverse=True)
 
-    def get_embeddings(self, node_features: np.ndarray, edge_index: np.ndarray) -> np.ndarray:
+    def get_embeddings(
+        self, node_features: np.ndarray, edge_index: np.ndarray
+    ) -> np.ndarray:
         """Get node embeddings from the trained encoder."""
         self.encoder.eval()
         x = torch.FloatTensor(node_features)

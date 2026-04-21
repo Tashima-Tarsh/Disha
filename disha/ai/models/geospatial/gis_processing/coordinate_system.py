@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 WGS84_A: float = 6_378_137.0  # Semi-major axis (meters)
 WGS84_B: float = 6_356_752.314245  # Semi-minor axis (meters)
 WGS84_F: float = 1.0 / 298.257223563  # Flattening
-WGS84_E2: float = 2.0 * WGS84_F - WGS84_F ** 2  # First eccentricity squared
+WGS84_E2: float = 2.0 * WGS84_F - WGS84_F**2  # First eccentricity squared
 
 EARTH_RADIUS: float = 6_371_000.0  # Mean Earth radius (meters)
 
@@ -88,7 +88,7 @@ class CoordinateTransformer:
         cos_lon = math.cos(lon_rad)
 
         # Radius of curvature in the prime vertical
-        n = WGS84_A / math.sqrt(1.0 - WGS84_E2 * sin_lat ** 2)
+        n = WGS84_A / math.sqrt(1.0 - WGS84_E2 * sin_lat**2)
 
         x = (n + geo.altitude) * cos_lat * cos_lon
         y = (n + geo.altitude) * cos_lat * sin_lon
@@ -96,7 +96,12 @@ class CoordinateTransformer:
 
         logger.debug(
             "geo_to_cartesian: (%f, %f, %f) -> (%f, %f, %f)",
-            geo.latitude, geo.longitude, geo.altitude, x, y, z,
+            geo.latitude,
+            geo.longitude,
+            geo.altitude,
+            x,
+            y,
+            z,
         )
         return CartesianCoordinate(x=x, y=y, z=z)
 
@@ -115,10 +120,10 @@ class CoordinateTransformer:
         x, y, z = cart.x, cart.y, cart.z
         lon = math.atan2(y, x)
 
-        p = math.sqrt(x ** 2 + y ** 2)
+        p = math.sqrt(x**2 + y**2)
         # Initial estimate using Bowring's method
         theta = math.atan2(z * WGS84_A, p * WGS84_B)
-        e_prime2 = (WGS84_A ** 2 - WGS84_B ** 2) / WGS84_B ** 2
+        e_prime2 = (WGS84_A**2 - WGS84_B**2) / WGS84_B**2
 
         lat = math.atan2(
             z + e_prime2 * WGS84_B * math.sin(theta) ** 3,
@@ -128,7 +133,7 @@ class CoordinateTransformer:
         # Iterative refinement
         for _ in range(10):
             sin_lat = math.sin(lat)
-            n = WGS84_A / math.sqrt(1.0 - WGS84_E2 * sin_lat ** 2)
+            n = WGS84_A / math.sqrt(1.0 - WGS84_E2 * sin_lat**2)
             lat_new = math.atan2(z + WGS84_E2 * n * sin_lat, p)
             if abs(lat_new - lat) < 1e-12:
                 break
@@ -136,7 +141,7 @@ class CoordinateTransformer:
 
         sin_lat = math.sin(lat)
         cos_lat = math.cos(lat)
-        n = WGS84_A / math.sqrt(1.0 - WGS84_E2 * sin_lat ** 2)
+        n = WGS84_A / math.sqrt(1.0 - WGS84_E2 * sin_lat**2)
 
         if abs(cos_lat) > 1e-10:
             alt = p / cos_lat - n
@@ -148,7 +153,12 @@ class CoordinateTransformer:
 
         logger.debug(
             "cartesian_to_geo: (%f, %f, %f) -> (%f, %f, %f)",
-            x, y, z, latitude, longitude, alt,
+            x,
+            y,
+            z,
+            latitude,
+            longitude,
+            alt,
         )
         return GeoCoordinate(latitude=latitude, longitude=longitude, altitude=alt)
 
@@ -179,8 +189,11 @@ class CoordinateTransformer:
 
         logger.debug(
             "haversine_distance: (%f, %f) -> (%f, %f) = %f m",
-            coord1.latitude, coord1.longitude,
-            coord2.latitude, coord2.longitude, distance,
+            coord1.latitude,
+            coord1.longitude,
+            coord2.latitude,
+            coord2.longitude,
+            distance,
         )
         return distance
 
@@ -200,17 +213,19 @@ class CoordinateTransformer:
         dlon = math.radians(to_coord.longitude - from_coord.longitude)
 
         x = math.sin(dlon) * math.cos(lat2)
-        y = (
-            math.cos(lat1) * math.sin(lat2)
-            - math.sin(lat1) * math.cos(lat2) * math.cos(dlon)
-        )
+        y = math.cos(lat1) * math.sin(lat2) - math.sin(lat1) * math.cos(
+            lat2
+        ) * math.cos(dlon)
         initial_bearing = math.degrees(math.atan2(x, y))
         compass_bearing = (initial_bearing + 360.0) % 360.0
 
         logger.debug(
             "bearing: (%f, %f) -> (%f, %f) = %f°",
-            from_coord.latitude, from_coord.longitude,
-            to_coord.latitude, to_coord.longitude, compass_bearing,
+            from_coord.latitude,
+            from_coord.longitude,
+            to_coord.latitude,
+            to_coord.longitude,
+            compass_bearing,
         )
         return compass_bearing
 
@@ -242,9 +257,7 @@ class CoordinateTransformer:
         sin_ad = math.sin(angular_dist)
         cos_ad = math.cos(angular_dist)
 
-        lat2 = math.asin(
-            sin_lat1 * cos_ad + cos_lat1 * sin_ad * math.cos(brng)
-        )
+        lat2 = math.asin(sin_lat1 * cos_ad + cos_lat1 * sin_ad * math.cos(brng))
         lon2 = lon1 + math.atan2(
             math.sin(brng) * sin_ad * cos_lat1,
             cos_ad - sin_lat1 * math.sin(lat2),
@@ -259,7 +272,11 @@ class CoordinateTransformer:
         )
         logger.debug(
             "destination_point: (%f, %f) bearing=%f° dist=%f m -> (%f, %f)",
-            start.latitude, start.longitude, bearing_deg, distance,
-            result.latitude, result.longitude,
+            start.latitude,
+            start.longitude,
+            bearing_deg,
+            distance,
+            result.latitude,
+            result.longitude,
         )
         return result

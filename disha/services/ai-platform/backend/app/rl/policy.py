@@ -9,12 +9,13 @@ try:
     import torch.nn as nn
     import torch.optim as optim
     from torch.distributions import Categorical
+
     TORCH_AVAILABLE = True
 except ImportError:
     TORCH_AVAILABLE = False
 
-class PolicyNetwork:
 
+class PolicyNetwork:
     def __init__(
         self,
         state_dim: int = 12,
@@ -165,7 +166,10 @@ class PolicyNetwork:
 
             ratio = torch.exp(new_log_probs - old_log_probs)
             surr1 = ratio * advantages
-            surr2 = torch.clamp(ratio, 1 - self.clip_epsilon, 1 + self.clip_epsilon) * advantages
+            surr2 = (
+                torch.clamp(ratio, 1 - self.clip_epsilon, 1 + self.clip_epsilon)
+                * advantages
+            )
 
             actor_loss = -torch.min(surr1, surr2).mean()
             critic_loss = nn.functional.mse_loss(values, returns_t)

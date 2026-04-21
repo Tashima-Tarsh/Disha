@@ -1,6 +1,5 @@
 """Tests for the multi-agent architecture."""
 
-
 from auto_learning.multi_agent import (
     AgentMessage,
     AgentOrchestrator,
@@ -120,9 +119,11 @@ class TestEmbeddingAgent:
 
         pipe = MockPipeline()
         agent = EmbeddingAgent(rag_pipeline=pipe)
-        result = agent.embed_items([
-            {"text": "item1", "source": "test", "quality_score": 90},
-        ])
+        result = agent.embed_items(
+            [
+                {"text": "item1", "source": "test", "quality_score": 90},
+            ]
+        )
         assert result["status"] == "stored"
         assert result["added"] == 1
 

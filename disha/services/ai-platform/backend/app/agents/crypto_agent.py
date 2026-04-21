@@ -1,4 +1,3 @@
-
 from typing import Any
 
 import httpx
@@ -6,8 +5,8 @@ import httpx
 from app.agents.base_agent import BaseAgent
 from app.core.config import get_settings
 
-class CryptoAgent(BaseAgent):
 
+class CryptoAgent(BaseAgent):
     def __init__(self):
         super().__init__(
             name="CryptoAgent",
@@ -15,13 +14,17 @@ class CryptoAgent(BaseAgent):
         )
         self.settings = get_settings()
 
-    async def execute(self, target: str, options: dict[str, Any] | None = None) -> dict[str, Any]:
+    async def execute(
+        self, target: str, options: dict[str, Any] | None = None
+    ) -> dict[str, Any]:
         options = options or {}
         results: dict[str, Any] = {"target": target, "chain": "ethereum"}
 
         if self.settings.ETHERSCAN_API_KEY:
             results["balance"] = await self._get_balance(target)
-            results["transactions"] = await self._get_transactions(target, limit=options.get("tx_limit", 20))
+            results["transactions"] = await self._get_transactions(
+                target, limit=options.get("tx_limit", 20)
+            )
             results["token_transfers"] = await self._get_token_transfers(target)
 
         results["entities"] = self._extract_entities(target, results)
@@ -51,7 +54,9 @@ class CryptoAgent(BaseAgent):
             self.logger.warning("etherscan_balance_failed", error=str(e))
             return {"error": str(e)}
 
-    async def _get_transactions(self, address: str, limit: int = 20) -> list[dict[str, Any]]:
+    async def _get_transactions(
+        self, address: str, limit: int = 20
+    ) -> list[dict[str, Any]]:
         try:
             async with httpx.AsyncClient(timeout=30.0) as client:
                 response = await client.get(
@@ -122,7 +127,9 @@ class CryptoAgent(BaseAgent):
             self.logger.warning("etherscan_tokens_failed", error=str(e))
             return []
 
-    def _extract_entities(self, target: str, data: dict[str, Any]) -> list[dict[str, Any]]:
+    def _extract_entities(
+        self, target: str, data: dict[str, Any]
+    ) -> list[dict[str, Any]]:
         entities = [
             {
                 "id": f"wallet-{target}",
@@ -141,15 +148,21 @@ class CryptoAgent(BaseAgent):
         for tx in data.get("transactions", []):
             for addr_field in ("from", "to"):
                 addr = tx.get(addr_field, "")
-                if addr and addr.lower() != target.lower() and addr not in seen_addresses:
+                if (
+                    addr
+                    and addr.lower() != target.lower()
+                    and addr not in seen_addresses
+                ):
                     seen_addresses.add(addr)
-                    entities.append({
-                        "id": f"wallet-{addr}",
-                        "label": f"{addr[:8]}...{addr[-6:]}",
-                        "entity_type": "wallet",
-                        "properties": {"address": addr},
-                        "risk_score": 0.0,
-                    })
+                    entities.append(
+                        {
+                            "id": f"wallet-{addr}",
+                            "label": f"{addr[:8]}...{addr[-6:]}",
+                            "entity_type": "wallet",
+                            "properties": {"address": addr},
+                            "risk_score": 0.0,
+                        }
+                    )
 
         return entities
 

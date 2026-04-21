@@ -1,4 +1,3 @@
-
 import json
 import os
 
@@ -8,7 +7,6 @@ from torch.utils.data import DataLoader, Dataset
 
 
 class AttackClassifier(nn.Module):
-
     def __init__(self, input_dim: int, n_classes: int):
         super().__init__()
         self.net = nn.Sequential(
@@ -26,7 +24,6 @@ class AttackClassifier(nn.Module):
 
 
 class AnomalyDetector(nn.Module):
-
     def __init__(self, input_dim: int, latent_dim: int = 16):
         super().__init__()
         self.encoder = nn.Sequential(
@@ -58,7 +55,6 @@ LABEL_NAMES = {v: k for k, v in ATTACK_LABELS.items()}
 
 
 class HoneypotLogDataset(Dataset):
-
     FEATURE_DIM = 8
 
     def __init__(self, json_files: list[str]):

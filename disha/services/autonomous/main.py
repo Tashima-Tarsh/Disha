@@ -4,12 +4,14 @@ import logging
 import os
 
 # Configure logging
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+)
 logger = logging.getLogger("DISHA-AutoHeal")
 
 SERVICES = {
     "alerts": os.getenv("DISHA_ALERTS_URL", "http://localhost:8001/"),
-    "forecast": os.getenv("DISHA_FORECAST_URL", "http://localhost:8002/")
+    "forecast": os.getenv("DISHA_FORECAST_URL", "http://localhost:8002/"),
 }
 
 
@@ -38,7 +40,9 @@ class AutoHeal:
 
         # Simulate wait for restart
         await asyncio.sleep(2)
-        logger.info(f"Service '{name}' has been successfully RESTARTED (Attempt #{self.heal_counts[name]})")
+        logger.info(
+            f"Service '{name}' has been successfully RESTARTED (Attempt #{self.heal_counts[name]})"
+        )
 
     async def run_loop(self):
         logger.info("DISHA Autonomous Layer Started.")

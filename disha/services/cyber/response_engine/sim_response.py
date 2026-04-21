@@ -1,4 +1,3 @@
-
 import json
 import logging
 import random
@@ -12,7 +11,6 @@ logger = logging.getLogger(__name__)
 
 
 class SimulatedResponse:
-
     def __init__(self):
         self.log_entries = []
 
@@ -29,13 +27,10 @@ class SimulatedResponse:
 
 
 class TarpitResponse(SimulatedResponse):
-
     def engage(self, attacker_ip: str, delay_seconds: float = 0.0) -> dict:
         if delay_seconds <= 0:
             delay_seconds = random.uniform(5.0, 15.0)
-        logger.info(
-            "Tarpit engaged for %s: delaying %.1fs", attacker_ip, delay_seconds
-        )
+        logger.info("Tarpit engaged for %s: delaying %.1fs", attacker_ip, delay_seconds)
 
         return self._log_action(
             "tarpit",
@@ -44,7 +39,6 @@ class TarpitResponse(SimulatedResponse):
 
 
 class FakeShellResponse(SimulatedResponse):
-
     FAKE_RESPONSES = {
         "ls": "Desktop  Documents  Downloads  .ssh  .bash_history",
         "whoami": "root",
@@ -70,7 +64,6 @@ class FakeShellResponse(SimulatedResponse):
 
 
 class DecoyFilesystem(SimulatedResponse):
-
     DECOY_FILES = {
         "/root/.ssh/id_rsa": "-----BEGIN FAKE RSA PRIVATE KEY-----\nNOT_A_REAL_KEY\n-----END FAKE RSA PRIVATE KEY-----",
         "/etc/config/db.conf": "host=decoy.internal\nuser=admin\npassword=decoy_password_not_real",
@@ -91,7 +84,6 @@ class DecoyFilesystem(SimulatedResponse):
 
 
 class ContainmentZone(SimulatedResponse):
-
     def __init__(self):
         super().__init__()
         self.contained_ips: dict[str, dict] = {}
@@ -116,7 +108,6 @@ class ContainmentZone(SimulatedResponse):
 
 
 class ResponseOrchestrator:
-
     def __init__(self):
         self.tarpit = TarpitResponse()
         self.fake_shell = FakeShellResponse()
@@ -131,7 +122,9 @@ class ResponseOrchestrator:
         attack_label = classification.get("label", "benign")
 
         if threat_score < 20:
-            logger.info("Low threat from %s (score: %d). Monitoring.", attacker_ip, threat_score)
+            logger.info(
+                "Low threat from %s (score: %d). Monitoring.", attacker_ip, threat_score
+            )
             return actions
 
         if threat_score < 50:

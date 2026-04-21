@@ -1,9 +1,18 @@
 from fastapi import APIRouter
-from app.api.v1.routers import auth, investigate, multimodal, rl, ranking, osint_stream, physics
+from app.api.v1.routers import (
+    auth,
+    investigate,
+    multimodal,
+    rl,
+    ranking,
+    osint_stream,
+    physics,
+)
 from app.models.schemas import HealthResponse
 from app.core.config import get_settings
 
 router = APIRouter()
+
 
 @router.get("/health", response_model=HealthResponse)
 async def health_check():
@@ -16,6 +25,7 @@ async def health_check():
             "agents": "ready",
         },
     )
+
 
 router.include_router(auth.router, tags=["auth"])
 router.include_router(investigate.router, tags=["investigate"])

@@ -77,7 +77,12 @@ class EventQueue:
         heapq.heappush(self._heap, event)
         self._cancelled.discard(event.event_id)
         self._size += 1
-        logger.debug("Queued event '%s' type='%s' at t=%f", event.event_id, event.event_type, event.scheduled_time)
+        logger.debug(
+            "Queued event '%s' type='%s' at t=%f",
+            event.event_id,
+            event.event_type,
+            event.scheduled_time,
+        )
 
     def pop(self) -> Optional[Event]:
         """Remove and return the next non-cancelled event.
@@ -239,7 +244,8 @@ class EventEngine:
             except Exception:
                 logger.exception(
                     "Error in handler for event type '%s' (event '%s')",
-                    event.event_type, event.event_id,
+                    event.event_type,
+                    event.event_id,
                 )
 
     @property

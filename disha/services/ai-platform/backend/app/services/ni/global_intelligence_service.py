@@ -3,8 +3,8 @@ import structlog
 
 logger = structlog.get_logger(__name__)
 
-class GlobalIntelligenceService:
 
+class GlobalIntelligenceService:
     def __init__(self):
         self.logger = logger.bind(service="global_intel_service")
 
@@ -12,7 +12,7 @@ class GlobalIntelligenceService:
             "vix_index": 18.5,
             "geopolitical_tension": 0.45,
             "supply_chain_stress": 0.3,
-            "trusted_sovereign_yield": 0.045
+            "trusted_sovereign_yield": 0.045,
         }
 
     async def get_global_pulse_summary(self) -> Dict[str, Any]:

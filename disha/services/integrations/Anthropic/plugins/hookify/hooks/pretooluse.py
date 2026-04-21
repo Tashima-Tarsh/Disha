@@ -11,7 +11,7 @@ import json
 
 # CRITICAL: Add plugin root to Python path for imports
 # We need to add the parent of the plugin directory so Python can find "hookify" package
-PLUGIN_ROOT = os.environ.get('CLAUDE_PLUGIN_ROOT')
+PLUGIN_ROOT = os.environ.get("CLAUDE_PLUGIN_ROOT")
 if PLUGIN_ROOT:
     # Add the parent directory of the plugin
     parent_dir = os.path.dirname(PLUGIN_ROOT)
@@ -40,13 +40,13 @@ def main():
 
         # Determine event type for filtering
         # For PreToolUse, we use tool_name to determine "bash" vs "file" event
-        tool_name = input_data.get('tool_name', '')
+        tool_name = input_data.get("tool_name", "")
 
         event = None
-        if tool_name == 'Bash':
-            event = 'bash'
-        elif tool_name in ['Edit', 'Write', 'MultiEdit']:
-            event = 'file'
+        if tool_name == "Bash":
+            event = "bash"
+        elif tool_name in ["Edit", "Write", "MultiEdit"]:
+            event = "file"
 
         # Load rules
         rules = load_rules(event=event)
@@ -60,9 +60,7 @@ def main():
 
     except Exception as e:
         # On any error, allow the operation and log
-        error_output = {
-            "systemMessage": f"Hookify error: {str(e)}"
-        }
+        error_output = {"systemMessage": f"Hookify error: {str(e)}"}
         print(json.dumps(error_output), file=sys.stdout)
 
     finally:
@@ -70,5 +68,5 @@ def main():
         sys.exit(0)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

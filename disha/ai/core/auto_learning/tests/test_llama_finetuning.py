@@ -62,11 +62,16 @@ class TestDatasetPreparer:
         path = tmp_path / "train.jsonl"
         with open(str(path), "w") as f:
             for i in range(5):
-                f.write(json.dumps({
-                    "instruction": f"Task {i}",
-                    "output": f"Result {i}",
-                    "input": "",
-                }) + "\n")
+                f.write(
+                    json.dumps(
+                        {
+                            "instruction": f"Task {i}",
+                            "output": f"Result {i}",
+                            "input": "",
+                        }
+                    )
+                    + "\n"
+                )
 
         config = DatasetConfig(train_file=str(path), max_samples=3)
         dataset = DatasetPreparer.prepare_dataset(config)

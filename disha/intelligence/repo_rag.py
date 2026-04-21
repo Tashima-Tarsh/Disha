@@ -16,7 +16,7 @@ class RepositoryRAG:
 
     def _load_metadata(self):
         if os.path.exists(self.meta_data_path):
-            with open(self.meta_data_path, 'r') as f:
+            with open(self.meta_data_path, "r") as f:
                 self.metadata = json.load(f)
         else:
             self.metadata = {}
@@ -28,8 +28,16 @@ class RepositoryRAG:
         """
         # Logic to return semantic matches
         return [
-            {"path": "disha/ai/agents/agent.py", "score": 0.95, "summary": "Main Agent orchestrator base class."},
-            {"path": "disha/docs/ARCHITECTURE.md", "score": 0.88, "summary": "Core 7-layer cognitive loop documentation."}
+            {
+                "path": "disha/ai/agents/agent.py",
+                "score": 0.95,
+                "summary": "Main Agent orchestrator base class.",
+            },
+            {
+                "path": "disha/docs/ARCHITECTURE.md",
+                "score": 0.88,
+                "summary": "Core 7-layer cognitive loop documentation.",
+            },
         ]
 
     def answer_with_context(self, question: str) -> str:

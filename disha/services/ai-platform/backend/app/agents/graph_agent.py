@@ -5,6 +5,7 @@ from typing import Any
 from app.agents.base_agent import BaseAgent
 from app.core.config import get_settings
 
+
 class GraphAgent(BaseAgent):
     """Agent for knowledge graph operations using Neo4j."""
 
@@ -20,13 +21,16 @@ class GraphAgent(BaseAgent):
         """Get or create Neo4j driver."""
         if self._driver is None:
             from neo4j import GraphDatabase
+
             self._driver = GraphDatabase.driver(
                 self.settings.NEO4J_URI,
                 auth=(self.settings.NEO4J_USER, self.settings.NEO4J_PASSWORD),
             )
         return self._driver
 
-    async def execute(self, target: str, options: dict[str, Any] | None = None) -> dict[str, Any]:
+    async def execute(
+        self, target: str, options: dict[str, Any] | None = None
+    ) -> dict[str, Any]:
         """Execute graph operations for the target."""
         options = options or {}
         entities = options.get("entities", [])

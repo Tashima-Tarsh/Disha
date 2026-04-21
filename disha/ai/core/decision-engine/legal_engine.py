@@ -1,4 +1,3 @@
-
 from __future__ import annotations
 
 import os
@@ -14,11 +13,13 @@ except ImportError:
     def faiss_available() -> bool:
         return False
 
+
 _BASE = os.path.dirname(os.path.abspath(__file__))
 _DEFAULT_CLAUSE_INDEX = os.path.join(_BASE, "data", "index", "constitution.faiss")
 _DEFAULT_CLAUSE_META = os.path.join(_BASE, "data", "index", "constitution_meta.json")
 _DEFAULT_CASE_INDEX = os.path.join(_BASE, "data", "index", "case_law.faiss")
 _DEFAULT_CASE_META = os.path.join(_BASE, "data", "index", "case_law_meta.json")
+
 
 def _make_retriever(
     index_path: str,
@@ -41,8 +42,8 @@ def _make_retriever(
         pass
     return sr
 
-class LegalAgent:
 
+class LegalAgent:
     def __init__(
         self,
         clause_index: Optional[str] = None,
@@ -73,8 +74,7 @@ class LegalAgent:
             for h in clause_hits
         )
         case_context = "\n".join(
-            f"- Case {h.get('id', '?')}: {h.get('text', '')[:200]}"
-            for h in case_hits
+            f"- Case {h.get('id', '?')}: {h.get('text', '')[:200]}" for h in case_hits
         )
 
         prompt = (
@@ -89,14 +89,18 @@ class LegalAgent:
 
         sources: List[Dict[str, Any]] = []
         for h in clause_hits:
-            sources.append({"type": "clause", "id": h.get("id"), "text": h.get("text", "")[:200]})
+            sources.append(
+                {"type": "clause", "id": h.get("id"), "text": h.get("text", "")[:200]}
+            )
         for h in case_hits:
-            sources.append({
-                "type": "case_law",
-                "id": h.get("id"),
-                "title": h.get("title", ""),
-                "text": h.get("text", "")[:200],
-            })
+            sources.append(
+                {
+                    "type": "case_law",
+                    "id": h.get("id"),
+                    "title": h.get("title", ""),
+                    "text": h.get("text", "")[:200],
+                }
+            )
 
         return {
             "summary": f"Legal analysis of: {scenario[:80]}",

@@ -16,7 +16,7 @@ async def log_event(request: Request):
         "event": data.get("event", "unknown"),
         "actor": data.get("actor", "system"),
         "details": data.get("details", {}),
-        "status": data.get("status", "info")
+        "status": data.get("status", "info"),
     }
 
     with open(LOG_FILE, "a") as f:
@@ -35,6 +35,8 @@ async def get_logs(limit: int = 100):
                 logs.append(json.loads(line))
     return logs
 
+
 if __name__ == "__main__":
     import uvicorn
+
     uvicorn.run(app, host="0.0.0.0", port=8003)

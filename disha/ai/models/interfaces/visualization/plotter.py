@@ -17,6 +17,7 @@ logger = logging.getLogger(__name__)
 # ---------------------------------------------------------------------------
 try:
     import matplotlib
+
     matplotlib.use("Agg")  # Non-interactive backend for server use
     import matplotlib.pyplot as plt
     from mpl_toolkits.mplot3d import Axes3D  # noqa: F401 (side-effect import)
@@ -30,6 +31,7 @@ except ImportError:  # pragma: no cover
 # ========================================================================= #
 # SimulationPlotter (matplotlib)
 # ========================================================================= #
+
 
 class SimulationPlotter:
     """High-level plotting helper backed by :pypi:`matplotlib`.
@@ -66,10 +68,12 @@ class SimulationPlotter:
             title: Plot title.
         """
         if not self._ensure_mpl():
-            print(self._fallback.render_grid(
-                [{"position": list(p)} for p in positions_history],
-                bounds=(100.0, 100.0),
-            ))
+            print(
+                self._fallback.render_grid(
+                    [{"position": list(p)} for p in positions_history],
+                    bounds=(100.0, 100.0),
+                )
+            )
             return
 
         pts = np.asarray(positions_history)
@@ -105,9 +109,11 @@ class SimulationPlotter:
             title: Plot title.
         """
         if not self._ensure_mpl():
-            print(self._fallback.render_bar_chart(
-                {f"t={t:.2f}": e for t, e in zip(time_series, energy_series)}
-            ))
+            print(
+                self._fallback.render_bar_chart(
+                    {f"t={t:.2f}": e for t, e in zip(time_series, energy_series)}
+                )
+            )
             return
 
         self._fig, self._ax = plt.subplots(figsize=(8, 5))
@@ -213,6 +219,7 @@ class SimulationPlotter:
 # ========================================================================= #
 # TextVisualizer (no-dependency fallback)
 # ========================================================================= #
+
 
 class TextVisualizer:
     """Pure-text visualisation fallback that requires no external packages."""

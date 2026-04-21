@@ -33,12 +33,14 @@ except ImportError:  # pragma: no cover
             def _decorator(func):  # type: ignore[no-untyped-def]
                 self._routes.append({"method": "GET", "path": path, "handler": func})
                 return func
+
             return _decorator
 
         def post(self, path: str, **kwargs: Any):  # type: ignore[override]
             def _decorator(func):  # type: ignore[no-untyped-def]
                 self._routes.append({"method": "POST", "path": path, "handler": func})
                 return func
+
             return _decorator
 
     class HTTPException(Exception):  # type: ignore[no-redef]
@@ -64,6 +66,7 @@ except ImportError:  # pragma: no cover
 
 class EntityCreate(BaseModel):  # type: ignore[misc]
     """Payload for creating a new world entity."""
+
     name: str = Field(default="entity")
     entity_type: str = Field(default="generic")
     position: List[float] = Field(default=[0.0, 0.0, 0.0])
@@ -74,6 +77,7 @@ class EntityCreate(BaseModel):  # type: ignore[misc]
 
 class SimulationRunRequest(BaseModel):  # type: ignore[misc]
     """Payload for launching a simulation run."""
+
     dt: float = Field(default=0.01)
     max_steps: int = Field(default=1000)
     seed: Optional[int] = Field(default=None)
@@ -81,6 +85,7 @@ class SimulationRunRequest(BaseModel):  # type: ignore[misc]
 
 class HypothesisRequest(BaseModel):  # type: ignore[misc]
     """Payload for submitting a reasoning hypothesis."""
+
     description: str = Field(default="")
     confidence: float = Field(default=0.5)
     evidence: List[str] = Field(default=[])
@@ -88,11 +93,13 @@ class HypothesisRequest(BaseModel):  # type: ignore[misc]
 
 class CollapseRequest(BaseModel):  # type: ignore[misc]
     """Payload for collapsing hypotheses to a decision."""
+
     strategy: str = Field(default="max_confidence")
 
 
 class PipelineRunRequest(BaseModel):  # type: ignore[misc]
     """Payload for executing the AI pipeline."""
+
     stages: List[str] = Field(default=["all"])
     parameters: Dict[str, Any] = Field(default={})
 

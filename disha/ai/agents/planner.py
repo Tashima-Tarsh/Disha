@@ -127,8 +127,7 @@ class Planner:
         completed = [t for t in plan.tasks if t.status == TaskStatus.COMPLETED]
         if completed:
             context_parts.append(
-                "Completed tasks: "
-                + ", ".join(t.title for t in completed)
+                "Completed tasks: " + ", ".join(t.title for t in completed)
             )
 
         if failed_task:
@@ -141,7 +140,8 @@ class Planner:
 
         # Build remaining tasks
         remaining = [
-            t for t in plan.tasks
+            t
+            for t in plan.tasks
             if t.status in (TaskStatus.PENDING, TaskStatus.BLOCKED)
         ]
 
@@ -162,9 +162,7 @@ class Planner:
         A task is executable if it is PENDING and all its
         dependencies are COMPLETED.
         """
-        completed_ids = {
-            t.id for t in plan.tasks if t.status == TaskStatus.COMPLETED
-        }
+        completed_ids = {t.id for t in plan.tasks if t.status == TaskStatus.COMPLETED}
         for task in plan.tasks:
             if task.status != TaskStatus.PENDING:
                 continue
@@ -176,9 +174,7 @@ class Planner:
     # Claude-powered planning
     # ------------------------------------------------------------------
 
-    def _plan_with_claude(
-        self, objective: str, context: str
-    ) -> list[Task] | None:
+    def _plan_with_claude(self, objective: str, context: str) -> list[Task] | None:
         """Use Claude API to decompose the objective into tasks."""
         if not self._claude_config.api_key:
             logger.debug("No API key — skipping Claude planning")
@@ -292,6 +288,7 @@ class Planner:
         if self._client is None:
             try:
                 import anthropic
+
                 self._client = anthropic.Anthropic(
                     api_key=self._claude_config.api_key,
                     timeout=self._claude_config.timeout_seconds,

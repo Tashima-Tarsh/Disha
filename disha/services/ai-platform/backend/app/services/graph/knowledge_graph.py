@@ -8,6 +8,7 @@ from app.core.config import get_settings
 
 logger = structlog.get_logger(__name__)
 
+
 class KnowledgeGraph:
     """Neo4j-based knowledge graph for entity intelligence."""
 
@@ -19,6 +20,7 @@ class KnowledgeGraph:
         """Get or create Neo4j driver."""
         if self._driver is None:
             from neo4j import GraphDatabase
+
             self._driver = GraphDatabase.driver(
                 self.settings.NEO4J_URI,
                 auth=(self.settings.NEO4J_USER, self.settings.NEO4J_PASSWORD),
@@ -45,8 +47,13 @@ class KnowledgeGraph:
             logger.error("add_entity_failed", error=str(e))
             return False
 
-    async def add_relationship(self, source_id: str, target_id: str, rel_type: str,
-                               properties: dict[str, Any] | None = None) -> bool:
+    async def add_relationship(
+        self,
+        source_id: str,
+        target_id: str,
+        rel_type: str,
+        properties: dict[str, Any] | None = None,
+    ) -> bool:
         """Add a relationship between entities."""
         try:
             driver = self._get_driver()
@@ -86,7 +93,9 @@ class KnowledgeGraph:
             logger.error("get_entity_failed", error=str(e))
             return None
 
-    async def get_subgraph(self, entity_id: str, depth: int = 2, limit: int = 50) -> dict[str, Any]:
+    async def get_subgraph(
+        self, entity_id: str, depth: int = 2, limit: int = 50
+    ) -> dict[str, Any]:
         """Get a subgraph around an entity."""
         try:
             driver = self._get_driver()
@@ -108,7 +117,10 @@ class KnowledgeGraph:
                 )
                 record = result.single()
                 if record:
-                    return {"nodes": record["nodes"][:limit], "edges": record["edges"][:limit]}
+                    return {
+                        "nodes": record["nodes"][:limit],
+                        "edges": record["edges"][:limit],
+                    }
                 return {"nodes": [], "edges": []}
         except Exception as e:
             logger.error("get_subgraph_failed", error=str(e))

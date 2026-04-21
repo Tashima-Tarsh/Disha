@@ -91,7 +91,9 @@ class ReasoningEngine:
             metadata=metadata or {},
         )
         self._hypotheses[h.id] = h
-        logger.info("Added hypothesis '%s' (id=%s, p=%.4f)", description, h.id, h.probability)
+        logger.info(
+            "Added hypothesis '%s' (id=%s, p=%.4f)", description, h.id, h.probability
+        )
         return h.id
 
     def get_hypothesis(self, hypothesis_id: str) -> Hypothesis:
@@ -121,7 +123,12 @@ class ReasoningEngine:
         """
         h = self.get_hypothesis(hypothesis_id)
         h.evidence.append((evidence, weight))
-        logger.debug("Evidence '%s' (w=%.2f) added to hypothesis %s", evidence, weight, hypothesis_id)
+        logger.debug(
+            "Evidence '%s' (w=%.2f) added to hypothesis %s",
+            evidence,
+            weight,
+            hypothesis_id,
+        )
 
     # -- Bayesian update ----------------------------------------------------
 
@@ -168,8 +175,7 @@ class ReasoningEngine:
             descending probability.
         """
         items = [
-            (h.id, h.description, h.probability)
-            for h in self._hypotheses.values()
+            (h.id, h.description, h.probability) for h in self._hypotheses.values()
         ]
         items.sort(key=lambda t: t[2], reverse=True)
         return items
@@ -202,7 +208,11 @@ class ReasoningEngine:
         else:
             chosen = max(hypotheses, key=lambda h: h.probability)
 
-        logger.info("Collapsed to hypothesis '%s' (p=%.4f)", chosen.description, chosen.probability)
+        logger.info(
+            "Collapsed to hypothesis '%s' (p=%.4f)",
+            chosen.description,
+            chosen.probability,
+        )
         return chosen
 
     # -- Entropy ------------------------------------------------------------
@@ -235,7 +245,9 @@ class ReasoningEngine:
         for hid in to_remove:
             del self._hypotheses[hid]
         if to_remove:
-            logger.info("Pruned %d hypotheses below threshold %.4f", len(to_remove), threshold)
+            logger.info(
+                "Pruned %d hypotheses below threshold %.4f", len(to_remove), threshold
+            )
         return to_remove
 
 
@@ -323,7 +335,7 @@ class DecisionFramework:
             beneficial = np.asarray(beneficial, dtype=bool)
 
         # Step 1 – normalise
-        norms = np.sqrt((mat ** 2).sum(axis=0))
+        norms = np.sqrt((mat**2).sum(axis=0))
         norms[norms == 0] = 1.0
         normed = mat / norms
 

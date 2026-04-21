@@ -127,7 +127,9 @@ class World:
                     logger.exception("on_collision callback error")
 
         interactions_resolved = self.resolver.resolve_all(
-            entity_lookup, dt, on_collision=_collision_cb,
+            entity_lookup,
+            dt,
+            on_collision=_collision_cb,
         )
 
         # --- 2. Agent behaviour + 3. Physics integration -------------------
@@ -141,7 +143,8 @@ class World:
 
             if isinstance(entity, AgentEntity):
                 nearby = self.registry.get_in_radius(
-                    entity.position, entity.perception_radius,
+                    entity.position,
+                    entity.perception_radius,
                 )
                 # Exclude self
                 nearby = [e for e in nearby if e.id != entity.id]
@@ -255,8 +258,12 @@ class World:
                     name=edata.get("name", "unnamed"),
                     goal=edata.get("goal", ""),
                     perception_radius=edata.get("perception_radius", 10.0),
-                    position=np.array(edata.get("position", [0, 0, 0]), dtype=np.float64),
-                    velocity=np.array(edata.get("velocity", [0, 0, 0]), dtype=np.float64),
+                    position=np.array(
+                        edata.get("position", [0, 0, 0]), dtype=np.float64
+                    ),
+                    velocity=np.array(
+                        edata.get("velocity", [0, 0, 0]), dtype=np.float64
+                    ),
                     properties=edata.get("properties", {}),
                 )
             elif klass is ObjectEntity:
@@ -266,16 +273,24 @@ class World:
                     material=edata.get("material", "default"),
                     is_static=edata.get("is_static", False),
                     durability=edata.get("durability", 100.0),
-                    position=np.array(edata.get("position", [0, 0, 0]), dtype=np.float64),
-                    velocity=np.array(edata.get("velocity", [0, 0, 0]), dtype=np.float64),
+                    position=np.array(
+                        edata.get("position", [0, 0, 0]), dtype=np.float64
+                    ),
+                    velocity=np.array(
+                        edata.get("velocity", [0, 0, 0]), dtype=np.float64
+                    ),
                     properties=edata.get("properties", {}),
                 )
             else:
                 entity = Entity(
                     name=edata.get("name", "unnamed"),
                     entity_type=edata.get("entity_type", "generic"),
-                    position=np.array(edata.get("position", [0, 0, 0]), dtype=np.float64),
-                    velocity=np.array(edata.get("velocity", [0, 0, 0]), dtype=np.float64),
+                    position=np.array(
+                        edata.get("position", [0, 0, 0]), dtype=np.float64
+                    ),
+                    velocity=np.array(
+                        edata.get("velocity", [0, 0, 0]), dtype=np.float64
+                    ),
                     properties=edata.get("properties", {}),
                 )
 

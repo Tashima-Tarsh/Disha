@@ -1,4 +1,3 @@
-
 import json
 import os
 import sys
@@ -13,9 +12,7 @@ from train import (
 )
 
 
-def load_classifier(
-    model_path: str, n_classes: int = 5
-) -> AttackClassifier:
+def load_classifier(model_path: str, n_classes: int = 5) -> AttackClassifier:
     input_dim = HoneypotLogDataset.FEATURE_DIM
     model = AttackClassifier(input_dim=input_dim, n_classes=n_classes)
     model.load_state_dict(torch.load(model_path, weights_only=True))
@@ -73,9 +70,7 @@ def analyze_log_entry(log_entry: dict, models: dict) -> dict:
     result = {"input": log_entry, "analysis": {}}
 
     if "classifier" in models:
-        result["analysis"]["classification"] = classify(
-            models["classifier"], log_entry
-        )
+        result["analysis"]["classification"] = classify(models["classifier"], log_entry)
 
     if "binary_classifier" in models:
         binary_result = classify(models["binary_classifier"], log_entry)

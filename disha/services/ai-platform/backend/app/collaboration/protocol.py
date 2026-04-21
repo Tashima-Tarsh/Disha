@@ -8,6 +8,7 @@ import structlog
 
 logger = structlog.get_logger(__name__)
 
+
 class MessageType(Enum):
     REQUEST = "request"
     RESPONSE = "response"
@@ -16,11 +17,13 @@ class MessageType(Enum):
     CONSENSUS = "consensus"
     FEEDBACK = "feedback"
 
+
 class Priority(Enum):
     LOW = 0
     NORMAL = 1
     HIGH = 2
     CRITICAL = 3
+
 
 @dataclass
 class AgentMessage:
@@ -39,8 +42,8 @@ class AgentMessage:
     def is_expired(self) -> bool:
         return time.time() - self.timestamp > self.ttl
 
-class Conversation:
 
+class Conversation:
     def __init__(self, conversation_id: Optional[str] = None, topic: str = ""):
         self.conversation_id = conversation_id or str(uuid.uuid4())
         self.topic = topic
@@ -76,8 +79,8 @@ class Conversation:
         self.status = "concluded"
         self.conclusion = conclusion
 
-class MessageRouter:
 
+class MessageRouter:
     def __init__(self):
         self.conversations: dict = {}
         self.agent_inboxes: dict = defaultdict(list)
@@ -96,7 +99,6 @@ class MessageRouter:
             self.conversations[message.conversation_id].add_message(message)
 
         if message.receiver == "*":
-
             for agent_name in list(self.agent_inboxes.keys()):
                 if agent_name != message.sender:
                     self.agent_inboxes[agent_name].append(message)
@@ -108,7 +110,9 @@ class MessageRouter:
             sender=message.sender,
             receiver=message.receiver,
             type=message.message_type.value,
-            conversation=message.conversation_id[:8] if message.conversation_id else "none",
+            conversation=message.conversation_id[:8]
+            if message.conversation_id
+            else "none",
         )
 
         return message.message_id

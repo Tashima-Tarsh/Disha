@@ -5,6 +5,7 @@ Converts gravity, orbital, and field computations into structured chart data
 (line plots, scatter plots, vector fields, heatmaps) consumable by any
 front-end graphing library (Chart.js, D3, Plotly, etc.).
 """
+
 from __future__ import annotations
 
 import logging
@@ -52,10 +53,12 @@ class Grafify:
         for i in range(num_points):
             r = 10 ** (log_min + i * step)
             force = G * m1 * m2 / r**2
-            data_points.append({
-                "r_m": round(r, 4),
-                "force_N": round(force, 6),
-            })
+            data_points.append(
+                {
+                    "r_m": round(r, 4),
+                    "force_N": round(force, 6),
+                }
+            )
 
         return {
             "chart_type": "line",
@@ -75,11 +78,13 @@ class Grafify:
         bars: list[dict] = []
         for name, bd in _BODIES.items():
             g = G * bd["mass"] / bd["radius"] ** 2
-            bars.append({
-                "body": name.capitalize(),
-                "surface_gravity_ms2": round(g, 4),
-                "relative_to_earth": round(g / 9.80665, 4),
-            })
+            bars.append(
+                {
+                    "body": name.capitalize(),
+                    "surface_gravity_ms2": round(g, 4),
+                    "relative_to_earth": round(g / 9.80665, 4),
+                }
+            )
 
         bars.sort(key=lambda b: b["surface_gravity_ms2"], reverse=True)
 
@@ -98,10 +103,12 @@ class Grafify:
         bars: list[dict] = []
         for name, bd in _BODIES.items():
             v_esc = math.sqrt(2 * G * bd["mass"] / bd["radius"])
-            bars.append({
-                "body": name.capitalize(),
-                "escape_velocity_kms": round(v_esc / 1000, 4),
-            })
+            bars.append(
+                {
+                    "body": name.capitalize(),
+                    "escape_velocity_kms": round(v_esc / 1000, 4),
+                }
+            )
 
         bars.sort(key=lambda b: b["escape_velocity_kms"], reverse=True)
 
@@ -115,9 +122,7 @@ class Grafify:
 
     # ── N-body trajectory visualisation ───────────────────────────────────────
 
-    def trajectory_plot(
-        self, trajectories: dict[str, list[dict]]
-    ) -> dict[str, Any]:
+    def trajectory_plot(self, trajectories: dict[str, list[dict]]) -> dict[str, Any]:
         """Transform N-body trajectories into scatter/line chart data.
 
         Parameters
@@ -129,13 +134,14 @@ class Grafify:
 
         datasets: list[dict] = []
         for body_name, points in trajectories.items():
-            datasets.append({
-                "label": body_name,
-                "points": [
-                    {"x": p["x_m"], "y": p["y_m"], "t_s": p["t_s"]}
-                    for p in points
-                ],
-            })
+            datasets.append(
+                {
+                    "label": body_name,
+                    "points": [
+                        {"x": p["x_m"], "y": p["y_m"], "t_s": p["t_s"]} for p in points
+                    ],
+                }
+            )
 
         return {
             "chart_type": "scatter",
@@ -145,9 +151,7 @@ class Grafify:
             "datasets": datasets,
         }
 
-    def velocity_over_time(
-        self, trajectories: dict[str, list[dict]]
-    ) -> dict[str, Any]:
+    def velocity_over_time(self, trajectories: dict[str, list[dict]]) -> dict[str, Any]:
         """Line chart of speed vs time for each body in an N-body sim."""
         if not trajectories:
             return {"error": "No trajectory data provided"}
@@ -157,10 +161,12 @@ class Grafify:
             series: list[dict] = []
             for p in points:
                 speed = math.sqrt(p["vx_ms"] ** 2 + p["vy_ms"] ** 2)
-                series.append({
-                    "t_s": p["t_s"],
-                    "speed_ms": round(speed, 4),
-                })
+                series.append(
+                    {
+                        "t_s": p["t_s"],
+                        "speed_ms": round(speed, 4),
+                    }
+                )
             datasets.append({"label": body_name, "data": series})
 
         return {
@@ -253,10 +259,12 @@ class Grafify:
             if r <= r_s:
                 continue
             factor = math.sqrt(1 - r_s / r)
-            data_points.append({
-                "r_m": round(r, 4),
-                "dilation_factor": round(factor, 10),
-            })
+            data_points.append(
+                {
+                    "r_m": round(r, 4),
+                    "dilation_factor": round(factor, 10),
+                }
+            )
 
         return {
             "chart_type": "line",
@@ -293,10 +301,12 @@ class Grafify:
         for i in range(num_points):
             r = 10 ** (log_min + i * step)
             a_tidal = 2 * G * mass * delta_r / r**3
-            data_points.append({
-                "r_m": round(r, 4),
-                "tidal_accel_ms2": round(a_tidal, 8),
-            })
+            data_points.append(
+                {
+                    "r_m": round(r, 4),
+                    "tidal_accel_ms2": round(a_tidal, 8),
+                }
+            )
 
         return {
             "chart_type": "line",
@@ -336,10 +346,12 @@ class Grafify:
             r = 10 ** (log_min + i * step)
             theta = 4 * G * mass / (C**2 * r)
             arcsec = math.degrees(theta) * 3600
-            data_points.append({
-                "r_m": round(r, 4),
-                "deflection_arcsec": round(arcsec, 6),
-            })
+            data_points.append(
+                {
+                    "r_m": round(r, 4),
+                    "deflection_arcsec": round(arcsec, 6),
+                }
+            )
 
         return {
             "chart_type": "line",

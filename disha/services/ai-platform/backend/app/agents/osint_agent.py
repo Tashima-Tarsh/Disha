@@ -1,4 +1,3 @@
-
 from typing import Any
 
 import httpx
@@ -6,8 +5,8 @@ import httpx
 from app.agents.base_agent import BaseAgent
 from app.core.config import get_settings
 
-class OSINTAgent(BaseAgent):
 
+class OSINTAgent(BaseAgent):
     def __init__(self):
         super().__init__(
             name="OSINTAgent",
@@ -15,7 +14,9 @@ class OSINTAgent(BaseAgent):
         )
         self.settings = get_settings()
 
-    async def execute(self, target: str, options: dict[str, Any] | None = None) -> dict[str, Any]:
+    async def execute(
+        self, target: str, options: dict[str, Any] | None = None
+    ) -> dict[str, Any]:
         options = options or {}
         results: dict[str, Any] = {"target": target, "sources": {}}
 
@@ -77,45 +78,58 @@ class OSINTAgent(BaseAgent):
 
     async def _query_spiderfoot(self, target: str) -> dict[str, Any]:
 
-        return {"status": "configured", "target": target, "note": "SpiderFoot integration ready"}
+        return {
+            "status": "configured",
+            "target": target,
+            "note": "SpiderFoot integration ready",
+        }
 
     def _extract_entities(self, sources: dict[str, Any]) -> list[dict[str, Any]]:
         entities = []
         shodan_data = sources.get("shodan", {})
 
         if shodan_data and "error" not in shodan_data:
-            entities.append({
-                "id": f"host-{shodan_data.get('ip', 'unknown')}",
-                "label": shodan_data.get("ip", "Unknown Host"),
-                "entity_type": "host",
-                "properties": {
-                    "hostnames": shodan_data.get("hostnames", []),
-                    "ports": shodan_data.get("ports", []),
-                    "org": shodan_data.get("org"),
-                    "country": shodan_data.get("country"),
-                    "vulns": shodan_data.get("vulns", []),
-                },
-                "risk_score": min(len(shodan_data.get("vulns", [])) * 0.15, 1.0),
-            })
+            entities.append(
+                {
+                    "id": f"host-{shodan_data.get('ip', 'unknown')}",
+                    "label": shodan_data.get("ip", "Unknown Host"),
+                    "entity_type": "host",
+                    "properties": {
+                        "hostnames": shodan_data.get("hostnames", []),
+                        "ports": shodan_data.get("ports", []),
+                        "org": shodan_data.get("org"),
+                        "country": shodan_data.get("country"),
+                        "vulns": shodan_data.get("vulns", []),
+                    },
+                    "risk_score": min(len(shodan_data.get("vulns", [])) * 0.15, 1.0),
+                }
+            )
 
             for hostname in shodan_data.get("hostnames", []):
-                entities.append({
-                    "id": f"domain-{hostname}",
-                    "label": hostname,
-                    "entity_type": "domain",
-                    "properties": {"ip": shodan_data.get("ip")},
-                    "risk_score": 0.0,
-                })
+                entities.append(
+                    {
+                        "id": f"domain-{hostname}",
+                        "label": hostname,
+                        "entity_type": "domain",
+                        "properties": {"ip": shodan_data.get("ip")},
+                        "risk_score": 0.0,
+                    }
+                )
 
         dns_data = sources.get("dns", {})
         if dns_data and "error" not in dns_data:
             for record in dns_data.get("records", []):
-                entities.append({
-                    "id": f"dns-{record.get('data', 'unknown')}",
-                    "label": record.get("data", ""),
-                    "entity_type": "dns_record",
-                    "properties": {"type": record.get("type"), "name": record.get("name")},
-                    "risk_score": 0.0,
-                })
+                entities.append(
+                    {
+                        "id": f"dns-{record.get('data', 'unknown')}",
+                        "label": record.get("data", ""),
+                        "entity_type": "dns_record",
+                        "properties": {
+                            "type": record.get("type"),
+                            "name": record.get("name"),
+                        },
+                        "risk_score": 0.0,
+                    }
+                )
 
         return entities

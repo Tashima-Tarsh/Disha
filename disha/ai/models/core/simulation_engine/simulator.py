@@ -132,7 +132,9 @@ class Simulator:
         in place.
         """
         self._systems.append(system_fn)
-        logger.debug("System added: %s", getattr(system_fn, "__name__", repr(system_fn)))
+        logger.debug(
+            "System added: %s", getattr(system_fn, "__name__", repr(system_fn))
+        )
 
     # -- Events -------------------------------------------------------------
 
@@ -198,7 +200,9 @@ class Simulator:
             The recorded history list (one entry per logging interval).
         """
         steps = n_steps if n_steps is not None else self._config.max_steps
-        logger.info("Simulation starting for %d steps (dt=%.4f)", steps, self._config.dt)
+        logger.info(
+            "Simulation starting for %d steps (dt=%.4f)", steps, self._config.dt
+        )
 
         for _ in range(steps):
             self.step()

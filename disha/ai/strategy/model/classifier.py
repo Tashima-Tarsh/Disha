@@ -20,7 +20,9 @@ class StrategyClassifier:
     based on historical conflict features.
     """
 
-    def __init__(self, n_estimators: int = 200, max_depth: int = 15, random_state: int = 42):
+    def __init__(
+        self, n_estimators: int = 200, max_depth: int = 15, random_state: int = 42
+    ):
         self.model = RandomForestClassifier(
             n_estimators=n_estimators,
             max_depth=max_depth,
@@ -33,15 +35,24 @@ class StrategyClassifier:
         self.feature_names_: Optional[List[str]] = None
         self.is_trained: bool = False
 
-    def train(self, X: np.ndarray, y: np.ndarray, feature_names: Optional[List[str]] = None) -> "StrategyClassifier":
+    def train(
+        self, X: np.ndarray, y: np.ndarray, feature_names: Optional[List[str]] = None
+    ) -> "StrategyClassifier":
         """
         Train the classifier on feature matrix X and labels y.
         """
         self.model.fit(X, y)
         self.classes_ = self.model.classes_
-        self.feature_names_ = feature_names or [f"feature_{i}" for i in range(X.shape[1])]
+        self.feature_names_ = feature_names or [
+            f"feature_{i}" for i in range(X.shape[1])
+        ]
         self.is_trained = True
-        logger.info("Trained on %d samples, %d features, %d classes.", X.shape[0], X.shape[1], len(np.unique(y)))
+        logger.info(
+            "Trained on %d samples, %d features, %d classes.",
+            X.shape[0],
+            X.shape[1],
+            len(np.unique(y)),
+        )
         return self
 
     def predict(self, X: np.ndarray) -> np.ndarray:
@@ -59,10 +70,14 @@ class StrategyClassifier:
     def get_feature_importance(self) -> Dict[str, float]:
         """Return feature importances as a dict sorted descending."""
         if not self.is_trained:
-            raise RuntimeError("Model must be trained before getting feature importances.")
+            raise RuntimeError(
+                "Model must be trained before getting feature importances."
+            )
         importances = self.model.feature_importances_
         names = self.feature_names_ or [f"feature_{i}" for i in range(len(importances))]
-        importance_dict = dict(sorted(zip(names, importances.tolist()), key=lambda x: -x[1]))
+        importance_dict = dict(
+            sorted(zip(names, importances.tolist()), key=lambda x: -x[1])
+        )
         return importance_dict
 
     def save(self, path: str) -> None:
@@ -108,8 +123,11 @@ class StrategyRecommender:
         "Coalition": "Uniting multiple parties against a common enemy. Provides resource and legitimacy advantages.",
     }
 
-    def __init__(self, classifier: Optional[StrategyClassifier] = None,
-                 label_encoder: Optional[LabelEncoder] = None):
+    def __init__(
+        self,
+        classifier: Optional[StrategyClassifier] = None,
+        label_encoder: Optional[LabelEncoder] = None,
+    ):
         self.classifier = classifier
         self.label_encoder = label_encoder
 
@@ -136,19 +154,26 @@ class StrategyRecommender:
                 else:
                     strategy_name = str(class_idx)
                 confidence = float(sample_proba[idx])
-                recommendations.append({
-                    "strategy": strategy_name,
-                    "confidence": round(confidence, 4),
-                    "description": self.STRATEGY_DESCRIPTIONS.get(strategy_name, "No description available."),
-                    "rank": len(recommendations) + 1,
-                })
+                recommendations.append(
+                    {
+                        "strategy": strategy_name,
+                        "confidence": round(confidence, 4),
+                        "description": self.STRATEGY_DESCRIPTIONS.get(
+                            strategy_name, "No description available."
+                        ),
+                        "rank": len(recommendations) + 1,
+                    }
+                )
             results.append(recommendations)
 
         return results[0] if len(results) == 1 else results
 
     def recommend_from_params(
-            self, params: Dict[str, Any], encoders: Dict[str, LabelEncoder],
-            feature_names: List[str]) -> List[Dict[str, Any]]:
+        self,
+        params: Dict[str, Any],
+        encoders: Dict[str, LabelEncoder],
+        feature_names: List[str],
+    ) -> List[Dict[str, Any]]:
         """
         Recommend strategies from a raw parameter dictionary.
         Handles encoding and normalization internally.
@@ -160,8 +185,11 @@ class StrategyRecommender:
         return self.recommend(feature_vector.reshape(1, -1))
 
     def _encode_params(
-            self, params: Dict[str, Any], encoders: Dict[str, LabelEncoder],
-            feature_names: List[str]) -> np.ndarray:
+        self,
+        params: Dict[str, Any],
+        encoders: Dict[str, LabelEncoder],
+        feature_names: List[str],
+    ) -> np.ndarray:
         """Encode raw parameters into feature vector."""
         feature_map: Dict[str, float] = {}
 
@@ -174,7 +202,9 @@ class StrategyRecommender:
                 if value in encoder.classes_:
                     feature_map[enc_key] = float(encoder.transform([value])[0])
                 else:
-                    feature_map[enc_key] = float(encoder.transform([encoder.classes_[0]])[0])
+                    feature_map[enc_key] = float(
+                        encoder.transform([encoder.classes_[0]])[0]
+                    )
             else:
                 feature_map[enc_key] = 0.0
 
@@ -189,7 +219,11 @@ class StrategyRecommender:
         feature_map["log_casualties"] = float(np.log1p(casualties))
 
         outcome_map = {"Victory": 1.0, "Draw": 0.5, "Defeat": 0.0}
-        feature_map["outcome_score"] = outcome_map.get(str(params.get("outcome", "Draw")), 0.5)
+        feature_map["outcome_score"] = outcome_map.get(
+            str(params.get("outcome", "Draw")), 0.5
+        )
 
-        vector = np.array([feature_map.get(name, 0.0) for name in feature_names], dtype=np.float32)
+        vector = np.array(
+            [feature_map.get(name, 0.0) for name in feature_names], dtype=np.float32
+        )
         return vector

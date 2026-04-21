@@ -1,4 +1,3 @@
-
 from __future__ import annotations
 
 import json
@@ -43,12 +42,13 @@ try:
 except ImportError:
     pass
 
+
 def finetuning_deps_available() -> bool:
     return _TORCH_AVAILABLE and _TRANSFORMERS_AVAILABLE and _PEFT_AVAILABLE
 
+
 @dataclass
 class LoRAConfig:
-
     r: int = 16
     lora_alpha: int = 32
     lora_dropout: float = 0.05
@@ -59,9 +59,9 @@ class LoRAConfig:
     task_type: str = "CAUSAL_LM"
     use_qlora: bool = False
 
+
 @dataclass
 class TrainingConfig:
-
     output_dir: str = "checkpoints/llama-finetuned"
     num_train_epochs: int = 3
     per_device_train_batch_size: int = 4
@@ -78,9 +78,9 @@ class TrainingConfig:
     seed: int = 42
     save_total_limit: int = 3
 
+
 @dataclass
 class DatasetConfig:
-
     train_file: str = ""
     eval_file: str = ""
     prompt_template: str = (
@@ -90,8 +90,8 @@ class DatasetConfig:
     )
     max_samples: int = 0
 
-class DatasetPreparer:
 
+class DatasetPreparer:
     REQUIRED_FIELDS = {"instruction", "output"}
 
     @staticmethod
@@ -175,8 +175,8 @@ class DatasetPreparer:
         )
         return result
 
-class LLaMAFineTuner:
 
+class LLaMAFineTuner:
     def __init__(
         self,
         model_name_or_path: str = "meta-llama/Llama-2-7b-hf",
@@ -272,9 +272,7 @@ class LLaMAFineTuner:
             "qlora": self.lora_config.use_qlora,
         }
 
-    def train(
-        self, dataset: Dict[str, List[Dict[str, str]]]
-    ) -> Dict[str, Any]:
+    def train(self, dataset: Dict[str, List[Dict[str, str]]]) -> Dict[str, Any]:
         if not finetuning_deps_available():
             return {"status": "skipped", "reason": "Missing dependencies"}
 
@@ -286,9 +284,7 @@ class LLaMAFineTuner:
         from datasets import Dataset as HFDataset
 
         train_ds = HFDataset.from_list(dataset["train"])
-        eval_ds = (
-            HFDataset.from_list(dataset["eval"]) if dataset.get("eval") else None
-        )
+        eval_ds = HFDataset.from_list(dataset["eval"]) if dataset.get("eval") else None
 
         def tokenize(batch: Dict) -> Dict:
             return self._tokenizer(
@@ -337,7 +333,9 @@ class LLaMAFineTuner:
             "status": "completed",
             "train_loss": train_result.training_loss,
             "train_runtime": elapsed,
-            "train_samples_per_second": len(dataset["train"]) / elapsed if elapsed > 0 else 0,
+            "train_samples_per_second": len(dataset["train"]) / elapsed
+            if elapsed > 0
+            else 0,
         }
         logger.info("training_completed", **metrics)
         return metrics
@@ -358,7 +356,9 @@ class LLaMAFineTuner:
 
         return {"status": "skipped", "reason": "PEFT not available"}
 
-    def generate_training_config_file(self, output_path: str = "training_config.json") -> str:
+    def generate_training_config_file(
+        self, output_path: str = "training_config.json"
+    ) -> str:
         config = {
             "model_name_or_path": self.model_name_or_path,
             "lora": {

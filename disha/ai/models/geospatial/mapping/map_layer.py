@@ -49,7 +49,10 @@ class MapLayer:
         self._cols: int = self.data.shape[1]
         logger.info(
             "MapLayer '%s' created: shape=%s res=%f origin=%s",
-            name, self.data.shape, resolution, origin,
+            name,
+            self.data.shape,
+            resolution,
+            origin,
         )
 
     def _world_to_grid(self, x: float, y: float) -> Tuple[float, float]:
@@ -94,7 +97,15 @@ class MapLayer:
         row = int(round(gy))
         self._check_bounds(row, col)
         self.data[row, col] = value
-        logger.debug("set_value '%s': (%f, %f) -> grid[%d,%d] = %f", self.name, x, y, row, col, value)
+        logger.debug(
+            "set_value '%s': (%f, %f) -> grid[%d,%d] = %f",
+            self.name,
+            x,
+            y,
+            row,
+            col,
+            value,
+        )
 
     def interpolate(self, x: float, y: float) -> float:
         """Bilinear interpolation at world coordinates (x, y).

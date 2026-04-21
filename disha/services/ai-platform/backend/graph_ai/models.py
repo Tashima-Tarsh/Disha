@@ -1,6 +1,5 @@
 """Graph Neural Network models for entity intelligence."""
 
-
 import torch
 import torch.nn.functional as F
 from torch import nn
@@ -9,10 +8,17 @@ from torch import nn
 class GCNEncoder(nn.Module):
     """Graph Convolutional Network encoder for node embeddings."""
 
-    def __init__(self, in_channels: int, hidden_channels: int, out_channels: int, dropout: float = 0.5):
+    def __init__(
+        self,
+        in_channels: int,
+        hidden_channels: int,
+        out_channels: int,
+        dropout: float = 0.5,
+    ):
         super().__init__()
         try:
             from torch_geometric.nn import GCNConv
+
             self.conv1 = GCNConv(in_channels, hidden_channels)
             self.conv2 = GCNConv(hidden_channels, out_channels)
         except ImportError:
@@ -27,17 +33,22 @@ class GCNEncoder(nn.Module):
         """Check if torch_geometric is available."""
         try:
             from torch_geometric.nn import GCNConv
+
             return isinstance(self.conv1, GCNConv)
         except ImportError:
             return False
 
-    def forward(self, x: torch.Tensor, edge_index: torch.Tensor | None = None) -> torch.Tensor:
+    def forward(
+        self, x: torch.Tensor, edge_index: torch.Tensor | None = None
+    ) -> torch.Tensor:
         """Forward pass through GCN layers."""
         if self._use_geometric:
             if edge_index is None:
                 # Default to self-loops if no edges provided
                 num_nodes = x.size(0)
-                edge_index = torch.arange(num_nodes, device=x.device).unsqueeze(0).repeat(2, 1)
+                edge_index = (
+                    torch.arange(num_nodes, device=x.device).unsqueeze(0).repeat(2, 1)
+                )
 
             x = self.conv1(x, edge_index)
             x = self.bn1(x)
@@ -75,9 +86,13 @@ class LinkPredictor(nn.Module):
 class GraphClassifier(nn.Module):
     """Node classification model for entity risk scoring."""
 
-    def __init__(self, in_channels: int, hidden_channels: int = 64, num_classes: int = 4):
+    def __init__(
+        self, in_channels: int, hidden_channels: int = 64, num_classes: int = 4
+    ):
         super().__init__()
-        self.encoder = GCNEncoder(in_channels, hidden_channels, hidden_channels, dropout=0.5)
+        self.encoder = GCNEncoder(
+            in_channels, hidden_channels, hidden_channels, dropout=0.5
+        )
         self.classifier = nn.Sequential(
             nn.Linear(hidden_channels, hidden_channels // 2),
             nn.BatchNorm1d(hidden_channels // 2),
@@ -86,7 +101,9 @@ class GraphClassifier(nn.Module):
             nn.Linear(hidden_channels // 2, num_classes),
         )
 
-    def forward(self, x: torch.Tensor, edge_index: torch.Tensor | None = None) -> torch.Tensor:
+    def forward(
+        self, x: torch.Tensor, edge_index: torch.Tensor | None = None
+    ) -> torch.Tensor:
         """Classify nodes in the graph."""
         embeddings = self.encoder(x, edge_index)
         return self.classifier(embeddings)

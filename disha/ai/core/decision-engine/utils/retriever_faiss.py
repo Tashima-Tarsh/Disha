@@ -1,4 +1,3 @@
-
 from __future__ import annotations
 
 import json
@@ -14,11 +13,12 @@ try:
 except ImportError:
     _FAISS_AVAILABLE = False
 
+
 def faiss_available() -> bool:
     return _FAISS_AVAILABLE
 
-class FAISSRetriever:
 
+class FAISSRetriever:
     def __init__(self, model_name: str = "all-MiniLM-L6-v2") -> None:
         if not _FAISS_AVAILABLE:
             raise RuntimeError(
@@ -45,9 +45,7 @@ class FAISSRetriever:
         self.index = faiss.IndexFlatL2(dim)
         self.index.add(embeddings)
 
-        self.metadata = [
-            {"id": i, "text": line} for i, line in enumerate(lines)
-        ]
+        self.metadata = [{"id": i, "text": line} for i, line in enumerate(lines)]
 
         faiss.write_index(self.index, index_path)
         with open(metadata_path, "w", encoding="utf-8") as fh:

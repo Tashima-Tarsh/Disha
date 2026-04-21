@@ -41,30 +41,51 @@ def engine():
     ):
         # Memory mock
         mem = MockMem.return_value
-        mem.retrieve = AsyncMock(return_value={
-            "working": [],
-            "episodic": [{"content": "prior event", "importance": 0.8}],
-            "semantic": [{"concept": "evil.io", "definition": "malicious domain"}],
-        })
+        mem.retrieve = AsyncMock(
+            return_value={
+                "working": [],
+                "episodic": [{"content": "prior event", "importance": 0.8}],
+                "semantic": [{"concept": "evil.io", "definition": "malicious domain"}],
+            }
+        )
         mem.working = MagicMock()
         mem.working.decay = MagicMock()
         mem.working.add = MagicMock()
         mem.store_episode = AsyncMock()
         mem.promote_to_semantic = MagicMock(return_value=1)
         mem.learn_concept = AsyncMock()
-        mem.get_memory_stats = MagicMock(return_value={"working": 1, "episodic": 5, "semantic": 3})
+        mem.get_memory_stats = MagicMock(
+            return_value={"working": 1, "episodic": 5, "semantic": 3}
+        )
 
         # Deliberation mock
         del_ = MockDel.return_value
-        del_.deliberate = AsyncMock(return_value={
-            "all_opinions": [
-                {"agent": "planner", "confidence": 0.8, "recommendation": "Block the domain"},
-                {"agent": "executor", "confidence": 0.75, "recommendation": "Quarantine host"},
-                {"agent": "critic", "confidence": 0.7, "recommendation": "Investigate further"},
-            ],
-            "winner": {"recommendation": "Block the domain", "confidence": 0.8},
-            "dissenting_view": {"agent": "critic", "recommendation": "Investigate further"},
-        })
+        del_.deliberate = AsyncMock(
+            return_value={
+                "all_opinions": [
+                    {
+                        "agent": "planner",
+                        "confidence": 0.8,
+                        "recommendation": "Block the domain",
+                    },
+                    {
+                        "agent": "executor",
+                        "confidence": 0.75,
+                        "recommendation": "Quarantine host",
+                    },
+                    {
+                        "agent": "critic",
+                        "confidence": 0.7,
+                        "recommendation": "Investigate further",
+                    },
+                ],
+                "winner": {"recommendation": "Block the domain", "confidence": 0.8},
+                "dissenting_view": {
+                    "agent": "critic",
+                    "recommendation": "Investigate further",
+                },
+            }
+        )
 
         # Reasoner mock
         reas = MockReas.return_value
@@ -73,7 +94,10 @@ def engine():
             mode = "deductive"
             hypothesis = "evil.io is a C2 server"
             confidence = 0.82
-            chain_of_thought = ["It resolves to a known bad IP", "Pattern matches APT42"]
+            chain_of_thought = [
+                "It resolves to a known bad IP",
+                "Pattern matches APT42",
+            ]
 
             def __iter__(self):
                 return iter(self.__dict__.items())
@@ -107,10 +131,21 @@ class TestCognitiveState:
     def test_to_dict_contains_all_fields(self, state):
         d = state.to_dict()
         for key in [
-            "session_id", "turn", "raw_input", "intent", "entities",
-            "uncertainty", "working_memory", "hypotheses", "agent_deliberations",
-            "action", "confidence", "reflection", "learning_triggers",
-            "consolidated_episodes", "new_concepts_learned",
+            "session_id",
+            "turn",
+            "raw_input",
+            "intent",
+            "entities",
+            "uncertainty",
+            "working_memory",
+            "hypotheses",
+            "agent_deliberations",
+            "action",
+            "confidence",
+            "reflection",
+            "learning_triggers",
+            "consolidated_episodes",
+            "new_concepts_learned",
         ]:
             assert key in d, f"Missing key in to_dict(): {key}"
 
@@ -137,13 +172,13 @@ class TestPerceiveStage:
         long_input = "word " * 30
         s = CognitiveState(session_id="s", turn=0, raw_input=long_input)
         await engine._perceive(s)
-        assert s.uncertainty <= 0.2   # long input → low uncertainty
+        assert s.uncertainty <= 0.2  # long input → low uncertainty
 
     @pytest.mark.asyncio
     async def test_uncertainty_short_input(self, engine):
         s = CognitiveState(session_id="s", turn=0, raw_input="help")
         await engine._perceive(s)
-        assert s.uncertainty >= 0.7   # short input → high uncertainty
+        assert s.uncertainty >= 0.7  # short input → high uncertainty
 
     @pytest.mark.asyncio
     async def test_entities_capped_at_10(self, engine):
@@ -170,7 +205,9 @@ class TestAttendStage:
     @pytest.mark.asyncio
     async def test_decay_called(self, engine, state):
         await engine._attend(state)
-        engine.memory.working.decay.assert_called_once_with(CognitiveEngine.WORKING_MEMORY_DECAY)
+        engine.memory.working.decay.assert_called_once_with(
+            CognitiveEngine.WORKING_MEMORY_DECAY
+        )
 
 
 class TestReasonStage:
@@ -198,7 +235,11 @@ class TestReasonStage:
 class TestActStage:
     @pytest.mark.asyncio
     async def test_high_confidence_produces_action(self, engine, state):
-        state.selected_hypothesis = {"confidence": 0.9, "hypothesis": "C2 server", "mode": "deductive"}
+        state.selected_hypothesis = {
+            "confidence": 0.9,
+            "hypothesis": "C2 server",
+            "mode": "deductive",
+        }
         state.consensus = {"confidence": 0.85, "recommendation": "Block domain"}
         state.intent = "threat"
         state.entities = ["evil.io"]
@@ -209,7 +250,11 @@ class TestActStage:
 
     @pytest.mark.asyncio
     async def test_low_confidence_produces_clarification(self, engine, state):
-        state.selected_hypothesis = {"confidence": 0.1, "hypothesis": "Unknown", "mode": "abductive"}
+        state.selected_hypothesis = {
+            "confidence": 0.1,
+            "hypothesis": "Unknown",
+            "mode": "abductive",
+        }
         state.consensus = {"confidence": 0.1, "recommendation": ""}
         state.intent = "general"
         state.entities = []
@@ -229,13 +274,15 @@ class TestActStage:
 class TestReflectStage:
     @pytest.mark.asyncio
     async def test_reflection_populated(self, engine, state):
-        state.agent_deliberations = [
-            {"confidence": 0.8}, {"confidence": 0.75}
-        ]
+        state.agent_deliberations = [{"confidence": 0.8}, {"confidence": 0.75}]
         state.confidence = 0.77
         state.recalled_episodes = [{"content": "x"}]
         state.recalled_concepts = []
-        state.hypotheses = [{"mode": "deductive"}, {"mode": "inductive"}, {"mode": "abductive"}]
+        state.hypotheses = [
+            {"mode": "deductive"},
+            {"mode": "inductive"},
+            {"mode": "abductive"},
+        ]
         await engine._reflect(state)
         assert state.reflection is not None
         assert 0.0 <= state.reflection["quality"] <= 1.0
@@ -278,7 +325,9 @@ class TestConsolidateStage:
 class TestFullCycle:
     @pytest.mark.asyncio
     async def test_process_returns_state(self, engine):
-        state = await engine.process("Check domain evil.io for malware", session_id="sess1")
+        state = await engine.process(
+            "Check domain evil.io for malware", session_id="sess1"
+        )
         assert isinstance(state, CognitiveState)
         assert state.session_id == "sess1"
         assert state.turn == 0
@@ -293,7 +342,15 @@ class TestFullCycle:
     @pytest.mark.asyncio
     async def test_stage_durations_recorded(self, engine):
         state = await engine.process("Any input", session_id="sess3")
-        for stage in ["perceive", "attend", "reason", "deliberate", "act", "reflect", "consolidate"]:
+        for stage in [
+            "perceive",
+            "attend",
+            "reason",
+            "deliberate",
+            "act",
+            "reflect",
+            "consolidate",
+        ]:
             assert stage in state.stage_durations
             assert state.stage_durations[stage] >= 0
 

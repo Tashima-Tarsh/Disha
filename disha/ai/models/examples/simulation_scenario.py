@@ -40,13 +40,13 @@ def main() -> None:
     env.terrain_map = rng.uniform(0.0, 10.0, size=(32, 32))
     print(f"\nEnvironment: {env.name}")
     print(f"  Bounds: {env.bounds_min.tolist()} -> {env.bounds_max.tolist()}")
-    print(f"  Terrain height range: {env.terrain_map.min():.2f} - {env.terrain_map.max():.2f}")
+    print(
+        f"  Terrain height range: {env.terrain_map.min():.2f} - {env.terrain_map.max():.2f}"
+    )
 
     # --- Place 5 bodies with different masses ---
     # Use a larger G constant so gravitational effects are visible at this scale
-    engine = ClassicalMechanicsEngine(
-        gravitational_constant=1.0, softening_length=1.0
-    )
+    engine = ClassicalMechanicsEngine(gravitational_constant=1.0, softening_length=1.0)
 
     bodies = [
         PhysicsObject(
@@ -108,7 +108,9 @@ def main() -> None:
         engine.step(dt)
 
         if step % 20 == 0:
-            print(f"  Step {step:3d}: KE={ke:.4f}, PE={pe:.4f}, Total={total_energy:.4f}")
+            print(
+                f"  Step {step:3d}: KE={ke:.4f}, PE={pe:.4f}, Total={total_energy:.4f}"
+            )
 
     # Final energy
     ke_final = engine.total_kinetic_energy()

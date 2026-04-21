@@ -53,8 +53,12 @@ def setup_logging(config: Optional[LoggingSettings] = None) -> None:
     for handler in handlers:
         root.addHandler(handler)
 
-    logger.debug("Logging configured: level=%s, file=%s, console=%s",
-                 config.level, config.file_path, config.console_output)
+    logger.debug(
+        "Logging configured: level=%s, file=%s, console=%s",
+        config.level,
+        config.file_path,
+        config.console_output,
+    )
 
 
 def get_logger(name: str) -> logging.Logger:

@@ -13,8 +13,8 @@ from app.collaboration.protocol import (
 
 logger = structlog.get_logger(__name__)
 
-class AgentNode:
 
+class AgentNode:
     def __init__(self, name: str, agent_instance, capabilities: list = None):
         self.name = name
         self.agent = agent_instance
@@ -30,8 +30,8 @@ class AgentNode:
             return 0.0
         return self.total_time / self.tasks_completed
 
-class ClusterCoordinator:
 
+class ClusterCoordinator:
     MAX_CONVERSATION_ROUNDS = 10
     CONSENSUS_THRESHOLD = 0.6
 
@@ -48,7 +48,8 @@ class ClusterCoordinator:
 
     def get_capable_agents(self, capability: str) -> list:
         return [
-            node for node in self.nodes.values()
+            node
+            for node in self.nodes.values()
             if capability in node.capabilities and node.status != "offline"
         ]
 
@@ -112,7 +113,9 @@ class ClusterCoordinator:
                 },
             }
 
-            refined = await self._selective_execute(low_conf_agents, target, enriched_context)
+            refined = await self._selective_execute(
+                low_conf_agents, target, enriched_context
+            )
             results.update(refined)
 
             review_results = await self._peer_review(results, conversation)
@@ -159,7 +162,9 @@ class ClusterCoordinator:
     async def _selective_execute(
         self, agent_names: list[str], target: str, context: dict
     ) -> dict:
-        selected = [(name, node) for name, node in self.nodes.items() if name in agent_names]
+        selected = [
+            (name, node) for name, node in self.nodes.items() if name in agent_names
+        ]
         if not selected:
             return {}
 
@@ -174,7 +179,9 @@ class ClusterCoordinator:
                 node.last_active = time.time()
                 return name, result
             except Exception as e:
-                logger.error("selective_agent_execution_failed", agent=name, error=str(e))
+                logger.error(
+                    "selective_agent_execution_failed", agent=name, error=str(e)
+                )
                 return name, {"error": str(e), "status": "failed"}
 
         agent_results = await asyncio.gather(
@@ -229,9 +236,7 @@ class ClusterCoordinator:
 
         return results
 
-    async def _peer_review(
-        self, results: dict, conversation: Conversation
-    ) -> dict:
+    async def _peer_review(self, results: dict, conversation: Conversation) -> dict:
         reviews = {}
 
         for reviewer_name, reviewer_node in self.nodes.items():
@@ -251,7 +256,9 @@ class ClusterCoordinator:
                     message_type=MessageType.FEEDBACK,
                     content={
                         "score": score,
-                        "reviewed_result_keys": list(result.keys()) if isinstance(result, dict) else [],
+                        "reviewed_result_keys": list(result.keys())
+                        if isinstance(result, dict)
+                        else [],
                     },
                 )
                 self.router.send(review_msg)
@@ -302,7 +309,9 @@ class ClusterCoordinator:
         avg_review = sum(review_scores) / max(len(review_scores), 1)
 
         if risk_scores:
-            risk_variance = sum((r - avg_risk) ** 2 for r in risk_scores) / max(len(risk_scores), 1)
+            risk_variance = sum((r - avg_risk) ** 2 for r in risk_scores) / max(
+                len(risk_scores), 1
+            )
             agreement = max(0, 1.0 - risk_variance * 4)
         else:
             agreement = 0.0
@@ -351,7 +360,9 @@ class ClusterCoordinator:
     def get_cluster_status(self) -> dict:
         return {
             "total_agents": len(self.nodes),
-            "online_agents": sum(1 for n in self.nodes.values() if n.status != "offline"),
+            "online_agents": sum(
+                1 for n in self.nodes.values() if n.status != "offline"
+            ),
             "busy_agents": sum(1 for n in self.nodes.values() if n.status == "busy"),
             "agents": {
                 name: {

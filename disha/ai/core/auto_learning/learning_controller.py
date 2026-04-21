@@ -1,4 +1,3 @@
-
 from __future__ import annotations
 
 import hashlib
@@ -23,9 +22,9 @@ DEFAULT_SOURCE_CREDIBILITY: Dict[str, float] = {
     "unknown": 0.20,
 }
 
+
 @dataclass
 class DataItem:
-
     text: str
     source: str = "unknown"
     metadata: Dict[str, Any] = field(default_factory=dict)
@@ -38,8 +37,8 @@ class DataItem:
         if not self.content_hash:
             self.content_hash = hashlib.sha256(self.text.encode()).hexdigest()[:20]
 
-class QualityScorer:
 
+class QualityScorer:
     def __init__(
         self,
         source_credibility: Optional[Dict[str, float]] = None,
@@ -56,7 +55,11 @@ class QualityScorer:
         total = 0.0
         text = item.text.strip()
 
-        base_key = item.source.lower().split("/")[0] if "/" in item.source else item.source.lower()
+        base_key = (
+            item.source.lower().split("/")[0]
+            if "/" in item.source
+            else item.source.lower()
+        )
         cred = self._source_cred.get(base_key, 0.2)
         stars = item.metadata.get("stars", 0)
         citations = item.metadata.get("citations", 0)
@@ -74,7 +77,9 @@ class QualityScorer:
             total += 3
 
         has_paragraphs = "\n\n" in text
-        has_code = any(marker in text for marker in ["```", "def ", "class ", "import "])
+        has_code = any(
+            marker in text for marker in ["```", "def ", "class ", "import "]
+        )
         total += 3 * has_paragraphs + 2 * has_code
 
         words = text.lower().split()
@@ -95,8 +100,8 @@ class QualityScorer:
 
         return min(round(total), 100)
 
-class LearningController:
 
+class LearningController:
     def __init__(
         self,
         rag_pipeline: Any = None,
@@ -192,8 +197,7 @@ class LearningController:
         metadata: Optional[Dict[str, Any]] = None,
     ) -> Dict[str, Any]:
         items = [
-            DataItem(text=t, source=source, metadata=metadata or {})
-            for t in texts
+            DataItem(text=t, source=source, metadata=metadata or {}) for t in texts
         ]
         return self.ingest_batch(items)
 
@@ -218,9 +222,7 @@ class LearningController:
         self._finetuning_approved = approved
         if approved:
             self._finetuning_queue = list(self.permanent_store)
-            logger.info(
-                "finetuning_approved", items=len(self._finetuning_queue)
-            )
+            logger.info("finetuning_approved", items=len(self._finetuning_queue))
             return {
                 "status": "approved",
                 "items_queued": len(self._finetuning_queue),
@@ -235,11 +237,13 @@ class LearningController:
 
         dataset = []
         for item in self._finetuning_queue:
-            dataset.append({
-                "instruction": "Analyse the following information and provide insights.",
-                "input": item.text,
-                "output": f"[Quality score: {item.quality_score}] Analysis of: {item.text[:100]}...",
-            })
+            dataset.append(
+                {
+                    "instruction": "Analyse the following information and provide insights.",
+                    "input": item.text,
+                    "output": f"[Quality score: {item.quality_score}] Analysis of: {item.text[:100]}...",
+                }
+            )
         return dataset
 
     def export_finetuning_jsonl(self, output_path: str) -> int:
@@ -323,12 +327,8 @@ class LearningController:
         with open(str(path), "r", encoding="utf-8") as fh:
             state = json.load(fh)
 
-        self.permanent_store = [
-            DataItem(**item) for item in state.get("permanent", [])
-        ]
-        self.temporary_store = [
-            DataItem(**item) for item in state.get("temporary", [])
-        ]
+        self.permanent_store = [DataItem(**item) for item in state.get("permanent", [])]
+        self.temporary_store = [DataItem(**item) for item in state.get("temporary", [])]
         self._audit_log = state.get("audit_log", [])
         return True
 

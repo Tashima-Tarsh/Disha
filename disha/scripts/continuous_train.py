@@ -1,4 +1,3 @@
-
 from __future__ import annotations
 
 import argparse
@@ -28,8 +27,8 @@ os.environ.setdefault("DISHA_MODEL_PROVIDER", "mock")
 
 logger = structlog.get_logger("continuous_train")
 
-class HyperparamScheduler:
 
+class HyperparamScheduler:
     STAGNATION_THRESHOLD = 0.01
 
     EPSILON = 1e-8
@@ -77,6 +76,7 @@ class HyperparamScheduler:
             "alpha": max(0.01, 0.1 - round_num * 0.01),
         }
 
+
 def _merge_graphs(threat_graph, knowledge_graph: dict):
     from data_fetchers import GraphDataset
 
@@ -119,11 +119,13 @@ def _merge_graphs(threat_graph, knowledge_graph: dict):
     else:
         merged_edges = kg_edges_offset
 
-    logger.info("graphs_merged",
-                threat_nodes=offset,
-                knowledge_nodes=kg_feats.shape[0],
-                total_nodes=merged_feats.shape[0],
-                total_edges=merged_edges.shape[1] if merged_edges.size else 0)
+    logger.info(
+        "graphs_merged",
+        threat_nodes=offset,
+        knowledge_nodes=kg_feats.shape[0],
+        total_nodes=merged_feats.shape[0],
+        total_edges=merged_edges.shape[1] if merged_edges.size else 0,
+    )
 
     return GraphDataset(
         node_features=merged_feats,
@@ -136,6 +138,7 @@ def _merge_graphs(threat_graph, knowledge_graph: dict):
             "total_nodes": int(merged_feats.shape[0]),
         },
     )
+
 
 def _train_rl(
     scenarios: list,
@@ -172,7 +175,11 @@ def _train_rl(
             policy.critic.load_state_dict(ckpt["critic_state_dict"])
             logger.info("rl_checkpoint_loaded", path=str(prev_checkpoint))
         else:
-            logger.warning("rl_checkpoint_dim_mismatch", expected=hidden_dim, got=ckpt.get("hidden_dim"))
+            logger.warning(
+                "rl_checkpoint_dim_mismatch",
+                expected=hidden_dim,
+                got=ckpt.get("hidden_dim"),
+            )
 
     replay = ExperienceReplayBuffer(capacity=30_000)
     reward_computer = RewardComputer()
@@ -220,18 +227,23 @@ def _train_rl(
 
     checkpoint_dir.mkdir(parents=True, exist_ok=True)
     ckpt_path = checkpoint_dir / "rl_policy.pt"
-    torch.save({
-        "actor_state_dict": policy.actor.state_dict(),
-        "critic_state_dict": policy.critic.state_dict(),
-        "state_dim": policy.state_dim,
-        "action_dim": policy.action_dim,
-        "hidden_dim": hidden_dim,
-        "episodes_trained": num_episodes,
-    }, ckpt_path)
+    torch.save(
+        {
+            "actor_state_dict": policy.actor.state_dict(),
+            "critic_state_dict": policy.critic.state_dict(),
+            "state_dim": policy.state_dim,
+            "action_dim": policy.action_dim,
+            "hidden_dim": hidden_dim,
+            "episodes_trained": num_episodes,
+        },
+        ckpt_path,
+    )
 
     metrics = {
         "episodes_trained": num_episodes,
-        "final_avg_reward": float(np.mean(episode_rewards[-50:])) if episode_rewards else 0,
+        "final_avg_reward": float(np.mean(episode_rewards[-50:]))
+        if episode_rewards
+        else 0,
         "reward_std": float(np.std(episode_rewards[-50:])) if episode_rewards else 0,
         "replay_buffer_size": len(replay),
         "data_source_scenarios": len(scenarios),
@@ -239,8 +251,12 @@ def _train_rl(
     with open(checkpoint_dir / "rl_training_metrics.json", "w") as f:
         json.dump(metrics, f, indent=2, default=str)
 
-    logger.info("rl_training_complete", **{k: round(v, 4) if isinstance(v, float) else v for k, v in metrics.items()})
+    logger.info(
+        "rl_training_complete",
+        **{k: round(v, 4) if isinstance(v, float) else v for k, v in metrics.items()},
+    )
     return metrics
+
 
 def _scenario_outcome(action: int, scenario, rng: np.random.RandomState) -> dict:
     if action >= 5:
@@ -264,13 +280,16 @@ def _scenario_outcome(action: int, scenario, rng: np.random.RandomState) -> dict
         elif action == 1:
             base["anomalies_found"] += int(rng.binomial(2, real_risk))
         elif action == 2:
-            base["risk_score"] = float(np.clip(base["risk_score"] + real_risk * 0.3, 0, 1))
+            base["risk_score"] = float(
+                np.clip(base["risk_score"] + real_risk * 0.3, 0, 1)
+            )
         elif action == 3:
             base["relationships_found"] += int(num_indicators * 0.5)
         elif action == 4:
             base["anomalies_found"] += int(rng.binomial(1, real_risk))
 
     return base
+
 
 def _train_gnn(
     graph_data,
@@ -279,6 +298,7 @@ def _train_gnn(
     prev_checkpoint: Path | None = None,
 ) -> dict:
     import importlib.util
+
     try:
         import torch
     except ImportError:
@@ -293,7 +313,8 @@ def _train_gnn(
     _models_spec.loader.exec_module(_models)
 
     _trainer_spec = importlib.util.spec_from_file_location(
-        "graph_ai.trainer", _GRAPH_DIR / "trainer.py",
+        "graph_ai.trainer",
+        _GRAPH_DIR / "trainer.py",
         submodule_search_locations=[],
     )
     sys.modules["graph_ai.models"] = _models
@@ -314,10 +335,14 @@ def _train_gnn(
 
     if prev_checkpoint and (prev_checkpoint / "gnn_link_predictor.pt").exists():
         try:
-            ckpt = torch.load(prev_checkpoint / "gnn_link_predictor.pt", weights_only=True)
+            ckpt = torch.load(
+                prev_checkpoint / "gnn_link_predictor.pt", weights_only=True
+            )
             if ckpt.get("in_features") == feature_dim:
                 trainer.encoder.load_state_dict(ckpt["encoder_state_dict"])
-                trainer.link_predictor.load_state_dict(ckpt["link_predictor_state_dict"])
+                trainer.link_predictor.load_state_dict(
+                    ckpt["link_predictor_state_dict"]
+                )
                 logger.info("gnn_link_checkpoint_loaded")
         except Exception as e:
             logger.warning("gnn_checkpoint_load_failed", error=str(e))
@@ -329,12 +354,17 @@ def _train_gnn(
     )
 
     num_classes = int(graph_data.node_labels.max()) + 1
-    classifier = GraphClassifier(in_channels=feature_dim, hidden_channels=64, num_classes=num_classes)
+    classifier = GraphClassifier(
+        in_channels=feature_dim, hidden_channels=64, num_classes=num_classes
+    )
 
     if prev_checkpoint and (prev_checkpoint / "gnn_classifier.pt").exists():
         try:
             ckpt = torch.load(prev_checkpoint / "gnn_classifier.pt", weights_only=True)
-            if ckpt.get("in_channels") == feature_dim and ckpt.get("num_classes") == num_classes:
+            if (
+                ckpt.get("in_channels") == feature_dim
+                and ckpt.get("num_classes") == num_classes
+            ):
                 classifier.load_state_dict(ckpt["classifier_state_dict"])
                 logger.info("gnn_classifier_checkpoint_loaded")
         except Exception as e:
@@ -377,7 +407,9 @@ def _train_gnn(
             with torch.no_grad():
                 eval_logits = classifier(x, edge_idx)
                 eval_preds = eval_logits.argmax(dim=-1)
-                curr_test_acc = float((eval_preds[test_mask] == labels[test_mask]).float().mean())
+                curr_test_acc = float(
+                    (eval_preds[test_mask] == labels[test_mask]).float().mean()
+                )
             if curr_test_acc > best_test_acc:
                 best_test_acc = curr_test_acc
                 best_state = {k: v.clone() for k, v in classifier.state_dict().items()}
@@ -387,7 +419,11 @@ def _train_gnn(
             classifier.train()
 
             if patience_counter >= patience:
-                logger.info("gnn_early_stopping", epoch=epoch, best_test_acc=round(best_test_acc, 4))
+                logger.info(
+                    "gnn_early_stopping",
+                    epoch=epoch,
+                    best_test_acc=round(best_test_acc, 4),
+                )
                 break
 
     if best_state is not None:
@@ -398,35 +434,47 @@ def _train_gnn(
         logits = classifier(x, edge_idx)
         preds = logits.argmax(dim=-1)
         train_acc = float((preds[train_mask] == labels[train_mask]).float().mean())
-        test_acc = float((preds[test_mask] == labels[test_mask]).float().mean()) if test_mask.sum() > 0 else 0.0
+        test_acc = (
+            float((preds[test_mask] == labels[test_mask]).float().mean())
+            if test_mask.sum() > 0
+            else 0.0
+        )
 
     checkpoint_dir.mkdir(parents=True, exist_ok=True)
-    torch.save({
-        "encoder_state_dict": trainer.encoder.state_dict(),
-        "link_predictor_state_dict": trainer.link_predictor.state_dict(),
-        "in_features": feature_dim,
-        "hidden_dim": 64,
-        "embedding_dim": 32,
-        "epochs_trained": params.get("num_epochs_link", 200),
-        "final_loss": link_metrics["final_loss"],
-    }, checkpoint_dir / "gnn_link_predictor.pt")
+    torch.save(
+        {
+            "encoder_state_dict": trainer.encoder.state_dict(),
+            "link_predictor_state_dict": trainer.link_predictor.state_dict(),
+            "in_features": feature_dim,
+            "hidden_dim": 64,
+            "embedding_dim": 32,
+            "epochs_trained": params.get("num_epochs_link", 200),
+            "final_loss": link_metrics["final_loss"],
+        },
+        checkpoint_dir / "gnn_link_predictor.pt",
+    )
 
-    torch.save({
-        "classifier_state_dict": classifier.state_dict(),
-        "in_channels": feature_dim,
-        "hidden_channels": 64,
-        "num_classes": num_classes,
-        "epochs_trained": params.get("num_epochs_classify", 150),
-        "train_acc": train_acc,
-        "test_acc": test_acc,
-    }, checkpoint_dir / "gnn_classifier.pt")
+    torch.save(
+        {
+            "classifier_state_dict": classifier.state_dict(),
+            "in_channels": feature_dim,
+            "hidden_channels": 64,
+            "num_classes": num_classes,
+            "epochs_trained": params.get("num_epochs_classify", 150),
+            "train_acc": train_acc,
+            "test_acc": test_acc,
+        },
+        checkpoint_dir / "gnn_classifier.pt",
+    )
 
     metrics = {
         "link_final_loss": link_metrics["final_loss"],
         "train_accuracy": train_acc,
         "test_accuracy": test_acc,
         "graph_nodes": graph_data.node_features.shape[0],
-        "graph_edges": int(graph_data.edge_index.shape[1]) if graph_data.edge_index.size else 0,
+        "graph_edges": int(graph_data.edge_index.shape[1])
+        if graph_data.edge_index.size
+        else 0,
     }
 
     metrics_file = {
@@ -441,15 +489,21 @@ def _train_gnn(
         },
         "graph_stats": {
             "nodes": graph_data.node_features.shape[0],
-            "edges": int(graph_data.edge_index.shape[1]) if graph_data.edge_index.size else 0,
+            "edges": int(graph_data.edge_index.shape[1])
+            if graph_data.edge_index.size
+            else 0,
             "feature_dim": feature_dim,
         },
     }
     with open(checkpoint_dir / "gnn_training_metrics.json", "w") as f:
         json.dump(metrics_file, f, indent=2, default=str)
 
-    logger.info("gnn_training_complete", **{k: round(v, 4) if isinstance(v, float) else v for k, v in metrics.items()})
+    logger.info(
+        "gnn_training_complete",
+        **{k: round(v, 4) if isinstance(v, float) else v for k, v in metrics.items()},
+    )
     return metrics
+
 
 def _train_decision_engine(
     scenarios: list[dict],
@@ -460,6 +514,7 @@ def _train_decision_engine(
 
     de_train_path = DECISION_DIR / "train.py"
     import importlib.util
+
     spec = importlib.util.spec_from_file_location("de_train", de_train_path)
     de_train = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(de_train)
@@ -515,8 +570,12 @@ def _train_decision_engine(
     with open(checkpoint_dir / "decision_training_metrics.json", "w") as f:
         json.dump(metrics_file, f, indent=2)
 
-    logger.info("de_training_complete", **{k: round(v, 4) if isinstance(v, float) else v for k, v in metrics.items()})
+    logger.info(
+        "de_training_complete",
+        **{k: round(v, 4) if isinstance(v, float) else v for k, v in metrics.items()},
+    )
     return metrics
+
 
 def _should_promote(current: dict, previous: dict | None, component: str) -> bool:
     if previous is None:
@@ -539,11 +598,14 @@ def _should_promote(current: dict, previous: dict | None, component: str) -> boo
 
     return True
 
+
 def _promote_checkpoint(staging_dir: Path, production_dir: Path, component: str):
     import shutil
 
     if not staging_dir.exists():
-        logger.warning("checkpoint_staging_missing", component=component, path=str(staging_dir))
+        logger.warning(
+            "checkpoint_staging_missing", component=component, path=str(staging_dir)
+        )
         return
 
     production_dir.mkdir(parents=True, exist_ok=True)
@@ -553,7 +615,13 @@ def _promote_checkpoint(staging_dir: Path, production_dir: Path, component: str)
             dest = production_dir / item.name
             shutil.copy2(item, dest)
 
-    logger.info("checkpoint_promoted", component=component, src=str(staging_dir), dst=str(production_dir))
+    logger.info(
+        "checkpoint_promoted",
+        component=component,
+        src=str(staging_dir),
+        dst=str(production_dir),
+    )
+
 
 def run_continuous_training(
     rounds: int = 3,
@@ -585,9 +653,11 @@ def run_continuous_training(
 
     logger.info("loading_knowledge_corpus")
     knowledge_corpus = load_all_knowledge()
-    logger.info("knowledge_corpus_loaded",
-                total_items=len(knowledge_corpus.items),
-                domains=list(knowledge_corpus.domain_counts.keys()))
+    logger.info(
+        "knowledge_corpus_loaded",
+        total_items=len(knowledge_corpus.items),
+        domains=list(knowledge_corpus.domain_counts.keys()),
+    )
 
     for round_num in range(1, rounds + 1):
         logger.info("round_start", round=round_num, total=rounds)
@@ -601,12 +671,16 @@ def run_continuous_training(
             threat_scenarios = fetch_all_rl_data()
             if not threat_scenarios:
                 logger.warning("network_fetch_empty_fallback_to_synthetic")
-                threat_scenarios = generate_synthetic_threats(n=150, seed=round_num * 42)
+                threat_scenarios = generate_synthetic_threats(
+                    n=150, seed=round_num * 42
+                )
 
         threat_graph = build_graph_from_threats(threat_scenarios)
 
         if component is None or component in ("gnn", "knowledge"):
-            kg = build_knowledge_graph(knowledge_corpus, feature_dim=threat_graph.node_features.shape[1])
+            kg = build_knowledge_graph(
+                knowledge_corpus, feature_dim=threat_graph.node_features.shape[1]
+            )
             graph_data = _merge_graphs(threat_graph, kg)
         else:
             graph_data = threat_graph
@@ -707,9 +781,11 @@ def run_continuous_training(
     staging_root = REPO_ROOT / "checkpoints_staging"
     if staging_root.exists():
         import shutil
+
         shutil.rmtree(staging_root, ignore_errors=True)
 
     return summary
+
 
 def _load_metrics(path: Path) -> dict | None:
     if path.exists():
@@ -717,12 +793,20 @@ def _load_metrics(path: Path) -> dict | None:
             return json.load(f)
     return None
 
+
 def main():
     parser = argparse.ArgumentParser(description="Continuous AI Training Pipeline")
-    parser.add_argument("--rounds", type=int, default=3, help="Number of training rounds")
-    parser.add_argument("--component", choices=["rl", "gnn", "decision", "knowledge"],
-                        help="Train specific component only (knowledge = cross-domain GNN+DE)")
-    parser.add_argument("--offline", action="store_true", help="Use synthetic data only (no network)")
+    parser.add_argument(
+        "--rounds", type=int, default=3, help="Number of training rounds"
+    )
+    parser.add_argument(
+        "--component",
+        choices=["rl", "gnn", "decision", "knowledge"],
+        help="Train specific component only (knowledge = cross-domain GNN+DE)",
+    )
+    parser.add_argument(
+        "--offline", action="store_true", help="Use synthetic data only (no network)"
+    )
     args = parser.parse_args()
 
     result = run_continuous_training(
@@ -746,10 +830,13 @@ def main():
         if "rl" in r:
             print(f"    RL:  avg_reward={r['rl'].get('final_avg_reward', 'N/A'):.4f}")
         if "gnn" in r:
-            print(f"    GNN: link_loss={r['gnn'].get('link_final_loss', 'N/A'):.4f}  "
-                  f"train_acc={r['gnn'].get('train_accuracy', 'N/A'):.4f}")
+            print(
+                f"    GNN: link_loss={r['gnn'].get('link_final_loss', 'N/A'):.4f}  "
+                f"train_acc={r['gnn'].get('train_accuracy', 'N/A'):.4f}"
+            )
         if "decision" in r:
             print(f"    DE:  test_mse={r['decision'].get('test_mse', 'N/A'):.4f}")
+
 
 if __name__ == "__main__":
     main()

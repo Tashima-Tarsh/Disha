@@ -1,8 +1,14 @@
 """Reasoning engine tests."""
-from core.reasoning_engine.reasoning import ReasoningEngine, DecisionFramework, Hypothesis
+
+from core.reasoning_engine.reasoning import (
+    ReasoningEngine,
+    DecisionFramework,
+    Hypothesis,
+)
 import sys
 import os
 import unittest
+
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 

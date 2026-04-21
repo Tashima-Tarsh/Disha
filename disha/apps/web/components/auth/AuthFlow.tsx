@@ -12,7 +12,8 @@ import {
   EyeOff,
   RefreshCcw,
   CheckCircle2,
-  Info
+  Info,
+  AlertCircle
 } from "lucide-react";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { Button } from "@/components/ui/button";
@@ -73,7 +74,7 @@ export function AuthFlow() {
     setTimeout(() => {
       setStep("success");
       setTimeout(() => {
-        router.push("/dashboard");
+        router.push("/dashboard" as any);
       }, 2000);
     }, 2000);
   };

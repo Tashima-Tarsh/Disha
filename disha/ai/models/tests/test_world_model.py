@@ -1,4 +1,5 @@
 """World model tests."""
+
 from world_model.world_manager.world import World
 from world_model.interactions.interaction import CollisionInteraction
 from world_model.environments.environment import Environment
@@ -8,6 +9,7 @@ import sys
 import os
 import unittest
 import numpy as np
+
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 

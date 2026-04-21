@@ -49,57 +49,75 @@ def _print_result(title: str, data: Dict[str, Any]) -> None:
 # Command handlers
 # ---------------------------------------------------------------------------
 
+
 def _cmd_run_simulation(args: argparse.Namespace) -> None:
     """Execute a simulation run."""
-    _print_result("Simulation Run", {
-        "dt": args.dt,
-        "max_steps": args.max_steps,
-        "seed": args.seed,
-        "status": "completed",
-        "steps_executed": args.max_steps,
-        "note": "Simulation engine executed successfully",
-    })
+    _print_result(
+        "Simulation Run",
+        {
+            "dt": args.dt,
+            "max_steps": args.max_steps,
+            "seed": args.seed,
+            "status": "completed",
+            "steps_executed": args.max_steps,
+            "note": "Simulation engine executed successfully",
+        },
+    )
 
 
 def _cmd_add_entity(args: argparse.Namespace) -> None:
     """Add an entity to the world."""
     position = [float(x) for x in args.position.split(",")]
-    _print_result("Entity Created", {
-        "name": args.name,
-        "type": args.entity_type,
-        "position": position,
-        "mass": args.mass,
-    })
+    _print_result(
+        "Entity Created",
+        {
+            "name": args.name,
+            "type": args.entity_type,
+            "position": position,
+            "mass": args.mass,
+        },
+    )
 
 
 def _cmd_world_status(args: argparse.Namespace) -> None:
     """Show current world status."""
-    _print_result("World Status", {
-        "bounds": [100.0, 100.0, 100.0],
-        "max_entities": 1000,
-        "current_entities": 0,
-        "status": "nominal",
-    })
+    _print_result(
+        "World Status",
+        {
+            "bounds": [100.0, 100.0, 100.0],
+            "max_entities": 1000,
+            "current_entities": 0,
+            "status": "nominal",
+        },
+    )
 
 
 def _cmd_run_pipeline(args: argparse.Namespace) -> None:
     """Run the AI pipeline."""
     stages = args.stages.split(",") if args.stages else ["all"]
-    _print_result("Pipeline Execution", {
-        "stages": stages,
-        "status": "completed",
-        "outputs": {},
-    })
+    _print_result(
+        "Pipeline Execution",
+        {
+            "stages": stages,
+            "status": "completed",
+            "outputs": {},
+        },
+    )
 
 
 def _cmd_reasoning(args: argparse.Namespace) -> None:
     """Perform reasoning operations."""
-    _print_result("Reasoning", {
-        "operation": args.operation,
-        "hypothesis": args.hypothesis or "(none)",
-        "confidence": args.confidence,
-        "result": "Hypothesis processed" if args.operation == "add" else "Decision collapsed",
-    })
+    _print_result(
+        "Reasoning",
+        {
+            "operation": args.operation,
+            "hypothesis": args.hypothesis or "(none)",
+            "confidence": args.confidence,
+            "result": "Hypothesis processed"
+            if args.operation == "add"
+            else "Decision collapsed",
+        },
+    )
 
 
 def _cmd_monte_carlo(args: argparse.Namespace) -> None:
@@ -109,18 +127,22 @@ def _cmd_monte_carlo(args: argparse.Namespace) -> None:
     rng = random.Random(args.seed)
     results: List[float] = [rng.gauss(0, 1) for _ in range(args.samples)]
     mean = sum(results) / len(results)
-    _print_result("Monte-Carlo Sampling", {
-        "samples": args.samples,
-        "seed": args.seed,
-        "mean": round(mean, 6),
-        "min": round(min(results), 6),
-        "max": round(max(results), 6),
-    })
+    _print_result(
+        "Monte-Carlo Sampling",
+        {
+            "samples": args.samples,
+            "seed": args.seed,
+            "mean": round(mean, 6),
+            "min": round(min(results), 6),
+            "max": round(max(results), 6),
+        },
+    )
 
 
 # ---------------------------------------------------------------------------
 # Parser construction
 # ---------------------------------------------------------------------------
+
 
 def _build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
@@ -155,14 +177,22 @@ def _build_parser() -> argparse.ArgumentParser:
 
     # run-pipeline
     p_pipe = sub.add_parser("run-pipeline", help="Run AI pipeline")
-    p_pipe.add_argument("--stages", type=str, default="all", help="Comma-separated stages")
+    p_pipe.add_argument(
+        "--stages", type=str, default="all", help="Comma-separated stages"
+    )
     p_pipe.set_defaults(func=_cmd_run_pipeline)
 
     # reasoning
     p_reason = sub.add_parser("reasoning", help="Reasoning operations")
-    p_reason.add_argument("operation", choices=["add", "collapse"], help="Operation type")
-    p_reason.add_argument("--hypothesis", type=str, default=None, help="Hypothesis text")
-    p_reason.add_argument("--confidence", type=float, default=0.5, help="Confidence level")
+    p_reason.add_argument(
+        "operation", choices=["add", "collapse"], help="Operation type"
+    )
+    p_reason.add_argument(
+        "--hypothesis", type=str, default=None, help="Hypothesis text"
+    )
+    p_reason.add_argument(
+        "--confidence", type=float, default=0.5, help="Confidence level"
+    )
     p_reason.set_defaults(func=_cmd_reasoning)
 
     # monte-carlo
@@ -177,6 +207,7 @@ def _build_parser() -> argparse.ArgumentParser:
 # ---------------------------------------------------------------------------
 # Entry point
 # ---------------------------------------------------------------------------
+
 
 def main(argv: Optional[Sequence[str]] = None) -> None:
     """CLI entry point.

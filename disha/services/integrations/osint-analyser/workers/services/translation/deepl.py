@@ -3,19 +3,20 @@
 # Core
 import logging
 import os
+
 # Project
 from translation_service import TranslationService
 
 
 class DeepLTranslate(TranslationService):
     def __init__(self):
-        super().__init__('deepl')
+        super().__init__("deepl")
 
     def translate(self, text: str):
         logging.info("DeepLTranslate() received translation request")
 
         # Check existence of DeepL API key and retrieve it
-        api_key = os.environ.get('DEEPL_API_KEY')
+        api_key = os.environ.get("DEEPL_API_KEY")
         if not api_key:
             logging.error("No DeepL API key has been set as an env. var!")
             return None
@@ -23,4 +24,4 @@ class DeepLTranslate(TranslationService):
         return None
 
 
-TranslationService.register('deepl', DeepLTranslate)
+TranslationService.register("deepl", DeepLTranslate)

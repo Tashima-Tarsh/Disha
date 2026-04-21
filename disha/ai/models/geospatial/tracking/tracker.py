@@ -98,7 +98,9 @@ class ObjectTracker:
         """
         new_position = np.asarray(new_position, dtype=np.float64)
         if new_position.shape != (3,):
-            raise ValueError(f"new_position must have shape (3,), got {new_position.shape}")
+            raise ValueError(
+                f"new_position must have shape (3,), got {new_position.shape}"
+            )
 
         if track_id not in self._tracks:
             track = Track(track_id=track_id)
@@ -113,7 +115,11 @@ class ObjectTracker:
             if dt > 0:
                 velocity = (new_position - track.positions[-1]) / dt
             else:
-                velocity = track.velocities[-1] if track.velocities else np.zeros(3, dtype=np.float64)
+                velocity = (
+                    track.velocities[-1]
+                    if track.velocities
+                    else np.zeros(3, dtype=np.float64)
+                )
         else:
             velocity = np.zeros(3, dtype=np.float64)
 
@@ -124,7 +130,10 @@ class ObjectTracker:
 
         logger.debug(
             "Track '%s' updated: pos=%s vel=%s t=%f",
-            track_id, new_position, velocity, timestamp,
+            track_id,
+            new_position,
+            velocity,
+            timestamp,
         )
 
     def predict(self, track_id: str, future_time: float) -> np.ndarray:
@@ -149,13 +158,21 @@ class ObjectTracker:
             raise ValueError(f"Track '{track_id}' has no observations")
 
         last_pos = track.positions[-1]
-        last_vel = track.velocities[-1] if track.velocities else np.zeros(3, dtype=np.float64)
+        last_vel = (
+            track.velocities[-1] if track.velocities else np.zeros(3, dtype=np.float64)
+        )
         last_t = track.timestamps[-1]
 
         dt = future_time - last_t
         predicted = last_pos + last_vel * dt
 
-        logger.debug("Predicted track '%s' at t=%f: %s (dt=%f)", track_id, future_time, predicted, dt)
+        logger.debug(
+            "Predicted track '%s' at t=%f: %s (dt=%f)",
+            track_id,
+            future_time,
+            predicted,
+            dt,
+        )
         return predicted
 
     def get_track(self, track_id: str) -> Track:

@@ -31,8 +31,10 @@ def debug_log(message):
 SECURITY_PATTERNS = [
     {
         "ruleName": "github_actions_workflow",
-        "path_check": lambda path: ".github/workflows/" in path
-        and (path.endswith(".yml") or path.endswith(".yaml")),
+        "path_check": lambda path: (
+            ".github/workflows/" in path
+            and (path.endswith(".yml") or path.endswith(".yaml"))
+        ),
         "reminder": """You are editing a GitHub Actions workflow file. Be aware of these security risks:
 
 1. **Command Injection**: Never use untrusted input (like issue titles, PR descriptions, commit messages) directly in run: commands without proper escaping

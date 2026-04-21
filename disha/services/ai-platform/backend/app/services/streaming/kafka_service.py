@@ -1,4 +1,3 @@
-
 import json
 from typing import Any, Callable
 
@@ -8,8 +7,8 @@ from app.core.config import get_settings
 
 logger = structlog.get_logger(__name__)
 
-class KafkaProducer:
 
+class KafkaProducer:
     def __init__(self):
         self.settings = get_settings()
         self._producer = None
@@ -17,6 +16,7 @@ class KafkaProducer:
     def _get_producer(self):
         if self._producer is None:
             from kafka import KafkaProducer as KP
+
             self._producer = KP(
                 bootstrap_servers=self.settings.KAFKA_BOOTSTRAP_SERVERS.split(","),
                 value_serializer=lambda v: json.dumps(v, default=str).encode("utf-8"),
@@ -24,7 +24,9 @@ class KafkaProducer:
             )
         return self._producer
 
-    async def publish_event(self, topic: str, event: dict[str, Any], key: str | None = None) -> bool:
+    async def publish_event(
+        self, topic: str, event: dict[str, Any], key: str | None = None
+    ) -> bool:
         try:
             producer = self._get_producer()
             producer.send(topic, value=event, key=key)
@@ -35,7 +37,9 @@ class KafkaProducer:
             logger.error("publish_failed", topic=topic, error=str(e))
             return False
 
-    async def publish_investigation_event(self, investigation_id: str, data: dict[str, Any]) -> bool:
+    async def publish_investigation_event(
+        self, investigation_id: str, data: dict[str, Any]
+    ) -> bool:
         event = {
             "type": "investigation_result",
             "investigation_id": investigation_id,
@@ -59,8 +63,8 @@ class KafkaProducer:
             self._producer.close()
             self._producer = None
 
-class KafkaConsumer:
 
+class KafkaConsumer:
     def __init__(self, topic: str, group_id: str = "intelligence-group"):
         self.settings = get_settings()
         self.topic = topic
@@ -70,6 +74,7 @@ class KafkaConsumer:
     def _get_consumer(self):
         if self._consumer is None:
             from kafka import KafkaConsumer as KC
+
             self._consumer = KC(
                 self.topic,
                 bootstrap_servers=self.settings.KAFKA_BOOTSTRAP_SERVERS.split(","),
@@ -80,7 +85,9 @@ class KafkaConsumer:
             )
         return self._consumer
 
-    async def consume(self, handler: Callable[[dict[str, Any]], Any], max_messages: int | None = None) -> None:
+    async def consume(
+        self, handler: Callable[[dict[str, Any]], Any], max_messages: int | None = None
+    ) -> None:
         try:
             consumer = self._get_consumer()
             count = 0

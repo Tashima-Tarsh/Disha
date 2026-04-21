@@ -1,4 +1,3 @@
-
 from __future__ import annotations
 
 import asyncio
@@ -13,8 +12,8 @@ from disha.ai.core.memory.semantic import SemanticMemory
 
 log = structlog.get_logger(__name__)
 
-class MemoryManager:
 
+class MemoryManager:
     def __init__(self) -> None:
         self.working = WorkingMemory()
         self.episodic = EpisodicMemory()
@@ -114,7 +113,9 @@ class MemoryManager:
             definition = what
 
             outcome_words = [
-                w.strip(".,!?") for w in ep.get("outcome", "").lower().split() if len(w) > 3
+                w.strip(".,!?")
+                for w in ep.get("outcome", "").lower().split()
+                if len(w) > 3
             ]
             relations: list[dict[str, Any]] = []
             if outcome_words:
@@ -148,7 +149,9 @@ class MemoryManager:
                     )
                 promoted += 1
             except Exception as exc:
-                log.warning("memory_manager.promote_failed", error=str(exc), concept=concept)
+                log.warning(
+                    "memory_manager.promote_failed", error=str(exc), concept=concept
+                )
 
         log.info(
             "memory_manager.promoted_to_semantic",

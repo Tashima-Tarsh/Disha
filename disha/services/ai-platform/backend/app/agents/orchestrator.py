@@ -1,4 +1,3 @@
-
 import asyncio
 import uuid
 from typing import Any
@@ -19,8 +18,8 @@ from app.agents.growth_agent import GrowthAgent
 
 logger = structlog.get_logger(__name__)
 
-class Orchestrator:
 
+class Orchestrator:
     def __init__(self):
         self.osint_agent = OSINTAgent()
         self.crypto_agent = CryptoAgent()
@@ -79,7 +78,9 @@ class Orchestrator:
         )
         agent_results["reasoning"] = reasoning_result
 
-        result = self._compile_results(investigation_id, target, investigation_type, agent_results)
+        result = self._compile_results(
+            investigation_id, target, investigation_type, agent_results
+        )
 
         self.logger.info(
             "investigation_completed",
@@ -124,13 +125,20 @@ class Orchestrator:
         completed = await asyncio.gather(*tasks.values(), return_exceptions=True)
         for key, result in zip(tasks.keys(), completed):
             if isinstance(result, Exception):
-                results[key] = {"agent": key, "status": "error", "error": str(result), "data": {}}
+                results[key] = {
+                    "agent": key,
+                    "status": "error",
+                    "error": str(result),
+                    "data": {},
+                }
             else:
                 results[key] = result
 
         return results
 
-    def _build_relationships(self, entities: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    def _build_relationships(
+        self, entities: list[dict[str, Any]]
+    ) -> list[dict[str, Any]]:
         relationships = []
         for i, entity in enumerate(entities):
             for j, other in enumerate(entities):
@@ -141,22 +149,30 @@ class Orchestrator:
                 if entity["entity_type"] == "host" and other["entity_type"] == "domain":
                     related = True
                     rel_type = "HOSTS"
-                elif entity["entity_type"] == "wallet" and other["entity_type"] == "wallet":
+                elif (
+                    entity["entity_type"] == "wallet"
+                    and other["entity_type"] == "wallet"
+                ):
                     related = True
                     rel_type = "TRANSACTED_WITH"
-                elif entity["entity_type"] == "dns_record" and other["entity_type"] in ["host", "domain"]:
+                elif entity["entity_type"] == "dns_record" and other["entity_type"] in [
+                    "host",
+                    "domain",
+                ]:
                     related = True
                     rel_type = "RESOLVES_TO"
                 else:
                     continue
 
                 if related:
-                    relationships.append({
-                        "source_id": entity["id"],
-                        "target_id": other["id"],
-                        "relationship_type": rel_type,
-                        "confidence": 0.8,
-                    })
+                    relationships.append(
+                        {
+                            "source_id": entity["id"],
+                            "target_id": other["id"],
+                            "relationship_type": rel_type,
+                            "confidence": 0.8,
+                        }
+                    )
 
         return relationships
 
@@ -180,7 +196,9 @@ class Orchestrator:
                 if "risk_analysis" in data:
                     risk_scores.append(data["risk_analysis"].get("risk_score", 0))
                 if "risk_assessment" in data:
-                    risk_scores.append(data["risk_assessment"].get("overall_risk_score", 0))
+                    risk_scores.append(
+                        data["risk_assessment"].get("overall_risk_score", 0)
+                    )
 
         overall_risk = max(risk_scores) if risk_scores else 0.0
 
@@ -209,12 +227,17 @@ class Orchestrator:
     ) -> list[dict[str, Any]]:
         tasks = [
             self.investigate(
-                target, investigation_type=investigation_type, depth=depth, user_id=user_id
+                target,
+                investigation_type=investigation_type,
+                depth=depth,
+                user_id=user_id,
             )
             for target in targets
         ]
         results = await asyncio.gather(*tasks, return_exceptions=True)
         return [
-            r if not isinstance(r, Exception) else {"target": t, "status": "error", "error": str(r)}
+            r
+            if not isinstance(r, Exception)
+            else {"target": t, "status": "error", "error": str(r)}
             for t, r in zip(targets, results)
         ]

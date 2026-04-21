@@ -21,6 +21,7 @@ class SentinelAgent(BaseAgent):
         """Get or create LLM instance."""
         if self._llm is None:
             from langchain_openai import ChatOpenAI
+
             self._llm = ChatOpenAI(
                 model=self.settings.LLM_MODEL,
                 temperature=0.1,
@@ -28,7 +29,9 @@ class SentinelAgent(BaseAgent):
             )
         return self._llm
 
-    async def execute(self, target: str, options: dict[str, Any] | None = None) -> dict[str, Any]:
+    async def execute(
+        self, target: str, options: dict[str, Any] | None = None
+    ) -> dict[str, Any]:
         """Process security signals and generate a defensive incident report."""
         options = options or {}
         signals = options.get("signals", [])
@@ -41,10 +44,12 @@ class SentinelAgent(BaseAgent):
             "target": target,
             "incident_report": incident_report,
             "is_security_alert": True,
-            "defense_mode_active": True
+            "defense_mode_active": True,
         }
 
-    def _build_sentinel_prompt(self, target: str, signals: list[Any], context: str) -> str:
+    def _build_sentinel_prompt(
+        self, target: str, signals: list[Any], context: str
+    ) -> str:
         """Build the defensive-only Sentinel prompt."""
         return f"""
 You are DISHA Sentinel, an elite defensive cybersecurity AI.

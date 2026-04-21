@@ -8,19 +8,21 @@ from app.services.ni.global_intelligence_service import GlobalIntelligenceServic
 
 logger = structlog.get_logger(__name__)
 
-class GrowthAgent(BaseAgent):
 
+class GrowthAgent(BaseAgent):
     def __init__(self):
         super().__init__(
             name="GrowthAgent",
-            description="Performs Sovereign Growth Analytics and determines funding priorities for national resilience."
+            description="Performs Sovereign Growth Analytics and determines funding priorities for national resilience.",
         )
         self.infra_service = InfrastructureService()
         self.judicial_service = JudicialService()
         self.disaster_service = DisasterService()
         self.global_service = GlobalIntelligenceService()
 
-    async def execute(self, target: str, options: dict[str, Any] | None = None) -> dict[str, Any]:
+    async def execute(
+        self, target: str, options: dict[str, Any] | None = None
+    ) -> dict[str, Any]:
         options = options or {}
 
         targets = [t.strip() for t in target.split(",")]
@@ -40,10 +42,12 @@ class GrowthAgent(BaseAgent):
             "global_context": global_summary,
             "funding_priorities": priorities,
             "top_recommendation": priorities[0] if priorities else None,
-            "entities": self._get_growth_entities(priorities)
+            "entities": self._get_growth_entities(priorities),
         }
 
-    async def _analyze_asset_priority(self, asset_name: str, options: dict[str, Any]) -> dict[str, Any]:
+    async def _analyze_asset_priority(
+        self, asset_name: str, options: dict[str, Any]
+    ) -> dict[str, Any]:
 
         asset_details = await self.infra_service.get_asset_details(asset_name)
         if not asset_details:
@@ -51,14 +55,18 @@ class GrowthAgent(BaseAgent):
 
         region = asset_details["location"]
 
-        legal_urgency = await self.judicial_service.get_legal_priority_index(asset_name, region)
+        legal_urgency = await self.judicial_service.get_legal_priority_index(
+            asset_name, region
+        )
 
         weather_risk = 0.8 if region == "Assam" or region == "Mumbai" else 0.3
 
         global_modifier = await self.global_service.get_growth_modifier()
 
         physical_risk = 0.9 if "Tezpur" in asset_name else 0.5
-        base_index = (physical_risk * 0.4) + (legal_urgency * 0.4) + (weather_risk * 0.2)
+        base_index = (
+            (physical_risk * 0.4) + (legal_urgency * 0.4) + (weather_risk * 0.2)
+        )
         rfpi_index = min(1.0, base_index * global_modifier)
 
         return {
@@ -69,9 +77,9 @@ class GrowthAgent(BaseAgent):
             "indicators": {
                 "physical_risk": physical_risk,
                 "legal_urgency": legal_urgency,
-                "climate_threat": weather_risk
+                "climate_threat": weather_risk,
             },
-            "recommendation": self._get_budget_directive(rfpi_index)
+            "recommendation": self._get_budget_directive(rfpi_index),
         }
 
     def _get_budget_directive(self, score: float) -> str:
@@ -84,14 +92,16 @@ class GrowthAgent(BaseAgent):
     def _get_growth_entities(self, priorities: List[Dict]) -> List[Dict]:
         entities = []
         for p in priorities:
-            entities.append({
-                "id": f"funding-node-{p['asset'].replace(' ', '-')}",
-                "label": f"Priority: {p['asset']}",
-                "entity_type": "strategic_priority",
-                "properties": {
-                    "rfpi_score": p["rfpi_index"],
-                    "directive": p["recommendation"]
-                },
-                "risk_score": p["rfpi_index"]
-            })
+            entities.append(
+                {
+                    "id": f"funding-node-{p['asset'].replace(' ', '-')}",
+                    "label": f"Priority: {p['asset']}",
+                    "entity_type": "strategic_priority",
+                    "properties": {
+                        "rfpi_score": p["rfpi_index"],
+                        "directive": p["recommendation"],
+                    },
+                    "risk_score": p["rfpi_index"],
+                }
+            )
         return entities

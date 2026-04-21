@@ -1,4 +1,3 @@
-
 import uuid
 from datetime import datetime, timezone
 from typing import Any
@@ -10,8 +9,8 @@ from app.core.config import get_settings
 
 logger = structlog.get_logger(__name__)
 
-class ConnectionManager:
 
+class ConnectionManager:
     def __init__(self):
         self.active_connections: list[WebSocket] = []
 
@@ -36,8 +35,8 @@ class ConnectionManager:
         for conn in disconnected:
             self.disconnect(conn)
 
-class AlertManager:
 
+class AlertManager:
     def __init__(self, connection_manager: ConnectionManager):
         self.connection_manager = connection_manager
         self.settings = get_settings()
@@ -66,14 +65,18 @@ class AlertManager:
 
         self.alerts.append(alert)
         if len(self.alerts) > self.max_alerts:
-            self.alerts = self.alerts[-self.max_alerts:]
+            self.alerts = self.alerts[-self.max_alerts :]
 
         await self.connection_manager.broadcast({"type": "alert", "data": alert})
 
-        logger.info("alert_created", alert_id=alert["alert_id"], level=level, title=title)
+        logger.info(
+            "alert_created", alert_id=alert["alert_id"], level=level, title=title
+        )
         return alert
 
-    async def create_alerts_from_investigation(self, investigation: dict[str, Any]) -> list[dict[str, Any]]:
+    async def create_alerts_from_investigation(
+        self, investigation: dict[str, Any]
+    ) -> list[dict[str, Any]]:
         alerts = []
         risk_score = investigation.get("risk_score", 0)
 
@@ -81,7 +84,9 @@ class AlertManager:
             alert = await self.create_alert(
                 level="critical",
                 title=f"Critical threat detected: {investigation.get('target', 'Unknown')}",
-                description=investigation.get("summary", "Critical risk level detected during investigation."),
+                description=investigation.get(
+                    "summary", "Critical risk level detected during investigation."
+                ),
                 source="investigation",
                 metadata={"investigation_id": investigation.get("investigation_id")},
             )
@@ -109,7 +114,9 @@ class AlertManager:
 
         return alerts
 
-    def get_alerts(self, limit: int = 50, level: str | None = None) -> list[dict[str, Any]]:
+    def get_alerts(
+        self, limit: int = 50, level: str | None = None
+    ) -> list[dict[str, Any]]:
         alerts = self.alerts
         if level:
             alerts = [a for a in alerts if a["level"] == level]

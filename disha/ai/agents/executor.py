@@ -94,9 +94,7 @@ class Executor:
                 results.append(result)
 
                 if not result.success:
-                    task.mark_failed(
-                        f"Tool '{call.tool_name}' failed: {result.error}"
-                    )
+                    task.mark_failed(f"Tool '{call.tool_name}' failed: {result.error}")
                     self._memory.log(
                         f"Tool failed: {call.tool_name} — {result.error}",
                         LogLevel.ERROR,
@@ -181,10 +179,12 @@ class Executor:
                 max_tokens=2048,
                 temperature=0.1,
                 system=system,
-                messages=[{
-                    "role": "user",
-                    "content": f"Task: {task.title}\nDescription: {task.description}",
-                }],
+                messages=[
+                    {
+                        "role": "user",
+                        "content": f"Task: {task.title}\nDescription: {task.description}",
+                    }
+                ],
             )
 
             text = response.content[0].text
@@ -230,20 +230,26 @@ class Executor:
         calls: list[ToolCall] = []
 
         if any(kw in desc for kw in ["analyze", "scan", "structure", "explore"]):
-            calls.append(ToolCall(tool_name="analyze_structure", arguments={"path": "."}))
+            calls.append(
+                ToolCall(tool_name="analyze_structure", arguments={"path": "."})
+            )
 
         if any(kw in desc for kw in ["read", "view", "inspect", "check"]):
             # Try to extract a file path from the description
             calls.append(ToolCall(tool_name="list_directory", arguments={"path": "."}))
 
         if any(kw in desc for kw in ["search", "find", "locate", "grep"]):
-            calls.append(ToolCall(tool_name="search_files", arguments={"pattern": "**/*.py"}))
+            calls.append(
+                ToolCall(tool_name="search_files", arguments={"pattern": "**/*.py"})
+            )
 
         if any(kw in desc for kw in ["run", "test", "build", "lint", "execute"]):
             calls.append(
                 ToolCall(
                     tool_name="run_command",
-                    arguments={"command": "echo 'Task requires manual command specification'"},
+                    arguments={
+                        "command": "echo 'Task requires manual command specification'"
+                    },
                 )
             )
 
@@ -301,6 +307,7 @@ class Executor:
         if self._client is None:
             try:
                 import anthropic
+
                 self._client = anthropic.Anthropic(
                     api_key=self._claude_config.api_key,
                     timeout=self._claude_config.timeout_seconds,

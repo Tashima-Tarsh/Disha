@@ -96,15 +96,20 @@ def rotation_matrix_3d(axis: ArrayLike, angle: float) -> NDArray[np.floating]:
     c = np.cos(angle)
     s = np.sin(angle)
     # Skew-symmetric cross-product matrix of k
-    K = np.array([
-        [0, -k[2], k[1]],
-        [k[2], 0, -k[0]],
-        [-k[1], k[0], 0],
-    ], dtype=np.float64)
+    K = np.array(
+        [
+            [0, -k[2], k[1]],
+            [k[2], 0, -k[0]],
+            [-k[1], k[0], 0],
+        ],
+        dtype=np.float64,
+    )
     return np.eye(3, dtype=np.float64) * c + (1 - c) * np.outer(k, k) + s * K
 
 
-def random_unit_vector(dim: int = 3, rng: np.random.Generator | None = None) -> NDArray[np.floating]:
+def random_unit_vector(
+    dim: int = 3, rng: np.random.Generator | None = None
+) -> NDArray[np.floating]:
     """Generate a random unit vector uniformly distributed on the unit sphere.
 
     Args:

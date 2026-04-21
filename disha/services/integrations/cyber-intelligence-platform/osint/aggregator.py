@@ -5,6 +5,7 @@ Sources:
   - ip-api.com  : geo-location and ASN data for IPs (free, no key required)
   - HackerTarget: passive DNS and host-search (free tier, no key required)
 """
+
 import logging
 import re
 import socket
@@ -45,9 +46,7 @@ def domain_lookup(domain: str) -> dict:
         # Fallback: stdlib DNS resolution
         try:
             result["resolved_ips"] = [
-                info[4][0]
-                for info in socket.getaddrinfo(domain, None)
-                if info[4][0]
+                info[4][0] for info in socket.getaddrinfo(domain, None) if info[4][0]
             ]
         except socket.gaierror:
             pass
@@ -69,7 +68,7 @@ def ip_lookup(ip: str) -> dict:
             f"https://ip-api.com/json/{ip}",
             params={
                 "fields": "status,message,country,countryCode,regionName,"
-                          "city,zip,isp,org,as,query"
+                "city,zip,isp,org,as,query"
             },
             timeout=_TIMEOUT,
         )

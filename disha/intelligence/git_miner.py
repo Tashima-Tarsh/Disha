@@ -12,15 +12,11 @@ def get_git_history():
         result = subprocess.run(command, capture_output=True, text=True, check=True)
 
         commits = []
-        for line in result.stdout.strip().split('\n'):
+        for line in result.stdout.strip().split("\n"):
             if not line:
                 continue
-            h, d, s = line.split('|', 2)
-            commits.append({
-                "hash": h,
-                "date": d,
-                "subject": s
-            })
+            h, d, s = line.split("|", 2)
+            commits.append({"hash": h, "date": d, "subject": s})
 
         return commits
     except Exception as e:
@@ -31,13 +27,13 @@ def get_git_history():
 def categorize_commit(subject):
     """Categorizes commits based on keywords."""
     subject = subject.lower()
-    if any(k in subject for k in ['fix', 'bug', 'resolve', 'issue']):
+    if any(k in subject for k in ["fix", "bug", "resolve", "issue"]):
         return "FIX"
-    if any(k in subject for k in ['feat', 'add', 'new']):
+    if any(k in subject for k in ["feat", "add", "new"]):
         return "FEATURE"
-    if any(k in subject for k in ['refactor', 'clean', 'style']):
+    if any(k in subject for k in ["refactor", "clean", "style"]):
         return "REFACTOR"
-    if any(k in subject for k in ['doc', 'readme', 'wiki']):
+    if any(k in subject for k in ["doc", "readme", "wiki"]):
         return "DOCUMENTATION"
     return "MISC"
 
@@ -47,12 +43,14 @@ if __name__ == "__main__":
     dataset = []
 
     for commit in commits:
-        category = categorize_commit(commit['subject'])
-        dataset.append({
-            "instruction": f"Explain the purpose of the following {category} commit.",
-            "input": commit['subject'],
-            "output": f"This commit is a {category.lower()} aimed at: {commit['subject']}. It was committed on {commit['date']}."
-        })
+        category = categorize_commit(commit["subject"])
+        dataset.append(
+            {
+                "instruction": f"Explain the purpose of the following {category} commit.",
+                "input": commit["subject"],
+                "output": f"This commit is a {category.lower()} aimed at: {commit['subject']}. It was committed on {commit['date']}.",
+            }
+        )
 
     print(f"Extracted {len(dataset)} commits for fine-tuning.")
     # with open('disha/intelligence/ft_commits.jsonl', 'w') as f:

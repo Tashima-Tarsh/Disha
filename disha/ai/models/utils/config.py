@@ -84,6 +84,7 @@ class SystemConfig:
         Returns:
             A fully populated ``SystemConfig`` instance.
         """
+
         def _build(klass: type, section: dict[str, Any]) -> Any:
             valid_keys = {f.name for f in klass.__dataclass_fields__.values()}
             filtered = {k: v for k, v in section.items() if k in valid_keys}
@@ -180,13 +181,15 @@ class SystemConfig:
         if val := os.environ.get("DISHA_GEO_GRID_RES"):
             geo["grid_resolution"] = float(val)
 
-        return cls.from_dict({
-            "simulation": sim,
-            "physics": phys,
-            "world": world,
-            "logging": log,
-            "geospatial": geo,
-        })
+        return cls.from_dict(
+            {
+                "simulation": sim,
+                "physics": phys,
+                "world": world,
+                "logging": log,
+                "geospatial": geo,
+            }
+        )
 
 
 def get_config() -> SystemConfig:

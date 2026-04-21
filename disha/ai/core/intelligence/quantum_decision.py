@@ -1,4 +1,3 @@
-
 from __future__ import annotations
 
 import asyncio
@@ -32,8 +31,8 @@ _REINFORCE_PAIRS: list[tuple[str, str]] = [
     ("search", "retrieve"),
 ]
 
-class QuantumDecisionEngine:
 
+class QuantumDecisionEngine:
     def __init__(self) -> None:
         log.info("quantum_decision_engine.initialized")
 
@@ -85,7 +84,11 @@ class QuantumDecisionEngine:
         self, superposition: list[dict[str, Any]], constraint: str
     ) -> dict[str, Any]:
         if not superposition:
-            return {"option": "no_decision", "final_amplitude": 0.0, "reason": "empty_superposition"}
+            return {
+                "option": "no_decision",
+                "final_amplitude": 0.0,
+                "reason": "empty_superposition",
+            }
 
         log.info("quantum_decision.collapse", constraint=constraint[:60])
 
@@ -94,7 +97,9 @@ class QuantumDecisionEngine:
         boosted: list[dict[str, Any]] = []
         for entry in superposition:
             option_words = set(entry["option"].lower().split())
-            overlap = len(constraint_words & option_words) / max(len(constraint_words), 1)
+            overlap = len(constraint_words & option_words) / max(
+                len(constraint_words), 1
+            )
             boosted_amplitude = entry["amplitude"] * (1.0 + overlap * 0.5)
             boosted.append(
                 {
@@ -168,16 +173,26 @@ class QuantumDecisionEngine:
             implications.append(
                 {
                     "option": b_opt,
-                    "correlation": round(overlap + (0.2 if direction == "reinforcing" else -0.1 if direction == "conflicting" else 0.0), 4),
+                    "correlation": round(
+                        overlap
+                        + (
+                            0.2
+                            if direction == "reinforcing"
+                            else -0.1
+                            if direction == "conflicting"
+                            else 0.0
+                        ),
+                        4,
+                    ),
                     "direction": direction,
                 }
             )
 
         implications.sort(key=lambda x: x["correlation"], reverse=True)
 
-        entanglement_strength = (
-            sum(abs(imp["correlation"]) for imp in implications) / max(len(implications), 1)
-        )
+        entanglement_strength = sum(
+            abs(imp["correlation"]) for imp in implications
+        ) / max(len(implications), 1)
 
         explanation = (
             f"Choosing '{a_option[:40]}' creates correlation structure across B's option space. "
@@ -230,7 +245,6 @@ class QuantumDecisionEngine:
         option_map = {s["option"].lower(): i for i, s in enumerate(superposition)}
 
         for ca, cb in _CONFLICT_PAIRS:
-
             a_indices = [i for opt, i in option_map.items() if ca in opt]
             b_indices = [i for opt, i in option_map.items() if cb in opt]
 
@@ -243,13 +257,17 @@ class QuantumDecisionEngine:
                         penalty = _CONFLICT_PENALTY * amp_a
                         superposition[ai]["amplitude"] = max(0.01, amp_a - penalty)
                         superposition[ai]["interference_factor"] = round(
-                            superposition[ai]["interference_factor"] * (1 - _CONFLICT_PENALTY), 4
+                            superposition[ai]["interference_factor"]
+                            * (1 - _CONFLICT_PENALTY),
+                            4,
                         )
                     else:
                         penalty = _CONFLICT_PENALTY * amp_b
                         superposition[bi]["amplitude"] = max(0.01, amp_b - penalty)
                         superposition[bi]["interference_factor"] = round(
-                            superposition[bi]["interference_factor"] * (1 - _CONFLICT_PENALTY), 4
+                            superposition[bi]["interference_factor"]
+                            * (1 - _CONFLICT_PENALTY),
+                            4,
                         )
 
         log.debug("quantum_decision.destructive_interference_applied")
@@ -268,11 +286,14 @@ class QuantumDecisionEngine:
 
             for ai in a_indices:
                 for bi in b_indices:
-
                     boost_a = _REINFORCEMENT_BOOST * superposition[ai]["amplitude"]
                     boost_b = _REINFORCEMENT_BOOST * superposition[bi]["amplitude"]
-                    superposition[ai]["amplitude"] = min(1.0, superposition[ai]["amplitude"] + boost_a)
-                    superposition[bi]["amplitude"] = min(1.0, superposition[bi]["amplitude"] + boost_b)
+                    superposition[ai]["amplitude"] = min(
+                        1.0, superposition[ai]["amplitude"] + boost_a
+                    )
+                    superposition[bi]["amplitude"] = min(
+                        1.0, superposition[bi]["amplitude"] + boost_b
+                    )
 
         log.debug("quantum_decision.constructive_interference_applied")
         return superposition

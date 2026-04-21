@@ -9,11 +9,11 @@ from abc import ABC, abstractmethod
 class AnalysisException(Exception):
     pass
 
+
 # =========================================================================== #
 
 
 class AnalysisService(ABC):
-
     _registry = {}
 
     # ----------------------------------------------------------------------- #
@@ -38,5 +38,6 @@ class AnalysisService(ABC):
     @abstractmethod
     def analyse(self, prompt, content_text):
         pass
+
 
 # =========================================================================== #

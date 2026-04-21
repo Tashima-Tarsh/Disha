@@ -19,14 +19,16 @@ from pathlib import Path
 import numpy as np
 import pytest
 
-torch = pytest.importorskip("torch", reason="PyTorch not installed — skipping trained-model tests")
+torch = pytest.importorskip(
+    "torch", reason="PyTorch not installed — skipping trained-model tests"
+)
 
 # ── Path setup ────────────────────────────────────────────────────────
 # The test file lives at ai-platform/backend/tests/test_trained_models.py
 # Repo root is 3 levels up from this file.
 _THIS = Path(__file__).resolve()
-_BACKEND = _THIS.parents[1]                    # ai-platform/backend
-_REPO_ROOT = _THIS.parents[5]                  # repo root (Disha-main)
+_BACKEND = _THIS.parents[1]  # ai-platform/backend
+_REPO_ROOT = _THIS.parents[5]  # repo root (Disha-main)
 _DECISION = _REPO_ROOT / "disha" / "ai" / "core" / "decision-engine"
 
 if str(_BACKEND) not in sys.path:
@@ -39,16 +41,21 @@ os.environ.setdefault("DISHA_MODEL_PROVIDER", "mock")
 
 # ── RL Tests ──────────────────────────────────────────────────────────
 
+
 class TestRLTrainedModel:
     CKPT_DIR = _BACKEND / "checkpoints"
     RL_CKPT = CKPT_DIR / "rl_policy.pt"
 
-    @pytest.mark.skipif(not (CKPT_DIR / "rl_policy.pt").exists(), reason="rl_policy.pt missing")
+    @pytest.mark.skipif(
+        not (CKPT_DIR / "rl_policy.pt").exists(), reason="rl_policy.pt missing"
+    )
     def test_checkpoint_exists(self):
         assert (self.CKPT_DIR / "rl_policy.pt").exists()
         assert (self.CKPT_DIR / "rl_training_metrics.json").exists()
 
-    @pytest.mark.skipif(not (CKPT_DIR / "rl_policy.pt").exists(), reason="rl_policy.pt missing")
+    @pytest.mark.skipif(
+        not (CKPT_DIR / "rl_policy.pt").exists(), reason="rl_policy.pt missing"
+    )
     def test_load_and_infer(self):
         from app.rl.policy import PolicyNetwork
         from app.rl.environment import InvestigationEnvironment
@@ -68,7 +75,10 @@ class TestRLTrainedModel:
         assert 0 <= action < env.ACTION_DIM
         assert isinstance(log_prob, float)
 
-    @pytest.mark.skipif(not (CKPT_DIR / "rl_training_metrics.json").exists(), reason="rl_training_metrics.json missing")
+    @pytest.mark.skipif(
+        not (CKPT_DIR / "rl_training_metrics.json").exists(),
+        reason="rl_training_metrics.json missing",
+    )
     def test_metrics_valid(self):
         with open(self.CKPT_DIR / "rl_training_metrics.json") as f:
             m = json.load(f)
@@ -78,29 +88,37 @@ class TestRLTrainedModel:
 
 # ── GNN Tests ─────────────────────────────────────────────────────────
 
+
 class TestGNNTrainedModel:
     CKPT_DIR = _BACKEND / "checkpoints"
 
-    @pytest.mark.skipif(not (_BACKEND / "checkpoints" / "gnn_link_predictor.pt").exists(),
-                        reason="GNN checkpoints missing")
+    @pytest.mark.skipif(
+        not (_BACKEND / "checkpoints" / "gnn_link_predictor.pt").exists(),
+        reason="GNN checkpoints missing",
+    )
     def test_checkpoints_exist(self):
         assert (self.CKPT_DIR / "gnn_link_predictor.pt").exists()
         assert (self.CKPT_DIR / "gnn_classifier.pt").exists()
         assert (self.CKPT_DIR / "gnn_training_metrics.json").exists()
 
-    @pytest.mark.skipif(not (_BACKEND / "checkpoints" / "gnn_link_predictor.pt").exists(),
-                        reason="gnn_link_predictor.pt missing")
+    @pytest.mark.skipif(
+        not (_BACKEND / "checkpoints" / "gnn_link_predictor.pt").exists(),
+        reason="gnn_link_predictor.pt missing",
+    )
     def test_load_link_predictor(self):
         # Import models directly to avoid __init__.py/graph_exporter
         _models_spec = importlib.util.spec_from_file_location(
-            "graph_ai_models", _BACKEND / "graph_ai" / "models.py",
+            "graph_ai_models",
+            _BACKEND / "graph_ai" / "models.py",
         )
         _models = importlib.util.module_from_spec(_models_spec)
         _models_spec.loader.exec_module(_models)
 
         ckpt = torch.load(self.CKPT_DIR / "gnn_link_predictor.pt", weights_only=True)
         encoder = _models.GCNEncoder(
-            ckpt["in_features"], ckpt["hidden_dim"], ckpt["embedding_dim"],
+            ckpt["in_features"],
+            ckpt["hidden_dim"],
+            ckpt["embedding_dim"],
         )
         encoder.load_state_dict(ckpt["encoder_state_dict"])
         predictor = _models.LinkPredictor(ckpt["embedding_dim"])
@@ -115,18 +133,23 @@ class TestGNNTrainedModel:
             prob = predictor(z[0:1], z[1:2])
         assert 0 <= prob.item() <= 1
 
-    @pytest.mark.skipif(not (_BACKEND / "checkpoints" / "gnn_classifier.pt").exists(),
-                        reason="gnn_classifier.pt missing")
+    @pytest.mark.skipif(
+        not (_BACKEND / "checkpoints" / "gnn_classifier.pt").exists(),
+        reason="gnn_classifier.pt missing",
+    )
     def test_load_classifier(self):
         _models_spec = importlib.util.spec_from_file_location(
-            "graph_ai_models_clf", _BACKEND / "graph_ai" / "models.py",
+            "graph_ai_models_clf",
+            _BACKEND / "graph_ai" / "models.py",
         )
         _models = importlib.util.module_from_spec(_models_spec)
         _models_spec.loader.exec_module(_models)
 
         ckpt = torch.load(self.CKPT_DIR / "gnn_classifier.pt", weights_only=True)
         clf = _models.GraphClassifier(
-            ckpt["in_channels"], ckpt["hidden_channels"], ckpt["num_classes"],
+            ckpt["in_channels"],
+            ckpt["hidden_channels"],
+            ckpt["num_classes"],
         )
         clf.load_state_dict(ckpt["classifier_state_dict"])
         clf.eval()
@@ -135,8 +158,10 @@ class TestGNNTrainedModel:
             logits = clf(torch.randn(5, ckpt["in_channels"]))
         assert logits.shape == (5, ckpt["num_classes"])
 
-    @pytest.mark.skipif(not (CKPT_DIR / "gnn_training_metrics.json").exists(),
-                        reason="gnn_training_metrics.json missing")
+    @pytest.mark.skipif(
+        not (CKPT_DIR / "gnn_training_metrics.json").exists(),
+        reason="gnn_training_metrics.json missing",
+    )
     def test_metrics_valid(self):
         with open(self.CKPT_DIR / "gnn_training_metrics.json") as f:
             m = json.load(f)
@@ -147,18 +172,23 @@ class TestGNNTrainedModel:
 
 # ── Decision Engine Tests ─────────────────────────────────────────────
 
+
 class TestDecisionEngineTrainedModel:
     CKPT_DIR = _DECISION / "checkpoints"
 
-    @pytest.mark.skipif(not (_DECISION / "checkpoints" / "calibration_model.json").exists(),
-                        reason="Decision checkpoints missing")
+    @pytest.mark.skipif(
+        not (_DECISION / "checkpoints" / "calibration_model.json").exists(),
+        reason="Decision checkpoints missing",
+    )
     def test_checkpoint_exists(self):
         assert (self.CKPT_DIR / "calibration_model.json").exists()
         assert (self.CKPT_DIR / "decision_training_metrics.json").exists()
         assert (self.CKPT_DIR / "training_scenarios.json").exists()
 
-    @pytest.mark.skipif(not (_DECISION / "checkpoints" / "calibration_model.json").exists(),
-                        reason="calibration_model.json missing")
+    @pytest.mark.skipif(
+        not (_DECISION / "checkpoints" / "calibration_model.json").exists(),
+        reason="calibration_model.json missing",
+    )
     def test_load_and_predict(self):
         sys.path.insert(0, str(_DECISION))
         from train import CalibrationModel
@@ -180,8 +210,10 @@ class TestDecisionEngineTrainedModel:
         assert preds.shape == (5,)
         assert all(0 <= p <= 1 for p in preds)
 
-    @pytest.mark.skipif(not (_DECISION / "checkpoints" / "calibration_model.json").exists(),
-                        reason="calibration_model.json missing")
+    @pytest.mark.skipif(
+        not (_DECISION / "checkpoints" / "calibration_model.json").exists(),
+        reason="calibration_model.json missing",
+    )
     def test_full_pipeline_with_calibration(self):
         """Run engine + calibration together."""
         from main_decision_engine import DecisionEngine
@@ -196,8 +228,10 @@ class TestDecisionEngineTrainedModel:
         calibrated = model.predict(features.reshape(1, -1))
         assert 0 <= calibrated[0] <= 1
 
-    @pytest.mark.skipif(not (CKPT_DIR / "decision_training_metrics.json").exists(),
-                        reason="decision_training_metrics.json missing")
+    @pytest.mark.skipif(
+        not (CKPT_DIR / "decision_training_metrics.json").exists(),
+        reason="decision_training_metrics.json missing",
+    )
     def test_metrics_valid(self):
         with open(self.CKPT_DIR / "decision_training_metrics.json") as f:
             m = json.load(f)

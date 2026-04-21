@@ -1,4 +1,3 @@
-
 from __future__ import annotations
 
 import time
@@ -14,6 +13,7 @@ from .intelligence.quantum_decision import QuantumDecisionEngine
 from .intelligence.goal_engine import GoalEngine
 
 logger = structlog.get_logger("cognitive_loop")
+
 
 @dataclass
 class CognitiveState:
@@ -51,8 +51,8 @@ class CognitiveState:
     def to_dict(self) -> dict:
         return {k: v for k, v in self.__dict__.items()}
 
-class CognitiveEngine:
 
+class CognitiveEngine:
     CONFIDENCE_THRESHOLD = 0.45
     WORKING_MEMORY_DECAY = 0.92
 
@@ -65,7 +65,9 @@ class CognitiveEngine:
 
         self._traces: dict[str, list[CognitiveState]] = {}
 
-    async def process(self, raw_input: str, session_id: str | None = None) -> CognitiveState:
+    async def process(
+        self, raw_input: str, session_id: str | None = None
+    ) -> CognitiveState:
         session_id = session_id or str(uuid.uuid4())
         turn = len(self._traces.get(session_id, []))
 
@@ -96,13 +98,21 @@ class CognitiveEngine:
                 log.error("stage_failed", stage=stage_name, error=str(exc))
                 state.learning_triggers.append(f"stage_error:{stage_name}")
             state.stage_durations[stage_name] = round(time.perf_counter() - t0, 4)
-            log.debug("stage_complete", stage=stage_name, duration=state.stage_durations[stage_name])
+            log.debug(
+                "stage_complete",
+                stage=stage_name,
+                duration=state.stage_durations[stage_name],
+            )
 
         self._traces.setdefault(session_id, []).append(state)
-        log.info("cognitive_cycle_complete",
-                 confidence=round(state.confidence, 3),
-                 action_type=state.action.get("type") if state.action else None,
-                 reflection_quality=state.reflection.get("quality") if state.reflection else None)
+        log.info(
+            "cognitive_cycle_complete",
+            confidence=round(state.confidence, 3),
+            action_type=state.action.get("type") if state.action else None,
+            reflection_quality=state.reflection.get("quality")
+            if state.reflection
+            else None,
+        )
 
         return state
 
@@ -110,10 +120,24 @@ class CognitiveEngine:
         text = state.raw_input.lower()
 
         intent_map = {
-            "investigate": ["investigate", "analyse", "analyze", "check", "scan", "look into"],
+            "investigate": [
+                "investigate",
+                "analyse",
+                "analyze",
+                "check",
+                "scan",
+                "look into",
+            ],
             "explain": ["explain", "what is", "how does", "describe", "tell me about"],
             "plan": ["plan", "strategy", "how to", "steps to", "roadmap"],
-            "threat": ["threat", "attack", "malware", "vulnerability", "exploit", "breach"],
+            "threat": [
+                "threat",
+                "attack",
+                "malware",
+                "vulnerability",
+                "exploit",
+                "breach",
+            ],
             "compare": ["compare", "difference", "versus", "vs", "better than"],
             "summarize": ["summarize", "summary", "tldr", "overview", "brief"],
         }
@@ -124,6 +148,7 @@ class CognitiveEngine:
                 break
 
         import re
+
         ip_pattern = re.compile(r"\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b")
         domain_pattern = re.compile(r"\b[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}\b")
         state.entities = (
@@ -170,8 +195,14 @@ class CognitiveEngine:
         state.dissenting_view = result.get("dissenting_view")
 
     async def _act(self, state: CognitiveState) -> None:
-        hypothesis_conf = state.selected_hypothesis.get("confidence", 0.5) if state.selected_hypothesis else 0.5
-        deliberation_conf = state.consensus.get("confidence", 0.5) if state.consensus else 0.5
+        hypothesis_conf = (
+            state.selected_hypothesis.get("confidence", 0.5)
+            if state.selected_hypothesis
+            else 0.5
+        )
+        deliberation_conf = (
+            state.consensus.get("confidence", 0.5) if state.consensus else 0.5
+        )
         state.confidence = round((hypothesis_conf + deliberation_conf) / 2, 3)
 
         if state.confidence < self.CONFIDENCE_THRESHOLD:
@@ -187,10 +218,13 @@ class CognitiveEngine:
             recommendation = (state.consensus or {}).get("recommendation", "")
             state.action = {
                 "type": state.intent,
-                "response": recommendation or (state.selected_hypothesis or {}).get("hypothesis", ""),
+                "response": recommendation
+                or (state.selected_hypothesis or {}).get("hypothesis", ""),
                 "entities_involved": state.entities,
                 "confidence": state.confidence,
-                "reasoning_mode": (state.selected_hypothesis or {}).get("mode", "unknown"),
+                "reasoning_mode": (state.selected_hypothesis or {}).get(
+                    "mode", "unknown"
+                ),
             }
 
     async def _reflect(self, state: CognitiveState) -> None:
@@ -201,7 +235,9 @@ class CognitiveEngine:
         if len(opinions) >= 2:
             confs = [o.get("confidence", 0) for o in opinions if isinstance(o, dict)]
             if confs:
-                variance = sum((c - sum(confs) / len(confs)) ** 2 for c in confs) / len(confs)
+                variance = sum((c - sum(confs) / len(confs)) ** 2 for c in confs) / len(
+                    confs
+                )
                 convergence = max(0.0, 1.0 - variance * 4)
                 quality_factors.append(convergence)
                 if convergence < 0.4:
@@ -228,19 +264,27 @@ class CognitiveEngine:
         state.reflection = {
             "quality": quality,
             "factors": {
-                "agent_convergence": quality_factors[0] if len(quality_factors) > 0 else None,
+                "agent_convergence": quality_factors[0]
+                if len(quality_factors) > 0
+                else None,
                 "action_confidence": state.confidence,
-                "memory_retrieval": quality_factors[2] if len(quality_factors) > 2 else None,
-                "hypothesis_diversity": quality_factors[3] if len(quality_factors) > 3 else None,
+                "memory_retrieval": quality_factors[2]
+                if len(quality_factors) > 2
+                else None,
+                "hypothesis_diversity": quality_factors[3]
+                if len(quality_factors) > 3
+                else None,
             },
         }
         state.learning_triggers = triggers
 
     async def _consolidate(self, state: CognitiveState) -> None:
 
-        importance = round(
-            (state.reflection.get("quality", 0.5) + state.confidence) / 2, 3
-        ) if state.reflection else state.confidence
+        importance = (
+            round((state.reflection.get("quality", 0.5) + state.confidence) / 2, 3)
+            if state.reflection
+            else state.confidence
+        )
 
         await self.memory.store_episode(
             session_id=state.session_id,
@@ -258,7 +302,13 @@ class CognitiveEngine:
                 await self.memory.learn_concept(
                     concept=entity,
                     definition=f"Entity observed in session {state.session_id}, turn {state.turn}",
-                    relations=[{"target": state.intent, "rel_type": "related_to", "confidence": state.confidence}],
+                    relations=[
+                        {
+                            "target": state.intent,
+                            "rel_type": "related_to",
+                            "confidence": state.confidence,
+                        }
+                    ],
                     source=f"session:{state.session_id}",
                 )
                 state.new_concepts_learned += 1

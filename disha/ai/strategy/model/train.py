@@ -57,7 +57,9 @@ def print_confusion_matrix_text(cm: np.ndarray, labels: list):
     header = " " * col_width + "".join(f"{str(lbl):>{col_width}}" for lbl in labels)
     logger.info(header)
     for i, label in enumerate(labels):
-        row = f"{str(label):>{col_width}}" + "".join(f"{cm[i, j]:>{col_width}}" for j in range(len(labels)))
+        row = f"{str(label):>{col_width}}" + "".join(
+            f"{cm[i, j]:>{col_width}}" for j in range(len(labels))
+        )
         logger.info(row)
     logger.info("")
 
@@ -117,7 +119,9 @@ def evaluate_models(rf_clf, mlp_clf, X_test, y_test, metadata):
             rf_preds,
             labels=present_labels,
             target_names=present_names,
-            zero_division=0))
+            zero_division=0,
+        )
+    )
     rf_cm = confusion_matrix(y_test, rf_preds, labels=present_labels)
     print_confusion_matrix_text(rf_cm, present_names)
 
@@ -136,12 +140,22 @@ def evaluate_models(rf_clf, mlp_clf, X_test, y_test, metadata):
     mlp_present = sorted(list(set(y_test) | set(mlp_preds)))
     mlp_names = [labels[i] for i in mlp_present if i < len(labels)]
     logger.info("--- Classification Report ---")
-    logger.info(classification_report(y_test, mlp_preds, labels=mlp_present, target_names=mlp_names, zero_division=0))
+    logger.info(
+        classification_report(
+            y_test,
+            mlp_preds,
+            labels=mlp_present,
+            target_names=mlp_names,
+            zero_division=0,
+        )
+    )
 
     return rf_accuracy, mlp_accuracy, rf_cm
 
 
-def save_models_and_metrics(rf_clf, mlp_clf, rf_accuracy, mlp_accuracy, cv_scores, rf_cm, metadata):
+def save_models_and_metrics(
+    rf_clf, mlp_clf, rf_accuracy, mlp_accuracy, cv_scores, rf_cm, metadata
+):
     """Save trained models and metrics to disk."""
     MODEL_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -190,14 +204,19 @@ def main():
 
     mlp_clf = train_mlp(X_train, y_train)
 
-    rf_accuracy, mlp_accuracy, rf_cm = evaluate_models(rf_clf, mlp_clf, X_test, y_test, metadata)
+    rf_accuracy, mlp_accuracy, rf_cm = evaluate_models(
+        rf_clf, mlp_clf, X_test, y_test, metadata
+    )
 
     metrics = save_models_and_metrics(
         rf_clf, mlp_clf, rf_accuracy, mlp_accuracy, cv_scores, rf_cm, metadata
     )
 
     logger.info("Training pipeline complete.")
-    logger.info("Best model: RandomForest with %.4f test accuracy", metrics["random_forest"]["test_accuracy"])
+    logger.info(
+        "Best model: RandomForest with %.4f test accuracy",
+        metrics["random_forest"]["test_accuracy"],
+    )
     return metrics
 
 

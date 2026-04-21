@@ -1,4 +1,3 @@
-
 from __future__ import annotations
 
 from typing import Any, Dict, List, Optional
@@ -6,8 +5,8 @@ from typing import Any, Dict, List, Optional
 from utils.llm_wrapper import get_llm
 from utils.osint import OSINTClient
 
-class SecurityAgent:
 
+class SecurityAgent:
     def __init__(
         self,
         osint_client: Optional[OSINTClient] = None,
@@ -26,12 +25,9 @@ class SecurityAgent:
 
         osint_summary = ""
         if osint_findings:
-            osint_summary = (
-                "\n\nOSINT indicators:\n"
-                + "\n".join(
-                    f"- {f.get('source', '?')}: {f.get('indicator', f.get('title', str(f)))[:120]}"
-                    for f in osint_findings[:10]
-                )
+            osint_summary = "\n\nOSINT indicators:\n" + "\n".join(
+                f"- {f.get('source', '?')}: {f.get('indicator', f.get('title', str(f)))[:120]}"
+                for f in osint_findings[:10]
             )
 
         prompt = (
@@ -46,11 +42,13 @@ class SecurityAgent:
 
         sources: List[Dict[str, Any]] = []
         for f in osint_findings:
-            sources.append({
-                "type": "osint",
-                "source": f.get("source", "unknown"),
-                "indicator": f.get("indicator", f.get("title", "")),
-            })
+            sources.append(
+                {
+                    "type": "osint",
+                    "source": f.get("source", "unknown"),
+                    "indicator": f.get("indicator", f.get("title", "")),
+                }
+            )
 
         return {
             "summary": f"Security analysis of: {scenario[:80]}",

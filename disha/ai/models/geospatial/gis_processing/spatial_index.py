@@ -79,7 +79,13 @@ class SpatialGrid:
         self._points[entity_id] = coordinate
         key = self._cell_key(coordinate)
         self._cells.setdefault(key, set()).add(entity_id)
-        logger.debug("Inserted %s at (%f, %f) -> cell %s", entity_id, coordinate.x, coordinate.y, key)
+        logger.debug(
+            "Inserted %s at (%f, %f) -> cell %s",
+            entity_id,
+            coordinate.x,
+            coordinate.y,
+            key,
+        )
 
     def remove(self, entity_id: str) -> None:
         """Remove an entity from the spatial index.
@@ -129,7 +135,13 @@ class SpatialGrid:
                     if self._points[eid].distance_to(center) <= radius:
                         results.append(eid)
 
-        logger.debug("query_radius center=(%f,%f) r=%f -> %d results", center.x, center.y, radius, len(results))
+        logger.debug(
+            "query_radius center=(%f,%f) r=%f -> %d results",
+            center.x,
+            center.y,
+            radius,
+            len(results),
+        )
         return results
 
     def query_bbox(self, min_coord: Point2D, max_coord: Point2D) -> List[str]:
@@ -155,12 +167,19 @@ class SpatialGrid:
                     continue
                 for eid in cell:
                     pt = self._points[eid]
-                    if min_coord.x <= pt.x <= max_coord.x and min_coord.y <= pt.y <= max_coord.y:
+                    if (
+                        min_coord.x <= pt.x <= max_coord.x
+                        and min_coord.y <= pt.y <= max_coord.y
+                    ):
                         results.append(eid)
 
         logger.debug(
             "query_bbox (%f,%f)-(%f,%f) -> %d results",
-            min_coord.x, min_coord.y, max_coord.x, max_coord.y, len(results),
+            min_coord.x,
+            min_coord.y,
+            max_coord.x,
+            max_coord.y,
+            len(results),
         )
         return results
 
@@ -186,10 +205,14 @@ class SpatialGrid:
         center_key = self._cell_key(coord)
         candidates: List[Tuple[float, str]] = []
         ring = 0
-        max_ring = max(
-            max(abs(ck[0] - center_key[0]), abs(ck[1] - center_key[1]))
-            for ck in self._cells
-        ) if self._cells else 0
+        max_ring = (
+            max(
+                max(abs(ck[0] - center_key[0]), abs(ck[1] - center_key[1]))
+                for ck in self._cells
+            )
+            if self._cells
+            else 0
+        )
 
         while ring <= max_ring:
             for dx in range(-ring, ring + 1):
@@ -214,5 +237,7 @@ class SpatialGrid:
 
         candidates.sort(key=lambda t: t[0])
         result = [eid for _, eid in candidates[:k]]
-        logger.debug("nearest_neighbors (%f,%f) k=%d -> %s", coord.x, coord.y, k, result)
+        logger.debug(
+            "nearest_neighbors (%f,%f) k=%d -> %s", coord.x, coord.y, k, result
+        )
         return result

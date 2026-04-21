@@ -6,18 +6,18 @@ from app.core.security import decode_token
 router = APIRouter()
 logger = structlog.get_logger(__name__)
 
+
 @router.websocket("/ws")
 async def websocket_osint_stream(
     websocket: WebSocket,
     token: str | None = None,
-    connection_manager=Depends(get_connection_manager)
+    connection_manager=Depends(get_connection_manager),
 ):
     if not token:
         await websocket.close(code=4001, reason="Missing authentication token")
         return
 
     try:
-
         decode_token(token)
     except Exception:
         await websocket.close(code=4003, reason="Invalid or expired token")
@@ -28,16 +28,16 @@ async def websocket_osint_stream(
 
     try:
         while True:
-
             await websocket.receive_text()
     except WebSocketDisconnect:
         connection_manager.disconnect(websocket)
         logger.info("osint_stream_disconnected", client_host=websocket.client.host)
+
 
 @router.get("/status")
 async def get_stream_status():
     return {
         "status": "operational",
         "stream_id": "disha-osint-pulse-v5.1",
-        "active_sources": ["CVE-Database", "Global-News-RSS", "DarkWeb-Monitor"]
+        "active_sources": ["CVE-Database", "Global-News-RSS", "DarkWeb-Monitor"],
     }

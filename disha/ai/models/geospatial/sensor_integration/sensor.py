@@ -51,7 +51,9 @@ class SensorReading:
     def __post_init__(self) -> None:
         self.position = np.asarray(self.position, dtype=np.float64)
         if self.position.shape != (3,):
-            raise ValueError(f"position must have shape (3,), got {self.position.shape}")
+            raise ValueError(
+                f"position must have shape (3,), got {self.position.shape}"
+            )
         self.confidence = float(np.clip(self.confidence, 0.0, 1.0))
 
 
@@ -87,7 +89,11 @@ class Sensor:
         self._noise_model = noise_model
         logger.info(
             "Sensor '%s' (%s) created at %s, range=%f, accuracy=%f",
-            self.id, self.type.name, self.position, self.range, self.accuracy,
+            self.id,
+            self.type.name,
+            self.position,
+            self.range,
+            self.accuracy,
         )
 
     def _distance_to(self, target_position: np.ndarray) -> float:
@@ -127,7 +133,9 @@ class Sensor:
         if dist > self.range:
             logger.warning(
                 "Sensor '%s': target at distance %f exceeds range %f",
-                self.id, dist, self.range,
+                self.id,
+                dist,
+                self.range,
             )
 
         if self._noise_model is not None:
@@ -148,7 +156,12 @@ class Sensor:
             raw_data={"distance": dist, "snr": confidence * 100.0},
             confidence=confidence,
         )
-        logger.debug("Sensor '%s' reading: pos=%s conf=%f", self.id, observed_position, confidence)
+        logger.debug(
+            "Sensor '%s' reading: pos=%s conf=%f",
+            self.id,
+            observed_position,
+            confidence,
+        )
         return reading
 
 
@@ -183,7 +196,11 @@ class SensorFusion:
         """
         self._readings.append(reading)
         self._kalman_update(reading)
-        logger.debug("Added reading from sensor '%s' (buffer size=%d)", reading.sensor_id, len(self._readings))
+        logger.debug(
+            "Added reading from sensor '%s' (buffer size=%d)",
+            reading.sensor_id,
+            len(self._readings),
+        )
 
     def _kalman_update(self, reading: SensorReading) -> None:
         """Apply a simplified scalar-diagonal Kalman measurement update."""
@@ -237,9 +254,13 @@ class SensorFusion:
         weights = np.array([r.confidence for r in self._readings], dtype=np.float64)
         total_weight = weights.sum()
         if total_weight < 1e-12:
-            logger.warning("All readings have near-zero confidence; returning unweighted mean")
+            logger.warning(
+                "All readings have near-zero confidence; returning unweighted mean"
+            )
             return positions.mean(axis=0)
-        weighted_pos: np.ndarray = (positions * weights[:, np.newaxis]).sum(axis=0) / total_weight
+        weighted_pos: np.ndarray = (positions * weights[:, np.newaxis]).sum(
+            axis=0
+        ) / total_weight
         return weighted_pos
 
     def reset(self) -> None:

@@ -158,9 +158,7 @@ class TimeStepper:
 
         return self.state
 
-    def _adaptive_step(
-        self, derivative_fn: DerivativeFn
-    ) -> Tuple[np.ndarray, float]:
+    def _adaptive_step(self, derivative_fn: DerivativeFn) -> Tuple[np.ndarray, float]:
         """Perform one adaptive step via step-doubling error estimation.
 
         Two solutions are computed:
@@ -187,9 +185,7 @@ class TimeStepper:
 
         for _ in range(50):  # retry limit
             # Full step
-            y_full = self.integrator.step(
-                self.state, derivative_fn, self.time, dt
-            )
+            y_full = self.integrator.step(self.state, derivative_fn, self.time, dt)
             # Two half steps
             y_half = self.integrator.step(
                 self.state, derivative_fn, self.time, dt / 2.0

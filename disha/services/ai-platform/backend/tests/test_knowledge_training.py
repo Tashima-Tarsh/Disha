@@ -18,10 +18,11 @@ from pathlib import Path
 
 
 # Path setup
-_REPO_ROOT = Path(__file__).resolve().parents[3]
-_SCRIPTS = _REPO_ROOT / "scripts"
-_BACKEND = _REPO_ROOT / "ai-platform" / "backend"
-_DECISION = _REPO_ROOT / "decision-engine"
+_THIS = Path(__file__).resolve()
+_REPO_ROOT = _THIS.parents[5]  # Disha-main
+_SCRIPTS = _REPO_ROOT / "disha" / "scripts"
+_BACKEND = _REPO_ROOT / "disha" / "services" / "ai-platform" / "backend"
+_DECISION = _REPO_ROOT / "disha" / "ai" / "core" / "decision-engine"
 
 for p in [str(_SCRIPTS), str(_BACKEND), str(_DECISION)]:
     if p not in sys.path:
@@ -31,6 +32,7 @@ os.environ.setdefault("DISHA_MODEL_PROVIDER", "mock")
 
 
 # ── Knowledge Loading Tests ───────────────────────────────────────────
+
 
 class TestKnowledgeLoading:
     def test_load_all_knowledge(self):
@@ -44,17 +46,29 @@ class TestKnowledgeLoading:
         from knowledge_engine import load_all_knowledge
 
         corpus = load_all_knowledge()
-        expected_domains = {"physics", "mathematics", "computing", "chemistry",
-                            "law", "cybersecurity", "innovation", "history"}
+        expected_domains = {
+            "physics",
+            "mathematics",
+            "computing",
+            "chemistry",
+            "law",
+            "cybersecurity",
+            "innovation",
+            "history",
+        }
         loaded_domains = set(corpus.domain_counts.keys())
         # At least 6 of 8 domains should be present
-        assert len(loaded_domains & expected_domains) >= 6, f"Only loaded: {loaded_domains}"
+        assert len(loaded_domains & expected_domains) >= 6, (
+            f"Only loaded: {loaded_domains}"
+        )
 
     def test_chemistry_has_118_elements(self):
         from knowledge_engine import load_all_knowledge
 
         corpus = load_all_knowledge()
-        chem_items = [i for i in corpus.items if i.domain == "chemistry" and "Element:" in i.topic]
+        chem_items = [
+            i for i in corpus.items if i.domain == "chemistry" and "Element:" in i.topic
+        ]
         assert len(chem_items) == 118, f"Expected 118 elements, got {len(chem_items)}"
 
     def test_chemistry_element_range(self):
@@ -62,8 +76,13 @@ class TestKnowledgeLoading:
         from knowledge_engine import load_all_knowledge
 
         corpus = load_all_knowledge()
-        chem_items = [i for i in corpus.items if i.domain == "chemistry" and "Element:" in i.topic]
-        symbols = {c.split("(")[1].rstrip(")") for c in [i.topic.split("Element: ")[1] for i in chem_items]}
+        chem_items = [
+            i for i in corpus.items if i.domain == "chemistry" and "Element:" in i.topic
+        ]
+        symbols = {
+            c.split("(")[1].rstrip(")")
+            for c in [i.topic.split("Element: ")[1] for i in chem_items]
+        }
         assert "H" in symbols, "Hydrogen missing"
         assert "He" in symbols, "Helium missing"
         assert "Fe" in symbols, "Iron missing"
@@ -118,6 +137,7 @@ class TestKnowledgeLoading:
 
 # ── Knowledge Graph Tests ─────────────────────────────────────────────
 
+
 class TestKnowledgeGraph:
     def test_build_knowledge_graph(self):
         from knowledge_engine import load_all_knowledge, build_knowledge_graph
@@ -151,6 +171,7 @@ class TestKnowledgeGraph:
 
 
 # ── Cross-Domain Scenario Tests ───────────────────────────────────────
+
 
 class TestCrossDomainScenarios:
     def test_generate_cross_domain_scenarios(self):
@@ -192,24 +213,35 @@ class TestCrossDomainScenarios:
 
 # ── Graph Merging Tests ───────────────────────────────────────────────
 
+
 class TestGraphMerging:
     def test_merge_graphs(self):
         from continuous_train import _merge_graphs
-        from data_fetchers import generate_synthetic_threats, build_graph_from_threats, GraphDataset
+        from data_fetchers import (
+            generate_synthetic_threats,
+            build_graph_from_threats,
+            GraphDataset,
+        )
         from knowledge_engine import load_all_knowledge, build_knowledge_graph
 
         threats = generate_synthetic_threats(n=10, seed=42)
         threat_graph = build_graph_from_threats(threats)
         corpus = load_all_knowledge()
-        kg = build_knowledge_graph(corpus, feature_dim=threat_graph.node_features.shape[1])
+        kg = build_knowledge_graph(
+            corpus, feature_dim=threat_graph.node_features.shape[1]
+        )
 
         merged = _merge_graphs(threat_graph, kg)
         assert isinstance(merged, GraphDataset)
-        assert merged.node_features.shape[0] == threat_graph.node_features.shape[0] + kg["node_features"].shape[0]
+        assert (
+            merged.node_features.shape[0]
+            == threat_graph.node_features.shape[0] + kg["node_features"].shape[0]
+        )
         assert merged.edge_index.shape[1] >= threat_graph.edge_index.shape[1]
 
 
 # ── Academic Data Fetcher Tests ───────────────────────────────────────
+
 
 class TestAcademicFetchers:
     def test_legal_data_offline(self):
@@ -232,6 +264,7 @@ class TestAcademicFetchers:
 
 
 # ── End-to-end Knowledge Training Test ────────────────────────────────
+
 
 class TestKnowledgeTrainingE2E:
     def test_offline_round_with_knowledge(self):

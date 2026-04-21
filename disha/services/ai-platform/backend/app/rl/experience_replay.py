@@ -7,6 +7,7 @@ import structlog
 
 logger = structlog.get_logger(__name__)
 
+
 @dataclass
 class Transition:
     state: np.ndarray
@@ -18,8 +19,8 @@ class Transition:
     value: float = 0.0
     priority: float = 1.0
 
-class ExperienceReplayBuffer:
 
+class ExperienceReplayBuffer:
     def __init__(self, capacity: int = 10000, alpha: float = 0.6):
         self.capacity = capacity
         self.alpha = alpha
@@ -67,7 +68,9 @@ class ExperienceReplayBuffer:
 
         episode_len = len(self._episode_buffer)
         self._episode_buffer = []
-        logger.info("episode_stored", transitions=episode_len, buffer_size=len(self.buffer))
+        logger.info(
+            "episode_stored", transitions=episode_len, buffer_size=len(self.buffer)
+        )
 
     def sample(self, batch_size: int = 32) -> list:
         if len(self.buffer) < batch_size:
@@ -76,14 +79,15 @@ class ExperienceReplayBuffer:
         if self.alpha == 0:
             return random.sample(list(self.buffer), batch_size)
 
-        priorities = np.array([t.priority ** self.alpha for t in self.buffer])
+        priorities = np.array([t.priority**self.alpha for t in self.buffer])
         total = priorities.sum()
         if total == 0:
-
             return random.sample(list(self.buffer), batch_size)
         probs = priorities / total
 
-        indices = np.random.choice(len(self.buffer), size=batch_size, p=probs, replace=True)
+        indices = np.random.choice(
+            len(self.buffer), size=batch_size, p=probs, replace=True
+        )
         return [self.buffer[i] for i in indices]
 
     def get_batch_arrays(self, batch_size: int = 32) -> Optional[dict]:

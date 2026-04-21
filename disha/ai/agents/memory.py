@@ -103,9 +103,7 @@ class MemoryStore:
 
     def clear_scope(self, scope: MemoryScope) -> int:
         """Remove all entries in a scope. Returns count removed."""
-        to_remove = [
-            k for k, v in self._entries.items() if v.scope == scope
-        ]
+        to_remove = [k for k, v in self._entries.items() if v.scope == scope]
         for k in to_remove:
             del self._entries[k]
         return len(to_remove)
@@ -271,9 +269,7 @@ class MemoryStore:
             if scope == MemoryScope.SESSION
             else self._config.max_project_entries
         )
-        scoped = [
-            (k, v) for k, v in self._entries.items() if v.scope == scope
-        ]
+        scoped = [(k, v) for k, v in self._entries.items() if v.scope == scope]
         if len(scoped) <= limit:
             return
         scoped.sort(key=lambda kv: kv[1].access_count)

@@ -9,11 +9,11 @@ from abc import ABC, abstractmethod
 class TranslationException(Exception):
     pass
 
+
 # =========================================================================== #
 
 
 class TranslationService(ABC):
-
     _registry = {}
 
     # ----------------------------------------------------------------------- #
@@ -38,5 +38,6 @@ class TranslationService(ABC):
     @abstractmethod
     def translate(self, prompt, content_text):
         pass
+
 
 # =========================================================================== #

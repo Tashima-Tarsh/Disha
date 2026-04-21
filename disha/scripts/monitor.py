@@ -1,4 +1,3 @@
-
 from __future__ import annotations
 
 import ast
@@ -16,11 +15,13 @@ logger = structlog.get_logger("self_heal")
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 
+
 class HealthStatus(str, Enum):
     HEALTHY = "healthy"
     DEGRADED = "degraded"
     FAILING = "failing"
     UNKNOWN = "unknown"
+
 
 @dataclass
 class HealthCheck:
@@ -30,6 +31,7 @@ class HealthCheck:
     details: dict[str, Any] = field(default_factory=dict)
     fixable: bool = False
     fixed: bool = False
+
 
 @dataclass
 class SystemHealth:
@@ -51,8 +53,12 @@ class SystemHealth:
     def score(self) -> float:
         if not self.checks:
             return 0.0
-        weights = {HealthStatus.HEALTHY: 1.0, HealthStatus.DEGRADED: 0.5,
-                   HealthStatus.FAILING: 0.0, HealthStatus.UNKNOWN: 0.3}
+        weights = {
+            HealthStatus.HEALTHY: 1.0,
+            HealthStatus.DEGRADED: 0.5,
+            HealthStatus.FAILING: 0.0,
+            HealthStatus.UNKNOWN: 0.3,
+        }
         return sum(weights.get(c.status, 0) for c in self.checks) / len(self.checks)
 
     def to_dict(self) -> dict[str, Any]:
@@ -73,13 +79,16 @@ class SystemHealth:
             ],
         }
 
-class PythonImportChecker:
 
+class PythonImportChecker:
     def check(self, root: Path) -> HealthCheck:
         errors = []
         total = 0
         for py_file in root.rglob("*.py"):
-            if any(skip in str(py_file) for skip in ["node_modules", ".git", "__pycache__", "venv", ".venv"]):
+            if any(
+                skip in str(py_file)
+                for skip in ["node_modules", ".git", "__pycache__", "venv", ".venv"]
+            ):
                 continue
             total += 1
             try:
@@ -102,8 +111,8 @@ class PythonImportChecker:
             details={"total_files": total},
         )
 
-class CheckpointIntegrityChecker:
 
+class CheckpointIntegrityChecker:
     def check(self, root: Path) -> HealthCheck:
         checkpoint_dirs = [
             root / "disha" / "ai" / "core" / "checkpoints",
@@ -129,16 +138,20 @@ class CheckpointIntegrityChecker:
                     results[f"{dir_name}/{f.name}"] = "corrupt_json"
             results[dir_name] = f"{len(files)} files, {metrics_ok} valid metrics"
 
-        has_issues = any("missing" in v or "empty" in v or "corrupt" in v for v in results.values())
+        has_issues = any(
+            "missing" in v or "empty" in v or "corrupt" in v for v in results.values()
+        )
         return HealthCheck(
             name="checkpoint_integrity",
             status=HealthStatus.DEGRADED if has_issues else HealthStatus.HEALTHY,
-            message="Some checkpoints missing or corrupted" if has_issues else "All checkpoints valid",
+            message="Some checkpoints missing or corrupted"
+            if has_issues
+            else "All checkpoints valid",
             details=results,
         )
 
-class ConfigConsistencyChecker:
 
+class ConfigConsistencyChecker:
     def check(self, root: Path) -> HealthCheck:
         issues = []
 
@@ -189,8 +202,8 @@ class ConfigConsistencyChecker:
             message="All configurations consistent",
         )
 
-class WorkflowChecker:
 
+class WorkflowChecker:
     def check(self, root: Path) -> HealthCheck:
         workflows_dir = root / ".github" / "workflows"
         if not workflows_dir.is_dir():
@@ -228,8 +241,8 @@ class WorkflowChecker:
             details={"total": total},
         )
 
-class KnowledgeBaseChecker:
 
+class KnowledgeBaseChecker:
     def check(self, root: Path) -> HealthCheck:
         kb_dir = root / "disha" / "ai" / "rag"
         if not kb_dir.is_dir():
@@ -251,7 +264,9 @@ class KnowledgeBaseChecker:
                 elif isinstance(data, list):
                     total_items += len(data)
             except (json.JSONDecodeError, OSError) as e:
-                errors.append({"file": str(json_file.relative_to(root)), "error": str(e)})
+                errors.append(
+                    {"file": str(json_file.relative_to(root)), "error": str(e)}
+                )
 
         if errors:
             return HealthCheck(
@@ -267,8 +282,8 @@ class KnowledgeBaseChecker:
             details={"total_files": total, "total_items": total_items},
         )
 
-class TrainingPipelineChecker:
 
+class TrainingPipelineChecker:
     def check(self, root: Path) -> HealthCheck:
         scripts = [
             root / "disha" / "scripts" / "continuous_train.py",
@@ -305,8 +320,8 @@ class TrainingPipelineChecker:
             message="All training scripts valid",
         )
 
-class SubsystemChecker:
 
+class SubsystemChecker:
     _EXPECTED = {
         "disha/ai/core": ["cognitive_loop.py", "requirements.txt"],
         "disha/ai/core/decision-engine": ["checkpoints", "requirements.txt"],
@@ -338,8 +353,8 @@ class SubsystemChecker:
             message="All subsystems structurally complete",
         )
 
-class SelfHealingMonitor:
 
+class SelfHealingMonitor:
     def __init__(self, root: Path | None = None):
         self.root = root or REPO_ROOT
         self.checkers = [
@@ -359,15 +374,20 @@ class SelfHealingMonitor:
             try:
                 result = checker.check(self.root)
                 health.checks.append(result)
-                logger.info("health_result",
-                            name=result.name, status=result.status.value,
-                            message=result.message)
+                logger.info(
+                    "health_result",
+                    name=result.name,
+                    status=result.status.value,
+                    message=result.message,
+                )
             except Exception as e:
-                health.checks.append(HealthCheck(
-                    name=checker.__class__.__name__,
-                    status=HealthStatus.UNKNOWN,
-                    message=f"Check failed: {e}",
-                ))
+                health.checks.append(
+                    HealthCheck(
+                        name=checker.__class__.__name__,
+                        status=HealthStatus.UNKNOWN,
+                        message=f"Check failed: {e}",
+                    )
+                )
         return health
 
     def heal(self, health: SystemHealth) -> int:
@@ -390,7 +410,15 @@ class SelfHealingMonitor:
     def _fix_config_issues(self, check: HealthCheck) -> bool:
         issues = check.details.get("issues", [])
 
-        _DIR_ENTRIES = {"node_modules", "__pycache__", "dist", ".next", "venv", ".venv", "build"}
+        _DIR_ENTRIES = {
+            "node_modules",
+            "__pycache__",
+            "dist",
+            ".next",
+            "venv",
+            ".venv",
+            "build",
+        }
         fixed_any = False
         for issue in issues:
             if ".gitignore missing:" in issue:
@@ -404,6 +432,7 @@ class SelfHealingMonitor:
                             f.write(f"\n{entry}{suffix}\n")
                         fixed_any = True
         return fixed_any
+
 
 def main() -> None:
     import argparse
@@ -435,6 +464,7 @@ def main() -> None:
         sys.exit(1)
     sys.exit(0)
 
+
 def _print_health(health: SystemHealth) -> None:
     status_emoji = {
         HealthStatus.HEALTHY: "",
@@ -455,6 +485,7 @@ def _print_health(health: SystemHealth) -> None:
         print(f"  {e} {check.name}: {check.message}{fixed_tag}")
 
     print(f"\n{'' * 60}\n")
+
 
 if __name__ == "__main__":
     main()

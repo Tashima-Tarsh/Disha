@@ -1,12 +1,11 @@
-
 from typing import Any
 import structlog
 from datetime import datetime, timezone
 
 logger = structlog.get_logger(__name__)
 
-class DisasterService:
 
+class DisasterService:
     def __init__(self):
         self.logger = logger.bind(service="varuna_service")
         self.active_alerts: list[dict[str, Any]] = []
@@ -22,7 +21,7 @@ class DisasterService:
             "timestamp": datetime.now(timezone.utc).isoformat(),
             "description": "Critical flood levels expected in 48 hours due to concentrated rainfall.",
             "source": "SACHET",
-            "status": "active"
+            "status": "active",
         }
 
         return [mock_alert]
@@ -36,10 +35,13 @@ class DisasterService:
             "resource_needs": {
                 "NDRF_units": 4,
                 "medical_camps": 12,
-                "supply_kits": 50000
+                "supply_kits": 50000,
             },
             "evacuation_readiness": "High",
-            "critical_infrastructure_at_risk": ["Tezpur Bridge", "Power Grid Substation 4"]
+            "critical_infrastructure_at_risk": [
+                "Tezpur Bridge",
+                "Power Grid Substation 4",
+            ],
         }
 
         return impact_analysis

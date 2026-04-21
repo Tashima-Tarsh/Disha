@@ -7,8 +7,10 @@ Usage:
     python pipeline.py "UPI fraud via OTP"      # single text argument
     echo "Phishing email detected" | python pipeline.py
 """
+
 import os
 import sys
+
 # Ensure sibling packages are importable regardless of working directory
 _ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if _ROOT not in sys.path:

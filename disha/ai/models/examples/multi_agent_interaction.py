@@ -28,6 +28,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
 # --- Agent behaviour functions ---
 
+
 def patrol_behavior(agent: AgentEntity, dt: float, nearby: List[Entity]) -> None:
     """Moves in a rectangular patrol pattern."""
     step = agent.properties.get("patrol_step", 0)
@@ -88,7 +89,9 @@ def defend_behavior(agent: AgentEntity, dt: float, nearby: List[Entity]) -> None
     # Track threats
     threats = [e for e in nearby if e.entity_type == "agent" and e.name != agent.name]
     if threats:
-        agent.properties["threats_detected"] = agent.properties.get("threats_detected", 0) + len(threats)
+        agent.properties["threats_detected"] = agent.properties.get(
+            "threats_detected", 0
+        ) + len(threats)
         agent.observe({"event": "threat_detected", "count": len(threats)})
 
 
@@ -151,9 +154,7 @@ def main() -> None:
     for step in range(n_steps):
         # Every 10 steps, agents send status messages to each other
         if step % 10 == 0 and step > 0:
-            {
-                e.id: e for e in world.registry.get_all()
-            }
+            {e.id: e for e in world.registry.get_all()}
             for i, sender in enumerate(agents):
                 for j, receiver in enumerate(agents):
                     if i != j and sender.state == EntityState.ACTIVE:
@@ -185,11 +186,15 @@ def main() -> None:
     print("=" * 60)
     for a in agents:
         print(f"\n  {a.name} (goal: {a.goal}):")
-        print(f"    Position: ({a.position[0]:.2f}, {a.position[1]:.2f}, {a.position[2]:.2f})")
+        print(
+            f"    Position: ({a.position[0]:.2f}, {a.position[1]:.2f}, {a.position[2]:.2f})"
+        )
         print(f"    State: {a.state.value}")
         print(f"    Memory entries: {len(a.memory)}")
         if a.goal == "gather":
-            print(f"    Resources gathered: {a.properties.get('resources_gathered', 0)}")
+            print(
+                f"    Resources gathered: {a.properties.get('resources_gathered', 0)}"
+            )
         elif a.goal == "defend":
             print(f"    Threats detected: {a.properties.get('threats_detected', 0)}")
         elif a.goal == "patrol":

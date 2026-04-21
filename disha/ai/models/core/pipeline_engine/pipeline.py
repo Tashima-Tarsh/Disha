@@ -148,7 +148,9 @@ class ParsingStage(PipelineStage):
             structure["has_operators"] = any(t["type"] == "operator" for t in tokens)
         else:
             for key, value in parsed.items():
-                tokens.append({"type": type(value).__name__, "key": key, "value": value})
+                tokens.append(
+                    {"type": type(value).__name__, "key": key, "value": value}
+                )
             structure["keys"] = list(parsed.keys())
 
         data["tokens"] = tokens
@@ -179,9 +181,13 @@ class _ExprNode:
         if self.kind == "op":
             left = self.children[0].evaluate(variables)
             right = self.children[1].evaluate(variables)
-            ops = {"+": float.__add__, "-": float.__sub__,
-                   "*": float.__mul__, "/": float.__truediv__,
-                   "^": lambda a, b: a ** b}
+            ops = {
+                "+": float.__add__,
+                "-": float.__sub__,
+                "*": float.__mul__,
+                "/": float.__truediv__,
+                "^": lambda a, b: a**b,
+            }
             fn = ops.get(self.value)
             if fn is None:
                 raise ValueError(f"Unknown operator: {self.value}")
@@ -256,7 +262,9 @@ def _simplify(node: _ExprNode) -> _ExprNode:
 
     # constant folding
     if left.kind == "num" and right.kind == "num":
-        result = _ExprNode(kind="op", value=node.value, children=[left, right]).evaluate({})
+        result = _ExprNode(
+            kind="op", value=node.value, children=[left, right]
+        ).evaluate({})
         return _ExprNode(kind="num", value=result)
 
     return _ExprNode(kind="op", value=node.value, children=[left, right])
@@ -384,7 +392,7 @@ class SimulationStage(PipelineStage):
             v = 0.0
             history_x: List[float] = [x]
             for _ in range(steps):
-                a = -2.0 * zeta * omega * v - omega ** 2 * x
+                a = -2.0 * zeta * omega * v - omega**2 * x
                 v += a * dt
                 x += v * dt
                 history_x.append(x)
@@ -393,9 +401,7 @@ class SimulationStage(PipelineStage):
         data["simulation_history"] = np.array(history[0] if sim_fn is None else history)
         data["simulation_steps"] = steps
         data["simulation_dt"] = dt
-        logger.debug(
-            "SimulationStage completed %d steps (dt=%.4f)", steps, dt
-        )
+        logger.debug("SimulationStage completed %d steps (dt=%.4f)", steps, dt)
         return data
 
 

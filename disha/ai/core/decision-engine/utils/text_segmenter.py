@@ -1,4 +1,3 @@
-
 from __future__ import annotations
 
 import re
@@ -16,6 +15,7 @@ _CLAUSE_PATTERN = re.compile(
     r")",
     re.IGNORECASE,
 )
+
 
 def segment(text: str) -> List[str]:
     lines = text.splitlines()
@@ -40,6 +40,7 @@ def segment(text: str) -> List[str]:
 
     return clauses
 
+
 def segment_file(input_path: str, output_path: str) -> int:
     with open(input_path, "r", encoding="utf-8") as fh:
         text = fh.read()
@@ -51,6 +52,7 @@ def segment_file(input_path: str, output_path: str) -> int:
             fh.write(clause + "\n")
 
     return len(clauses)
+
 
 if __name__ == "__main__":
     import argparse

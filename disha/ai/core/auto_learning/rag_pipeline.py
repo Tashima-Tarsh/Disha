@@ -1,4 +1,3 @@
-
 from __future__ import annotations
 
 import hashlib
@@ -32,12 +31,13 @@ try:
 except ImportError:
     _ST_AVAILABLE = False
 
+
 def dependencies_available() -> bool:
     return _NP_AVAILABLE and _FAISS_AVAILABLE and _ST_AVAILABLE
 
+
 @dataclass
 class Document:
-
     text: str
     metadata: Dict[str, Any] = field(default_factory=dict)
     doc_id: str = ""
@@ -46,16 +46,16 @@ class Document:
         if not self.doc_id:
             self.doc_id = hashlib.sha256(self.text.encode()).hexdigest()[:16]
 
+
 @dataclass
 class SearchResult:
-
     text: str
     score: float
     metadata: Dict[str, Any] = field(default_factory=dict)
     doc_id: str = ""
 
-class _FallbackEmbedder:
 
+class _FallbackEmbedder:
     def __init__(self, dim: int = 64) -> None:
         self.dim = dim
 
@@ -76,8 +76,8 @@ class _FallbackEmbedder:
             vectors.append([f / norm for f in floats])
         return vectors
 
-class _FallbackIndex:
 
+class _FallbackIndex:
     def __init__(self) -> None:
         self._vectors: List[List[float]] = []
 
@@ -111,8 +111,8 @@ class _FallbackIndex:
         indices = [[s[1] for s in top]]
         return distances, indices
 
-class RAGPipeline:
 
+class RAGPipeline:
     def __init__(
         self,
         model_name: str = "all-MiniLM-L6-v2",
@@ -125,7 +125,9 @@ class RAGPipeline:
 
         if _ST_AVAILABLE:
             self._embedder = SentenceTransformer(model_name)
-            embedding_dim = self._embedder.get_sentence_embedding_dimension() or embedding_dim
+            embedding_dim = (
+                self._embedder.get_sentence_embedding_dimension() or embedding_dim
+            )
         else:
             logger.warning(
                 "sentence-transformers not installed — using fallback hash embedder"
@@ -167,7 +169,6 @@ class RAGPipeline:
             norms = np.where(norms == 0, 1.0, norms)
             embeddings = embeddings / norms
         else:
-
             pass
 
         self._index.add(embeddings)
@@ -180,9 +181,7 @@ class RAGPipeline:
         self, texts: List[str], metadatas: Optional[List[Dict[str, Any]]] = None
     ) -> int:
         metadatas = metadatas or [{}] * len(texts)
-        docs = [
-            Document(text=t, metadata=m) for t, m in zip(texts, metadatas)
-        ]
+        docs = [Document(text=t, metadata=m) for t, m in zip(texts, metadatas)]
         return self.add_documents(docs)
 
     def query(self, query_text: str, top_k: int = 5) -> List[SearchResult]:
@@ -245,7 +244,6 @@ class RAGPipeline:
         if _FAISS_AVAILABLE and hasattr(self._index, "ntotal"):
             faiss.write_index(self._index, str(index_path))
         else:
-
             vectors = getattr(self._index, "_vectors", [])
             with open(str(index_path), "w", encoding="utf-8") as fh:
                 json.dump(vectors, fh)

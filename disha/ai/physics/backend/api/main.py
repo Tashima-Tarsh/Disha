@@ -1,6 +1,7 @@
 """
 Quantum Physics API — FastAPI app on port 8002 (Layer 6 of Disha AGI).
 """
+
 from __future__ import annotations
 
 import logging
@@ -53,6 +54,7 @@ _grafify = Grafify()
 
 
 # ── Request/Response Models ───────────────────────────────────────────────────
+
 
 class ClassifyRequest(BaseModel):
     model_config = ConfigDict(extra="ignore")
@@ -189,6 +191,7 @@ class LensingRingRequest(BaseModel):
 
 # ── Endpoints ─────────────────────────────────────────────────────────────────
 
+
 @app.get("/")
 async def health_check() -> dict:
     return {
@@ -261,7 +264,9 @@ async def classify_physics(req: ClassifyRequest) -> dict:
     try:
         result = _classifier.classify(req.text)
         if "error" in result:
-            raise HTTPException(status_code=400, detail="Invalid input for classification")
+            raise HTTPException(
+                status_code=400, detail="Invalid input for classification"
+            )
         return result
     except HTTPException:
         raise
@@ -274,7 +279,9 @@ async def classify_physics(req: ClassifyRequest) -> dict:
 async def simulate_circuit(req: SimulateRequest) -> dict:
     try:
         if req.num_qubits < 1 or req.num_qubits > 10:
-            raise HTTPException(status_code=400, detail="num_qubits must be between 1 and 10")
+            raise HTTPException(
+                status_code=400, detail="num_qubits must be between 1 and 10"
+            )
         return _quantum.simulate_circuit(req.gates, req.num_qubits)
     except HTTPException:
         raise
@@ -296,7 +303,9 @@ async def get_algorithms() -> dict:
 async def entangle(req: EntangleRequest) -> dict:
     try:
         if req.num_qubits < 2 or req.num_qubits > 8:
-            raise HTTPException(status_code=400, detail="num_qubits must be between 2 and 8")
+            raise HTTPException(
+                status_code=400, detail="num_qubits must be between 2 and 8"
+            )
         return _quantum.entangle(req.num_qubits)
     except HTTPException:
         raise
@@ -339,7 +348,9 @@ async def simulate_orbit(req: OrbitRequest) -> dict:
             raise HTTPException(status_code=400, detail="duration_days must be 1–36500")
         result = _space.simulate_orbit(req.planet, req.duration_days)
         if "error" in result:
-            raise HTTPException(status_code=400, detail="Invalid planet or orbit parameters")
+            raise HTTPException(
+                status_code=400, detail="Invalid planet or orbit parameters"
+            )
         return result
     except HTTPException:
         raise
@@ -405,7 +416,9 @@ async def get_unification_history() -> dict:
 async def model_unification(req: UnificationRequest) -> dict:
     try:
         if req.energy_scale_gev <= 0:
-            raise HTTPException(status_code=400, detail="energy_scale_gev must be positive")
+            raise HTTPException(
+                status_code=400, detail="energy_scale_gev must be positive"
+            )
         return _unified.model_unification(req.energy_scale_gev)
     except HTTPException:
         raise
@@ -415,6 +428,7 @@ async def model_unification(req: UnificationRequest) -> dict:
 
 
 # ── Gravity Endpoints ─────────────────────────────────────────────────────────
+
 
 @app.post("/api/gravity/force")
 async def gravity_force(req: GravityForceRequest) -> dict:
@@ -434,7 +448,9 @@ async def gravity_force(req: GravityForceRequest) -> dict:
 async def gravity_surface(req: SurfaceGravityRequest) -> dict:
     try:
         result = _gravity.surface_gravity(
-            body=req.body, mass=req.mass, radius=req.radius,
+            body=req.body,
+            mass=req.mass,
+            radius=req.radius,
         )
         if "error" in result:
             raise HTTPException(status_code=400, detail=result["error"])
@@ -450,7 +466,9 @@ async def gravity_surface(req: SurfaceGravityRequest) -> dict:
 async def gravity_escape_velocity(req: EscapeVelocityRequest) -> dict:
     try:
         result = _gravity.escape_velocity(
-            body=req.body, mass=req.mass, radius=req.radius,
+            body=req.body,
+            mass=req.mass,
+            radius=req.radius,
         )
         if "error" in result:
             raise HTTPException(status_code=400, detail=result["error"])
@@ -508,7 +526,9 @@ async def gravity_tidal(req: TidalForceRequest) -> dict:
 async def gravity_roche_limit(req: RocheLimitRequest) -> dict:
     try:
         result = _gravity.roche_limit(
-            req.primary_mass, req.primary_radius, req.secondary_density,
+            req.primary_mass,
+            req.primary_radius,
+            req.secondary_density,
         )
         if "error" in result:
             raise HTTPException(status_code=400, detail=result["error"])
@@ -575,7 +595,9 @@ async def gravity_body_info(body: str) -> dict:
 async def gravity_potential_field(req: PotentialHeatmapRequest) -> dict:
     try:
         result = _gravity.gravitational_potential_field(
-            req.mass, req.grid_size, req.extent_m,
+            req.mass,
+            req.grid_size,
+            req.extent_m,
         )
         if "error" in result:
             raise HTTPException(status_code=400, detail=result["error"])
@@ -589,11 +611,16 @@ async def gravity_potential_field(req: PotentialHeatmapRequest) -> dict:
 
 # ── Grafify Endpoints ─────────────────────────────────────────────────────────
 
+
 @app.post("/api/grafify/force-vs-distance")
 async def grafify_force_vs_distance(req: ForceVsDistanceRequest) -> dict:
     try:
         result = _grafify.force_vs_distance(
-            req.m1, req.m2, req.r_min, req.r_max, req.num_points,
+            req.m1,
+            req.m2,
+            req.r_min,
+            req.r_max,
+            req.num_points,
         )
         if "error" in result:
             raise HTTPException(status_code=400, detail=result["error"])
@@ -655,7 +682,9 @@ async def grafify_velocity(req: NBodyRequest) -> dict:
 async def grafify_potential_heatmap(req: PotentialHeatmapRequest) -> dict:
     try:
         result = _grafify.potential_heatmap(
-            req.mass, req.grid_size, req.extent_m,
+            req.mass,
+            req.grid_size,
+            req.extent_m,
         )
         if "error" in result:
             raise HTTPException(status_code=400, detail=result["error"])
@@ -671,7 +700,10 @@ async def grafify_potential_heatmap(req: PotentialHeatmapRequest) -> dict:
 async def grafify_time_dilation(req: TimeDilationCurveRequest) -> dict:
     try:
         result = _grafify.time_dilation_curve(
-            req.mass, req.r_min, req.r_max, req.num_points,
+            req.mass,
+            req.r_min,
+            req.r_max,
+            req.num_points,
         )
         if "error" in result:
             raise HTTPException(status_code=400, detail=result["error"])
@@ -687,7 +719,11 @@ async def grafify_time_dilation(req: TimeDilationCurveRequest) -> dict:
 async def grafify_tidal_profile(req: TidalProfileRequest) -> dict:
     try:
         result = _grafify.tidal_force_profile(
-            req.mass, req.separation, req.r_min, req.r_max, req.num_points,
+            req.mass,
+            req.separation,
+            req.r_min,
+            req.r_max,
+            req.num_points,
         )
         if "error" in result:
             raise HTTPException(status_code=400, detail=result["error"])
@@ -703,7 +739,10 @@ async def grafify_tidal_profile(req: TidalProfileRequest) -> dict:
 async def grafify_lensing_ring(req: LensingRingRequest) -> dict:
     try:
         result = _grafify.lensing_ring(
-            req.mass, req.r_min, req.r_max, req.num_points,
+            req.mass,
+            req.r_min,
+            req.r_max,
+            req.num_points,
         )
         if "error" in result:
             raise HTTPException(status_code=400, detail=result["error"])
@@ -717,4 +756,5 @@ async def grafify_lensing_ring(req: LensingRingRequest) -> dict:
 
 if __name__ == "__main__":
     import uvicorn
+
     uvicorn.run(app, host="0.0.0.0", port=8002)
