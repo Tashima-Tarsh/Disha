@@ -1,12 +1,8 @@
-<div align="center">
-
 # 🛡️ DISHA — Sovereign Intelligence Platform
 
-### *Direction. Awareness. Decision. Resilience.*
+## *Direction. Awareness. Decision. Resilience.*
 
-**Disha** — The AGI that thinks in cycles, defends in layers, and learns from every encounter.
-
-<br/>
+**DISHA** — The AGI that thinks in cycles, defends in layers, and learns from every encounter.
 
 [![Build Status](https://img.shields.io/github/actions/workflow/status/Tashima-Tarsh/Disha/ci.yml?style=for-the-badge&logo=github-actions&logoColor=white&label=CI)](https://github.com/Tashima-Tarsh/Disha/actions)
 [![CodeQL](https://img.shields.io/github/actions/workflow/status/Tashima-Tarsh/Disha/codeql.yml?style=for-the-badge&logo=github&logoColor=white&label=CodeQL)](https://github.com/Tashima-Tarsh/Disha/security/code-scanning)
@@ -16,8 +12,6 @@
 [![Bun](https://img.shields.io/badge/Bun-1.3+-fbf0df?style=for-the-badge&logo=bun&logoColor=black)](https://bun.sh)
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue?style=for-the-badge)](./LICENSE)
 [![Stars](https://img.shields.io/github/stars/Tashima-Tarsh/Disha?style=for-the-badge&logo=github)](https://github.com/Tashima-Tarsh/Disha/stargazers)
-
-<br/>
 
 > **DISHA is not an AI wrapper. It is a cognitive architecture.**
 >
@@ -50,7 +44,7 @@ Alongside the AGI core, DISHA ships:
 
 ### 🧠 Cognitive Engine — 7-Stage Biological Loop
 
-```
+```text
 Perceive → Attend → Reason → Deliberate → Act → Reflect → Consolidate
 ```
 
@@ -59,7 +53,7 @@ Every query passes through all seven stages. Each stage has measurable output �
 ### 🔮 Hybrid Reasoning — Three Parallel Modes
 
 | Mode | Method | When Used |
-|------|--------|-----------|
+| --- | --- | --- |
 | **Symbolic** | Rule-based + Decision Tree | Structured legal/policy queries |
 | **Neural** | Transformer-style embedding | Open-ended reasoning |
 | **Quantum-Inspired** | Superposition probability scoring | High-ambiguity, multi-outcome scenarios |
@@ -77,7 +71,7 @@ Every query passes through all seven stages. Each stage has measurable output �
 Four specialized agents deliberate on every strategic query:
 
 | Agent | Domain | Grounding |
-|-------|--------|-----------|
+| --- | --- | --- |
 | **Political Agent** | Geopolitics & governance | Indian constitutional doctrine |
 | **Legal Agent** | Regulatory & judicial reasoning | Case law + statute parsing |
 | **Ideology Agent** | National interest & value alignment | Civilizational reasoning |
@@ -95,7 +89,7 @@ Four specialized agents deliberate on every strategic query:
 
 DISHA runs an autonomous daily pipeline:
 
-```
+```text
 Threat Guardian Scan → Self-Healing Monitor → Knowledge Aggregation → Continuous Training
 ```
 
@@ -105,7 +99,7 @@ When services degrade, DISHA detects, diagnoses, and restores them — no human 
 
 ## 🏗️ Architecture
 
-```
+```text
 Tashima-Tarsh/Disha/
 ├── disha/
 │   ├── ai/
@@ -190,21 +184,18 @@ flowchart TD
 
 ## 🛠️ Technology Stack
 
-<table>
-<tr>
-<th>Layer</th><th>Technology</th><th>Purpose</th>
-</tr>
-<tr><td><b>Runtime</b></td><td>Bun 1.3+, Node 20+</td><td>CLI, package management, TypeScript</td></tr>
-<tr><td><b>Frontend</b></td><td>React 19, Next.js, Vite + TypeScript</td><td>Web command center, Go4Bid UI</td></tr>
-<tr><td><b>AI Platform</b></td><td>FastAPI, Python 3.11</td><td>Multi-agent REST API (14 agents)</td></tr>
-<tr><td><b>ML / DL</b></td><td>PyTorch, Scikit-Learn, Sentence-Transformers</td><td>Attack classification, anomaly detection</td></tr>
-<tr><td><b>Memory</b></td><td>Neo4j, ChromaDB, Redis</td><td>Graph reasoning, vector retrieval, ephemeral cache</td></tr>
-<tr><td><b>Streaming</b></td><td>Apache Kafka, WebSockets</td><td>Real-time OSINT feed processing</td></tr>
-<tr><td><b>Security</b></td><td>Argon2id, SHA-256, Gitleaks, Bandit, pip-audit</td><td>Auth, PII hashing, secret scanning, SAST</td></tr>
-<tr><td><b>Infra</b></td><td>Docker, docker-compose, GitHub Actions (11 pipelines)</td><td>Container orchestration, CI/CD</td></tr>
-<tr><td><b>Linting</b></td><td>Biome (TS/JS), Ruff (Python)</td><td>Unified fast linting across both stacks</td></tr>
-<tr><td><b>Observability</b></td><td>structlog, ELK Stack, OpenCanary JSON logs</td><td>Structured logging, attack dashboards</td></tr>
-</table>
+| Layer | Technology | Purpose |
+| :--- | :--- | :--- |
+| **Runtime** | Bun 1.3+, Node 20+ | CLI, package management, TypeScript |
+| **Frontend** | React 19, Next.js, Vite + TypeScript | Web command center, Go4Bid UI |
+| **AI Platform** | FastAPI, Python 3.11 | Multi-agent REST API (14 agents) |
+| **ML / DL** | PyTorch, Scikit-Learn, Sentence-Transformers | Attack classification, anomaly detection |
+| **Memory** | Neo4j, ChromaDB, Redis | Graph reasoning, vector retrieval, ephemeral cache |
+| **Streaming** | Apache Kafka, WebSockets | Real-time OSINT feed processing |
+| **Security** | Argon2id, SHA-256, Gitleaks, Bandit, pip-audit | Auth, PII hashing, secret scanning, SAST |
+| **Infra** | Docker, docker-compose, GitHub Actions (11 pipelines) | Container orchestration, CI/CD |
+| **Linting** | Biome (TS/JS), Ruff (Python) | Unified fast linting across both stacks |
+| **Observability** | structlog, ELK Stack, OpenCanary JSON logs | Structured logging, attack dashboards |
 
 ---
 
@@ -213,7 +204,7 @@ flowchart TD
 ### Prerequisites
 
 | Tool | Version | Purpose |
-|------|---------|---------|
+| --- | --- | --- |
 | [Bun](https://bun.sh) | `≥ 1.3` | TypeScript runtime & package manager |
 | [Python](https://python.org) | `≥ 3.11` | Intelligence & cyber-defense layers |
 | [Docker](https://docker.com) | `v2+` | Honeypot mesh & service orchestration |
@@ -285,7 +276,7 @@ The AI Platform exposes a versioned REST API at `http://localhost:8000/api/v1/`.
 ### Available Agents
 
 | Endpoint | Agent | Capability |
-|----------|-------|-----------|
+| --- | --- | --- |
 | `POST /api/v1/agents/sentinel` | Sentinel Agent | Threat analysis, incident reporting |
 | `POST /api/v1/agents/osint` | OSINT Agent | Open-source intelligence gathering |
 | `POST /api/v1/agents/legal` | Legal Agent | Constitutional & regulatory analysis |
@@ -325,7 +316,7 @@ curl -X POST http://localhost:8000/api/v1/agents/sentinel \
 
 DISHA is engineered with a **zero-trust, defense-in-depth** security model:
 
-```
+```text
 ┌─────────────────────────────────────────────────────┐
 │  SECRET SCANNING     → Gitleaks (every push)        │
 │  SAST                → Bandit (Python static)        │
@@ -350,7 +341,7 @@ Security vulnerabilities can be reported privately via GitHub's [Security Adviso
 ## 📊 CI/CD Pipeline Status
 
 | Pipeline | Scope | Trigger |
-|----------|-------|---------|
+| --- | --- | --- |
 | **CI** | TypeScript lint (Biome) + Bun unit tests | Every push/PR |
 | **AI Platform CI** | Python lint (Ruff) + API tests | `disha/services/ai-platform/**` |
 | **Cognitive Engine CI** | Ruff lint + cognitive loop tests (cov≥10%) | `disha/ai/core/**` |
@@ -368,16 +359,19 @@ Security vulnerabilities can be reported privately via GitHub's [Security Adviso
 ## 🗺️ Roadmap
 
 ### v6.1 — Edge Intelligence *(Q3 2026)*
+
 - P2P distributed reasoning across edge nodes
 - On-device model quantization (GGUF format)
 - Mobile guardian app (iOS + Android)
 
 ### v6.5 — Quantum Acceleration *(Q4 2026)*
+
 - Hardware-accelerated strategy simulation (IBM Qiskit integration)
 - Multi-modal OSINT (image + audio + text fusion)
 - Federated learning for privacy-preserving model updates
 
 ### v7.0 — Planetary-Scale Intelligence *(2027)*
+
 - Global OSINT correlation across 50+ live feeds
 - Nation-state digital twin with real-time resilience scoring
 - Fully autonomous agentic task delegation with rollback
@@ -453,17 +447,11 @@ The project name दिशा (Disha) means **Direction** in Sanskrit — chosen
 
 ---
 
-<div align="center">
-
 **If DISHA taught you something or saved you time, a ⭐ star means the world.**
 
 [![Star this repo](https://img.shields.io/github/stars/Tashima-Tarsh/Disha?style=social)](https://github.com/Tashima-Tarsh/Disha/stargazers)
 [![Fork it](https://img.shields.io/github/forks/Tashima-Tarsh/Disha?style=social)](https://github.com/Tashima-Tarsh/Disha/fork)
 [![Follow](https://img.shields.io/github/followers/Tashima-Tarsh?style=social)](https://github.com/Tashima-Tarsh/Tashima-Tarsh)
 
-<br/>
-
 *DISHA — Sovereign Intelligence for a Resilient Nation.*
 *दिशा — Direction. Engineered for the Future.*
-
-</div>

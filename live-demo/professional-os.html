@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SOVEREIGN OS - Defense-Grade Command Center</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;500;700;900&display=swap');
+
+        :root {
+            --cyan: #00f3ff;
+            --blue: #0984e3;
+            --gold: #f39c12;
+            --red: #ff003c;
+            --green: #00ff66;
+            --bg-deep: #000205;
+            --panel-border: rgba(0, 243, 255, 0.3);
+            --panel-bg: rgba(0, 15, 30, 0.65);
+        }
+
+        * {
+            box-sizing: border-box; margin: 0; padding: 0;
+            user-select: none;
+        }
+
+        body {
+            background-color: var(--bg-deep);
+            color: var(--cyan);
+            font-family: 'Share Tech Mono', monospace;
+            height: 100vh; overflow: hidden;
+            display: grid;
+            grid-template-columns: 280px 1fr 380px;
+            grid-template-rows: 60px 1fr;
+            gap: 10px;
+            padding: 10px;
+            /* Complex Grid Background */
+            background-image: 
+                linear-gradient(rgba(0, 243, 255, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 243, 255, 0.05) 1px, transparent 1px),
+                linear-gradient(rgba(0, 243, 255, 0.02) 2px, transparent 2px),
+                linear-gradient(90deg, rgba(0, 243, 255, 0.02) 2px, transparent 2px);
+            background-size: 100px 100px, 100px 100px, 20px 20px, 20px 20px;
+            background-position: center center;
+        }
+
+        /* Scanline Overlay */
+        body::after {
+            content: ""; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0.2));
+            background-size: 100% 4px; pointer-events: none; z-index: 9999;
+        }
+
+        /* Glass Panel Styling */
+        .panel {
+            background: var(--panel-bg);
+            border: 1px solid var(--panel-border);
+            backdrop-filter: blur(8px);
+            position: relative;
+            box-shadow: inset 0 0 30px rgba(0,0,0,0.8), 0 5px 15px rgba(0,0,0,0.5);
+            display: flex; flex-direction: column;
+        }
+        
+        /* Sci-Fi Corners */
+        .panel::before, .panel::after {
+            content: ''; position: absolute; width: 20px; height: 20px;
+            border: 2px solid var(--cyan); transition: 0.3s;
+        }
+        .panel::before { top: -1px; left: -1px; border-right: none; border-bottom: none; }
+        .panel::after { bottom: -1px; right: -1px; border-left: none; border-top: none; }
+
+        .panel-header {
+            font-family: 'Orbitron', sans-serif; font-size: 14px; font-weight: 700; letter-spacing: 2px;
+            background: rgba(0, 243, 255, 0.1); padding: 8px 15px;
+            border-bottom: 1px solid var(--panel-border);
+            display: flex; justify-content: space-between; align-items: center;
+        }
+
+        /* --- HEADER --- */
+        .header-bar {
+            grid-column: 1 / -1; grid-row: 1;
+            display: flex; justify-content: space-between; align-items: center; padding: 0 20px;
+            border-bottom: 2px solid var(--cyan);
+            background: linear-gradient(90deg, rgba(0,243,255,0.2) 0%, transparent 50%, rgba(0,243,255,0.2) 100%);
+        }
+        .header-bar h1 {
+            font-family: 'Orbitron', sans-serif; font-size: 28px; font-weight: 900; letter-spacing: 8px;
+            text-shadow: 0 0 15px var(--cyan);
+        }
+        .system-specs { display: flex; gap: 40px; font-size: 12px; }
+        .spec-item { display: flex; flex-direction: column; align-items: flex-end; }
+        .spec-val { font-size: 18px; color: #fff; font-weight: bold; text-shadow: 0 0 10px var(--cyan); }
+
+        /* --- SIDEBAR --- */
+        .sidebar { grid-column: 1; grid-row: 2; padding: 15px; gap: 15px; }
+        .nav-btn {
+            background: rgba(0,0,0,0.5); border: 1px solid var(--blue);
+            padding: 15px; margin-bottom: 10px; cursor: pointer;
+            font-family: 'Orbitron', sans-serif; font-size: 12px; font-weight: 700; letter-spacing: 2px;
+            transition: all 0.3s; position: relative; overflow: hidden;
+            display: flex; align-items: center; gap: 15px;
+        }
+        .nav-btn::before {
+            content: ''; position: absolute; left: 0; top: 0; height: 100%; width: 4px; background: var(--cyan);
+            transform: scaleY(0); transition: 0.3s;
+        }
+        .nav-btn:hover::before, .nav-btn.active::before { transform: scaleY(1); }
+        .nav-btn:hover, .nav-btn.active { background: rgba(0, 243, 255, 0.15); box-shadow: inset 0 0 20px rgba(0,243,255,0.2); }
+        .nav-icon { width: 24px; height: 24px; fill: var(--cyan); }
+
+        /* --- 7-LAYER SCIENCE VISUALIZATION (THE CORE) --- */
+        .core-view {
+            grid-column: 2; grid-row: 2;
+            display: flex; flex-direction: column;
+            padding: 20px; position: relative; overflow: hidden;
+        }
+        
+        .layer-stack {
+            display: flex; flex-direction: column; gap: 12px; flex: 1;
+            justify-content: center; position: relative; z-index: 10;
+        }
+
+        .layer-row {
+            display: grid; grid-template-columns: 80px 2fr 1fr 1fr;
+            background: rgba(0,0,0,0.6); border: 1px solid rgba(0,243,255,0.2);
+            align-items: center; height: 70px;
+            transition: 0.3s; position: relative; cursor: pointer;
+        }
+        .layer-row:hover { background: rgba(0,243,255,0.1); border-color: var(--cyan); box-shadow: 0 0 20px rgba(0,243,255,0.2); transform: scale(1.02); z-index: 100;}
+
+        /* Connecting Lines Behind Layers */
+        .data-pipeline {
+            position: absolute; top: 10%; bottom: 10%; left: 40px; width: 4px;
+            background: rgba(0,243,255,0.1); z-index: 1;
+        }
+        .data-flow {
+            position: absolute; top: 0; left: 0; width: 100%; height: 50px;
+            background: linear-gradient(to bottom, transparent, var(--cyan), transparent);
+            animation: flowDown 3s linear infinite; box-shadow: 0 0 15px var(--cyan);
+        }
+        @keyframes flowDown { 0% { top: -10%; } 100% { top: 110%; } }
+
+        .layer-icon-box {
+            width: 100%; height: 100%; border-right: 1px solid rgba(0,243,255,0.2);
+            display: flex; justify-content: center; align-items: center; position: relative;
+            background: rgba(0,0,0,0.8); z-index: 10;
+        }
+        .layer-num { position: absolute; top: 2px; left: 4px; font-size: 10px; color: #555; }
+        
+        .layer-details { padding: 0 20px; display: flex; flex-direction: column; }
+        .layer-name { font-family: 'Orbitron', sans-serif; font-size: 18px; font-weight: 700; color: #fff; letter-spacing: 2px; }
+        .layer-desc { font-size: 11px; color: #aaa; }
+
+        .layer-metrics { display: flex; flex-direction: column; font-size: 12px; gap: 4px; }
+        .metric-line { display: flex; justify-content: space-between; }
+        .metric-val { color: var(--gold); }
+
+        .layer-shield { 
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            border-left: 1px solid rgba(0,243,255,0.2); height: 100%;
+        }
+        .shield-score { font-size: 24px; font-weight: bold; color: var(--green); text-shadow: 0 0 10px var(--green); }
+        .shield-label { font-size: 9px; color: #aaa; letter-spacing: 1px; }
+
+        /* Specific Layer Overrides */
+        .layer-row[data-status="alert"] { border-color: var(--red); background: rgba(255,0,60,0.1); animation: pulseRow 2s infinite; }
+        .layer-row[data-status="alert"] .shield-score { color: var(--red); text-shadow: 0 0 10px var(--red); }
+        .layer-row[data-status="warn"] .shield-score { color: var(--gold); text-shadow: 0 0 10px var(--gold); }
+
+        @keyframes pulseRow { 0%, 100% { box-shadow: inset 0 0 10px rgba(255,0,60,0); } 50% { box-shadow: inset 0 0 30px rgba(255,0,60,0.4); } }
+
+        /* Hexagonal Background Pattern in Core */
+        .hex-bg {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            opacity: 0.05; background-image: url('data:image/svg+xml;utf8,<svg width="60" height="100" viewBox="0 0 60 100" xmlns="http://www.w3.org/2000/svg"><path d="M30 0l25.98 15v30L30 60 4.02 45V15z" fill="none" stroke="%2300f3ff" stroke-width="1"/></svg>');
+            pointer-events: none;
+        }
+
+        /* --- RED ALERT CENTER (RIGHT) --- */
+        .alert-center { grid-column: 3; grid-row: 2; display: grid; grid-template-rows: auto 1fr auto; gap: 15px; }
+        
+        .threat-radar-box { height: 250px; display: flex; justify-content: center; align-items: center; position: relative; }
+        
+        /* Advanced SVG Radar */
+        .radar { width: 200px; height: 200px; border-radius: 50%; border: 2px solid var(--cyan); position: relative; background: rgba(0,243,255,0.05); box-shadow: 0 0 30px rgba(0,243,255,0.1); }
+        .radar::before { content:''; position:absolute; top:50%; left:0; width:100%; height:1px; background:var(--cyan); opacity:0.5; }
+        .radar::after { content:''; position:absolute; top:0; left:50%; width:1px; height:100%; background:var(--cyan); opacity:0.5; }
+        .radar-sweep-blade {
+            position: absolute; top: 0; left: 50%; width: 50%; height: 50%;
+            background: conic-gradient(from 90deg, transparent 0%, rgba(0,243,255,0.8) 90%);
+            transform-origin: bottom left; animation: spin 3s linear infinite;
+        }
+        .blip { position: absolute; width: 6px; height: 6px; background: var(--red); border-radius: 50%; box-shadow: 0 0 10px var(--red); animation: ping 3s infinite; }
+        @keyframes ping { 0% { opacity: 1; transform: scale(1); } 100% { opacity: 0; transform: scale(3); } }
+        
+        .live-logs { flex: 1; background: rgba(0,0,0,0.8); border: 1px inset #333; overflow: hidden; padding: 10px; font-size: 11px; line-height: 1.5; display: flex; flex-direction: column; justify-content: flex-end;}
+        .log-line { margin-bottom: 4px; opacity: 0; animation: logFadeIn 0.2s forwards; }
+        @keyframes logFadeIn { to { opacity: 1; } }
+        .log-time { color: #555; margin-right: 8px; }
+        .log-WARN { color: var(--gold); } .log-CRIT { color: var(--red); font-weight: bold; } .log-INFO { color: var(--blue); }
+
+        .defcon-status {
+            height: 100px; background: rgba(255,0,60,0.1); border: 1px solid var(--red);
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            animation: defconPulse 1s infinite;
+        }
+        @keyframes defconPulse { 0%,100% { box-shadow: 0 0 20px rgba(255,0,60,0.2); } 50% { box-shadow: 0 0 50px rgba(255,0,60,0.6); } }
+        .defcon-status h2 { font-family: 'Orbitron'; font-size: 32px; color: #fff; text-shadow: 0 0 15px var(--red); letter-spacing: 5px; }
+
+        /* Micro Tech Details */
+        .tech-barcode {
+            position: absolute; bottom: 10px; right: 20px; font-size: 8px; color: rgba(0,243,255,0.4);
+            letter-spacing: 2px; text-align: right;
+        }
+        .corner-data { position: absolute; top: 10px; right: 10px; font-size: 9px; color: #666; }
+
+    </style>
+</head>
+<body>
+
+    <!-- TOP HEADER -->
+    <div class="header-bar">
+        <h1>SOVEREIGN_OS</h1>
+        <div class="system-specs">
+            <div class="spec-item"><span style="color:#aaa">UPTIME</span><span class="spec-val">99.998%</span></div>
+            <div class="spec-item"><span style="color:#aaa">ACTIVE NODES</span><span class="spec-val">1,402</span></div>
+            <div class="spec-item"><span style="color:#aaa">THREAT INDEX</span><span class="spec-val" style="color:var(--red)">ELEVATED</span></div>
+            <div class="spec-item"><span style="color:#aaa">SYS.CLK</span><span class="spec-val" id="clock" style="color:var(--cyan)">00:00:00.000</span></div>
+        </div>
+    </div>
+
+    <!-- LEFT SIDEBAR -->
+    <div class="panel sidebar">
+        <div class="panel-header">COMMAND MODULES <span class="blinking-dot" style="color:var(--cyan)">●</span></div>
+        <div style="flex:1; display:flex; flex-direction:column; margin-top:20px;">
+            <div class="nav-btn active">
+                <svg class="nav-icon" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                SECURITY STACK
+            </div>
+            <div class="nav-btn">
+                <svg class="nav-icon" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                CYBER DEFENSE
+            </div>
+            <div class="nav-btn">
+                <svg class="nav-icon" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+                NEO4J TOPOLOGY
+            </div>
+            <div class="nav-btn">
+                <svg class="nav-icon" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg>
+                AUDIT LOGS
+            </div>
+        </div>
+        <div class="tech-barcode">
+            ||| ||||| || |||| ||| <br>
+            SYS.ID: 9X-A401
+        </div>
+    </div>
+
+    <!-- CENTER: THE 7-LAYER SCIENCE VISUALIZATION -->
+    <div class="panel core-view">
+        <div class="hex-bg"></div>
+        <div class="panel-header">
+            <span>7-LAYER ARCHITECTURE VISUALIZATION</span>
+            <span style="font-size:10px; color:#aaa">SECURE PIPELINE V6.1</span>
+        </div>
+        
+        <div class="layer-stack">
+            <div class="data-pipeline"><div class="data-flow"></div></div>
+
+            <!-- LAYER 1 -->
+            <div class="layer-row">
+                <div class="layer-icon-box"><span class="layer-num">L1</span><svg width="30" height="30" fill="var(--cyan)" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+                <div class="layer-details">
+                    <div class="layer-name">USER LAYER</div>
+                    <div class="layer-desc">Identity & Session Management</div>
+                </div>
+                <div class="layer-metrics">
+                    <div class="metric-line"><span>ACTIVE SESSIONS</span><span class="metric-val">12,408</span></div>
+                    <div class="metric-line"><span>AUTH FAILURES</span><span class="metric-val" style="color:var(--green)">0.02%</span></div>
+                </div>
+                <div class="layer-shield">
+                    <div class="shield-score">99%</div><div class="shield-label">INTEGRITY</div>
+                </div>
+            </div>
+
+            <!-- LAYER 2 -->
+            <div class="layer-row">
+                <div class="layer-icon-box"><span class="layer-num">L2</span><svg width="30" height="30" fill="var(--cyan)" viewBox="0 0 24 24"><rect x="4" y="2" width="16" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg></div>
+                <div class="layer-details">
+                    <div class="layer-name">APPLICATION LAYER</div>
+                    <div class="layer-desc">Next.js Web Command Center</div>
+                </div>
+                <div class="layer-metrics">
+                    <div class="metric-line"><span>REQ/SEC</span><span class="metric-val">3,450</span></div>
+                    <div class="metric-line"><span>WAF BLOCKS</span><span class="metric-val">142/s</span></div>
+                </div>
+                <div class="layer-shield">
+                    <div class="shield-score">100%</div><div class="shield-label">INTEGRITY</div>
+                </div>
+            </div>
+
+            <!-- LAYER 3 -->
+            <div class="layer-row">
+                <div class="layer-icon-box"><span class="layer-num">L3</span><svg width="30" height="30" fill="var(--cyan)" viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></div>
+                <div class="layer-details">
+                    <div class="layer-name">API LAYER</div>
+                    <div class="layer-desc">FastAPI Multi-Agent Gateway</div>
+                </div>
+                <div class="layer-metrics">
+                    <div class="metric-line"><span>LATENCY</span><span class="metric-val">42ms</span></div>
+                    <div class="metric-line"><span>5XX ERRORS</span><span class="metric-val">0</span></div>
+                </div>
+                <div class="layer-shield">
+                    <div class="shield-score">99%</div><div class="shield-label">INTEGRITY</div>
+                </div>
+            </div>
+
+            <!-- LAYER 4 -->
+            <div class="layer-row">
+                <div class="layer-icon-box"><span class="layer-num">L4</span><svg width="30" height="30" fill="var(--cyan)" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
+                <div class="layer-details">
+                    <div class="layer-name">AUTHENTICATION LAYER</div>
+                    <div class="layer-desc">Argon2id Blind Hash Protocols</div>
+                </div>
+                <div class="layer-metrics">
+                    <div class="metric-line"><span>KEY ROTATION</span><span class="metric-val">SYNCED</span></div>
+                    <div class="metric-line"><span>MFA CHALLENGES</span><span class="metric-val">840</span></div>
+                </div>
+                <div class="layer-shield">
+                    <div class="shield-score">100%</div><div class="shield-label">INTEGRITY</div>
+                </div>
+            </div>
+
+            <!-- LAYER 5 -->
+            <div class="layer-row" data-status="warn">
+                <div class="layer-icon-box"><span class="layer-num">L5</span><svg width="30" height="30" fill="var(--cyan)" viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg></div>
+                <div class="layer-details">
+                    <div class="layer-name">DATABASE LAYER</div>
+                    <div class="layer-desc">Neo4j Graph & Upstash Redis Ephemeral</div>
+                </div>
+                <div class="layer-metrics">
+                    <div class="metric-line"><span>GRAPH NODES</span><span class="metric-val">1.2M</span></div>
+                    <div class="metric-line"><span>QUERY LOAD</span><span class="metric-val" style="color:var(--gold)">88%</span></div>
+                </div>
+                <div class="layer-shield">
+                    <div class="shield-score">82%</div><div class="shield-label">INTEGRITY</div>
+                </div>
+            </div>
+
+            <!-- LAYER 6 (RED ALERT) -->
+            <div class="layer-row" data-status="alert">
+                <div class="layer-icon-box"><span class="layer-num">L6</span><svg width="30" height="30" fill="var(--red)" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"/><rect x="2" y="14" width="20" height="8" rx="2" ry="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg></div>
+                <div class="layer-details">
+                    <div class="layer-name">NETWORK LAYER</div>
+                    <div class="layer-desc" style="color:#ffb3c1">Sentinel Honeypot Mesh (Cowrie/Dionaea)</div>
+                </div>
+                <div class="layer-metrics">
+                    <div class="metric-line"><span>INBOUND THREATS</span><span class="metric-val" style="color:var(--red)">14,203</span></div>
+                    <div class="metric-line"><span>TARPIT STATUS</span><span class="metric-val" style="color:var(--red)">ENGAGED</span></div>
+                </div>
+                <div class="layer-shield">
+                    <div class="shield-score">41%</div><div class="shield-label" style="color:var(--red)">UNDER ATTACK</div>
+                </div>
+            </div>
+
+            <!-- LAYER 7 -->
+            <div class="layer-row">
+                <div class="layer-icon-box"><span class="layer-num">L7</span><svg width="30" height="30" fill="var(--cyan)" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div>
+                <div class="layer-details">
+                    <div class="layer-name">INFRASTRUCTURE LAYER</div>
+                    <div class="layer-desc">Docker Swarm / Bare Metal Kernels</div>
+                </div>
+                <div class="layer-metrics">
+                    <div class="metric-line"><span>NODE HEALTH</span><span class="metric-val">NOMINAL</span></div>
+                    <div class="metric-line"><span>AUTO-HEAL</span><span class="metric-val">STANDBY</span></div>
+                </div>
+                <div class="layer-shield">
+                    <div class="shield-score">100%</div><div class="shield-label">INTEGRITY</div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- RIGHT: RED ALERT CENTER -->
+    <div class="alert-center">
+        <!-- Threat Radar -->
+        <div class="panel threat-radar-box">
+            <div class="panel-header" style="position:absolute; top:0; width:100%; border-bottom:1px solid rgba(255,0,60,0.5); background:rgba(255,0,60,0.1); color:var(--red);">
+                GEO-THREAT RADAR
+            </div>
+            <div class="radar" id="radar">
+                <div class="radar-sweep-blade"></div>
+            </div>
+            <div class="corner-data">AZIMUTH 34.22.1</div>
+        </div>
+
+        <!-- Live Terminal -->
+        <div class="panel live-logs-box" style="display:flex; flex-direction:column;">
+            <div class="panel-header">SECURITY EVENT STREAM</div>
+            <div class="live-logs" id="logs-container">
+                <!-- Logs injected via JS -->
+            </div>
+        </div>
+
+        <!-- Defcon Status -->
+        <div class="panel defcon-status">
+            <h2 style="margin-bottom:5px;">DEFCON 2</h2>
+            <div style="font-size:12px; color:var(--red); letter-spacing:2px; font-weight:bold;">CYBER-KINETIC THREAT IMMINENT</div>
+        </div>
+    </div>
+
+    <script>
+        // Precision Clock
+        setInterval(() => {
+            const now = new Date();
+            const time = now.toLocaleTimeString('en-US', { hour12: false });
+            const ms = now.getMilliseconds().toString().padStart(3, '0');
+            document.getElementById('clock').innerText = `${time}.${ms}`;
+        }, 47);
+
+        // Radar Blip Generator
+        const radar = document.getElementById('radar');
+        setInterval(() => {
+            if(radar.children.length > 5) radar.removeChild(radar.children[1]); // keep sweep blade
+            const blip = document.createElement('div');
+            blip.className = 'blip';
+            
+            // Random position inside the 200px circle
+            const angle = Math.random() * Math.PI * 2;
+            const radius = Math.random() * 80 + 10;
+            const x = Math.cos(angle) * radius + 100;
+            const y = Math.sin(angle) * radius + 100;
+            
+            blip.style.left = `${x}px`;
+            blip.style.top = `${y}px`;
+            radar.appendChild(blip);
+        }, 1500);
+
+        // Advanced Incident Logging
+        const logBox = document.getElementById('logs-container');
+        const eventTemplates = [
+            { type: 'CRIT', text: '[COWRIE] TCP Handshake violation. Origin: 45.33.22.11', hex: '0x4F9A' },
+            { type: 'CRIT', text: '[HONEYPOT] Dictionary attack on ROOT over SSH. Payload isolated.', hex: '0x1B88' },
+            { type: 'WARN', text: '[ML_CLASSIFIER] BruteForce Signature Match: 98.4%', hex: '0x99AA' },
+            { type: 'INFO', text: '[TARPIT] Delaying packet response by 4500ms.', hex: '0x00FF' },
+            { type: 'INFO', text: '[DIONAEA] SMB exploit binary captured. Hashing to SHA-256.', hex: '0x7C22' },
+            { type: 'CRIT', text: '[FAIL2BAN] Adding subnet 45.33.22.0/24 to iptables DROP rule.', hex: '0xFF10' }
+        ];
+
+        let logCount = 0;
+        function pushLog() {
+            if(logBox.children.length > 20) logBox.removeChild(logBox.firstChild);
+            
+            const ev = eventTemplates[Math.floor(Math.random() * eventTemplates.length)];
+            const time = new Date().toLocaleTimeString('en-US', { hour12: false }) + '.' + new Date().getMilliseconds().toString().padStart(3,'0').substring(0,2);
+            
+            const div = document.createElement('div');
+            div.className = 'log-line';
+            div.innerHTML = `<span class="log-time">[${time}]</span><span class="log-${ev.type}">[${ev.type}]</span> <span style="color:#fff">${ev.text}</span> <span style="float:right; color:#444;">${ev.hex}</span>`;
+            
+            logBox.appendChild(div);
+            logCount++;
+            
+            setTimeout(pushLog, Math.random() * 1000 + 200);
+        }
+        pushLog();
+
+        // Animate metrics to look like a live system
+        setInterval(() => {
+            document.querySelector('.layer-row[data-status="alert"] .metric-val').innerText = (14203 + Math.floor(Math.random()*100)).toLocaleString();
+            document.querySelector('.layer-row[data-status="alert"] .shield-score').innerText = Math.floor(Math.random()*15 + 30) + '%';
+        }, 800);
+    </script>
+</body>
+</html>

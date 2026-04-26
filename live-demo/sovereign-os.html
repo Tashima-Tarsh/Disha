@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SOVEREIGN OS - Command Center</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&display=swap');
+
+        :root {
+            --jarvis-blue: #00e5ff;
+            --jarvis-blue-dim: rgba(0, 229, 255, 0.15);
+            --jarvis-gold: #ffaa00;
+            --jarvis-red: #ff003c;
+            --bg-dark: #02060d;
+            --panel-bg: rgba(2, 10, 20, 0.6);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Rajdhani', sans-serif;
+            text-transform: uppercase;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--jarvis-blue);
+            height: 100vh;
+            overflow: hidden;
+            background-image: 
+                radial-gradient(circle at center, rgba(0, 229, 255, 0.05) 0%, transparent 70%),
+                linear-gradient(rgba(0, 229, 255, 0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 229, 255, 0.02) 1px, transparent 1px);
+            background-size: 100% 100%, 40px 40px, 40px 40px;
+        }
+
+        /* Utility */
+        .hidden { display: none !important; }
+        .glass {
+            background: var(--panel-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--jarvis-blue-dim);
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
+            border-radius: 8px;
+        }
+
+        /* --- LOGIN SCREEN --- */
+        #login-screen {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            background: radial-gradient(circle at center, #05101a 0%, #010203 100%);
+        }
+
+        .login-box {
+            width: 400px;
+            padding: 40px;
+            text-align: center;
+            position: relative;
+            animation: formEntry 1s ease-out forwards;
+        }
+
+        @keyframes formEntry {
+            from { opacity: 0; transform: scale(0.9) translateY(20px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        .login-box h1 {
+            font-size: 32px;
+            letter-spacing: 5px;
+            margin-bottom: 30px;
+            text-shadow: 0 0 15px var(--jarvis-blue);
+        }
+
+        .input-group { margin-bottom: 20px; text-align: left; }
+        .input-group label { font-size: 14px; color: var(--jarvis-gold); display: block; margin-bottom: 5px; }
+        .input-group input {
+            width: 100%;
+            padding: 12px;
+            background: rgba(0,0,0,0.5);
+            border: 1px solid var(--jarvis-blue);
+            color: #fff;
+            font-size: 16px;
+            outline: none;
+            transition: all 0.3s;
+        }
+        .input-group input:focus { box-shadow: 0 0 15px var(--jarvis-blue-dim); }
+
+        .strength-meter { height: 4px; width: 100%; background: #111; margin-top: 5px; display: flex; }
+        .strength-fill { height: 100%; width: 0%; transition: 0.3s; }
+
+        .login-btn {
+            width: 100%; padding: 15px; margin-top: 10px;
+            background: transparent;
+            border: 2px solid var(--jarvis-blue);
+            color: var(--jarvis-blue);
+            font-size: 18px; font-weight: bold; cursor: pointer;
+            transition: 0.3s;
+            position: relative; overflow: hidden;
+        }
+        .login-btn:hover { background: var(--jarvis-blue); color: #000; box-shadow: 0 0 20px var(--jarvis-blue); }
+
+        /* Loader Overlay */
+        #loader {
+            position: absolute; top:0; left:0; width:100%; height:100%;
+            background: rgba(0,0,0,0.9);
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            z-index: 200;
+        }
+        .spinner {
+            width: 100px; height: 100px;
+            border: 3px solid transparent; border-top: 3px solid var(--jarvis-blue);
+            border-radius: 50%; animation: spin 1s linear infinite;
+        }
+        .spinner::before {
+            content: ''; position: absolute; top: 5px; left: 5px; right: 5px; bottom: 5px;
+            border: 3px solid transparent; border-top: 3px solid var(--jarvis-gold);
+            border-radius: 50%; animation: spin 2s linear infinite reverse;
+        }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+
+        /* --- DASHBOARD LAYOUT --- */
+        #dashboard {
+            display: grid;
+            grid-template-columns: 250px 1fr 350px;
+            grid-template-rows: 70px 1fr;
+            height: 100vh;
+            gap: 15px;
+            padding: 15px;
+            opacity: 0;
+            transition: opacity 1s;
+        }
+
+        /* Top Nav */
+        .top-nav {
+            grid-column: 1 / -1;
+            display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 2px solid var(--jarvis-blue);
+            padding: 0 20px;
+        }
+        .top-nav h2 { font-size: 28px; letter-spacing: 4px; text-shadow: 0 0 10px var(--jarvis-blue); }
+        .sys-stats { display: flex; gap: 30px; }
+        .sys-stats div { text-align: right; }
+        .sys-stats .val { font-size: 22px; font-weight: bold; color: var(--jarvis-gold); }
+
+        /* Sidebar */
+        .sidebar {
+            grid-column: 1;
+            display: flex; flex-direction: column; gap: 10px;
+        }
+        .nav-item {
+            padding: 15px 20px;
+            border-left: 3px solid transparent;
+            cursor: pointer; transition: 0.3s;
+            font-size: 16px; letter-spacing: 1px;
+        }
+        .nav-item:hover, .nav-item.active {
+            background: var(--jarvis-blue-dim);
+            border-left-color: var(--jarvis-blue);
+            color: #fff;
+        }
+
+        /* Main Content */
+        .main-content {
+            grid-column: 2;
+            display: grid;
+            grid-template-rows: auto 1fr;
+            gap: 15px;
+            overflow-y: auto;
+        }
+
+        /* 7-Layer Visualization */
+        .layers-container {
+            display: flex; justify-content: space-between; gap: 10px;
+            padding: 20px;
+        }
+        .layer-node {
+            flex: 1; text-align: center;
+            border: 1px solid var(--jarvis-blue-dim);
+            padding: 15px 5px;
+            position: relative;
+            background: rgba(0,0,0,0.4);
+            transition: 0.3s;
+        }
+        .layer-node:hover { transform: translateY(-5px); border-color: var(--jarvis-blue); box-shadow: 0 5px 15px var(--jarvis-blue-dim); }
+        .layer-node h4 { font-size: 12px; color: #fff; margin-bottom: 10px; }
+        .layer-node .status-dot {
+            width: 10px; height: 10px; border-radius: 50%;
+            background: var(--jarvis-blue); margin: 0 auto;
+            box-shadow: 0 0 10px var(--jarvis-blue);
+        }
+        /* Connector lines */
+        .layer-node:not(:last-child)::after {
+            content: ''; position: absolute;
+            top: 50%; right: -10px; width: 10px; height: 2px;
+            background: var(--jarvis-blue-dim);
+        }
+
+        /* Modules Grid */
+        .modules-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        .module-card { padding: 20px; min-height: 250px; }
+        .module-title { font-size: 18px; color: var(--jarvis-gold); border-bottom: 1px solid #333; padding-bottom: 10px; margin-bottom: 15px; }
+        
+        .radar-box {
+            width: 150px; height: 150px; border-radius: 50%;
+            border: 1px solid var(--jarvis-blue); margin: 0 auto;
+            position: relative; overflow: hidden;
+        }
+        .radar-sweep {
+            position: absolute; top: 0; left: 50%; width: 50%; height: 50%;
+            background: linear-gradient(to right, transparent, var(--jarvis-blue-dim));
+            transform-origin: bottom left; animation: radar 2s linear infinite;
+        }
+        @keyframes radar { 100% { transform: rotate(360deg); } }
+
+        /* RED ALERT Sidebar */
+        .red-alert-center {
+            grid-column: 3;
+            border: 1px solid var(--jarvis-red);
+            box-shadow: inset 0 0 20px rgba(255,0,60,0.2);
+            padding: 20px;
+            display: flex; flex-direction: column;
+            animation: pulseAlert 2s infinite;
+        }
+        @keyframes pulseAlert {
+            0%, 100% { border-color: rgba(255,0,60,0.3); }
+            50% { border-color: var(--jarvis-red); box-shadow: inset 0 0 30px rgba(255,0,60,0.4), 0 0 15px rgba(255,0,60,0.5); }
+        }
+        .alert-header {
+            color: var(--jarvis-red); font-size: 24px; font-weight: bold;
+            display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 2px solid var(--jarvis-red); padding-bottom: 10px; margin-bottom: 15px;
+            text-shadow: 0 0 10px var(--jarvis-red);
+        }
+        .alert-header .blinker { animation: blink 1s infinite; }
+        @keyframes blink { 50% { opacity: 0; } }
+
+        .incident-log {
+            flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 10px;
+        }
+        .incident {
+            background: rgba(255,0,60,0.1); border-left: 3px solid var(--jarvis-red);
+            padding: 10px; font-size: 13px; color: #fff;
+        }
+        .incident span { color: var(--jarvis-red); font-weight: bold; }
+
+        /* Responsive Breakpoints */
+        @media (max-width: 1200px) {
+            #dashboard { grid-template-columns: 200px 1fr; }
+            .red-alert-center { grid-column: 2; grid-row: 3; height: 300px; }
+        }
+        @media (max-width: 900px) {
+            #dashboard { grid-template-columns: 1fr; grid-template-rows: auto auto 1fr; }
+            .sidebar { grid-row: 2; flex-direction: row; overflow-x: auto; }
+            .main-content { grid-row: 3; }
+            .layers-container { flex-direction: column; }
+            .layer-node:not(:last-child)::after { display: none; }
+            .modules-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- SCREEN 1: LOGIN -->
+    <div id="login-screen">
+        <div class="glass login-box">
+            <h1>J.A.R.V.I.S // LOGIN</h1>
+            
+            <div class="input-group">
+                <label>Operator ID</label>
+                <input type="text" id="username" placeholder="Enter ID" autocomplete="off">
+            </div>
+            
+            <div class="input-group">
+                <label>Passphrase</label>
+                <input type="password" id="password" placeholder="••••••••" autocomplete="off" oninput="checkStrength(this.value)">
+                <div class="strength-meter"><div class="strength-fill" id="pwd-strength"></div></div>
+            </div>
+
+            <button class="login-btn" onclick="authenticate()">INITIALIZE LINK</button>
+        </div>
+    </div>
+
+    <!-- LOADER -->
+    <div id="loader" class="hidden">
+        <div class="spinner"></div>
+        <h2 style="margin-top: 30px; letter-spacing: 5px; animation: blink 1s infinite;">VERIFYING BIOMETRICS...</h2>
+    </div>
+
+    <!-- SCREEN 2: DASHBOARD -->
+    <div id="dashboard" class="hidden">
+        
+        <!-- Top Nav -->
+        <div class="top-nav glass">
+            <h2>SOVEREIGN_OS <span style="color:#fff; font-size:14px; vertical-align:middle;">v6.0.0</span></h2>
+            <div class="sys-stats">
+                <div>GLOBAL THREAT <br><span class="val" style="color:var(--jarvis-red)">HIGH</span></div>
+                <div>ACTIVE NODES <br><span class="val">14/14</span></div>
+                <div>LOCAL TIME <br><span class="val" id="clock" style="color:var(--jarvis-blue)">00:00:00</span></div>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="sidebar glass">
+            <div class="nav-item active">COMMAND CENTER</div>
+            <div class="nav-item">THREAT RADAR</div>
+            <div class="nav-item">NETWORK TOPOLOGY</div>
+            <div class="nav-item">NEO4J MEMORY</div>
+            <div class="nav-item">CYBER DEFENSE</div>
+            <div style="flex:1"></div>
+            <div class="nav-item" style="color:#aaa;">SETTINGS</div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            
+            <!-- 7-Layer Architecture -->
+            <div class="glass" style="margin-bottom: 15px;">
+                <div style="padding:15px; border-bottom:1px solid #333; color:var(--jarvis-gold); font-weight:bold;">7-LAYER SECURITY STACK VISUALIZATION</div>
+                <div class="layers-container">
+                    <div class="layer-node"><h4>1. USER</h4><div class="status-dot"></div></div>
+                    <div class="layer-node"><h4>2. APP</h4><div class="status-dot"></div></div>
+                    <div class="layer-node"><h4>3. API</h4><div class="status-dot"></div></div>
+                    <div class="layer-node"><h4>4. AUTH</h4><div class="status-dot"></div></div>
+                    <div class="layer-node"><h4>5. DATA</h4><div class="status-dot"></div></div>
+                    <div class="layer-node"><h4>6. NET</h4><div class="status-dot" style="background:var(--jarvis-red); box-shadow:0 0 10px var(--jarvis-red);"></div></div>
+                    <div class="layer-node"><h4>7. INFRA</h4><div class="status-dot"></div></div>
+                </div>
+            </div>
+
+            <!-- Modules -->
+            <div class="modules-grid">
+                <div class="module-card glass">
+                    <div class="module-title">GLOBAL THREAT RADAR</div>
+                    <div class="radar-box"><div class="radar-sweep"></div></div>
+                    <div style="text-align:center; margin-top:15px; font-size:12px; color:#aaa;">Scanning for inbound vectors...</div>
+                </div>
+                <div class="module-card glass">
+                    <div class="module-title">SYSTEM METRICS</div>
+                    <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+                        <span>CPU USAGE</span><span id="cpu">42%</span>
+                    </div>
+                    <div class="strength-meter"><div class="strength-fill" style="width:42%; background:var(--jarvis-blue)"></div></div>
+                    <br>
+                    <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+                        <span>MEMORY ALLOC</span><span id="ram">68%</span>
+                    </div>
+                    <div class="strength-meter"><div class="strength-fill" style="width:68%; background:var(--jarvis-gold)"></div></div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Red Alert Center -->
+        <div class="red-alert-center glass">
+            <div class="alert-header">
+                <span>DEFCON 2</span>
+                <span class="blinker">⚠️</span>
+            </div>
+            <div style="color:#aaa; font-size:12px; margin-bottom:15px;">LIVE INCIDENT FEED</div>
+            
+            <div class="incident-log" id="incident-log">
+                <!-- Injected via JS -->
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // Password Strength
+        function checkStrength(val) {
+            const meter = document.getElementById('pwd-strength');
+            if(val.length === 0) { meter.style.width = '0%'; }
+            else if(val.length < 5) { meter.style.width = '33%'; meter.style.background = 'var(--jarvis-red)'; }
+            else if(val.length < 8) { meter.style.width = '66%'; meter.style.background = 'var(--jarvis-gold)'; }
+            else { meter.style.width = '100%'; meter.style.background = 'var(--jarvis-blue)'; }
+        }
+
+        // Authentication Flow
+        function authenticate() {
+            document.getElementById('login-screen').classList.add('hidden');
+            document.getElementById('loader').classList.remove('hidden');
+            
+            // Simulate API verification
+            setTimeout(() => {
+                document.getElementById('loader').classList.add('hidden');
+                const dash = document.getElementById('dashboard');
+                dash.classList.remove('hidden');
+                // Trigger reflow for transition
+                void dash.offsetWidth; 
+                dash.style.opacity = 1;
+                startDashboardFeeds();
+            }, 2500);
+        }
+
+        // Dashboard Logic
+        function startDashboardFeeds() {
+            // Clock
+            setInterval(() => {
+                document.getElementById('clock').innerText = new Date().toLocaleTimeString('en-US', { hour12: false });
+            }, 1000);
+
+            // CPU/RAM Jitter
+            setInterval(() => {
+                document.getElementById('cpu').innerText = Math.floor(Math.random() * 20 + 30) + '%';
+                document.getElementById('ram').innerText = Math.floor(Math.random() * 10 + 60) + '%';
+            }, 2000);
+
+            // Red Alert Feed
+            const logBox = document.getElementById('incident-log');
+            const incidents = [
+                "[HONEYPOT] SSH Brute-force detected on port 2222 from 185.17.x.x",
+                "[FAIL2BAN] Banning IP 45.33.22.11 for repeated probing.",
+                "[ML_CLASSIFIER] Anomaly detected in API request headers. Confidence 94%.",
+                "[WAF] Dropping malformed SQL injection string."
+            ];
+
+            function addIncident() {
+                if(logBox.children.length > 5) logBox.removeChild(logBox.lastChild);
+                
+                const time = new Date().toLocaleTimeString('en-US', { hour12: false });
+                const msg = incidents[Math.floor(Math.random() * incidents.length)];
+                
+                const div = document.createElement('div');
+                div.className = 'incident';
+                div.innerHTML = `<span>[${time}]</span><br>${msg}`;
+                
+                logBox.prepend(div);
+                setTimeout(addIncident, Math.random() * 3000 + 1000);
+            }
+            addIncident();
+        }
+    </script>
+</body>
+</html>

@@ -157,5 +157,5 @@ DISHA is licensed under the Apache 2.0 License. See [LICENSE](./LICENSE) for det
 ---
 
 <p align="center">
-  <sub>DISHA — दिशा — Direction. Designed for the Future.</sub>
+  <sub>DISHA — Direction. Designed for the Future.</sub>
 </p>
