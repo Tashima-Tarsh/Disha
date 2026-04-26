@@ -4,7 +4,7 @@
 
 ### *Direction. Awareness. Decision. Resilience.*
 
-**दिशा** — The AGI that thinks in cycles, defends in layers, and learns from every encounter.
+**Disha** — The AGI that thinks in cycles, defends in layers, and learns from every encounter.
 
 <br/>
 
