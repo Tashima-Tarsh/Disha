@@ -1,0 +1,56 @@
+:root {
+  /* DISHA OS - Elite Design System Tokens */
+  
+  /* Core Palette - Dark Luxury Cybernetics */
+  --color-bg-base: #020205;       /* Absolute Deep Space */
+  --color-bg-surface: #0a0a0f;    /* Obsidian Surface */
+  --color-bg-glass: rgba(10, 10, 15, 0.7);
+  
+  /* Neon Accents */
+  --color-neon-cyan: #00f2ff;     /* Primary Action / Cyber */
+  --color-neon-pink: #ff0055;     /* Alert / Security */
+  --color-neon-green: #00ff66;    /* Success / Auth */
+  --color-neon-gold: #ffcc00;     /* Warning / Premium */
+  
+  /* Typography */
+  --font-family-sans: 'Inter', system-ui, sans-serif;
+  --font-family-mono: 'JetBrains Mono', 'Fira Code', monospace;
+  
+  /* Animations */
+  --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --animation-pulse-slow: pulse 4s infinite;
+  
+  /* Elevation */
+  --shadow-neon: 0 0 15px rgba(0, 242, 255, 0.3);
+  --border-glass: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.8; transform: scale(0.98); }
+}
+
+/* Base Component: Haptic Button Simulation */
+.haptic-btn {
+  background: var(--color-bg-surface);
+  color: var(--color-neon-cyan);
+  border: var(--border-glass);
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-family: var(--font-family-mono);
+  transition: var(--transition-smooth);
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+
+.haptic-btn:hover {
+  background: rgba(0, 242, 255, 0.1);
+  box-shadow: var(--shadow-neon);
+  transform: translateY(-1px);
+}
+
+.haptic-btn:active {
+  transform: scale(0.95);
+  background: rgba(0, 242, 255, 0.2);
+}
