@@ -3,6 +3,7 @@ from typing import List, TypedDict, Annotated, Sequence
 from datetime import datetime
 
 from disha.ai.core.agents.specialists.hub import SpecialistHub
+from app.services.security import SecurityService, UserRole, Permission
 
 logger = structlog.get_logger("graph_reasoner")
 
@@ -20,6 +21,7 @@ class GraphReasoner:
     
     def __init__(self):
         self.hub = SpecialistHub()
+        self.security = SecurityService()
         self.state: AgentState = {
             "input": "",
             "context": [],
@@ -29,11 +31,18 @@ class GraphReasoner:
             "final_output": ""
         }
 
-    async def execute(self, user_input: str):
-        """Executes a multi-step reasoning graph."""
-        logger.info("reasoning_graph_start", user_input=user_input)
+    async def execute(self, user_input: str, user_role: UserRole = UserRole.VIEWER):
+        """Executes a multi-step reasoning graph with security oversight."""
+        logger.info("reasoning_graph_start", user_input=user_input, role=user_role.value)
         
-        # 1. Perception Node
+        # 1. Security Gate Node
+        if not self.security.authorize(user_role, Permission.EXECUTE_AGENTS):
+            self.security.log_event("user_unknown", "EXECUTE_AGENTS", "GraphReasoner", "DENIED")
+            return "Error: Unauthorized. High-level agent execution requires ENGINEER or higher role."
+        
+        self.security.log_event("user_unknown", "EXECUTE_AGENTS", "GraphReasoner", "AUTHORIZED")
+
+        # 2. Perception Node
         self.state["input"] = user_input
         
         # 2. Collaborative Deliberation Node
