@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>J.A.R.V.I.S. // DISHA PROTOCOL</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&display=swap');
+
+        :root {
+            --jarvis-blue: #00e5ff;
+            --jarvis-blue-dim: rgba(0, 229, 255, 0.2);
+            --jarvis-gold: #ffaa00;
+            --jarvis-gold-dim: rgba(255, 170, 0, 0.3);
+            --jarvis-red: #ff2a2a;
+            --bg-color: #010409;
+            --panel-bg: rgba(0, 10, 20, 0.4);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Rajdhani', sans-serif;
+            text-transform: uppercase;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--jarvis-blue);
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            perspective: 1200px; /* 3D depth for the hollywood effect */
+            background-image: 
+                radial-gradient(circle at center, rgba(0, 229, 255, 0.1) 0%, transparent 60%),
+                linear-gradient(rgba(0, 229, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 229, 255, 0.03) 1px, transparent 1px);
+            background-size: 100% 100%, 30px 30px, 30px 30px;
+        }
+
+        /* Ambient scanline */
+        body::before {
+            content: " ";
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%);
+            background-size: 100% 4px;
+            pointer-events: none;
+            z-index: 100;
+        }
+
+        /* 3D HUD Layout */
+        .hud-wrapper {
+            display: grid;
+            grid-template-columns: 350px 1fr 350px;
+            grid-template-rows: auto 1fr auto;
+            width: 98vw;
+            height: 96vh;
+            gap: 20px;
+            transform-style: preserve-3d;
+        }
+
+        /* Top Bar */
+        .top-bar {
+            grid-column: 1 / -1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 40px;
+            border-bottom: 1px solid var(--jarvis-blue);
+            box-shadow: 0 5px 15px var(--jarvis-blue-dim);
+            transform: translateZ(20px);
+        }
+
+        .sys-title {
+            font-size: 32px;
+            font-weight: 700;
+            letter-spacing: 5px;
+            text-shadow: 0 0 10px var(--jarvis-blue);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .sys-title span { color: var(--jarvis-gold); }
+
+        .diagnostics {
+            display: flex;
+            gap: 30px;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .diagnostics div {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+        }
+
+        .diagnostics .val { color: var(--jarvis-gold); text-shadow: 0 0 8px var(--jarvis-gold); }
+
+        /* Left Panel - Angled Right */
+        .panel-left {
+            grid-column: 1;
+            grid-row: 2;
+            transform: rotateY(15deg) translateZ(50px);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        /* Right Panel - Angled Left */
+        .panel-right {
+            grid-column: 3;
+            grid-row: 2;
+            transform: rotateY(-15deg) translateZ(50px);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .glass-panel {
+            background: var(--panel-bg);
+            border: 1px solid var(--jarvis-blue-dim);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: inset 0 0 20px var(--jarvis-blue-dim), 0 0 15px rgba(0,0,0,0.5);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .glass-panel::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 2px;
+            background: linear-gradient(90deg, transparent, var(--jarvis-blue), transparent);
+            animation: scan 3s linear infinite;
+        }
+
+        @keyframes scan {
+            0% { top: 0; opacity: 1; }
+            100% { top: 100%; opacity: 0; }
+        }
+
+        .panel-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--jarvis-gold);
+            border-bottom: 1px solid var(--jarvis-gold-dim);
+            padding-bottom: 5px;
+            margin-bottom: 15px;
+            letter-spacing: 2px;
+        }
+
+        /* Cognitive Stages */
+        .stage {
+            margin-bottom: 12px;
+        }
+        
+        .stage-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .bar-bg {
+            width: 100%;
+            height: 6px;
+            background: rgba(255,255,255,0.1);
+            position: relative;
+        }
+
+        .bar-fill {
+            height: 100%;
+            background: var(--jarvis-blue);
+            width: 0%;
+            box-shadow: 0 0 10px var(--jarvis-blue);
+            transition: width 0.5s ease-out;
+        }
+        
+        .stage-desc {
+            font-size: 11px;
+            color: #88c0d0;
+            margin-top: 2px;
+            text-transform: none;
+        }
+
+        /* Center Hologram */
+        .panel-center {
+            grid-column: 2;
+            grid-row: 2;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            transform-style: preserve-3d;
+        }
+
+        .holo-core {
+            position: relative;
+            width: 500px;
+            height: 500px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transform: rotateX(60deg) translateZ(-50px);
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .ring {
+            position: absolute;
+            border-radius: 50%;
+            transform-style: preserve-3d;
+        }
+
+        .ring-1 {
+            width: 100%; height: 100%;
+            border: 2px solid var(--jarvis-blue);
+            border-top: 2px solid transparent;
+            border-bottom: 2px solid transparent;
+            animation: spinY 10s linear infinite;
+        }
+
+        .ring-2 {
+            width: 85%; height: 85%;
+            border: 2px dashed var(--jarvis-gold);
+            animation: spinZ 15s linear infinite reverse;
+        }
+
+        .ring-3 {
+            width: 70%; height: 70%;
+            border: 4px dotted var(--jarvis-blue);
+            animation: spinY 8s linear infinite reverse;
+            opacity: 0.5;
+        }
+
+        .ring-4 {
+            width: 55%; height: 55%;
+            border: 1px solid rgba(255,255,255,0.3);
+            background: rgba(0, 229, 255, 0.05);
+            animation: spinZ 5s linear infinite;
+        }
+
+        .core-data {
+            position: absolute;
+            transform: rotateX(-60deg) translateZ(100px); /* Counter-rotate to face camera */
+            text-align: center;
+            background: rgba(0,0,0,0.6);
+            padding: 20px;
+            border: 1px solid var(--jarvis-blue);
+            border-radius: 50%;
+            width: 250px;
+            height: 250px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 0 30px var(--jarvis-blue-dim);
+        }
+
+        .core-data h2 { font-size: 42px; color: #fff; text-shadow: 0 0 15px var(--jarvis-blue); margin-bottom: 5px; }
+        .core-data p { color: var(--jarvis-gold); font-weight: 600; letter-spacing: 2px; }
+        .core-data .hex { font-size: 10px; color: var(--jarvis-blue); opacity: 0.7; margin-top: 10px; }
+
+        /* Terminal Logs */
+        .log-stream {
+            height: 350px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            font-size: 12px;
+            line-height: 1.5;
+        }
+
+        .log-row {
+            margin-bottom: 5px;
+            border-left: 2px solid var(--jarvis-blue);
+            padding-left: 8px;
+            animation: slideIn 0.3s ease-out forwards;
+        }
+
+        .log-time { color: #88c0d0; margin-right: 10px; }
+        .log-type.WARN { color: var(--jarvis-gold); }
+        .log-type.CRIT { color: var(--jarvis-red); }
+        .log-type.INFO { color: var(--jarvis-blue); }
+
+        /* Bottom Nexus - Angled Up */
+        .bottom-nexus {
+            grid-column: 1 / -1;
+            grid-row: 3;
+            transform: rotateX(15deg) translateZ(30px);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .agents-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+        }
+
+        /* Command Input Area */
+        .command-interface {
+            display: flex;
+            align-items: center;
+            background: rgba(0, 229, 255, 0.05);
+            border: 1px solid var(--jarvis-blue);
+            padding: 10px 20px;
+            border-radius: 4px;
+            box-shadow: 0 0 15px var(--jarvis-blue-dim);
+        }
+
+        .command-interface span {
+            color: var(--jarvis-gold);
+            font-size: 18px;
+            font-weight: bold;
+            margin-right: 15px;
+            text-shadow: 0 0 5px var(--jarvis-gold);
+        }
+
+        .command-interface input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: #fff;
+            font-size: 18px;
+            font-family: 'Rajdhani', sans-serif;
+            text-transform: uppercase;
+            outline: none;
+            letter-spacing: 1px;
+        }
+
+        .command-interface input::placeholder {
+            color: rgba(0, 229, 255, 0.3);
+        }
+
+        .agent-card {
+            background: var(--panel-bg);
+            border: 1px solid var(--jarvis-gold-dim);
+            border-top: 3px solid var(--jarvis-gold);
+            padding: 15px;
+            border-radius: 4px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+            transition: all 0.3s;
+        }
+
+        .agent-card.active {
+            border-color: var(--jarvis-blue);
+            border-top-color: var(--jarvis-blue);
+            box-shadow: 0 0 20px var(--jarvis-blue-dim);
+        }
+
+        .agent-card h3 {
+            font-size: 16px;
+            color: #fff;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .agent-card .status {
+            font-size: 12px;
+            color: var(--jarvis-gold);
+        }
+
+        .agent-card.active .status { color: var(--jarvis-blue); animation: blink 1s infinite; }
+
+        .agent-output {
+            font-size: 12px;
+            color: #aaa;
+            height: 60px;
+            text-transform: none;
+            overflow: hidden;
+        }
+
+        /* Keyframes */
+        @keyframes spinY { 100% { transform: rotateY(360deg); } }
+        @keyframes spinZ { 100% { transform: rotateZ(360deg); } }
+        @keyframes float { 
+            0%, 100% { transform: rotateX(60deg) translateZ(-50px) translateY(0); } 
+            50% { transform: rotateX(60deg) translateZ(-50px) translateY(-20px); } 
+        }
+        @keyframes slideIn { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+    </style>
+</head>
+<body>
+
+    <div class="hud-wrapper">
+        
+        <!-- Top Bar -->
+        <div class="top-bar">
+            <div class="sys-title">J.A.R.V.I.S <span>//</span> DISHA PROTOCOL</div>
+            <div class="diagnostics">
+                <div><span>CPU LOAD</span><span class="val" id="cpu-val">42%</span></div>
+                <div><span>NEURAL NET</span><span class="val" style="color:var(--jarvis-blue)">ALIGNED</span></div>
+                <div><span>THREAT LEVEL</span><span class="val" style="color:var(--jarvis-red)">ELEVATED</span></div>
+                <div><span>SYSTEM CLOCK</span><span class="val" style="color:var(--jarvis-blue)" id="clock">00:00:00</span></div>
+            </div>
+        </div>
+
+        <!-- Left Panel -->
+        <div class="panel-left">
+            <div class="glass-panel" style="flex:1">
+                <div class="panel-title">7-STAGE COGNITIVE PIPELINE</div>
+                
+                <div class="stage" id="stg-1">
+                    <div class="stage-header"><span>1. PERCEIVE</span> <span class="val">0%</span></div>
+                    <div class="bar-bg"><div class="bar-fill"></div></div>
+                    <div class="stage-desc">Extracting user intent & entities</div>
+                </div>
+                <div class="stage" id="stg-2">
+                    <div class="stage-header"><span>2. ATTEND</span> <span class="val">0%</span></div>
+                    <div class="bar-bg"><div class="bar-fill"></div></div>
+                    <div class="stage-desc">Retrieving episodic & semantic memory</div>
+                </div>
+                <div class="stage" id="stg-3">
+                    <div class="stage-header"><span>3. REASON</span> <span class="val">0%</span></div>
+                    <div class="bar-bg"><div class="bar-fill"></div></div>
+                    <div class="stage-desc">Hybrid Symbolic/Neural hypothesis gen</div>
+                </div>
+                <div class="stage" id="stg-4">
+                    <div class="stage-header"><span>4. DELIBERATE</span> <span class="val">0%</span></div>
+                    <div class="bar-bg"><div class="bar-fill"></div></div>
+                    <div class="stage-desc">Multi-agent consensus voting</div>
+                </div>
+                <div class="stage" id="stg-5">
+                    <div class="stage-header"><span>5. ACT</span> <span class="val">0%</span></div>
+                    <div class="bar-bg"><div class="bar-fill"></div></div>
+                    <div class="stage-desc">Confidence score threshold met</div>
+                </div>
+                <div class="stage" id="stg-6">
+                    <div class="stage-header"><span>6. REFLECT</span> <span class="val">0%</span></div>
+                    <div class="bar-bg"><div class="bar-fill"></div></div>
+                    <div class="stage-desc">Quality & divergence assessment</div>
+                </div>
+                <div class="stage" id="stg-7">
+                    <div class="stage-header"><span>7. CONSOLIDATE</span> <span class="val">0%</span></div>
+                    <div class="bar-bg"><div class="bar-fill"></div></div>
+                    <div class="stage-desc">Writing to Neo4j graph DB</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Center Hologram -->
+        <div class="panel-center">
+            <div class="holo-core">
+                <div class="ring ring-1"></div>
+                <div class="ring ring-2"></div>
+                <div class="ring ring-3"></div>
+                <div class="ring ring-4"></div>
+                
+                <div class="core-data">
+                    <h2>AGI CORE</h2>
+                    <p>SOVEREIGN MODE</p>
+                    <div class="hex" id="hex-stream">0x00A7 0x1B9C 0xF421</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Panel -->
+        <div class="panel-right">
+            <div class="glass-panel" style="flex: 1">
+                <div class="panel-title">SENTINEL HONEYPOT MESH</div>
+                <div class="log-stream" id="logs">
+                    <!-- Logs generated via JS -->
+                </div>
+            </div>
+            
+            <div class="glass-panel" style="height: 180px">
+                <div class="panel-title">DISHA MYTHOS SYSTEM</div>
+                <div style="font-size: 12px; color: #aaa; text-transform: none; line-height: 1.6;">
+                    <strong style="color:var(--jarvis-gold)">[AUTONOMOUS HEALING]</strong> Active.<br>
+                    Running daily Threat Guardian scans.<br>
+                    Degraded services will be auto-restarted.<br><br>
+                    <strong style="color:var(--jarvis-blue)">[GO4BID AUCTION]</strong> Ephemeral DB initialized.<br>
+                    Argon2id blind auth verified. Zero PII.
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Nexus -->
+        <div class="bottom-nexus">
+            <div class="agents-grid">
+                <div class="agent-card" id="ag-pol">
+                    <h3>POLITICAL AGENT <span class="status">IDLE</span></h3>
+                    <div class="agent-output">Awaiting input stream...</div>
+                </div>
+                <div class="agent-card" id="ag-leg">
+                    <h3>LEGAL AGENT <span class="status">IDLE</span></h3>
+                    <div class="agent-output">Monitoring constitutional framework boundaries...</div>
+                </div>
+                <div class="agent-card" id="ag-sec">
+                    <h3>SECURITY AGENT <span class="status">IDLE</span></h3>
+                    <div class="agent-output">Honeypot mesh active. Traffic analysis nominal.</div>
+                </div>
+                <div class="agent-card" id="ag-ide">
+                    <h3>IDEOLOGY AGENT <span class="status">IDLE</span></h3>
+                    <div class="agent-output">Aligning priorities with national interests...</div>
+                </div>
+            </div>
+
+            <!-- Command Input -->
+            <div class="command-interface">
+                <span>SYSTEM_PROMPT ></span>
+                <input type="text" id="cmd-input" placeholder="ENTER DIRECTIVE OR QUERY..." autocomplete="off">
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // Clock & CPU
+        setInterval(() => {
+            document.getElementById('clock').innerText = new Date().toLocaleTimeString('en-US', { hour12: false }) + '.' + new Date().getMilliseconds().toString().padStart(3,'0');
+            if(Math.random() > 0.7) {
+                document.getElementById('cpu-val').innerText = Math.floor(Math.random() * 40 + 20) + '%';
+            }
+            document.getElementById('hex-stream').innerText = '0x' + Math.floor(Math.random()*16777215).toString(16).toUpperCase() + ' 0x' + Math.floor(Math.random()*16777215).toString(16).toUpperCase();
+        }, 100);
+
+        // Cyber Logs
+        const logsBox = document.getElementById('logs');
+        const logData = [
+            { t: "CRIT", msg: "[COWRIE] Unauthorized SSH brute-force detected from IP 45.33.22.11" },
+            { t: "INFO", msg: "[ML_ENGINE] PyTorch classifier: BruteForce attack. Confidence: 98.4%" },
+            { t: "WARN", msg: "[RESPONSE] Simulated Tarpit engaged. Delaying attacker responses by 5000ms." },
+            { t: "INFO", msg: "[OPENCANARY] Redis scanning detected on port 6379. Logging payload." },
+            { t: "INFO", msg: "[DIONAEA] SMB exploit payload captured. Forwarding to malware analysis queue." },
+            { t: "WARN", msg: "[FAIL2BAN] IP 45.33.22.11 added to containment zone. Route dropped." }
+        ];
+
+        function pushLog() {
+            if(logsBox.children.length > 8) logsBox.removeChild(logsBox.firstChild);
+            const l = logData[Math.floor(Math.random() * logData.length)];
+            const time = new Date().toLocaleTimeString('en-US', { hour12: false });
+            
+            const div = document.createElement('div');
+            div.className = 'log-row';
+            div.innerHTML = `<span class="log-time">[${time}]</span><span class="log-type ${l.t}">[${l.t}]</span> <span style="color:#fff">${l.msg}</span>`;
+            logsBox.appendChild(div);
+
+            setTimeout(pushLog, Math.random() * 2500 + 800);
+        }
+        setTimeout(pushLog, 1000);
+
+        let isProcessing = false;
+
+        function typeAgentText(id, text) {
+            const card = document.getElementById(id);
+            card.classList.add('active');
+            card.querySelector('.status').innerText = 'COMPUTING';
+            
+            const out = card.querySelector('.agent-output');
+            out.innerHTML = '';
+            let i = 0;
+            function type() {
+                if(i < text.length) {
+                    out.innerHTML += text.charAt(i);
+                    i++;
+                    setTimeout(type, 15);
+                } else {
+                    setTimeout(() => {
+                        card.classList.remove('active');
+                        card.querySelector('.status').innerText = 'IDLE';
+                    }, 2000);
+                }
+            }
+            type();
+        }
+
+        // Handle User Input Command
+        const cmdInput = document.getElementById('cmd-input');
+        cmdInput.addEventListener('keypress', function(e) {
+            if(e.key === 'Enter' && this.value.trim() !== '') {
+                const command = this.value.toUpperCase();
+                this.value = '';
+                
+                if(isProcessing) return;
+                isProcessing = true;
+
+                // 1. Log the user command
+                const time = new Date().toLocaleTimeString('en-US', { hour12: false });
+                const div = document.createElement('div');
+                div.className = 'log-row';
+                div.innerHTML = `<span class="log-time">[${time}]</span><span class="log-type INFO">[USER]</span> <span style="color:var(--jarvis-gold)">EXECUTING: ${command}</span>`;
+                logsBox.appendChild(div);
+
+                // 2. Trigger the Cognitive Pipeline
+                runPipeline(() => {
+                    // 3. When pipeline finishes, trigger agents based on keywords
+                    isProcessing = false;
+                    
+                    if (command.includes("HACK") || command.includes("IP") || command.includes("THREAT")) {
+                        typeAgentText('ag-sec', `Analyzing threat vector for directive: ${command}. Isolating network segment and deploying TARPIT.`);
+                        typeAgentText('ag-leg', `Validating defensive posture. Counter-measures authorized under cyber-defense protocol.`);
+                    } 
+                    else if (command.includes("POLICY") || command.includes("LAW") || command.includes("NATION")) {
+                        typeAgentText('ag-pol', `Evaluating geopolitical impact of: ${command}. Cross-referencing global treaties.`);
+                        typeAgentText('ag-ide', `Directive aligns with sovereign interests. Approval granted.`);
+                    }
+                    else {
+                        typeAgentText('ag-sec', `Scanning directive: ${command}... No immediate threats detected.`);
+                        typeAgentText('ag-pol', `Directive recognized. Entering observation mode.`);
+                    }
+
+                    // 4. Print final result to terminal
+                    setTimeout(() => {
+                        const resDiv = document.createElement('div');
+                        resDiv.className = 'log-row';
+                        resDiv.innerHTML = `<span class="log-time">[${new Date().toLocaleTimeString('en-US', { hour12: false })}]</span><span class="log-type INFO">[SYSTEM]</span> <span style="color:var(--jarvis-blue)">RESOLUTION ACHIEVED. ACTION LOGGED TO EPOCH MEMORY.</span>`;
+                        logsBox.appendChild(resDiv);
+                        logsBox.scrollTop = logsBox.scrollHeight;
+                    }, 2000);
+                });
+            }
+        });
+
+        // Cognitive Loop Animation
+        function runPipeline(onComplete) {
+            // Reset
+            for(let i=1; i<=7; i++) {
+                document.querySelector(`#stg-${i} .bar-fill`).style.width = '0%';
+                document.querySelector(`#stg-${i} .val`).innerText = '0%';
+            }
+
+            let currentStage = 1;
+            
+            function step() {
+                if(currentStage > 7) {
+                    if(onComplete) onComplete();
+                    return;
+                }
+                
+                const s = document.querySelector(`#stg-${currentStage}`);
+                s.querySelector('.bar-fill').style.background = 'var(--jarvis-gold)';
+                
+                let p = 0;
+                const int = setInterval(() => {
+                    p += Math.floor(Math.random() * 20 + 10);
+                    if(p > 100) p = 100;
+                    s.querySelector('.bar-fill').style.width = p + '%';
+                    s.querySelector('.val').innerText = p + '%';
+                    
+                    if(p === 100) {
+                        clearInterval(int);
+                        s.querySelector('.bar-fill').style.background = 'var(--jarvis-blue)';
+                        s.querySelector('.val').style.color = 'var(--jarvis-blue)';
+                        currentStage++;
+                        setTimeout(step, 150);
+                    }
+                }, 30);
+            }
+            step();
+        }
+
+    </script>
+</body>
+</html>
