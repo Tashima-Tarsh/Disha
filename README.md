@@ -1,142 +1,174 @@
-<div align="center">
-  <h1 align="center">DishaOS: The Autonomous Agentic Framework</h1>
-  <p align="center">
-    <strong>Engineered for Next-Generation Cognitive Loops, Elite RAG, and Swarm Intelligence.</strong>
-  </p>
-  <p align="center">
-    <a href="https://github.com/Tashima-Tarsh/Disha/stargazers"><img src="https://img.shields.io/github/stars/Tashima-Tarsh/Disha?style=for-the-badge&color=FFFFFF&labelColor=000000" alt="Stars"></a>
-    <a href="https://github.com/Tashima-Tarsh/Disha/network/members"><img src="https://img.shields.io/github/forks/Tashima-Tarsh/Disha?style=for-the-badge&color=FFFFFF&labelColor=000000" alt="Forks"></a>
-    <a href="https://github.com/Tashima-Tarsh/Disha/issues"><img src="https://img.shields.io/github/issues/Tashima-Tarsh/Disha?style=for-the-badge&color=FFFFFF&labelColor=000000" alt="Issues"></a>
-    <a href="https://github.com/Tashima-Tarsh/Disha/actions"><img src="https://img.shields.io/github/actions/workflow/status/Tashima-Tarsh/Disha/ci.yml?style=for-the-badge&logo=github-actions&logoColor=white&label=CI&color=FFFFFF&labelColor=000000" alt="Build Status"></a>
-    <a href="./LICENSE"><img src="https://img.shields.io/badge/License-Apache_2.0-FFFFFF?style=for-the-badge&labelColor=000000" alt="License"></a>
-  </p>
-</div>
+# 🛡️ DISHA OS: Sovereign Intelligence Platform
+
+[![CI/CD](https://github.com/Tashima-Tarsh/Disha/actions/workflows/ci.yml/badge.svg)](https://github.com/Tashima-Tarsh/Disha/actions)
+[![Security](https://img.shields.io/badge/Security-Blue--Team-00FFCC)](https://github.com/Tashima-Tarsh/Disha/blob/main/SECURITY.md)
+[![License: UNLICENSED](https://img.shields.io/badge/License-Proprietary-red)](LICENSE)
+[![AGI-Ready](https://img.shields.io/badge/Architecture-7--Stage%20Cognitive-violet)](docs/COGNITIVE_ENGINE.md)
+
+**DishaOS** is a globally elite, production-grade AGI infrastructure designed for sovereign intelligence, multi-agent orchestration, and autonomous cyber defense. It transcends "brittle LLM wrappers" by implementing a biological-inspired 7-stage cognitive loop, ensuring every action is deliberated, defended, and documented.
 
 ---
 
-## 🌌 The Next Era of Intelligence
-DishaOS is not a chatbot. It is a **production-grade, autonomous intelligence framework**. Most AI systems simply respond. **DishaOS deliberates.**
-
-Built for engineers who want to deploy multi-agent systems, continuous cognitive loops, and secure, sandboxed AI environments. It combines a 7-stage biological-inspired cognitive loop, an ML-powered honeypot cyber-defense system, a multi-agent decision nexus, real-time OSINT processing, and a privacy-first ephemeral auction engine—all inside a single, production-grade monorepo.
-
-### ⚡ Why DishaOS Wins
-- **Continuous Cognitive Loops:** Real-time reasoning over live data. (Perceive → Attend → Reason → Deliberate → Act → Reflect → Consolidate).
-- **AST-Aware RAG:** We chunk by syntax (Functions/Classes), not by blind line counts. Standard RAG is dead.
-- **Swarm Architecture:** Specialized Engineer, Security, Legal, and Architect agents debating and executing in parallel.
-- **Enterprise Security:** Fully sandboxed execution, RBAC, Honeypot mesh, and granular memory isolation.
+## 📖 Table of Contents
+- [The Product Story](#-product-story)
+- [Visual Showcase](#-visual-showcase)
+- [Core Features](#-core-features)
+- [Architecture Deep Dive](#-architecture-deep-dive)
+- [Tech Stack](#-tech-stack)
+- [Installation & Setup](#-installation--setup)
+- [Usage Guide](#-usage-guide)
+- [Roadmap](#-roadmap)
+- [Contributing](#-contributing)
 
 ---
 
-## 🏗️ Architecture Overview
+## ⚡ Product Story
 
+### The Pain Point
+The current AI landscape is saturated with "chatbots" that lack persistent memory, fail to reason through complex ethics, and have zero defensive capabilities against hostile environments.
+
+### The DISHA Solution
+DISHA (Digital Intelligence & Sovereign Heuristic Assistant) was built to be a **Sovereign Guardian**. It treats the digital world as a battleground, using honeypots to learn from attackers and a multi-agent "Decision Nexus" to ensure that AI agency is never unchecked. It doesn't just answer; it **reasons**.
+
+---
+
+## 🖼️ Visual Showcase
+
+### 1. The Sovereign Command Center
+![Command Center Dashboard Recommendation](https://via.placeholder.com/1200x600/000000/00FFCC?text=Recommendation:+Capture+GIF+of+live-demo/professional-os.html+with+Radar+and+Log+Streams)
+*Caption: Real-time monitoring of the 7-layer defense architecture and geo-threat radar.*
+
+### 2. The Cognitive Deliberation Flow
 ```mermaid
-flowchart TD
-    subgraph Input["Input Layer"]
-        CLI["CLI Assistant\n(Bun + Ink)"]
-        Web["Web Command Center\n(Next.js)"]
-        API["REST API\n(FastAPI)"]
-    end
-
-    subgraph Core["Sovereign Intelligence Core"]
-        CL["7-Stage Cognitive Loop"]
-        HR["Hybrid Reasoner"]
-        DN["Decision Nexus\n(Political · Legal · Security · Ideology)"]
-        MM["Memory Manager"]
-    end
-
-    subgraph Defense["Cyber Defense Layer"]
-        HP["Honeypot Mesh\n(Cowrie · OpenCanary · Dionaea)"]
-        ML["PyTorch Detection"]
-        RE["Response Engine"]
-        SH["Self-Healing Monitor"]
-    end
-
-    Input --> Core
-    Core --> MM
-    Core --> Defense
-    HP --> ML --> RE
-    Defense --> SH --> Core
+graph TD
+    A[Input] --> B[Perceive]
+    B --> C[Attend]
+    C --> D[Reason]
+    D --> E[Deliberate]
+    E --> F[Act]
+    F --> G[Reflect]
+    G --> H[Consolidate]
+    H --> C
 ```
+*Caption: The biological state machine driving DishaOS reasoning.*
 
 ---
 
-## 🚀 Quick Start
+## 🛠️ Core Features
+
+### 1. 7-Stage Cognitive Loop
+Unlike standard "Ask-Response" agents, DISHA processes every signal through:
+- **Perceive:** Intent & Entity Extraction.
+- **Attend:** Working & Episodic Memory retrieval (with 0.92 decay rate).
+- **Reason:** Competing Hypothesis generation.
+- **Deliberate:** Multi-agent cross-examination (Political, Legal, Security, Ideological).
+- **Act:** Execution with strict Confidence Thresholds (0.45).
+- **Reflect:** Self-quality assessment.
+- **Consolidate:** Long-term memory promotion.
+
+### 2. Sentinel Cyber Defense Mesh
+A native blue-team layer featuring:
+- **Honeypots:** Cowrie, OpenCanary, and Dionaea integrated directly into the learning loop.
+- **Anomaly Detection:** Unsupervised PyTorch autoencoders detecting zero-day network threats.
+- **Tarpitting:** Adaptive TCP slowing to neutralize brute-force attackers.
+
+### 3. Go4Bid: Ephemeral Commerce
+A privacy-first L1 reverse-auction engine:
+- **Zero-PII Storage:** Ephemeral Redis memory with 30-minute TTL.
+- **Blind Authentication:** Argon2id hashing for session integrity.
+
+---
+
+## 🏗️ Architecture Deep Dive
+
+### Frontend (Next.js 15)
+- **Framework:** Next.js with App Router.
+- **State Management:** React Server Components + Client-side hooks for WebSocket streams.
+- **Styling:** "Dark Luxury" Vanilla CSS + Tailwind for minimalist, premium dashboards.
+
+### Backend (FastAPI + Python 3.11)
+- **Orchestration:** FastAPI gateway managing asynchronous agent tasks.
+- **RAG Pipeline:** AST-aware code chunking using `tree-sitter` and vectorized retrieval via `chromadb`.
+- **Intelligence:** `HybridReasoner` switching between Symbolic and Neural logic.
+
+### Infrastructure
+- **Deployment:** Docker Compose for multi-service isolation.
+- **Package Management:** `uv` by Astral for extreme performance and reproducible environments.
+
+---
+
+## 💻 Tech Stack
+
+| Layer | Technologies |
+| :--- | :--- |
+| **Intelligence** | Python, FastAPI, PyTorch, LangChain, tree-sitter |
+| **Web** | Next.js, React, TypeScript, Tailwind CSS, xterm.js |
+| **Data** | Neo4j (Graph), Redis (Ephemeral), ChromaDB (Vector) |
+| **DevOps** | Docker, Bun, uv, GitHub Actions |
+| **Security** | Gitleaks, Bandit, Ruff, Biome |
+
+---
+
+## 🚀 Installation & Setup
 
 ### Prerequisites
-- **Bun** (≥ 1.3)
-- **Python** (≥ 3.11)
-- **Docker** (v2+)
+- Python 3.11+
+- Node.js / Bun
+- Docker & Docker Compose
 
-### 1. Clone & Install
+### 1. Clone the Repository
 ```bash
 git clone https://github.com/Tashima-Tarsh/Disha.git
 cd Disha
-bun install
 ```
 
-### 2. Configure Environment
+### 2. Initialize Backend (uv)
 ```bash
-cp .env.example .env
-# Edit .env — add API keys, Redis URL, Neo4j credentials
-```
-
-### 3. Launch the Intelligence Stack
-```bash
-# AI platform backend (FastAPI — 14 agents)
 cd disha-agi-brain/backend
+uv venv
+source .venv/bin/activate # or .venv\Scripts\activate on Windows
 uv pip install -r requirements.txt
-python main.py
-
-# Web command center (Next.js)
-bun dev:web
-
-# Cyber defense mesh (Docker)
-cd disha/services/cyber
-docker compose up -d
 ```
 
-### 4. Activate Autonomous Protection
+### 3. Initialize Frontend (Bun)
 ```bash
-python disha/scripts/disha_mythos.py --protect
+cd disha/apps/web
+bun install
+bun run dev
 ```
 
 ---
 
-## 🔌 API Reference
+## 🗺️ Roadmap
 
-The AI Platform exposes a versioned REST API.
+### Phase 1: Solidification (Current)
+- [x] Establish 7-stage Cognitive Loop.
+- [x] Implement Blue-Team Defense Mesh.
+- [x] Integrate AST-aware RAG.
 
-| Endpoint | Agent | Capability |
-| --- | --- | --- |
-| `POST /api/v1/agents/sentinel` | Sentinel Agent | Threat analysis, incident reporting |
-| `POST /api/v1/agents/osint` | OSINT Agent | Open-source intelligence gathering |
-| `POST /api/v1/agents/legal` | Legal Agent | Constitutional & regulatory analysis |
-| `POST /api/v1/agents/reasoning` | Reasoning Agent | Multi-step logical inference |
-
----
-
-## 🛡️ Enterprise Trust & Security
-
-DishaOS is engineered with a **zero-trust, defense-in-depth** security model. 
-
-- **SAST & Secret Scanning:** Gitleaks, Bandit, pip-audit.
-- **Honeypot Tarpit:** Built-in attacker slowing mechanisms.
-- **Container Isolation:** Strict no-new-privileges and memory caps.
-
-Please see our [SECURITY.md](./SECURITY.md) for vulnerability disclosure policies.
+### Phase 2: Proactive Intelligence (Q3 2026)
+- [ ] **Voice Mode:** WebRTC + Whisper/TTS for hands-free command.
+- [ ] **Predictive Hardening:** Using `pydriller` to predict vulnerability-prone commits.
+- [ ] **Swarm Expansion:** Adding autonomous PR agents for self-healing code.
 
 ---
 
-## 🤝 Join the Inner Circle
-
-We welcome engineers who think in systems, not scripts. 
-Please read our [Contributing Guidelines](./CONTRIBUTING.md) and our [Code of Conduct](./CODE_OF_CONDUCT.md).
+## 🤝 Contributing
+We maintain a **Top 0.1% code quality standard**.
+1. Fork the repo.
+2. Run `bun run lint` and `ruff check`.
+3. Submit a PR with detailed architecture impact notes.
 
 ---
 
-<div align="center">
-  <h3>Built by <a href="https://github.com/Tashima-Tarsh">Tashima Tarsh</a></h3>
-  <p>Architecting Autonomous Systems | Creator of DishaOS</p>
-  <br>
-  <p>If DishaOS taught you something or saved you time, a ⭐ star means the world.</p>
-</div>
+## 🛡️ License
+Proprietary / Unlicensed. See [LICENSE](LICENSE) for details.
+
+---
+
+## 🌌 Maintainer
+**DishaOS Architect** — Engineering True Autonomy.
+
+---
+
+**[⭐ Star on GitHub](https://github.com/Tashima-Tarsh/Disha)** | **[🍴 Fork Repo](https://github.com/Tashima-Tarsh/Disha/fork)** | **[📖 Read Wiki](docs/HOME.md)**
