@@ -3,19 +3,24 @@
 As an AI agent working in this workspace, you MUST adhere to the following Constitution at all times:
 
 ## Rule 1: No persistent database (No SQL/NoSQL)
+
 - ONLY use ephemeral memory solutions (e.g., Redis, In-Memory stores).
 - Do not plan, suggest, or implement any persistent database drivers (PostgreSQL, MongoDB, SQLite, etc.) unless specifically requested with a justification.
 
 ## Rule 2: PII Hashing
+
 - Every Personally Identifiable Information (PII) — including but not limited to names, emails, phone numbers — MUST be hashed (e.g., using SHA-256) before any form of storage or transit to loggers.
 
 ## Rule 3: Save Halt
+
 - If a task explicitly or implicitly involves "Saving User Data," you MUST halt the current task and ask the USER for an alternative ephemeral method.
 
 ## Rule 4: Priority Bidding Logic
+
 - Prioritize **"L1 Bidding"** (Lowest One technically qualified) logic in all merchant-matching and auction workflows.
 - Favor the lowest qualified bidder while maintaining L2/L3 backups for system resilience.
 
 ## Technical Context
+
 - **Stack**: Vite + React (TypeScript), Vanilla CSS.
 - **Persistence Preference**: Redis (Ephemerality).
