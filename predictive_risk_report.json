@@ -1,0 +1,90 @@
+{
+    "timestamp": "2026-04-27T05:12:59.648366",
+    "analysis_period_days": 180,
+    "top_risk_files": [
+        {
+            "file": "index.ts",
+            "risk_score": 81.5,
+            "total_commits": 271,
+            "fix_commits": 0,
+            "author_count": 1,
+            "complexity": 2
+        },
+        {
+            "file": "__init__.py",
+            "risk_score": 79.1,
+            "total_commits": 256,
+            "fix_commits": 3,
+            "author_count": 1,
+            "complexity": 2
+        },
+        {
+            "file": "README.md",
+            "risk_score": 36.6,
+            "total_commits": 119,
+            "fix_commits": 1,
+            "author_count": 1,
+            "complexity": null
+        },
+        {
+            "file": "prompt.ts",
+            "risk_score": 35.3,
+            "total_commits": 117,
+            "fix_commits": 0,
+            "author_count": 1,
+            "complexity": 1
+        },
+        {
+            "file": "client.go",
+            "risk_score": 28.1,
+            "total_commits": 93,
+            "fix_commits": 0,
+            "author_count": 1,
+            "complexity": 8
+        },
+        {
+            "file": "UI.tsx",
+            "risk_score": 26.4,
+            "total_commits": 85,
+            "fix_commits": 1,
+            "author_count": 1,
+            "complexity": 11
+        },
+        {
+            "file": "raw_client.go",
+            "risk_score": 23.6,
+            "total_commits": 78,
+            "fix_commits": 0,
+            "author_count": 1,
+            "complexity": 11
+        },
+        {
+            "file": "types.ts",
+            "risk_score": 22.7,
+            "total_commits": 75,
+            "fix_commits": 0,
+            "author_count": 1,
+            "complexity": 4
+        },
+        {
+            "file": "constants.ts",
+            "risk_score": 22.7,
+            "total_commits": 75,
+            "fix_commits": 0,
+            "author_count": 1,
+            "complexity": 1
+        },
+        {
+            "file": "requirements.txt",
+            "risk_score": 21.9,
+            "total_commits": 46,
+            "fix_commits": 11,
+            "author_count": 2,
+            "complexity": null
+        }
+    ],
+    "summary": {
+        "total_files_analyzed": 3165,
+        "high_risk_threshold": 5.0
+    }
+}

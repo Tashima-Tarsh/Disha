@@ -1,7 +1,7 @@
 {
   "link_prediction": {
     "epochs": 200,
-    "final_loss": 0.2850906252861023
+    "final_loss": 0.26943135261535645
   },
   "node_classification": {
     "epochs": 130,

@@ -72,7 +72,13 @@ A native blue-team layer featuring:
 - **Anomaly Detection:** Unsupervised PyTorch autoencoders detecting zero-day network threats.
 - **Tarpitting:** Adaptive TCP slowing to neutralize brute-force attackers.
 
-### 3. Go4Bid: Ephemeral Commerce
+### 3. Predictive Intelligence (PyDriller)
+Autonomous repository analysis that identifies high-risk, bug-prone files based on historical commit churn and complexity metrics.
+
+### 4. Voice Mode (WebRTC)
+Low-latency audio streaming for hands-free "Jarvis-style" commanding using Whisper-based speech-to-text and ultra-fast TTS responses.
+
+### 5. Go4Bid: Ephemeral Commerce
 A privacy-first L1 reverse-auction engine:
 - **Zero-PII Storage:** Ephemeral Redis memory with 30-minute TTL.
 - **Blind Authentication:** Argon2id hashing for session integrity.
@@ -146,9 +152,9 @@ bun run dev
 - [x] Implement Blue-Team Defense Mesh.
 - [x] Integrate AST-aware RAG.
 
-### Phase 2: Proactive Intelligence (Q3 2026)
-- [ ] **Voice Mode:** WebRTC + Whisper/TTS for hands-free command.
-- [ ] **Predictive Hardening:** Using `pydriller` to predict vulnerability-prone commits.
+### Phase 2: Proactive Intelligence (Current)
+- [x] **Voice Mode:** WebRTC + Audio Streaming integration.
+- [x] **Predictive Hardening:** PyDriller-powered risk analysis.
 - [ ] **Swarm Expansion:** Adding autonomous PR agents for self-healing code.
 
 ---
