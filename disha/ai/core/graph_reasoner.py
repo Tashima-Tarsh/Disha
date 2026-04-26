@@ -4,6 +4,8 @@ from datetime import datetime
 
 from disha.ai.core.agents.specialists.hub import SpecialistHub
 from app.services.security import SecurityService, UserRole, Permission
+from app.services.analytics import AnalyticsService
+import time
 
 logger = structlog.get_logger("graph_reasoner")
 
@@ -22,6 +24,7 @@ class GraphReasoner:
     def __init__(self):
         self.hub = SpecialistHub()
         self.security = SecurityService()
+        self.analytics = AnalyticsService()
         self.state: AgentState = {
             "input": "",
             "context": [],
@@ -45,19 +48,21 @@ class GraphReasoner:
         # 2. Perception Node
         self.state["input"] = user_input
         
-        # 2. Collaborative Deliberation Node
-        # We run the task through the Architect (check structure), Engineer (solve), and Security (audit)
-        logger.info("initiating_collaborative_deliberation", workflow=["architect", "engineer", "security"])
+        # 3. Final Synthesis
+        start_time = time.time()
         agent_results = await self.hub.collaborate(user_input, ["architect", "engineer", "security"])
+        latency_ms = (time.time() - start_time) * 1000
+        
+        self.analytics.track_ai_interaction(user_input, latency_ms, self.state["confidence"])
         
         self.state["history"].append({"step": "deliberation", "results": str(agent_results)})
         
-        # 3. Final Synthesis
+        # 4. Final Synthesis
         self.state["final_output"] = f"DishaOS Multi-Agent Response:\n"
         for agent, res in agent_results.items():
             self.state["final_output"] += f"- [{agent.upper()}]: {res}\n"
         
-        logger.info("reasoning_graph_complete", confidence=self.state["confidence"])
+        logger.info("reasoning_graph_complete", confidence=self.state["confidence"], latency=latency_ms)
         return self.state["final_output"]
 
 if __name__ == "__main__":

@@ -1,0 +1,39 @@
+name: Engineering Excellence (Quality Gate)
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  quality-gate:
+    name: Code Quality & Type Safety
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install ruff mypy pydantic pydantic-settings
+          pip install -r disha/services/ai-platform/backend/requirements.txt
+
+      - name: Lint with ruff
+        run: ruff check .
+
+      - name: Type Check with mypy
+        run: |
+          # Ensuring core AI modules are strictly typed
+          mypy disha/ai/core/ --ignore-missing-imports --strict
+
+      - name: Security Scan
+        run: |
+          pip install bandit
+          bandit -r disha/ai/core/ -ll
