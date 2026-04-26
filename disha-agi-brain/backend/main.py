@@ -2,6 +2,7 @@ import uvicorn
 from fastapi import FastAPI, WebSocket
 from fastapi.middleware.cors import CORSMiddleware
 
+# DISHA_STABILITY_PATCH: Enhanced Global Invariant Monitoring
 app = FastAPI(
     title="DISHA AGI Brain",
     description="Next-Generation Repository Intelligence Engine",
