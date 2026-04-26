@@ -12,6 +12,7 @@ import RankingPanel from "@/components/ranking/RankingPanel";
 import RLMetricsPanel from "@/components/rl/RLMetricsPanel";
 import QuantumPhysicsPanel from "@/components/quantum/QuantumPhysicsPanel";
 import { CognitiveLoop } from "@/components/cognitive/CognitiveLoop";
+import JarvisCommandCenter from "@/components/layout/JarvisCommandCenter";
 import { useWebSocket } from "@/hooks/useWebSocket";
 import { useApi } from "@/hooks/useApi";
 import type { Alert, Investigation } from "@/lib/types";
@@ -114,27 +115,18 @@ export default function Dashboard() {
         <main className="flex-1 overflow-auto p-5 space-y-5">
 
           {activeTab === "overview" && (
-            <>
-              {/* Hero row */}
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 animate-fade-in-up stagger">
-                <div className="lg:col-span-2">
-                  <StatsPanel investigations={investigations} alerts={alerts} />
-                </div>
-                <div className="glass rounded-2xl p-5 bracket-corner scan-overlay">
-                  <div className="section-heading">System Status</div>
-                  <SystemStatusMini />
-                </div>
+            <div className="flex flex-col gap-6 animate-fade-in-up">
+              {/* Jarvis Command Center Full Visualization */}
+              <div className="w-full h-[600px] xl:h-[700px]">
+                <JarvisCommandCenter />
               </div>
+
               {/* Main panels */}
               <div className="grid grid-cols-1 xl:grid-cols-2 gap-5 animate-fade-in-up" style={{ animationDelay: "0.15s" }}>
                 <AlertsFeed alerts={alerts} />
                 <InvestigationPanel onInvestigate={handleInvestigate} />
               </div>
-              {/* Graph preview */}
-              <div className="animate-fade-in-up" style={{ animationDelay: "0.25s" }}>
-                <GraphVisualization />
-              </div>
-            </>
+            </div>
           )}
 
           {activeTab === "investigate" && (
