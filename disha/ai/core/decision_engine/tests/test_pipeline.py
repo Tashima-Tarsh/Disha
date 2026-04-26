@@ -19,7 +19,9 @@ import pytest
 
 # Ensure the decision-engine directory and repo root are on sys.path
 _ENGINE_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir))
-_REPO_ROOT = os.path.abspath(os.path.join(_ENGINE_ROOT, os.pardir, os.pardir, os.pardir)) # disha/ai/core -> disha/ai -> disha -> root
+_REPO_ROOT = os.path.abspath(
+    os.path.join(_ENGINE_ROOT, os.pardir, os.pardir, os.pardir)
+)  # disha/ai/core -> disha/ai -> disha -> root
 
 for p in [_ENGINE_ROOT, _REPO_ROOT]:
     if p not in sys.path:
@@ -28,20 +30,23 @@ for p in [_ENGINE_ROOT, _REPO_ROOT]:
 # Force mock provider for deterministic behaviour
 os.environ.setdefault("DISHA_MODEL_PROVIDER", "mock")
 
-from disha.ai.core.decision_engine.utils.llm_wrapper import MockLLM, get_llm
-from disha.ai.core.decision_engine.utils.simple_retriever import SimpleRetriever
-from disha.ai.core.decision_engine.utils.text_segmenter import segment, segment_file
-from disha.ai.core.decision_engine.utils.case_law_ingest import parse_case_law, ingest
-from disha.ai.core.decision_engine.utils.osint import OSINTClient
-from disha.ai.core.decision_engine.political_engine import PoliticalAgent
-from disha.ai.core.decision_engine.legal_engine import LegalAgent
-from disha.ai.core.decision_engine.ideology_engine import IdeologyAgent
-from disha.ai.core.decision_engine.security_engine import SecurityAgent
-from disha.ai.core.decision_engine.main_decision_engine import DecisionEngine
+from disha.ai.core.decision_engine.utils.llm_wrapper import MockLLM, get_llm  # noqa: E402
+from disha.ai.core.decision_engine.utils.simple_retriever import SimpleRetriever  # noqa: E402
+from disha.ai.core.decision_engine.utils.text_segmenter import segment, segment_file  # noqa: E402
+from disha.ai.core.decision_engine.utils.case_law_ingest import parse_case_law, ingest  # noqa: E402
+from disha.ai.core.decision_engine.utils.osint import OSINTClient  # noqa: E402
+from disha.ai.core.decision_engine.political_engine import PoliticalAgent  # noqa: E402
+from disha.ai.core.decision_engine.legal_engine import LegalAgent  # noqa: E402
+from disha.ai.core.decision_engine.ideology_engine import IdeologyAgent  # noqa: E402
+from disha.ai.core.decision_engine.security_engine import SecurityAgent  # noqa: E402
+from disha.ai.core.decision_engine.main_decision_engine import DecisionEngine  # noqa: E402
 
 # Optional FAISS import
 try:
-    from disha.ai.core.decision_engine.utils.retriever_faiss import FAISSRetriever, faiss_available
+    from disha.ai.core.decision_engine.utils.retriever_faiss import (
+        FAISSRetriever,
+        faiss_available,
+    )
 
     _HAS_FAISS = faiss_available()
 except ImportError:
