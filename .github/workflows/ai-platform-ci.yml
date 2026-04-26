@@ -43,16 +43,17 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
+          cache: 'pip'
 
-      - name: Install lightweight dependencies
+      - name: Install dependencies
         run: |
-          pip install fastapi uvicorn pydantic pydantic-settings httpx pytest pytest-asyncio pytest-cov \
-            "python-jose[cryptography]" "passlib[bcrypt]" python-multipart python-dotenv structlog \
-            numpy pandas networkx anyio
+          pip install --upgrade pip
+          pip install -r disha/services/ai-platform/backend/requirements.txt
 
       - name: Run tests
         env:
           PYTHONPATH: ${{ github.workspace }}
+          DISHA_MODEL_PROVIDER: mock
         run: |
           cd disha/services/ai-platform/backend
           python -m pytest tests/ -v --tb=short
