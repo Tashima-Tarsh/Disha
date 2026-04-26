@@ -106,7 +106,7 @@ export default function JarvisCommandCenter() {
           <div className="text-[10px] flex-1 space-y-2 font-mono overflow-auto scrollbar-hide">
             {lastMessage ? (
               <div className="text-[var(--neon-green)] animate-fade-in-up break-words">
-                > {JSON.stringify(lastMessage)}
+                {"> "} {JSON.stringify(lastMessage)}
               </div>
             ) : (
               <div className="text-[var(--text-muted)] animate-pulse">Waiting for signals...</div>
