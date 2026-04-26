@@ -5,17 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SOVEREIGN OS - Defense-Grade Command Center</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;500;700;900&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Share+Tech+Mono&family=Orbitron:wght@400;500;700;900&display=swap');
 
         :root {
-            --cyan: #00f3ff;
+            --cyan: #00FFCC; /* Dark Luxury Neon Cyan */
+            --violet: #8A2BE2; /* Electric Violet */
             --blue: #0984e3;
             --gold: #f39c12;
             --red: #ff003c;
-            --green: #00ff66;
-            --bg-deep: #000205;
-            --panel-border: rgba(0, 243, 255, 0.3);
-            --panel-bg: rgba(0, 15, 30, 0.65);
+            --green: #00FFCC; /* Sync green with cyan for minimalism */
+            --bg-deep: #000000; /* Absolute Pitch Black */
+            --panel-border: rgba(0, 255, 204, 0.15);
+            --panel-bg: rgba(10, 10, 10, 0.85); /* Deep Graphite */
+            --text-silver: #A1A1AA;
         }
 
         * {
@@ -26,20 +28,18 @@
         body {
             background-color: var(--bg-deep);
             color: var(--cyan);
-            font-family: 'Share Tech Mono', monospace;
+            font-family: 'Inter', sans-serif; /* Cleaner modern font for luxury feel */
             height: 100vh; overflow: hidden;
             display: grid;
             grid-template-columns: 280px 1fr 380px;
             grid-template-rows: 60px 1fr;
-            gap: 10px;
-            padding: 10px;
-            /* Complex Grid Background */
+            gap: 15px;
+            padding: 15px;
+            /* Subtle grid */
             background-image: 
-                linear-gradient(rgba(0, 243, 255, 0.05) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(0, 243, 255, 0.05) 1px, transparent 1px),
-                linear-gradient(rgba(0, 243, 255, 0.02) 2px, transparent 2px),
-                linear-gradient(90deg, rgba(0, 243, 255, 0.02) 2px, transparent 2px);
-            background-size: 100px 100px, 100px 100px, 20px 20px, 20px 20px;
+                linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+            background-size: 50px 50px;
             background-position: center center;
         }
 
@@ -54,9 +54,10 @@
         .panel {
             background: var(--panel-bg);
             border: 1px solid var(--panel-border);
-            backdrop-filter: blur(8px);
+            backdrop-filter: blur(12px);
+            border-radius: 8px; /* Luxury rounded edges */
             position: relative;
-            box-shadow: inset 0 0 30px rgba(0,0,0,0.8), 0 5px 15px rgba(0,0,0,0.5);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
             display: flex; flex-direction: column;
         }
         
@@ -69,43 +70,49 @@
         .panel::after { bottom: -1px; right: -1px; border-left: none; border-top: none; }
 
         .panel-header {
-            font-family: 'Orbitron', sans-serif; font-size: 14px; font-weight: 700; letter-spacing: 2px;
-            background: rgba(0, 243, 255, 0.1); padding: 8px 15px;
+            font-family: 'Orbitron', sans-serif; font-size: 13px; font-weight: 700; letter-spacing: 3px;
+            background: rgba(255, 255, 255, 0.02); padding: 12px 20px;
             border-bottom: 1px solid var(--panel-border);
             display: flex; justify-content: space-between; align-items: center;
+            border-radius: 8px 8px 0 0;
+            color: var(--text-silver);
         }
 
         /* --- HEADER --- */
         .header-bar {
             grid-column: 1 / -1; grid-row: 1;
             display: flex; justify-content: space-between; align-items: center; padding: 0 20px;
-            border-bottom: 2px solid var(--cyan);
-            background: linear-gradient(90deg, rgba(0,243,255,0.2) 0%, transparent 50%, rgba(0,243,255,0.2) 100%);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            background: linear-gradient(90deg, rgba(0,0,0,0.8) 0%, rgba(10,10,10,0.9) 100%);
+            border-radius: 8px;
         }
         .header-bar h1 {
-            font-family: 'Orbitron', sans-serif; font-size: 28px; font-weight: 900; letter-spacing: 8px;
-            text-shadow: 0 0 15px var(--cyan);
+            font-family: 'Orbitron', sans-serif; font-size: 24px; font-weight: 900; letter-spacing: 6px;
+            color: #ffffff;
+            text-shadow: 0 0 20px rgba(255,255,255,0.2);
         }
-        .system-specs { display: flex; gap: 40px; font-size: 12px; }
+        .system-specs { display: flex; gap: 40px; font-size: 12px; font-family: 'Share Tech Mono', monospace; }
         .spec-item { display: flex; flex-direction: column; align-items: flex-end; }
-        .spec-val { font-size: 18px; color: #fff; font-weight: bold; text-shadow: 0 0 10px var(--cyan); }
+        .spec-val { font-size: 18px; color: #fff; font-weight: bold; text-shadow: 0 0 10px rgba(0,255,204,0.5); }
 
         /* --- SIDEBAR --- */
         .sidebar { grid-column: 1; grid-row: 2; padding: 15px; gap: 15px; }
         .nav-btn {
-            background: rgba(0,0,0,0.5); border: 1px solid var(--blue);
+            background: transparent; border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 6px;
             padding: 15px; margin-bottom: 10px; cursor: pointer;
-            font-family: 'Orbitron', sans-serif; font-size: 12px; font-weight: 700; letter-spacing: 2px;
+            font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 500; letter-spacing: 1px;
+            color: var(--text-silver);
             transition: all 0.3s; position: relative; overflow: hidden;
             display: flex; align-items: center; gap: 15px;
         }
         .nav-btn::before {
-            content: ''; position: absolute; left: 0; top: 0; height: 100%; width: 4px; background: var(--cyan);
+            content: ''; position: absolute; left: 0; top: 0; height: 100%; width: 3px; background: var(--cyan);
             transform: scaleY(0); transition: 0.3s;
         }
         .nav-btn:hover::before, .nav-btn.active::before { transform: scaleY(1); }
-        .nav-btn:hover, .nav-btn.active { background: rgba(0, 243, 255, 0.15); box-shadow: inset 0 0 20px rgba(0,243,255,0.2); }
-        .nav-icon { width: 24px; height: 24px; fill: var(--cyan); }
+        .nav-btn:hover, .nav-btn.active { background: rgba(255, 255, 255, 0.03); color: #fff; border-color: rgba(255,255,255,0.1); }
+        .nav-icon { width: 20px; height: 20px; fill: currentColor; }
 
         /* --- 7-LAYER SCIENCE VISUALIZATION (THE CORE) --- */
         .core-view {
