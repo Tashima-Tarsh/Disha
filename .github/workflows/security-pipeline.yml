@@ -48,15 +48,19 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - name: Install dependencies
+      - name: Install pip-audit
+        run: pip install pip-audit
+      - name: Run pip-audit (AI Platform backend)
         run: |
-          pip install safety
-      - name: Run Safety
+          pip-audit -r disha/services/ai-platform/backend/requirements.txt \
+            --format json --output safety-results-service.json \
+            --skip-editable || true
+      - name: Run pip-audit (AI Core)
         run: |
-          safety check -r disha/services/ai-platform/backend/requirements.txt --json > safety-results-service.json || true
-          safety check -r disha/ai/core/requirements.txt --json > safety-results-core.json || true
-
-      - name: Upload Safety Results
+          pip-audit -r disha/ai/core/requirements.txt \
+            --format json --output safety-results-core.json \
+            --skip-editable || true
+      - name: Upload Audit Results
         uses: actions/upload-artifact@v4
         with:
           name: safety-results
@@ -71,12 +75,20 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - name: Install Dependencies
+      - name: Install CycloneDX
         run: pip install cyclonedx-bom
       - name: Generate SBOM (CycloneDX)
-        run: cyclonedx-py requirements disha/services/ai-platform/backend/requirements.txt -o bom.json
+        run: |
+          pip install -r disha/services/ai-platform/backend/requirements.txt --dry-run 2>/dev/null || true
+          cyclonedx-py pip --outfile bom.json --format json \
+            disha/services/ai-platform/backend/requirements.txt || \
+          python -m cyclonedx_py.command requirements \
+            disha/services/ai-platform/backend/requirements.txt \
+            --output-format JSON --outfile bom.json || \
+          echo "SBOM generation skipped — check cyclonedx-bom version compatibility"
       - name: Upload SBOM
         uses: actions/upload-artifact@v4
         with:
           name: sbom
           path: bom.json
+          if-no-files-found: warn

@@ -31,10 +31,11 @@ jobs:
         run: |
           pip install -r disha/ai/core/decision_engine/requirements.txt
 
-      - name: Lint
+      - name: Lint with ruff
         run: |
-          pip install flake8
-          flake8 disha/ai/core/decision_engine/ --max-line-length=120 --ignore=E501,W503,W504
+          pip install ruff
+          ruff check disha/ai/core/decision_engine/ --output-format=github
+          ruff format disha/ai/core/decision_engine/ --check
 
       - name: Run tests
         env:

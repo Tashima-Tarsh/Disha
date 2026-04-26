@@ -29,16 +29,20 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install flake8
+          pip install ruff
           pip install -r disha/ai/strategy/requirements.txt
 
-      - name: Lint
-        run: flake8 disha/ai/strategy/ --max-line-length=120 --ignore=E501,W503,W504 --exclude=disha/ai/strategy/dashboard/
+      - name: Lint with ruff
+        run: ruff check disha/ai/strategy/ --output-format=github --exclude=disha/ai/strategy/dashboard/
 
       - name: Run tests (if any)
         run: |
-          cd disha/ai/strategy
-          python -m pytest tests/ -v --tb=short 2>/dev/null || echo "No tests found — skipping."
+          if [ -d "disha/ai/strategy/tests" ] && ls disha/ai/strategy/tests/test_*.py 2>/dev/null; then
+            cd disha/ai/strategy
+            python -m pytest tests/ -v --tb=short
+          else
+            echo "No tests found in disha/ai/strategy/tests/ — skipping."
+          fi
 
   quantum-physics:
     name: Lint Python (Quantum Physics)
@@ -51,8 +55,8 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Install dependencies
-        run: pip install flake8
+      - name: Install ruff
+        run: pip install ruff
 
-      - name: Lint
-        run: flake8 disha/ai/physics/backend/ --max-line-length=120 --ignore=E501,W503,W504
+      - name: Lint with ruff
+        run: ruff check disha/ai/physics/backend/ --output-format=github
