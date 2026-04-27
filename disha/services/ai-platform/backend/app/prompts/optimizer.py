@@ -203,9 +203,7 @@ class PromptOptimizer:
 
         return best_variant
 
-    def _mutate(
-        self, parent: PromptVariant, prompt_type: str
-    ) -> PromptVariant | None:
+    def _mutate(self, parent: PromptVariant, prompt_type: str) -> PromptVariant | None:
         mutations = [
             ("Add specificity", "Be very specific and detailed in your analysis. "),
             (

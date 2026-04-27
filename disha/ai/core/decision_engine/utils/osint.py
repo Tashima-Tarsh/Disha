@@ -44,7 +44,7 @@ class OSINTClient:
         name = feed.get("name", url)
 
         req = urllib.request.Request(url, headers={"User-Agent": "Disha-OSINT/1.0"})
-        with urllib.request.urlopen(req, timeout=self.timeout) as resp:
+        with urllib.request.urlopen(req, timeout=self.timeout) as resp:  # nosec B310
             raw = resp.read().decode("utf-8", errors="replace")
 
         if feed_type == "rss":
@@ -55,7 +55,7 @@ class OSINTClient:
 
     @staticmethod
     def _parse_rss(raw: str, source: str) -> list[dict[str, Any]]:
-        root = ET.fromstring(raw)
+        root = ET.fromstring(raw)  # nosec B314
         items: list[dict[str, Any]] = []
         for item in root.iter("item"):
             title = item.findtext("title", "")

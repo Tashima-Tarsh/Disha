@@ -180,7 +180,9 @@ class ScenarioRunner:
         self._current_time: float = 0.0
         self._event_index: int = 0
         self._results: list[dict[str, Any]] = []
-        self._step_callback: Callable[[float, ScheduledEvent, Scenario], None] | None = None
+        self._step_callback: (
+            Callable[[float, ScheduledEvent, Scenario], None] | None
+        ) = None
         self._is_running: bool = False
 
     def load(self, scenario: Scenario) -> None:

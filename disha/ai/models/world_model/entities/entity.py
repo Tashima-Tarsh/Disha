@@ -194,7 +194,9 @@ class AgentEntity(Entity):
             properties=properties,
         )
         self.goal: str = goal
-        self.behavior_fn: Callable[[AgentEntity, float, list[Entity]], None] | None = behavior_fn
+        self.behavior_fn: Callable[[AgentEntity, float, list[Entity]], None] | None = (
+            behavior_fn
+        )
         self.perception_radius: float = perception_radius
         self.memory: list[dict[str, Any]] = []
 

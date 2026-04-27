@@ -1,4 +1,3 @@
-
 import structlog
 from app.services.cache import CacheService
 

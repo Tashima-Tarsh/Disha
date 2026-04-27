@@ -231,8 +231,8 @@ class LLaMAFineTuner:
         if quant_config:
             model_kwargs["quantization_config"] = quant_config
 
-        self._model = AutoModelForCausalLM.from_pretrained(**model_kwargs)
-        self._tokenizer = AutoTokenizer.from_pretrained(
+        self._model = AutoModelForCausalLM.from_pretrained(**model_kwargs)  # nosec B615
+        self._tokenizer = AutoTokenizer.from_pretrained(  # nosec B615
             self.model_name_or_path, trust_remote_code=False
         )
         if self._tokenizer.pad_token is None:

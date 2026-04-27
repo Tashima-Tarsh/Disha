@@ -86,9 +86,7 @@ class AudioAgent(BaseAgent):
             logger.warning("audio_fetch_failed", url=url, error=str(e))
             return None
 
-    async def _transcribe(
-        self, audio_base64: str, language: str | None = None
-    ) -> dict:
+    async def _transcribe(self, audio_base64: str, language: str | None = None) -> dict:
         try:
             client = await self._get_client()
             api_key = self.settings.OPENAI_API_KEY

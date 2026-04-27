@@ -29,7 +29,7 @@ _REPO_ROOT = _THIS.parents[5]
 _BACKEND = _REPO_ROOT / "disha" / "services" / "ai-platform" / "backend"
 _DECISION = _REPO_ROOT / "disha" / "ai" / "core" / "decision_engine"
 
-for p in [str(_REPO_ROOT), str(_BACKEND / "app"), str(_BACKEND), str(_DECISION)]:
+for p in [str(_REPO_ROOT), str(_BACKEND / "app"), str(_BACKEND)]:
     if p not in sys.path:
         sys.path.insert(0, p)
 
@@ -187,8 +187,7 @@ class TestDecisionEngineTrainedModel:
         reason="calibration_model.json missing",
     )
     def test_load_and_predict(self):
-        sys.path.insert(0, str(_DECISION))
-        from train import CalibrationModel
+        from disha.ai.core.decision_engine.train import CalibrationModel
 
         with open(self.CKPT_DIR / "calibration_model.json") as f:
             data = json.load(f)
@@ -213,8 +212,11 @@ class TestDecisionEngineTrainedModel:
     )
     def test_full_pipeline_with_calibration(self):
         """Run engine + calibration together."""
-        from main_decision_engine import DecisionEngine
-        from train import CalibrationModel, _extract_features
+        from disha.ai.core.decision_engine.main_decision_engine import DecisionEngine
+        from disha.ai.core.decision_engine.train import (
+            CalibrationModel,
+            _extract_features,
+        )
 
         engine = DecisionEngine(seed=42)
         with open(self.CKPT_DIR / "calibration_model.json") as f:

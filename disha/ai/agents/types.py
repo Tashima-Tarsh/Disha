@@ -70,9 +70,7 @@ class Task:
     dependencies: list[str] = field(default_factory=list)
     result: Any = None
     error: str | None = None
-    created_at: str = field(
-        default_factory=lambda: datetime.now(UTC).isoformat()
-    )
+    created_at: str = field(default_factory=lambda: datetime.now(UTC).isoformat())
     completed_at: str | None = None
     metadata: dict[str, Any] = field(default_factory=dict)
 
@@ -117,9 +115,7 @@ class MemoryEntry:
     key: str = ""
     value: Any = None
     tags: list[str] = field(default_factory=list)
-    created_at: str = field(
-        default_factory=lambda: datetime.now(UTC).isoformat()
-    )
+    created_at: str = field(default_factory=lambda: datetime.now(UTC).isoformat())
     expires_at: str | None = None
     access_count: int = 0
 
@@ -135,9 +131,7 @@ class Plan:
     id: str = field(default_factory=lambda: uuid.uuid4().hex[:12])
     objective: str = ""
     tasks: list[Task] = field(default_factory=list)
-    created_at: str = field(
-        default_factory=lambda: datetime.now(UTC).isoformat()
-    )
+    created_at: str = field(default_factory=lambda: datetime.now(UTC).isoformat())
     metadata: dict[str, Any] = field(default_factory=dict)
 
     @property
