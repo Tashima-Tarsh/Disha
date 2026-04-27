@@ -77,8 +77,8 @@ class GraphReasoner:
         self.state["final_output"] += f"\n---\n*Deliberation Reflection:* {reflection_result}"
         
         # Persist to memory
-        memory.add_turn("user", user_input)
-        memory.add_turn("assistant", self.state["final_output"])
+        memory_ctx.add_turn("user", user_input)
+        memory_ctx.add_turn("assistant", self.state["final_output"])
 
         logger.info("reasoning_graph_complete", confidence=self.state["confidence"], latency=latency_ms)
         return self.state["final_output"]
