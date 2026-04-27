@@ -1,13 +1,13 @@
 from __future__ import annotations
 
 import json
-import logging
+import structlog
 import time
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any
+from typing import Any, Dict, List, Optional
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 _TORCH_AVAILABLE = False
 _TRANSFORMERS_AVAILABLE = False
@@ -186,9 +186,9 @@ class LLaMAFineTuner:
         self.model_name_or_path = model_name_or_path
         self.lora_config = lora_config or LoRAConfig()
         self.training_config = training_config or TrainingConfig()
-        self._model = None
-        self._tokenizer = None
-        self._trainer = None
+        self._model: Any = None
+        self._tokenizer: Any = None
+        self._trainer: Any = None
 
     def check_environment(self) -> dict[str, Any]:
         gpu_available = _TORCH_AVAILABLE and torch.cuda.is_available()

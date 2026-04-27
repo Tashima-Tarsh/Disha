@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import os
+from typing import Any
 
 try:
     import faiss
@@ -26,7 +27,7 @@ class FAISSRetriever:
             )
         self.model = SentenceTransformer(model_name)
         self.index: faiss.Index | None = None
-        self.metadata: list[dict] = []
+        self.metadata: list[dict[str, Any]] = []
 
     def build_index(
         self,
@@ -59,7 +60,7 @@ class FAISSRetriever:
         with open(metadata_path, encoding="utf-8") as fh:
             self.metadata = json.load(fh)
 
-    def query(self, query_text: str, top_k: int = 5) -> list[dict]:
+    def query(self, query_text: str, top_k: int = 5) -> list[dict[str, Any]]:
         if self.index is None or not self.metadata:
             return []
 
@@ -67,7 +68,7 @@ class FAISSRetriever:
         vec = np.array(vec, dtype="float32")
 
         distances, indices = self.index.search(vec, min(top_k, self.index.ntotal))
-        results: list[dict] = []
+        results: list[dict[str, Any]] = []
         for dist, idx in zip(distances[0], indices[0]):
             if idx < 0:
                 continue

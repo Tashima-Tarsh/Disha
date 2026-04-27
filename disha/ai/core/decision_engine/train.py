@@ -4,6 +4,7 @@ import json
 import os
 import sys
 from pathlib import Path
+from typing import Any
 
 import numpy as np
 from main_decision_engine import DecisionEngine
@@ -115,7 +116,7 @@ _FILLS = {
 }
 
 
-def _generate_scenarios(n: int = 200, seed: int = 42) -> list[dict]:
+def _generate_scenarios(n: int = 200, seed: int = 42) -> list[dict[str, Any]]:
     rng = np.random.RandomState(seed)
     scenarios = []
     for i in range(n):
@@ -131,7 +132,7 @@ def _generate_scenarios(n: int = 200, seed: int = 42) -> list[dict]:
     return scenarios
 
 
-def _extract_features(decision: dict) -> np.ndarray:
+def _extract_features(decision: dict[str, Any]) -> np.ndarray:
     agent_results = decision.get("agent_results", {})
     features = []
     for agent_name in ("political", "legal", "ideology", "security"):
@@ -149,13 +150,13 @@ def _extract_features(decision: dict) -> np.ndarray:
 
 
 class CalibrationModel:
-    def __init__(self):
+    def __init__(self) -> None:
         self.weights: np.ndarray | None = None
         self.bias: float = 0.0
         self.feature_mean: np.ndarray | None = None
         self.feature_std: np.ndarray | None = None
 
-    def fit(self, X: np.ndarray, y: np.ndarray, alpha: float = 0.1) -> dict:
+    def fit(self, X: np.ndarray, y: np.ndarray, alpha: float = 0.1) -> dict[str, float]:
 
         self.feature_mean = X.mean(axis=0)
         self.feature_std = X.std(axis=0) + 1e-8
@@ -188,7 +189,7 @@ class CalibrationModel:
         raw = X_norm @ self.weights + self.bias
         return np.clip(raw, 0.0, 1.0)
 
-    def to_dict(self) -> dict:
+    def to_dict(self) -> dict[str, Any]:
         return {
             "weights": self.weights.tolist() if self.weights is not None else None,
             "bias": self.bias,
@@ -217,7 +218,7 @@ class CalibrationModel:
 def train(
     num_scenarios: int = 200,
     checkpoint_dir: str | None = None,
-) -> dict:
+) -> dict[str, Any]:
     print("Generating synthetic scenarios…")
     scenarios = _generate_scenarios(num_scenarios)
 

@@ -2,13 +2,13 @@ from __future__ import annotations
 
 import hashlib
 import json
-import logging
+import structlog
 import time
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any
+from typing import Any, Dict, List, Set
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 REJECT_THRESHOLD = 60
 TEMPORARY_THRESHOLD = 80
@@ -44,7 +44,7 @@ class QualityScorer:
         source_credibility: dict[str, float] | None = None,
     ) -> None:
         self._source_cred = source_credibility or DEFAULT_SOURCE_CREDIBILITY
-        self._seen_hashes: set = set()
+        self._seen_hashes: Set[str] = set()
 
     def score(self, item: DataItem) -> int:
 
