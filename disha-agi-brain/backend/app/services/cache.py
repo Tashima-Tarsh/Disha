@@ -19,7 +19,8 @@ class CacheService:
             self.redis = None
 
     def get(self, key: str) -> Optional[Any]:
-        if not self.redis: return None
+        if not self.redis:
+            return None
         data = self.redis.get(key)
         if data:
             logger.info("cache_hit", key=key)
@@ -27,11 +28,13 @@ class CacheService:
         return None
 
     def set(self, key: str, value: Any, expire_seconds: int = 3600):
-        if not self.redis: return
+        if not self.redis:
+            return
         self.redis.set(key, json.dumps(value), ex=expire_seconds)
         logger.info("cache_set", key=key, ttl=expire_seconds)
 
     def invalidate(self, key: str):
-        if not self.redis: return
+        if not self.redis:
+            return
         self.redis.delete(key)
         logger.info("cache_invalidated", key=key)

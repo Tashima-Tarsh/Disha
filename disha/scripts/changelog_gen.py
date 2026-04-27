@@ -28,10 +28,14 @@ class ChangelogGenerator:
         # Categorization logic (Simple version)
         categories = {"feat": [], "fix": [], "chore": [], "docs": []}
         for line in commits.split("\n"):
-            if "feat" in line: categories["feat"].append(line)
-            elif "fix" in line: categories["fix"].append(line)
-            elif "chore" in line: categories["chore"].append(line)
-            else: categories["docs"].append(line)
+            if "feat" in line:
+                categories["feat"].append(line)
+            elif "fix" in line:
+                categories["fix"].append(line)
+            elif "chore" in line:
+                categories["chore"].append(line)
+            else:
+                categories["docs"].append(line)
 
         report = header
         for cat, items in categories.items():

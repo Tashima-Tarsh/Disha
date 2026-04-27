@@ -37,7 +37,7 @@ async def voice_endpoint(websocket: WebSocket):
     try:
         while True:
             # Receive audio/binary data from client (e.g. WebRTC stream)
-            data = await websocket.receive_bytes()
+            _data = await websocket.receive_bytes()
             # Placeholder for Whisper/TTS logic
             await websocket.send_text("Voice signal received. Processing command via DishaOS...")
     except Exception:

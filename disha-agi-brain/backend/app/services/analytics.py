@@ -1,6 +1,6 @@
 import structlog
 from datetime import datetime
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any
 
 logger = structlog.get_logger("analytics_service")
 

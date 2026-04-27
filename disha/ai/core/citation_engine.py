@@ -19,7 +19,7 @@ class CitationEngine:
         citations = []
         for file_path, line in matches:
             # Validate existence (basic check)
-            full_path = f"{self.repo_path}/{file_path}"
+            _full_path = f"{self.repo_path}/{file_path}"
             citations.append({
                 "file": file_path,
                 "line": line if line else "1",

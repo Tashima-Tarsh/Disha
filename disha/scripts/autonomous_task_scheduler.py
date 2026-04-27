@@ -1,6 +1,6 @@
 import asyncio
 import structlog
-from datetime import datetime, timedelta
+from datetime import datetime
 
 logger = structlog.get_logger("task_scheduler")
 

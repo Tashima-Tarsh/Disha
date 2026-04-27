@@ -1,6 +1,5 @@
 import structlog
-from typing import Dict, List, Any, Optional
-from pydantic import ValidationError
+from typing import Dict, List, Any
 
 logger = structlog.get_logger("data_quality")
 

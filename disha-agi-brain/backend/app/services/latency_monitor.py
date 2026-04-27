@@ -29,7 +29,8 @@ class LatencyMonitor:
     def get_p95_latency(self, component: str) -> float:
         """Calculates the P95 latency for a specific component."""
         comp_latencies = sorted([h["latency_ms"] for h in self.history if h["component"] == component])
-        if not comp_latencies: return 0.0
+        if not comp_latencies:
+            return 0.0
         
         idx = int(len(comp_latencies) * 0.95)
         return comp_latencies[idx]

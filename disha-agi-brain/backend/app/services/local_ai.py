@@ -1,6 +1,5 @@
 import httpx
 import structlog
-from typing import Dict, Any, Optional
 
 logger = structlog.get_logger("local_ai")
 
@@ -28,5 +27,5 @@ class LocalAIInterface:
         try:
             # response = await self.client.get(f"{self.endpoint}/")
             return True
-        except:
+        except Exception:
             return False

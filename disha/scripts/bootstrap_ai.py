@@ -38,7 +38,7 @@ def bootstrap_data():
     # 3. Simple Indexing (Simulating the SimpleRetriever build process)
     def build_dummy_index(raw_file, name):
         with open(raw_file, "r", encoding="utf-8") as f:
-            docs = [l.strip() for l in f if l.strip()]
+            docs = [line.strip() for line in f if line.strip()]
         
         # SimpleRetriever expects a JSON list of strings for the index
         with open(os.path.join(index_path, f"{name}.json"), "w", encoding="utf-8") as f:

@@ -1,5 +1,5 @@
 import structlog
-from typing import Dict, Any, Optional
+from typing import Dict, Optional
 from pydantic import BaseModel
 
 logger = structlog.get_logger("tenant_manager")
@@ -42,7 +42,8 @@ class TenantManager:
     def check_feature_access(self, tenant_id: str, feature_id: str) -> bool:
         """Enforces tier-based access to elite features (Monetization)."""
         tenant = self.get_tenant(tenant_id)
-        if not tenant: return False
+        if not tenant:
+            return False
         
         # Elite features reserved for Pro/Enterprise
         elite_features = ["agent_collaboration", "cross_repo_rag", "audit_logs"]

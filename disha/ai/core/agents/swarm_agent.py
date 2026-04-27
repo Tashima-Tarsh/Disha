@@ -1,7 +1,6 @@
 import os
 import structlog
 from github import Github, Auth
-from typing import List, Dict
 
 logger = structlog.get_logger("swarm_agent")
 

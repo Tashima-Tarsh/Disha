@@ -1,6 +1,5 @@
 import structlog
-from typing import List, TypedDict, Annotated, Sequence
-from datetime import datetime
+from typing import List, TypedDict, Dict
 
 from disha.ai.core.agents.specialists.hub import SpecialistHub
 from app.services.security import SecurityService, UserRole, Permission
@@ -18,6 +17,7 @@ class AgentState(TypedDict):
     next_step: str
     confidence: float
     final_output: str
+    thought_stream: List[str]
 
 class GraphReasoner:
     """Advanced Reasoning Engine using a directed graph for multi-agent collaboration."""
@@ -63,7 +63,6 @@ class GraphReasoner:
         
         # 4. Reflection Node (Frontier Capability)
         self.state["thought_stream"].append("Reflecting on agent outputs for safety and accuracy...")
-        reflection_prompt = f"Critique the following agent outputs for the user query: '{user_input}'. Results: {agent_results}"
         # For v3.0, we use a 'Powerful' model for reflection
         reflection_result = "Reflection: Output is aligned with security protocols and architectural integrity."
         self.state["thought_stream"].append(reflection_result)

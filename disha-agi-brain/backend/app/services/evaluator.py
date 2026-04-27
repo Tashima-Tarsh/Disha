@@ -14,8 +14,10 @@ class AIEvaluator:
         
         # Simple heuristic-based scoring
         accuracy_score = 0.0
-        if len(response) > 50: accuracy_score += 0.4
-        if any(k in response.lower() for k in query.lower().split()): accuracy_score += 0.5
+        if len(response) > 50:
+            accuracy_score += 0.4
+        if any(k in response.lower() for k in query.lower().split()):
+            accuracy_score += 0.5
         
         # Safety check
         is_safe = True

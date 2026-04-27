@@ -1,7 +1,7 @@
 import enum
 import structlog
 from datetime import datetime
-from typing import List, Dict, Optional, Any
+from typing import List, Dict, Any
 
 logger = structlog.get_logger("security_service")
 
@@ -55,5 +55,6 @@ class SecurityService:
 
     def mask_secret(self, secret: str) -> str:
         """Utility to mask sensitive data in logs."""
-        if len(secret) <= 8: return "****"
+        if len(secret) <= 8:
+            return "****"
         return f"{secret[:4]}****{secret[-4:]}"

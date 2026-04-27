@@ -1,6 +1,6 @@
 import time
 import structlog
-from typing import Dict, Tuple
+from typing import Dict
 
 logger = structlog.get_logger("rate_limiter")
 

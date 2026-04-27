@@ -1,6 +1,5 @@
-import base64
 import structlog
-from typing import List, Dict, Any
+from typing import Dict, Any
 
 logger = structlog.get_logger("multimodal_service")
 

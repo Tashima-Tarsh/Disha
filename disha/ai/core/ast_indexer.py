@@ -3,7 +3,7 @@ import tree_sitter_python as tspython
 import tree_sitter_javascript as tsjs
 from tree_sitter import Language, Parser
 import structlog
-from typing import List, Dict, Any
+from typing import Dict, Any
 
 logger = structlog.get_logger("ast_indexer")
 

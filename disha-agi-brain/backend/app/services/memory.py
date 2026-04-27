@@ -1,5 +1,5 @@
 import structlog
-from typing import List, Dict, Any, Optional
+from typing import List, Dict
 from app.services.cache import CacheService
 
 logger = structlog.get_logger("memory_service")
