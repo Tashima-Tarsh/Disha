@@ -57,7 +57,7 @@ jobs:
             "networkx>=3.0"
 
       - name: Run mypy strict
-        run: mypy disha/ai/core/ --ignore-missing-imports --strict
+        run: mypy disha/ai/core/
 
   # ── Job 3: Security ───────────────────────────────────────────────────
   security:

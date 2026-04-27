@@ -26,6 +26,21 @@ ignore_errors = true
 module = "*.tests.*"
 ignore_errors = true
 
+# ── Optional heavy-dep modules (torch / transformers / peft) ─────────────
+# These use guarded `try: import torch` patterns. When torch is absent in CI,
+# missing types resolve to Any, triggering warn_return_any / warn_unused_ignores.
+# We relax only those two flags per-module; all other strict checks remain.
+[[tool.mypy.overrides]]
+module = [
+    "disha.ai.core.auto_learning.*",
+    "disha.ai.core.intelligence.*",
+    "disha.ai.core.cognitive_loop",
+    "disha.ai.core.graph_reasoner",
+]
+warn_return_any = false
+warn_unused_ignores = false
+ignore_missing_imports = true
+
 [tool.ruff]
 line-length = 88
 target-version = "py311"
