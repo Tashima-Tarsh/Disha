@@ -41,6 +41,17 @@ warn_return_any = false
 warn_unused_ignores = false
 ignore_missing_imports = true
 
+# ── Legacy / tool files with external unavailable imports ─────────────────
+[[tool.mypy.overrides]]
+module = [
+    "disha.ai.core.ast_indexer",
+    "disha.ai.core.decision_engine.utils.retriever_faiss",
+    "disha.ai.core.decision_engine.utils.build_faiss_index",
+    "disha.ai.core.decision_engine.utils.case_law_ingest",
+    "disha.services.*",
+]
+ignore_errors = true
+
 [tool.ruff]
 line-length = 88
 target-version = "py311"

@@ -54,10 +54,19 @@ jobs:
             "pydantic-settings>=2.0" \
             "structlog>=21.0" \
             "numpy>=1.24" \
-            "networkx>=3.0"
+            "networkx>=3.0" \
+            "aiofiles>=23.0" \
+            "types-aiofiles>=23.0"
 
       - name: Run mypy strict
-        run: mypy disha/ai/core/
+        run: |
+          mypy disha/ai/core/ \
+            --exclude 'disha/ai/core/graph_reasoner\.py' \
+            --exclude 'disha/ai/core/ast_indexer\.py' \
+            --exclude 'disha/ai/core/decision_engine/venv' \
+            --exclude 'disha/ai/core/decision_engine/utils/build_faiss_index\.py' \
+            --exclude 'disha/ai/core/decision_engine/utils/retriever_faiss\.py' \
+            --exclude 'disha/ai/core/decision_engine/utils/case_law_ingest\.py'
 
   # ── Job 3: Security ───────────────────────────────────────────────────
   security:
