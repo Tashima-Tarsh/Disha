@@ -220,6 +220,30 @@
         }
         .corner-data { position: absolute; top: 10px; right: 10px; font-size: 9px; color: #666; }
 
+        /* Chat Panel */
+        .chat-panel { grid-column: 1; grid-row: 3; display: flex; flex-direction: column; background: var(--panel-bg); border: 1px solid var(--panel-border); border-radius: 8px; overflow: hidden; height: 300px; }
+        .chat-messages { flex: 1; overflow-y: auto; padding: 10px; font-size: 12px; display: flex; flex-direction: column; gap: 8px; }
+        .chat-input-box { display: flex; border-top: 1px solid var(--panel-border); padding: 8px; gap: 8px; background: rgba(0,0,0,0.4); }
+        .chat-input { flex: 1; background: transparent; border: none; color: #fff; font-family: 'Inter'; font-size: 13px; outline: none; }
+        .voice-btn { background: transparent; border: 1px solid var(--cyan); border-radius: 50%; width: 30px; height: 30px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--cyan); transition: 0.3s; }
+        .voice-btn.listening { background: var(--red); border-color: var(--red); animation: pulse-red 1s infinite; }
+        @keyframes pulse-red { 0% { box-shadow: 0 0 0 0 rgba(255,0,60,0.4); } 70% { box-shadow: 0 0 0 10px rgba(255,0,60,0); } 100% { box-shadow: 0 0 0 0 rgba(255,0,60,0); } }
+        
+        .message { padding: 8px 12px; border-radius: 6px; max-width: 85%; }
+        .msg-user { background: rgba(0,255,204,0.1); border: 1px solid rgba(0,255,204,0.2); align-self: flex-end; color: var(--cyan); }
+        .msg-jarvis { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); align-self: flex-start; color: #fff; }
+
+        /* Layer Modal/Detail */
+        .layer-detail-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(8px); z-index: 2000; display: none; align-items: center; justify-content: center; }
+        .layer-detail-card { width: 600px; max-width: 90vw; background: var(--panel-bg); border: 1px solid var(--cyan); padding: 30px; border-radius: 12px; position: relative; box-shadow: 0 0 50px rgba(0,255,204,0.2); }
+        .close-detail { position: absolute; top: 15px; right: 20px; font-size: 24px; cursor: pointer; color: var(--muted); }
+        
+        /* Layout Grid Update */
+        body {
+            grid-template-rows: 60px 1fr 300px;
+        }
+        .core-view { grid-row: 2 / span 2; }
+        .alert-center { grid-row: 2 / span 2; }
     </style>
 </head>
 <body>
@@ -231,6 +255,7 @@
             <div class="spec-item"><span style="color:#aaa">UPTIME</span><span class="spec-val">99.998%</span></div>
             <div class="spec-item"><span style="color:#aaa">ACTIVE NODES</span><span class="spec-val">1,402</span></div>
             <div class="spec-item"><span style="color:#aaa">THREAT INDEX</span><span class="spec-val" style="color:var(--red)">ELEVATED</span></div>
+            <div class="spec-item"><span style="color:#aaa">USER</span><span class="spec-val" style="color:var(--violet)">DISH@MICROSOFT</span></div>
             <div class="spec-item"><span style="color:#aaa">SYS.CLK</span><span class="spec-val" id="clock" style="color:var(--cyan)">00:00:00.000</span></div>
         </div>
     </div>
@@ -416,6 +441,35 @@
         </div>
     </div>
 
+    <!-- CHAT MODULE -->
+    <div class="panel chat-panel">
+        <div class="panel-header">JARVIS COGNITIVE INTERFACE <span id="voice-status" style="font-size:9px; color:var(--muted)">READY</span></div>
+        <div class="chat-messages" id="chat-msgs">
+            <div class="message msg-jarvis">Welcome, Commander. DISHA OS is fully integrated. How may I assist you with the 7-layer architecture today?</div>
+        </div>
+        <div class="chat-input-box">
+            <button class="voice-btn" id="voice-btn" onclick="toggleVoice()"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/><path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/></svg></button>
+            <input type="text" class="chat-input" id="chat-input" placeholder="Type a directive or ask about system health..." onkeydown="if(event.key==='Enter') sendChat()">
+            <button class="nav-btn" style="margin:0; padding:5px 15px;" onclick="sendChat()">SEND</button>
+        </div>
+    </div>
+
+    <!-- LAYER DETAIL MODAL -->
+    <div class="layer-detail-overlay" id="layer-overlay">
+        <div class="layer-detail-card">
+            <span class="close-detail" onclick="closeLayerDetail()">&times;</span>
+            <h2 id="detail-title" style="font-family:Orbitron; color:#fff; margin-bottom:10px;">LAYER DETAIL</h2>
+            <p id="detail-desc" style="color:var(--text-silver); font-size:14px; margin-bottom:20px;"></p>
+            <div id="detail-stats" style="display:grid; grid-template-columns:1fr 1fr; gap:15px; margin-bottom:20px;">
+                <!-- Stats injected -->
+            </div>
+            <div id="detail-live" style="background:rgba(0,0,0,0.4); border:1px solid rgba(0,255,204,0.1); padding:15px; border-radius:6px; font-family:'Share Tech Mono'; font-size:12px;">
+                <span style="color:var(--cyan)">LIVE DATA STREAM:</span><br>
+                <div id="detail-stream">INITIALIZING...</div>
+            </div>
+        </div>
+    </div>
+
     <script>
         // Precision Clock
         setInterval(() => {
@@ -478,7 +532,178 @@
         setInterval(() => {
             document.querySelector('.layer-row[data-status="alert"] .metric-val').innerText = (14203 + Math.floor(Math.random()*100)).toLocaleString();
             document.querySelector('.layer-row[data-status="alert"] .shield-score').innerText = Math.floor(Math.random()*15 + 30) + '%';
+            
+            // Randomly update other metrics for "live" feel
+            const rows = document.querySelectorAll('.layer-row:not([data-status="alert"])');
+            const randomRow = rows[Math.floor(Math.random() * rows.length)];
+            const metricVal = randomRow.querySelector('.metric-val');
+            if(metricVal) {
+                const text = metricVal.innerText;
+                const numMatch = text.match(/[0-9,.]+/);
+                if(numMatch) {
+                    const numText = numMatch[0];
+                    const num = parseFloat(numText.replace(/,/g, ''));
+                    const suffix = text.replace(numText, '');
+                    const newVal = (num + (Math.random() > 0.5 ? 1 : -1));
+                    metricVal.innerText = newVal.toLocaleString() + suffix;
+                }
+            }
         }, 800);
+
+        // Voice & Chat Integration
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        let recognition;
+        if(SpeechRecognition) {
+            recognition = new SpeechRecognition();
+            recognition.continuous = false;
+            recognition.interimResults = false;
+            recognition.lang = 'en-US';
+
+            recognition.onstart = () => {
+                document.getElementById('voice-btn').classList.add('listening');
+                document.getElementById('voice-status').innerText = 'LISTENING...';
+            };
+            recognition.onresult = (event) => {
+                const transcript = event.results[0][0].transcript;
+                document.getElementById('chat-input').value = transcript;
+                sendChat();
+            };
+            recognition.onend = () => {
+                document.getElementById('voice-btn').classList.remove('listening');
+                document.getElementById('voice-status').innerText = 'READY';
+            };
+        }
+
+        function toggleVoice() {
+            if(!recognition) return alert("Speech recognition not supported in this browser.");
+            recognition.start();
+        }
+
+        function sendChat() {
+            const input = document.getElementById('chat-input');
+            const msg = input.value.trim();
+            if(!msg) return;
+
+            addMsg(msg, 'user');
+            input.value = '';
+
+            // Call Bridge API
+            fetch(`http://localhost:3001/ask?q=${encodeURIComponent(msg)}`)
+                .then(r => r.json())
+                .then(data => {
+                    addMsg(data.answer, 'jarvis');
+                    speak(data.answer);
+                    
+                    if(data.action === 'start_walkthrough') {
+                        runWalkthrough(data.steps);
+                    }
+                })
+                .catch(() => {
+                    const response = getJarvisResponse(msg);
+                    addMsg(response, 'jarvis');
+                    speak(response);
+                });
+        }
+
+        function runWalkthrough(steps) {
+            let i = 0;
+            function nextStep() {
+                if(i >= steps.length) {
+                    addMsg("Walkthrough complete. All cognitive subsystems aligned.", 'jarvis');
+                    speak("Walkthrough complete. All cognitive subsystems aligned.");
+                    return;
+                }
+                const s = steps[i];
+                addMsg(s.msg, 'jarvis');
+                speak(s.msg);
+                
+                // Highlight element
+                const el = document.querySelector('.' + s.element) || document.getElementById(s.element);
+                if(el) {
+                    el.style.boxShadow = "0 0 50px var(--cyan)";
+                    setTimeout(() => {
+                        el.style.boxShadow = "";
+                        i++;
+                        nextStep();
+                    }, 4000);
+                } else {
+                    i++;
+                    setTimeout(nextStep, 3000);
+                }
+            }
+            nextStep();
+        }
+
+        function addMsg(txt, type) {
+            const box = document.getElementById('chat-msgs');
+            const div = document.createElement('div');
+            div.className = `message msg-${type}`;
+            div.innerText = txt;
+            box.appendChild(div);
+            box.scrollTop = box.scrollHeight;
+        }
+
+        function getJarvisResponse(query) {
+            query = query.toLowerCase();
+            if(query.includes('status')) return "System status is nominal. Threat level at DEFCON 2. All 7 layers reporting integrity.";
+            if(query.includes('threat') || query.includes('attack')) return "Honeypot mesh is currently trapping 14,203 inbound vectors. Sentinel architecture is holding.";
+            if(query.includes('who are you')) return "I am JARVIS, the core intelligence of DISHA OS. I manage all cognitive and defensive subsystems.";
+            if(query.includes('layer 6') || query.includes('network')) return "Layer 6 is currently under heavy load due to a simulated dictionary attack. Tarpit protocols are active.";
+            return "Directive received. I am cross-referencing your request with the DISHA Mythos framework. Standing by.";
+        }
+
+        function speak(text) {
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.pitch = 0.9;
+            utterance.rate = 1.0;
+            window.speechSynthesis.speak(utterance);
+        }
+
+        // Layer Interaction
+        const layerData = {
+            "USER LAYER": { desc: "Identity & Session Management. Currently handling 12,408 active global sessions.", stats: ["Auth Rate: 99.8%", "Encryption: AES-256-GCM"] },
+            "APPLICATION LAYER": { desc: "Next.js Command Center. High-performance reactive interface.", stats: ["Vercel Status: Healthy", "Cache Hit: 88%"] },
+            "API LAYER": { desc: "FastAPI Multi-Agent Gateway. Connecting DISHA services.", stats: ["Agents Active: 14", "Endpoint Load: 34%"] },
+            "AUTHENTICATION LAYER": { desc: "Argon2id Blind Hash Protocols. No PII stored in raw form.", stats: ["Key Rotation: Synchronized", "Honeypot Decoys: 150"] },
+            "DATABASE LAYER": { desc: "Neo4j Graph & Upstash Redis Ephemeral Storage.", stats: ["Nodes: 1.2M", "Relationships: 4.5M"] },
+            "NETWORK LAYER": { desc: "Sentinel Honeypot Mesh. Active-Defense infrastructure.", stats: ["Tarpit: Engaged", "Packets Dropped: 1.4M/hr"] },
+            "INFRASTRUCTURE LAYER": { desc: "Bare Metal Kernels & Docker Swarm nodes.", stats: ["Uptime: 99.998%", "Nodes Healthy: 1,402"] }
+        };
+
+        document.querySelectorAll('.layer-row').forEach(row => {
+            row.addEventListener('click', () => {
+                const name = row.querySelector('.layer-name').innerText;
+                const data = layerData[name];
+                
+                document.getElementById('detail-title').innerText = name;
+                document.getElementById('detail-desc').innerText = data.desc;
+                
+                const statsBox = document.getElementById('detail-stats');
+                statsBox.innerHTML = '';
+                data.stats.forEach(s => {
+                    const d = document.createElement('div');
+                    d.style.color = 'var(--cyan)';
+                    d.innerText = `● ${s}`;
+                    statsBox.appendChild(d);
+                });
+
+                document.getElementById('layer-overlay').style.display = 'flex';
+                
+                // Start a mini stream
+                let i = 0;
+                const stream = document.getElementById('detail-stream');
+                clearInterval(window.layerStream);
+                window.layerStream = setInterval(() => {
+                    const hex = Math.floor(Math.random()*0xFFFFFF).toString(16).toUpperCase();
+                    stream.innerHTML = `[SYNC_${name.split(' ')[0]}] ADDR: 0x${hex} STATUS: OK<br>` + stream.innerHTML.substring(0, 100);
+                }, 400);
+            });
+        });
+
+        function closeLayerDetail() {
+            document.getElementById('layer-overlay').style.display = 'none';
+            clearInterval(window.layerStream);
+        }
     </script>
 </body>
 </html>

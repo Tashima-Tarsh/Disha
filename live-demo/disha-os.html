@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>DISHA OS — Powered by Microsoft</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#06060c;--card:rgba(12,15,25,0.85);--border:rgba(0,180,255,0.15);--accent:#00b4ff;--accent2:#0078d4;--glow:rgba(0,180,255,0.3);--text:#e8edf3;--muted:#6b7a8d;--danger:#ff4d6a;--success:#00e676}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);height:100vh;overflow:hidden;display:flex;align-items:center;justify-content:center}
+
+/* Background */
+.bg{position:fixed;inset:0;z-index:0}
+.bg canvas{width:100%;height:100%}
+.bg-overlay{position:fixed;inset:0;background:radial-gradient(ellipse at 50% 40%,rgba(0,120,212,0.08) 0%,transparent 70%);z-index:1}
+
+/* Container */
+.os-container{position:relative;z-index:10;display:flex;flex-direction:column;align-items:center;gap:28px;width:420px;max-width:92vw}
+
+/* Clock */
+.clock{text-align:center;margin-bottom:8px}
+.clock-time{font-family:'Orbitron',sans-serif;font-size:64px;font-weight:700;letter-spacing:4px;background:linear-gradient(135deg,#fff 40%,var(--accent));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.clock-date{font-size:13px;color:var(--muted);letter-spacing:3px;text-transform:uppercase;margin-top:4px}
+
+/* Jarvis Ring */
+.jarvis-ring{position:relative;width:110px;height:110px;margin:0 auto}
+.jarvis-ring svg{position:absolute;inset:0;animation:spin 12s linear infinite}
+.jarvis-ring svg:nth-child(2){animation:spin-rev 8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes spin-rev{to{transform:rotate(-360deg)}}
+.jarvis-core{position:absolute;inset:18px;border-radius:50%;background:radial-gradient(circle,var(--accent) 0%,transparent 70%);opacity:0.5;animation:pulse-core 3s ease-in-out infinite}
+@keyframes pulse-core{0%,100%{opacity:0.4;transform:scale(0.95)}50%{opacity:0.7;transform:scale(1.05)}}
+
+/* Brand */
+.brand{text-align:center}
+.brand-name{font-family:'Orbitron',sans-serif;font-size:38px;font-weight:900;letter-spacing:8px;color:#fff;text-shadow:0 0 40px var(--glow),0 0 80px rgba(0,180,255,0.15)}
+.brand-partner{font-size:11px;color:var(--muted);letter-spacing:4px;text-transform:uppercase;margin-top:6px;display:flex;align-items:center;justify-content:center;gap:6px}
+.brand-partner svg{width:16px;height:16px;fill:var(--muted)}
+
+/* Login Card */
+.login-card{width:100%;background:var(--card);border:1px solid var(--border);border-radius:16px;padding:32px;backdrop-filter:blur(24px);box-shadow:0 8px 32px rgba(0,0,0,0.6),inset 0 1px 0 rgba(255,255,255,0.04);transition:all 0.4s ease}
+.login-card:hover{border-color:rgba(0,180,255,0.3);box-shadow:0 8px 40px rgba(0,0,0,0.6),0 0 30px rgba(0,180,255,0.06),inset 0 1px 0 rgba(255,255,255,0.04)}
+
+/* Steps indicator */
+.steps{display:flex;justify-content:center;gap:8px;margin-bottom:24px}
+.step-dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,0.12);transition:all 0.3s}
+.step-dot.active{background:var(--accent);box-shadow:0 0 8px var(--glow)}
+.step-dot.done{background:var(--success)}
+
+.step-title{font-size:15px;font-weight:600;text-align:center;margin-bottom:4px}
+.step-sub{font-size:12px;color:var(--muted);text-align:center;margin-bottom:20px}
+
+/* Form */
+.form-group{margin-bottom:16px;position:relative}
+.form-group label{display:block;font-size:11px;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:6px}
+.form-group input{width:100%;padding:12px 14px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;color:#fff;font-size:14px;font-family:'Inter',sans-serif;outline:none;transition:all 0.3s}
+.form-group input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(0,180,255,0.1)}
+.form-group input::placeholder{color:rgba(255,255,255,0.2)}
+
+/* MFA code inputs */
+.mfa-inputs{display:flex;gap:10px;justify-content:center;margin:16px 0}
+.mfa-inputs input{width:48px;height:56px;text-align:center;font-family:'Orbitron',sans-serif;font-size:22px;font-weight:700;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:10px;color:var(--accent);outline:none;transition:all 0.3s}
+.mfa-inputs input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(0,180,255,0.1)}
+
+/* Buttons */
+.btn{width:100%;padding:13px;border:none;border-radius:10px;font-family:'Inter',sans-serif;font-size:14px;font-weight:600;cursor:pointer;transition:all 0.3s;letter-spacing:0.5px}
+.btn-primary{background:linear-gradient(135deg,var(--accent2),var(--accent));color:#fff;box-shadow:0 4px 16px rgba(0,120,212,0.3)}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 6px 24px rgba(0,120,212,0.45)}
+.btn-secondary{background:transparent;border:1px solid rgba(255,255,255,0.1);color:var(--muted);margin-top:8px}
+.btn-secondary:hover{border-color:rgba(255,255,255,0.2);color:#fff}
+
+/* Avatar */
+.avatar{width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,var(--accent2),var(--accent));display:flex;align-items:center;justify-content:center;margin:0 auto 12px;font-family:'Orbitron',sans-serif;font-size:22px;font-weight:700;color:#fff;box-shadow:0 0 20px var(--glow)}
+
+/* Error/Success messages */
+.msg{font-size:12px;text-align:center;padding:8px;border-radius:8px;margin-top:12px;display:none}
+.msg.error{display:block;background:rgba(255,77,106,0.1);color:var(--danger);border:1px solid rgba(255,77,106,0.2)}
+.msg.success{display:block;background:rgba(0,230,118,0.1);color:var(--success);border:1px solid rgba(0,230,118,0.2)}
+
+/* Step panels */
+.step-panel{display:none;animation:fadeUp 0.4s ease}
+.step-panel.active{display:block}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+/* Welcome screen */
+.welcome{display:none;text-align:center;animation:fadeUp 0.5s ease}
+.welcome.active{display:flex;flex-direction:column;align-items:center;gap:16px}
+.welcome-title{font-family:'Orbitron',sans-serif;font-size:28px;font-weight:700;background:linear-gradient(135deg,#fff,var(--accent));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.welcome-sub{color:var(--muted);font-size:13px;max-width:300px}
+
+/* Status bar */
+.status-bar{position:fixed;bottom:0;left:0;right:0;display:flex;justify-content:space-between;align-items:center;padding:8px 24px;background:rgba(6,6,12,0.9);border-top:1px solid rgba(255,255,255,0.05);z-index:20;font-size:11px;color:var(--muted)}
+.status-bar .status-left,.status-bar .status-right{display:flex;align-items:center;gap:16px}
+.status-indicator{width:6px;height:6px;border-radius:50%;background:var(--success);box-shadow:0 0 6px var(--success);animation:blink 3s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.4}}
+</style>
+</head>
+<body>
+
+<!-- Background -->
+<div class="bg"><canvas id="bgCanvas"></canvas></div>
+<div class="bg-overlay"></div>
+
+<!-- Main Container -->
+<div class="os-container">
+  <!-- Clock -->
+  <div class="clock">
+    <div class="clock-time" id="clockTime">00:00</div>
+    <div class="clock-date" id="clockDate">Loading...</div>
+  </div>
+
+  <!-- Jarvis Ring -->
+  <div class="jarvis-ring">
+    <svg viewBox="0 0 110 110"><circle cx="55" cy="55" r="50" fill="none" stroke="rgba(0,180,255,0.2)" stroke-width="1" stroke-dasharray="8 6"/></svg>
+    <svg viewBox="0 0 110 110"><circle cx="55" cy="55" r="42" fill="none" stroke="rgba(0,180,255,0.12)" stroke-width="0.8" stroke-dasharray="4 8"/></svg>
+    <div class="jarvis-core"></div>
+  </div>
+
+  <!-- Brand -->
+  <div class="brand">
+    <div class="brand-name">DISHA</div>
+    <div class="brand-partner">
+      <svg viewBox="0 0 23 23"><path d="M0 0h11v11H0zM12 0h11v11H12zM0 12h11v11H0zM12 12h11v11H12z"/></svg>
+      Partner with Microsoft
+    </div>
+  </div>
+
+  <!-- Login Card -->
+  <div class="login-card" id="loginCard">
+    <div class="steps">
+      <div class="step-dot active" id="dot1"></div>
+      <div class="step-dot" id="dot2"></div>
+      <div class="step-dot" id="dot3"></div>
+    </div>
+
+    <!-- Step 1: Identity -->
+    <div class="step-panel active" id="step1">
+      <div class="step-title">Sign in to DISHA OS</div>
+      <div class="step-sub">Enter your organizational identity</div>
+      <div class="form-group">
+        <label>Email or Username</label>
+        <input type="text" id="emailInput" placeholder="admin@disha.microsoft.com" value="dish@microsoft.com" autofocus>
+      </div>
+      <button class="btn btn-primary" onclick="goStep(2)">Next</button>
+      <button class="btn btn-secondary">Create Account</button>
+      <div class="msg" id="msg1"></div>
+      <div style="text-align:center; margin-top:10px; font-size:10px; opacity:0.5; cursor:pointer" onclick="window.location.href='professional-os.html'">Quick Access: Skip to Dashboard</div>
+    </div>
+
+    <!-- Step 2: Password -->
+    <div class="step-panel" id="step2">
+      <div class="avatar" id="userAvatar">A</div>
+      <div class="step-title" id="userName">admin@disha.microsoft.com</div>
+      <div class="step-sub">Enter your password to continue</div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="passInput" placeholder="••••••••••" value="Ajit@906099">
+      </div>
+      <button class="btn btn-primary" onclick="goStep(3)">Sign In</button>
+      <button class="btn btn-secondary" onclick="goStep(1)">← Back</button>
+      <div class="msg" id="msg2"></div>
+    </div>
+
+    <!-- Step 3: MFA -->
+    <div class="step-panel" id="step3">
+      <div class="step-title">🔒 Multi-Factor Authentication</div>
+      <div class="step-sub">Enter the 6-digit code from your authenticator</div>
+      <div class="mfa-inputs">
+        <input type="text" maxlength="1" id="mfa1" oninput="mfaNav(this,'mfa2')">
+        <input type="text" maxlength="1" id="mfa2" oninput="mfaNav(this,'mfa3')">
+        <input type="text" maxlength="1" id="mfa3" oninput="mfaNav(this,'mfa4')">
+        <input type="text" maxlength="1" id="mfa4" oninput="mfaNav(this,'mfa5')">
+        <input type="text" maxlength="1" id="mfa5" oninput="mfaNav(this,'mfa6')">
+        <input type="text" maxlength="1" id="mfa6" oninput="verifyMFA()">
+      </div>
+      <button class="btn btn-primary" onclick="verifyMFA()">Verify & Access DISHA</button>
+      <button class="btn btn-secondary" onclick="goStep(2)">← Back</button>
+      <div class="msg" id="msg3"></div>
+    </div>
+  </div>
+
+  <!-- Welcome (post-login) -->
+  <div class="welcome" id="welcomeScreen">
+    <div class="avatar" style="width:80px;height:80px;font-size:28px" id="welcomeAvatar">A</div>
+    <div class="welcome-title">Welcome, Commander</div>
+    <div class="welcome-sub">DISHA OS v3.0 — Jarvis Architecture Active. All cognitive subsystems are online.</div>
+    <button class="btn btn-primary" style="max-width:240px" onclick="location.reload()">Lock Screen</button>
+  </div>
+</div>
+
+<!-- Status Bar -->
+<div class="status-bar">
+  <div class="status-left">
+    <span>DISHA OS v3.0</span>
+    <span>Jarvis Core — Active</span>
+  </div>
+  <div class="status-right">
+    <span id="statusTime">00:00:00</span>
+    <div class="status-indicator"></div>
+    <span>Secure Channel</span>
+  </div>
+</div>
+
+<script>
+// Clock
+function updateClock(){
+  const n=new Date();
+  const h=n.getHours().toString().padStart(2,'0');
+  const m=n.getMinutes().toString().padStart(2,'0');
+  document.getElementById('clockTime').textContent=h+':'+m;
+  document.getElementById('clockDate').textContent=n.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
+  document.getElementById('statusTime').textContent=n.toLocaleTimeString();
+}
+setInterval(updateClock,1000);updateClock();
+
+// Background particles
+const c=document.getElementById('bgCanvas'),ctx=c.getContext('2d');
+let pts=[];
+function resizeCanvas(){c.width=innerWidth;c.height=innerHeight;pts=[];for(let i=0;i<80;i++)pts.push({x:Math.random()*c.width,y:Math.random()*c.height,vx:(Math.random()-0.5)*0.3,vy:(Math.random()-0.5)*0.3,r:Math.random()*1.5+0.5})}
+function drawBg(){ctx.clearRect(0,0,c.width,c.height);pts.forEach(p=>{p.x+=p.vx;p.y+=p.vy;if(p.x<0||p.x>c.width)p.vx*=-1;if(p.y<0||p.y>c.height)p.vy*=-1;ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fillStyle='rgba(0,180,255,0.25)';ctx.fill()});
+for(let i=0;i<pts.length;i++)for(let j=i+1;j<pts.length;j++){const d=Math.hypot(pts[i].x-pts[j].x,pts[i].y-pts[j].y);if(d<120){ctx.beginPath();ctx.moveTo(pts[i].x,pts[i].y);ctx.lineTo(pts[j].x,pts[j].y);ctx.strokeStyle=`rgba(0,180,255,${0.06*(1-d/120)})`;ctx.stroke()}}
+requestAnimationFrame(drawBg)}
+resizeCanvas();drawBg();addEventListener('resize',resizeCanvas);
+
+// Step navigation
+function goStep(s){
+  const email=document.getElementById('emailInput').value.trim();
+  if(s===2&&!email){showMsg('msg1','Please enter your identity','error');return}
+  if(s===2){
+    document.getElementById('userName').textContent=email;
+    document.getElementById('userAvatar').textContent=email[0].toUpperCase();
+    document.getElementById('welcomeAvatar').textContent=email[0].toUpperCase();
+  }
+  if(s===3){
+    const pass=document.getElementById('passInput').value;
+    if(!pass){showMsg('msg2','Please enter your password','error');return}
+    if(pass.length<4){showMsg('msg2','Invalid credentials','error');return}
+  }
+  document.querySelectorAll('.step-panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('step'+s).classList.add('active');
+  document.querySelectorAll('.step-dot').forEach((d,i)=>{d.classList.remove('active','done');if(i<s-1)d.classList.add('done');if(i===s-1)d.classList.add('active')});
+  if(s===3)setTimeout(()=>document.getElementById('mfa1').focus(),100);
+  hideMsg('msg1');hideMsg('msg2');hideMsg('msg3');
+}
+
+function mfaNav(el,next){if(el.value.length===1){const n=document.getElementById(next);if(n)n.focus()}}
+
+function verifyMFA(){
+  let code='';for(let i=1;i<=6;i++)code+=document.getElementById('mfa'+i).value;
+  if(code.length<6){showMsg('msg3','Please enter all 6 digits','error');return}
+  showMsg('msg3','Verifying with Jarvis Core...','success');
+    setTimeout(()=>{
+      window.location.href = 'professional-os.html';
+    },1500);
+}
+
+function showMsg(id,txt,type){const m=document.getElementById(id);m.textContent=txt;m.className='msg '+type}
+function hideMsg(id){document.getElementById(id).className='msg'}
+
+// Enter key support
+document.getElementById('emailInput').addEventListener('keydown',e=>{if(e.key==='Enter')goStep(2)});
+document.getElementById('passInput').addEventListener('keydown',e=>{if(e.key==='Enter')goStep(3)});
+
+// Auto-Login Script
+window.addEventListener('load', () => {
+  const params = new URLSearchParams(window.location.search);
+  if(params.has('skip')) {
+    window.location.href = 'professional-os.html';
+    return;
+  }
+
+  console.log("System initializing...");
+  setTimeout(() => {
+    if(document.getElementById('step1').classList.contains('active')) {
+      // Step 1 -> 2
+      goStep(2);
+      setTimeout(() => {
+        if(document.getElementById('step2').classList.contains('active')) {
+          // Step 2 -> 3
+          goStep(3);
+          setTimeout(() => {
+            if(document.getElementById('step3').classList.contains('active')) {
+              // Fill MFA
+              const mfaInputs = [1,2,3,4,5,6];
+              let i = 0;
+              const typeMFA = setInterval(() => {
+                if(i < 6) {
+                  document.getElementById('mfa' + (i+1)).value = Math.floor(Math.random() * 10);
+                  i++;
+                } else {
+                  clearInterval(typeMFA);
+                  verifyMFA();
+                }
+              }, 150);
+            }
+          }, 1200);
+        }
+      }, 1200);
+    }
+  }, 1000);
+});
+</script>
+</body>
+</html>
