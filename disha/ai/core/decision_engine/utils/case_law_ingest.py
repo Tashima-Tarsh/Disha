@@ -2,12 +2,12 @@ from __future__ import annotations
 
 import json
 import os
-from typing import Dict, List
+from typing import Any
 
 
-def parse_case_law(text: str) -> List[Dict]:
-    blocks: List[List[str]] = []
-    current: List[str] = []
+def parse_case_law(text: str) -> list[dict[str, Any]]:
+    blocks: list[list[str]] = []
+    current: list[str] = []
     for line in text.splitlines():
         stripped = line.strip()
         if not stripped:
@@ -19,7 +19,7 @@ def parse_case_law(text: str) -> List[Dict]:
     if current:
         blocks.append(current)
 
-    cases: List[Dict] = []
+    cases: list[dict[str, Any]] = []
     for idx, block in enumerate(blocks):
         title = block[0]
         summary = " ".join(block[1:]) if len(block) > 1 else title
@@ -32,7 +32,7 @@ def ingest(
     output_path: str,
     metadata_path: str,
 ) -> int:
-    with open(input_path, "r", encoding="utf-8") as fh:
+    with open(input_path, encoding="utf-8") as fh:
         text = fh.read()
 
     cases = parse_case_law(text)

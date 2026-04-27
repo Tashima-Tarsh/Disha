@@ -9,8 +9,6 @@ from __future__ import annotations
 import logging
 import math
 from dataclasses import dataclass
-from typing import Dict, List, Set, Tuple
-
 
 logger = logging.getLogger(__name__)
 
@@ -49,11 +47,11 @@ class SpatialGrid:
         if cell_size <= 0:
             raise ValueError(f"cell_size must be positive, got {cell_size}")
         self._cell_size: float = cell_size
-        self._cells: Dict[Tuple[int, int], Set[str]] = {}
-        self._points: Dict[str, Point2D] = {}
+        self._cells: dict[tuple[int, int], set[str]] = {}
+        self._points: dict[str, Point2D] = {}
         logger.info("SpatialGrid created with cell_size=%f", cell_size)
 
-    def _cell_key(self, point: Point2D) -> Tuple[int, int]:
+    def _cell_key(self, point: Point2D) -> tuple[int, int]:
         """Return the grid cell key for a given point."""
         cx = int(math.floor(point.x / self._cell_size))
         cy = int(math.floor(point.y / self._cell_size))
@@ -108,7 +106,7 @@ class SpatialGrid:
                 del self._cells[key]
         logger.debug("Removed %s from cell %s", entity_id, key)
 
-    def query_radius(self, center: Point2D, radius: float) -> List[str]:
+    def query_radius(self, center: Point2D, radius: float) -> list[str]:
         """Return all entity IDs within *radius* of *center*.
 
         Args:
@@ -121,7 +119,7 @@ class SpatialGrid:
         if radius < 0:
             raise ValueError(f"radius must be non-negative, got {radius}")
 
-        results: List[str] = []
+        results: list[str] = []
         cells_range = int(math.ceil(radius / self._cell_size))
         center_key = self._cell_key(center)
 
@@ -144,7 +142,7 @@ class SpatialGrid:
         )
         return results
 
-    def query_bbox(self, min_coord: Point2D, max_coord: Point2D) -> List[str]:
+    def query_bbox(self, min_coord: Point2D, max_coord: Point2D) -> list[str]:
         """Return all entity IDs inside an axis-aligned bounding box.
 
         Args:
@@ -159,7 +157,7 @@ class SpatialGrid:
         max_cx = int(math.floor(max_coord.x / self._cell_size))
         max_cy = int(math.floor(max_coord.y / self._cell_size))
 
-        results: List[str] = []
+        results: list[str] = []
         for cx in range(min_cx, max_cx + 1):
             for cy in range(min_cy, max_cy + 1):
                 cell = self._cells.get((cx, cy))
@@ -183,7 +181,7 @@ class SpatialGrid:
         )
         return results
 
-    def nearest_neighbors(self, coord: Point2D, k: int) -> List[str]:
+    def nearest_neighbors(self, coord: Point2D, k: int) -> list[str]:
         """Return the *k* nearest entity IDs to *coord*.
 
         Uses an expanding-ring search: starts from the cell containing
@@ -203,7 +201,7 @@ class SpatialGrid:
             return []
 
         center_key = self._cell_key(coord)
-        candidates: List[Tuple[float, str]] = []
+        candidates: list[tuple[float, str]] = []
         ring = 0
         max_ring = (
             max(

@@ -1,7 +1,7 @@
+import datetime
+
 from fastapi import FastAPI
 from pydantic import BaseModel
-from typing import List
-import datetime
 
 app = FastAPI(title="DISHA Alerts Service", version="6.0.0")
 
@@ -12,7 +12,7 @@ class AlertRequest(BaseModel):
     severity: str  # critical, high, medium, low
     region: str
     category: str  # disaster, crime, health, cyber, traffic
-    channels: List[str] = ["web"]  # sms, push, web, voice
+    channels: list[str] = ["web"]  # sms, push, web, voice
 
 
 @app.get("/")

@@ -4,11 +4,12 @@ Loads, cleans, preprocesses, and prepares data for ML training.
 """
 
 import json
+from pathlib import Path
+
 import numpy as np
 import pandas as pd
-from pathlib import Path
-from sklearn.preprocessing import LabelEncoder
 from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import LabelEncoder
 
 # Paths
 BASE_DIR = Path(__file__).parent
@@ -18,7 +19,7 @@ PROCESSED_DIR = BASE_DIR / "processed"
 
 def load_data(path: Path = DATA_FILE) -> pd.DataFrame:
     """Load historical conflict data from JSON."""
-    with open(path, "r") as f:
+    with open(path) as f:
         data = json.load(f)
     df = pd.DataFrame(data)
     print(f"[Pipeline] Loaded {len(df)} records from {path}")

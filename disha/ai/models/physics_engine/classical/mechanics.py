@@ -21,7 +21,6 @@ from __future__ import annotations
 
 import logging
 import uuid
-from typing import Dict, List, Optional
 
 import numpy as np
 
@@ -50,9 +49,9 @@ class PhysicsObject:
     def __init__(
         self,
         mass: float,
-        position: Optional[np.ndarray] = None,
-        velocity: Optional[np.ndarray] = None,
-        name: Optional[str] = None,
+        position: np.ndarray | None = None,
+        velocity: np.ndarray | None = None,
+        name: str | None = None,
     ) -> None:
         if mass <= 0.0:
             raise ValueError(f"Mass must be positive, got {mass}")
@@ -166,7 +165,7 @@ class ClassicalMechanicsEngine:
         gravitational_constant: float = GRAVITATIONAL_CONSTANT,
         softening_length: float = 1e-10,
     ) -> None:
-        self._objects: Dict[str, PhysicsObject] = {}
+        self._objects: dict[str, PhysicsObject] = {}
         self.G: float = gravitational_constant
         self.softening: float = softening_length
         self.time: float = 0.0
@@ -211,7 +210,7 @@ class ClassicalMechanicsEngine:
         return obj
 
     @property
-    def objects(self) -> List[PhysicsObject]:
+    def objects(self) -> list[PhysicsObject]:
         """Return a list of all registered objects."""
         return list(self._objects.values())
 
@@ -273,7 +272,7 @@ class ClassicalMechanicsEngine:
     # State queries
     # ------------------------------------------------------------------
 
-    def get_state(self) -> Dict[str, Dict[str, object]]:
+    def get_state(self) -> dict[str, dict[str, object]]:
         """Return a snapshot of the engine state.
 
         Returns
@@ -282,7 +281,7 @@ class ClassicalMechanicsEngine:
             Mapping from object name to a dict of ``position``, ``velocity``,
             ``acceleration``, ``kinetic_energy``, and ``momentum``.
         """
-        state: Dict[str, Dict[str, object]] = {}
+        state: dict[str, dict[str, object]] = {}
         for name, obj in self._objects.items():
             state[name] = {
                 "position": obj.position.copy(),

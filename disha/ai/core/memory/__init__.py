@@ -8,10 +8,10 @@ Exports three complementary memory types:
   - MemoryManager  : Unified interface that orchestrates all three
 """
 
-from .working import WorkingMemory
 from .episodic import EpisodicMemory
-from .semantic import SemanticMemory
 from .memory_manager import MemoryManager
+from .semantic import SemanticMemory
+from .working import WorkingMemory
 
 __all__ = [
     "WorkingMemory",

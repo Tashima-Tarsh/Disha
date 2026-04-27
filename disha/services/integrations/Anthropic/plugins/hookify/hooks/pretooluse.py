@@ -5,9 +5,9 @@ This script is called by Claude Code before any tool executes.
 It reads .claude/hookify.*.local.md files and evaluates rules.
 """
 
+import json
 import os
 import sys
-import json
 
 # CRITICAL: Add plugin root to Python path for imports
 # We need to add the parent of the plugin directory so Python can find "hookify" package

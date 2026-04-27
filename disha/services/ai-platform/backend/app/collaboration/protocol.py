@@ -1,9 +1,9 @@
 import time
 import uuid
+from collections import defaultdict
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Optional
-from collections import defaultdict
+
 import structlog
 
 logger = structlog.get_logger(__name__)
@@ -35,7 +35,7 @@ class AgentMessage:
     conversation_id: str = ""
     priority: Priority = Priority.NORMAL
     timestamp: float = field(default_factory=time.time)
-    parent_message_id: Optional[str] = None
+    parent_message_id: str | None = None
     requires_response: bool = False
     ttl: int = 300
 
@@ -44,14 +44,14 @@ class AgentMessage:
 
 
 class Conversation:
-    def __init__(self, conversation_id: Optional[str] = None, topic: str = ""):
+    def __init__(self, conversation_id: str | None = None, topic: str = ""):
         self.conversation_id = conversation_id or str(uuid.uuid4())
         self.topic = topic
         self.messages: list = []
         self.participants: set = set()
         self.started_at = time.time()
         self.status = "active"
-        self.conclusion: Optional[dict] = None
+        self.conclusion: dict | None = None
 
     def add_message(self, message: AgentMessage):
         message.conversation_id = self.conversation_id
@@ -60,7 +60,7 @@ class Conversation:
         if message.receiver != "*":
             self.participants.add(message.receiver)
 
-    def get_history(self, last_n: Optional[int] = None) -> list:
+    def get_history(self, last_n: int | None = None) -> list:
         msgs = self.messages
         if last_n:
             msgs = msgs[-last_n:]
@@ -130,7 +130,7 @@ class MessageRouter:
             self.agent_inboxes[agent_name] = []
             logger.info("agent_registered", agent=agent_name)
 
-    def get_conversation(self, conversation_id: str) -> Optional[Conversation]:
+    def get_conversation(self, conversation_id: str) -> Conversation | None:
         return self.conversations.get(conversation_id)
 
     def get_stats(self) -> dict:

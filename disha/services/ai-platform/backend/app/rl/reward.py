@@ -1,7 +1,7 @@
 import time
-from dataclasses import dataclass, field
-from typing import Optional
 from collections import deque
+from dataclasses import dataclass, field
+
 import numpy as np
 import structlog
 
@@ -12,11 +12,11 @@ logger = structlog.get_logger(__name__)
 class InvestigationFeedback:
     investigation_id: str
     timestamp: float = field(default_factory=time.time)
-    true_positive: Optional[bool] = None
-    user_rating: Optional[float] = None
+    true_positive: bool | None = None
+    user_rating: float | None = None
     false_positive_count: int = 0
     actionable_findings: int = 0
-    time_to_resolution: Optional[float] = None
+    time_to_resolution: float | None = None
 
 
 class RewardComputer:
@@ -49,7 +49,7 @@ class RewardComputer:
     def compute_episode_reward(
         self,
         investigation_result: dict,
-        feedback: Optional[InvestigationFeedback] = None,
+        feedback: InvestigationFeedback | None = None,
     ) -> float:
 
         entities = investigation_result.get("entities", [])

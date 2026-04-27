@@ -10,8 +10,9 @@ from __future__ import annotations
 import heapq
 import logging
 import uuid
+from collections.abc import Callable
 from dataclasses import dataclass, field
-from typing import Any, Callable, Dict, List, Optional, Set
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -35,8 +36,8 @@ class Event:
     event_type: str
     scheduled_time: float
     priority: int = 0
-    payload: Dict[str, Any] = field(default_factory=dict)
-    callback: Optional[Callable[["Event"], None]] = field(default=None, repr=False)
+    payload: dict[str, Any] = field(default_factory=dict)
+    callback: Callable[[Event], None] | None = field(default=None, repr=False)
 
     def __lt__(self, other: Event) -> bool:
         """Order by (scheduled_time, priority) for the heap."""
@@ -55,8 +56,8 @@ class EventQueue:
     """
 
     def __init__(self) -> None:
-        self._heap: List[Event] = []
-        self._cancelled: Set[str] = set()
+        self._heap: list[Event] = []
+        self._cancelled: set[str] = set()
         self._size: int = 0
 
     @property
@@ -84,7 +85,7 @@ class EventQueue:
             event.scheduled_time,
         )
 
-    def pop(self) -> Optional[Event]:
+    def pop(self) -> Event | None:
         """Remove and return the next non-cancelled event.
 
         Returns:
@@ -99,7 +100,7 @@ class EventQueue:
             return event
         return None
 
-    def peek(self) -> Optional[Event]:
+    def peek(self) -> Event | None:
         """Return the next non-cancelled event without removing it.
 
         Returns:
@@ -149,7 +150,7 @@ class EventEngine:
 
     def __init__(self) -> None:
         self._queue: EventQueue = EventQueue()
-        self._handlers: Dict[str, List[EventHandler]] = {}
+        self._handlers: dict[str, list[EventHandler]] = {}
         self._processed_count: int = 0
         logger.info("EventEngine initialised")
 
@@ -182,7 +183,7 @@ class EventEngine:
         self._handlers.setdefault(event_type, []).append(handler)
         logger.debug("Registered handler for event type '%s'", event_type)
 
-    def emit(self, event_type: str, payload: Optional[Dict[str, Any]] = None) -> None:
+    def emit(self, event_type: str, payload: dict[str, Any] | None = None) -> None:
         """Immediately trigger all handlers for an event type.
 
         Creates a transient event (not queued) and invokes handlers
@@ -200,7 +201,7 @@ class EventEngine:
         )
         self._dispatch(transient)
 
-    def process_events(self, current_time: float) -> List[Event]:
+    def process_events(self, current_time: float) -> list[Event]:
         """Process all events scheduled at or before *current_time*.
 
         For each event, the per-event callback (if set) and all
@@ -212,7 +213,7 @@ class EventEngine:
         Returns:
             List of events that were processed.
         """
-        triggered: List[Event] = []
+        triggered: list[Event] = []
 
         while True:
             next_event = self._queue.peek()

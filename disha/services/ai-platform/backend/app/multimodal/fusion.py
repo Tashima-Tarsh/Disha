@@ -1,4 +1,4 @@
-from typing import Optional
+
 import structlog
 
 logger = structlog.get_logger(__name__)
@@ -16,9 +16,9 @@ class MultimodalFusion:
 
     def fuse(
         self,
-        text_results: Optional[dict] = None,
-        vision_results: Optional[dict] = None,
-        audio_results: Optional[dict] = None,
+        text_results: dict | None = None,
+        vision_results: dict | None = None,
+        audio_results: dict | None = None,
     ) -> dict:
         all_entities = []
         all_risks = []

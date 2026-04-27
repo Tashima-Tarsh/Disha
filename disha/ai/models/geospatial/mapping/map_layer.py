@@ -8,7 +8,6 @@ compositing.
 from __future__ import annotations
 
 import logging
-from typing import Dict, List, Tuple
 
 import numpy as np
 
@@ -34,7 +33,7 @@ class MapLayer:
         name: str,
         data: np.ndarray,
         resolution: float = 1.0,
-        origin: Tuple[float, float] = (0.0, 0.0),
+        origin: tuple[float, float] = (0.0, 0.0),
     ) -> None:
         if data.ndim != 2:
             raise ValueError(f"data must be 2-D, got {data.ndim}-D")
@@ -44,7 +43,7 @@ class MapLayer:
         self.name: str = name
         self.data: np.ndarray = np.asarray(data, dtype=np.float64)
         self.resolution: float = resolution
-        self.origin: Tuple[float, float] = origin
+        self.origin: tuple[float, float] = origin
         self._rows: int = self.data.shape[0]
         self._cols: int = self.data.shape[1]
         logger.info(
@@ -55,7 +54,7 @@ class MapLayer:
             origin,
         )
 
-    def _world_to_grid(self, x: float, y: float) -> Tuple[float, float]:
+    def _world_to_grid(self, x: float, y: float) -> tuple[float, float]:
         """Convert world coordinates to continuous grid indices."""
         gx = (x - self.origin[0]) / self.resolution
         gy = (y - self.origin[1]) / self.resolution
@@ -153,7 +152,7 @@ class MapStack:
     """
 
     def __init__(self) -> None:
-        self._layers: Dict[str, MapLayer] = {}
+        self._layers: dict[str, MapLayer] = {}
         logger.info("MapStack created")
 
     def add_layer(self, layer: MapLayer) -> None:
@@ -196,7 +195,7 @@ class MapStack:
         return self._layers[name]
 
     @property
-    def layer_names(self) -> List[str]:
+    def layer_names(self) -> list[str]:
         """List of layer names in the stack."""
         return list(self._layers.keys())
 
@@ -204,7 +203,7 @@ class MapStack:
         self,
         x: float,
         y: float,
-        weights: Dict[str, float],
+        weights: dict[str, float],
     ) -> float:
         """Compute a weighted composite of layer values at world (x, y).
 

@@ -3,7 +3,7 @@ from __future__ import annotations
 import asyncio
 import json
 import uuid
-from typing import Optional
+from typing import Any
 
 import structlog
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
@@ -19,7 +19,7 @@ _engine = CognitiveEngine()
 
 class ProcessRequest(BaseModel):
     input: str
-    session_id: Optional[str] = None
+    session_id: str | None = None
 
 
 class ProcessResponse(BaseModel):
@@ -27,18 +27,18 @@ class ProcessResponse(BaseModel):
     turn: int
     intent: str
     confidence: float
-    action: dict
-    reflection: Optional[dict]
-    stage_durations: dict
+    action: dict[str, Any]
+    reflection: dict[str, Any] | None
+    stage_durations: dict[str, float]
 
 
 @router.get("/health")
-async def health():
+async def health() -> dict[str, str]:
     return {"status": "ok", "engine": "DISHA-MIND", "version": "1.0.0"}
 
 
 @router.post("/process", response_model=ProcessResponse)
-async def process_input(req: ProcessRequest):
+async def process_input(req: ProcessRequest) -> ProcessResponse:
     state = await _engine.process(req.input, session_id=req.session_id)
     return ProcessResponse(
         session_id=state.session_id,
@@ -52,12 +52,12 @@ async def process_input(req: ProcessRequest):
 
 
 @router.get("/introspect/{session_id}")
-async def introspect(session_id: str):
+async def introspect(session_id: str) -> dict[str, Any]:
     return _engine.get_introspection_report(session_id)
 
 
 @router.get("/sessions")
-async def sessions():
+async def sessions() -> dict[str, list[str]]:
     return {"session_ids": _engine.get_session_ids()}
 
 
@@ -73,7 +73,7 @@ STAGE_ORDER = [
 
 
 @router.websocket("/cognitive/stream/{session_id}")
-async def cognitive_stream(websocket: WebSocket, session_id: str):
+async def cognitive_stream(websocket: WebSocket, session_id: str) -> None:
     await websocket.accept()
     log = logger.bind(session=session_id)
     log.info("ws_connected")
@@ -100,7 +100,9 @@ async def cognitive_stream(websocket: WebSocket, session_id: str):
             pass
 
 
-async def _stream_cognitive_cycle(ws: WebSocket, raw_input: str, session_id: str):
+async def _stream_cognitive_cycle(
+    ws: WebSocket, raw_input: str, session_id: str
+) -> None:
     import time
 
     from disha.ai.core.cognitive_loop import CognitiveState
@@ -158,7 +160,7 @@ async def _stream_cognitive_cycle(ws: WebSocket, raw_input: str, session_id: str
     )
 
 
-def _stage_payload(stage: str, state) -> dict:
+def _stage_payload(stage: str, state: Any) -> dict[str, Any]:
     if stage == "perceiving":
         return {
             "intent": state.intent,

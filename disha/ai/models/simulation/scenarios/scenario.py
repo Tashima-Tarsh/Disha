@@ -9,8 +9,9 @@ from __future__ import annotations
 
 import copy
 import logging
+from collections.abc import Callable
 from dataclasses import dataclass, field
-from typing import Any, Callable, Dict, List, Optional
+from typing import Any
 
 import numpy as np
 
@@ -31,7 +32,7 @@ class Entity:
     entity_id: str
     entity_type: str
     position: np.ndarray = field(default_factory=lambda: np.zeros(3, dtype=np.float64))
-    properties: Dict[str, Any] = field(default_factory=dict)
+    properties: dict[str, Any] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
         self.position = np.asarray(self.position, dtype=np.float64)
@@ -49,7 +50,7 @@ class ScheduledEvent:
 
     time: float
     event_type: str
-    payload: Dict[str, Any] = field(default_factory=dict)
+    payload: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass
@@ -67,9 +68,9 @@ class Scenario:
 
     name: str
     description: str = ""
-    entities: List[Entity] = field(default_factory=list)
-    environment_config: Dict[str, Any] = field(default_factory=dict)
-    events_schedule: List[ScheduledEvent] = field(default_factory=list)
+    entities: list[Entity] = field(default_factory=list)
+    environment_config: dict[str, Any] = field(default_factory=dict)
+    events_schedule: list[ScheduledEvent] = field(default_factory=list)
     duration: float = 0.0
 
 
@@ -93,9 +94,9 @@ class ScenarioBuilder:
     def __init__(self) -> None:
         self._name: str = ""
         self._description: str = ""
-        self._entities: List[Entity] = []
-        self._environment: Dict[str, Any] = {}
-        self._events: List[ScheduledEvent] = []
+        self._entities: list[Entity] = []
+        self._environment: dict[str, Any] = {}
+        self._events: list[ScheduledEvent] = []
         self._duration: float = 0.0
 
     def set_name(self, name: str) -> ScenarioBuilder:
@@ -115,7 +116,7 @@ class ScenarioBuilder:
         self._duration = duration
         return self
 
-    def set_environment(self, config: Dict[str, Any]) -> ScenarioBuilder:
+    def set_environment(self, config: dict[str, Any]) -> ScenarioBuilder:
         """Set the environment configuration."""
         self._environment = dict(config)
         return self
@@ -175,13 +176,11 @@ class ScenarioRunner:
     """
 
     def __init__(self) -> None:
-        self._scenario: Optional[Scenario] = None
+        self._scenario: Scenario | None = None
         self._current_time: float = 0.0
         self._event_index: int = 0
-        self._results: List[Dict[str, Any]] = []
-        self._step_callback: Optional[
-            Callable[[float, ScheduledEvent, Scenario], None]
-        ] = None
+        self._results: list[dict[str, Any]] = []
+        self._step_callback: Callable[[float, ScheduledEvent, Scenario], None] | None = None
         self._is_running: bool = False
 
     def load(self, scenario: Scenario) -> None:
@@ -204,7 +203,7 @@ class ScenarioRunner:
         """
         self._step_callback = callback
 
-    def run(self) -> List[Dict[str, Any]]:
+    def run(self) -> list[dict[str, Any]]:
         """Execute the loaded scenario from start to finish.
 
         Returns:
@@ -253,7 +252,7 @@ class ScenarioRunner:
         )
         return list(self._results)
 
-    def get_results(self) -> List[Dict[str, Any]]:
+    def get_results(self) -> list[dict[str, Any]]:
         """Return results accumulated so far.
 
         Returns:

@@ -9,7 +9,7 @@ from __future__ import annotations
 
 import json
 import logging
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import Any
 
@@ -44,7 +44,7 @@ class MemoryStore:
     ) -> MemoryEntry:
         """Store a value in memory under the given key and scope."""
         ttl = ttl_hours or self._config.default_ttl_hours
-        expires = datetime.now(timezone.utc) + timedelta(hours=ttl)
+        expires = datetime.now(UTC) + timedelta(hours=ttl)
         entry = MemoryEntry(
             key=key,
             value=value,
@@ -121,7 +121,7 @@ class MemoryStore:
     ) -> None:
         """Append a structured log entry."""
         entry = {
-            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "timestamp": datetime.now(UTC).isoformat(),
             "level": level.value,
             "message": message,
             "context": context or {},
@@ -159,7 +159,7 @@ class MemoryStore:
     ) -> dict[str, Any]:
         """Record a decision with its rationale for auditability."""
         entry = {
-            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "timestamp": datetime.now(UTC).isoformat(),
             "decision": decision,
             "rationale": rationale,
             "alternatives": alternatives or [],
@@ -257,8 +257,8 @@ class MemoryStore:
         try:
             expires = datetime.fromisoformat(entry.expires_at)
             if expires.tzinfo is None:
-                expires = expires.replace(tzinfo=timezone.utc)
-            return datetime.now(timezone.utc) > expires
+                expires = expires.replace(tzinfo=UTC)
+            return datetime.now(UTC) > expires
         except (ValueError, TypeError):
             return False
 

@@ -11,14 +11,14 @@ import statistics
 import time
 from dataclasses import dataclass, field
 from types import TracebackType
-from typing import Any, Dict, List, Optional, Type
+from typing import Any
 
 from .config import LoggingSettings
 
 logger = logging.getLogger(__name__)
 
 
-def setup_logging(config: Optional[LoggingSettings] = None) -> None:
+def setup_logging(config: LoggingSettings | None = None) -> None:
     """Configure root and module loggers based on *config*.
 
     Args:
@@ -92,15 +92,15 @@ class PerformanceTimer:
         self.elapsed: float = 0.0
         self._start: float = 0.0
 
-    def __enter__(self) -> "PerformanceTimer":
+    def __enter__(self) -> PerformanceTimer:
         self._start = time.perf_counter()
         return self
 
     def __exit__(
         self,
-        exc_type: Optional[Type[BaseException]],
-        exc_val: Optional[BaseException],
-        exc_tb: Optional[TracebackType],
+        exc_type: type[BaseException] | None,
+        exc_val: BaseException | None,
+        exc_tb: TracebackType | None,
     ) -> None:
         self.elapsed = time.perf_counter() - self._start
         logger.log(
@@ -124,7 +124,7 @@ class MetricsCollector:
         # {'loss': {'mean': 0.4, 'min': 0.3, 'max': 0.5, 'count': 2}}
     """
 
-    _store: Dict[str, List[float]] = field(default_factory=dict)
+    _store: dict[str, list[float]] = field(default_factory=dict)
 
     def collect_metric(self, name: str, value: float) -> None:
         """Record a single metric observation.
@@ -135,14 +135,14 @@ class MetricsCollector:
         """
         self._store.setdefault(name, []).append(float(value))
 
-    def get_summary(self) -> Dict[str, Dict[str, Any]]:
+    def get_summary(self) -> dict[str, dict[str, Any]]:
         """Compute summary statistics for all collected metrics.
 
         Returns:
             A dictionary mapping each metric name to a dict with keys
             ``mean``, ``min``, ``max``, and ``count``.
         """
-        summary: Dict[str, Dict[str, Any]] = {}
+        summary: dict[str, dict[str, Any]] = {}
         for name, values in self._store.items():
             summary[name] = {
                 "mean": statistics.mean(values),

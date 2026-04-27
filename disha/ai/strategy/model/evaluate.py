@@ -4,18 +4,19 @@ Provides functions to evaluate models, analyze patterns, and generate reports.
 """
 
 import json
-import numpy as np
-from typing import Dict, List, Any, Optional
 from collections import defaultdict
+from typing import Any
+
+import numpy as np
 
 try:
     from sklearn.metrics import (
         accuracy_score,
+        classification_report,
+        confusion_matrix,
+        f1_score,
         precision_score,
         recall_score,
-        f1_score,
-        confusion_matrix,
-        classification_report,
     )
 
     SKLEARN_AVAILABLE = True
@@ -27,8 +28,8 @@ def evaluate_model(
     model,
     X_test: np.ndarray,
     y_test: np.ndarray,
-    class_names: Optional[List[str]] = None,
-) -> Dict[str, Any]:
+    class_names: list[str] | None = None,
+) -> dict[str, Any]:
     """
     Evaluate a classifier on test data.
 
@@ -68,7 +69,7 @@ def evaluate_model(
     return metrics
 
 
-def plot_confusion_matrix(cm: List[List[int]], labels: List[str]) -> str:
+def plot_confusion_matrix(cm: list[list[int]], labels: list[str]) -> str:
     """
     Generate a text-based confusion matrix visualization.
     Returns a formatted string.
@@ -108,7 +109,7 @@ def plot_confusion_matrix(cm: List[List[int]], labels: List[str]) -> str:
     return "\n".join(lines)
 
 
-def analyze_strategy_patterns(data: List[Dict[str, Any]]) -> Dict[str, Any]:
+def analyze_strategy_patterns(data: list[dict[str, Any]]) -> dict[str, Any]:
     """
     Analyze patterns in strategy success rates from historical data.
 
@@ -116,13 +117,13 @@ def analyze_strategy_patterns(data: List[Dict[str, Any]]) -> Dict[str, Any]:
         strategy_win_rates, terrain_effectiveness, era_patterns,
         technology_advantage_impact, top_strategies_by_terrain
     """
-    strategy_wins: Dict[str, List[int]] = defaultdict(list)
-    terrain_strategy_wins: Dict[str, Dict[str, List[int]]] = defaultdict(
+    strategy_wins: dict[str, list[int]] = defaultdict(list)
+    terrain_strategy_wins: dict[str, dict[str, list[int]]] = defaultdict(
         lambda: defaultdict(list)
     )
-    era_wins: Dict[str, List[int]] = defaultdict(list)
-    region_wins: Dict[str, List[int]] = defaultdict(list)
-    technology_wins: Dict[str, List[int]] = defaultdict(list)
+    era_wins: dict[str, list[int]] = defaultdict(list)
+    region_wins: dict[str, list[int]] = defaultdict(list)
+    technology_wins: dict[str, list[int]] = defaultdict(list)
 
     outcome_score = {"Victory": 1, "Draw": 0, "Defeat": 0}
 
@@ -211,7 +212,7 @@ def analyze_strategy_patterns(data: List[Dict[str, Any]]) -> Dict[str, Any]:
     return patterns
 
 
-def generate_report(metrics: Dict[str, Any], patterns: Dict[str, Any]) -> str:
+def generate_report(metrics: dict[str, Any], patterns: dict[str, Any]) -> str:
     """
     Generate a comprehensive text evaluation report.
     Returns formatted report string.

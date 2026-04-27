@@ -17,8 +17,8 @@ import sys
 from pathlib import Path
 
 import numpy as np
-import torch
 import structlog
+import torch
 
 _SCRIPT_DIR = Path(__file__).resolve().parent
 _BACKEND_ROOT = _SCRIPT_DIR.parent

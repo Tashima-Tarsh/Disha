@@ -1,7 +1,6 @@
 """Tests for the advanced reasoning protocol."""
 
 import pytest
-
 from auto_learning.advanced_reasoning import (
     AdvancedReasoningEngine,
     ComplexityClass,

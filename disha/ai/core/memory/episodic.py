@@ -28,11 +28,11 @@ class EpisodicMemory:
             return
         async with self._lock:
             if self._loaded:
-                return
+                return  # type: ignore[unreachable]
             try:
                 self._path.parent.mkdir(parents=True, exist_ok=True)
                 if self._path.exists():
-                    async with aiofiles.open(self._path, "r") as f:
+                    async with aiofiles.open(self._path) as f:
                         raw = await f.read()
                     self._episodes = json.loads(raw) if raw.strip() else []
                     log.info(

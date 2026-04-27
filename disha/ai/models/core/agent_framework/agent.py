@@ -12,8 +12,9 @@ import heapq
 import logging
 import uuid
 from collections import deque
+from collections.abc import Callable
 from dataclasses import dataclass, field
-from typing import Any, Callable, Deque, Dict, List, Optional, Set, Tuple
+from typing import Any
 
 import numpy as np
 
@@ -43,9 +44,9 @@ class Perception:
         messages: Messages received since last perception.
     """
 
-    entities: List[Dict[str, Any]] = field(default_factory=list)
-    environmental_data: Dict[str, Any] = field(default_factory=dict)
-    messages: List[Dict[str, Any]] = field(default_factory=list)
+    entities: list[dict[str, Any]] = field(default_factory=list)
+    environmental_data: dict[str, Any] = field(default_factory=dict)
+    messages: list[dict[str, Any]] = field(default_factory=list)
 
 
 @dataclass
@@ -61,7 +62,7 @@ class Action:
 
     action_type: str
     target: Any = None
-    parameters: Dict[str, Any] = field(default_factory=dict)
+    parameters: dict[str, Any] = field(default_factory=dict)
     priority: float = 0.0
 
 
@@ -81,7 +82,7 @@ class SimAgent:
     def __init__(
         self,
         name: str,
-        position: Optional[np.ndarray] = None,
+        position: np.ndarray | None = None,
         perception_radius: float = 10.0,
         memory_size: int = 100,
     ) -> None:
@@ -94,21 +95,21 @@ class SimAgent:
         self.perception_radius: float = perception_radius
 
         # Bounded memory
-        self.memory: Deque[Dict[str, Any]] = deque(maxlen=memory_size)
+        self.memory: deque[dict[str, Any]] = deque(maxlen=memory_size)
 
         # Priority queue of goals: list of (-priority, seq, goal_dict)
         self._goal_seq: int = 0
-        self._goals: List[Tuple[float, int, Dict[str, Any]]] = []
+        self._goals: list[tuple[float, int, dict[str, Any]]] = []
 
         # Communication inbox
-        self._inbox: List[Dict[str, Any]] = []
+        self._inbox: list[dict[str, Any]] = []
 
         # Optional custom think function
-        self._think_fn: Optional[Callable[[SimAgent, Perception], List[Action]]] = None
+        self._think_fn: Callable[[SimAgent, Perception], list[Action]] | None = None
 
     # -- Goals --------------------------------------------------------------
 
-    def add_goal(self, goal: Dict[str, Any], priority: float = 0.0) -> None:
+    def add_goal(self, goal: dict[str, Any], priority: float = 0.0) -> None:
         """Push a goal onto the priority queue (higher priority first).
 
         Args:
@@ -118,11 +119,11 @@ class SimAgent:
         heapq.heappush(self._goals, (-priority, self._goal_seq, goal))
         self._goal_seq += 1
 
-    def peek_goal(self) -> Optional[Dict[str, Any]]:
+    def peek_goal(self) -> dict[str, Any] | None:
         """Return the highest-priority goal without removing it."""
         return self._goals[0][2] if self._goals else None
 
-    def pop_goal(self) -> Optional[Dict[str, Any]]:
+    def pop_goal(self) -> dict[str, Any] | None:
         """Remove and return the highest-priority goal."""
         if self._goals:
             return heapq.heappop(self._goals)[2]
@@ -132,7 +133,7 @@ class SimAgent:
 
     def set_think_function(
         self,
-        fn: Callable[["SimAgent", Perception], List[Action]],
+        fn: Callable[[SimAgent, Perception], list[Action]],
     ) -> None:
         """Register an external deliberation function.
 
@@ -143,7 +144,7 @@ class SimAgent:
 
     # -- Core loop ----------------------------------------------------------
 
-    def perceive(self, world_state: Dict[str, Any]) -> Perception:
+    def perceive(self, world_state: dict[str, Any]) -> Perception:
         """Gather perception data from *world_state*.
 
         Entities in ``world_state["entities"]`` within
@@ -160,7 +161,7 @@ class SimAgent:
         """
         self.state = AgentState.OBSERVING
 
-        nearby: List[Dict[str, Any]] = []
+        nearby: list[dict[str, Any]] = []
         for entity in world_state.get("entities", []):
             if entity.get("id") == self.id:
                 continue
@@ -193,7 +194,7 @@ class SimAgent:
         )
         return perception
 
-    def think(self, perception: Perception) -> List[Action]:
+    def think(self, perception: Perception) -> list[Action]:
         """Deliberate on perceived data and produce actions.
 
         If a custom think function has been set via
@@ -217,7 +218,7 @@ class SimAgent:
             actions.sort(key=lambda a: a.priority, reverse=True)
             return actions
 
-        actions: List[Action] = []
+        actions: list[Action] = []
 
         # React to messages
         for msg in perception.messages:
@@ -269,7 +270,7 @@ class SimAgent:
 
         return actions
 
-    def act(self, actions: List[Action], world: Dict[str, Any]) -> List[Dict[str, Any]]:
+    def act(self, actions: list[Action], world: dict[str, Any]) -> list[dict[str, Any]]:
         """Execute *actions* against the *world* state.
 
         Currently supports ``"move"`` (updates position) and ``"reply"``
@@ -283,7 +284,7 @@ class SimAgent:
             List of result dictionaries (one per action).
         """
         self.state = AgentState.ACTING
-        results: List[Dict[str, Any]] = []
+        results: list[dict[str, Any]] = []
 
         for action in actions:
             if action.action_type == "move":
@@ -301,7 +302,7 @@ class SimAgent:
                     }
                 )
             elif action.action_type == "reply":
-                bus: Optional[AgentCommunicationBus] = world.get("comm_bus")
+                bus: AgentCommunicationBus | None = world.get("comm_bus")
                 content = action.parameters.get("content", "")
                 if bus is not None and action.target is not None:
                     bus.send_direct(self.id, action.target, content)
@@ -323,7 +324,7 @@ class SimAgent:
 
         return results
 
-    def communicate(self, message: str, target_agent: "SimAgent") -> None:
+    def communicate(self, message: str, target_agent: SimAgent) -> None:
         """Send a direct message to *target_agent*.
 
         The message is placed in the target agent's inbox for the next
@@ -339,7 +340,7 @@ class SimAgent:
         )
         logger.debug("Agent '%s' → '%s': %s", self.name, target_agent.name, message)
 
-    def update(self, dt: float, world: Dict[str, Any]) -> List[Dict[str, Any]]:
+    def update(self, dt: float, world: dict[str, Any]) -> list[dict[str, Any]]:
         """Run a full perceive → think → act cycle.
 
         Args:
@@ -369,8 +370,8 @@ class AgentCommunicationBus:
     """Centralised message bus supporting broadcast, direct, and topic-based messaging."""
 
     def __init__(self) -> None:
-        self._agents: Dict[str, SimAgent] = {}
-        self._subscriptions: Dict[str, Set[str]] = {}  # topic -> set of agent ids
+        self._agents: dict[str, SimAgent] = {}
+        self._subscriptions: dict[str, set[str]] = {}  # topic -> set of agent ids
 
     def register(self, agent: SimAgent) -> None:
         """Register an agent with the bus."""
@@ -489,9 +490,9 @@ class MultiAgentSystem:
         world: Initial world state dictionary.
     """
 
-    def __init__(self, world: Optional[Dict[str, Any]] = None) -> None:
-        self.world: Dict[str, Any] = world if world is not None else {}
-        self.agents: Dict[str, SimAgent] = {}
+    def __init__(self, world: dict[str, Any] | None = None) -> None:
+        self.world: dict[str, Any] = world if world is not None else {}
+        self.agents: dict[str, SimAgent] = {}
         self.comm_bus: AgentCommunicationBus = AgentCommunicationBus()
         self.world["comm_bus"] = self.comm_bus
         self._turn: int = 0
@@ -507,7 +508,7 @@ class MultiAgentSystem:
         self.agents.pop(agent_id, None)
         self.comm_bus.unregister(agent_id)
 
-    def _build_entities_list(self) -> List[Dict[str, Any]]:
+    def _build_entities_list(self) -> list[dict[str, Any]]:
         """Build the entities list for perception from current agents."""
         return [
             {"id": a.id, "name": a.name, "position": a.position.tolist()}
@@ -516,11 +517,11 @@ class MultiAgentSystem:
 
     def _resolve_conflicts(
         self,
-        all_results: Dict[str, List[Dict[str, Any]]],
+        all_results: dict[str, list[dict[str, Any]]],
     ) -> None:
         """Simple conflict resolution: if two agents moved to the same cell
         (within tolerance), push the later one back slightly."""
-        positions: List[Tuple[str, np.ndarray]] = [
+        positions: list[tuple[str, np.ndarray]] = [
             (aid, agent.position) for aid, agent in self.agents.items()
         ]
         tolerance = 0.1
@@ -541,7 +542,7 @@ class MultiAgentSystem:
                         aid_i,
                     )
 
-    def step(self, dt: float = 1.0) -> Dict[str, List[Dict[str, Any]]]:
+    def step(self, dt: float = 1.0) -> dict[str, list[dict[str, Any]]]:
         """Advance the system by one turn.
 
         All agents perceive, think, and act in round-robin order.
@@ -555,7 +556,7 @@ class MultiAgentSystem:
         self._turn += 1
         self.world["entities"] = self._build_entities_list()
 
-        all_results: Dict[str, List[Dict[str, Any]]] = {}
+        all_results: dict[str, list[dict[str, Any]]] = {}
         for aid, agent in self.agents.items():
             results = agent.update(dt, self.world)
             all_results[aid] = results
@@ -571,7 +572,7 @@ class MultiAgentSystem:
 
     def run(
         self, n_turns: int, dt: float = 1.0
-    ) -> List[Dict[str, List[Dict[str, Any]]]]:
+    ) -> list[dict[str, list[dict[str, Any]]]]:
         """Run *n_turns* of the multi-agent system.
 
         Args:
@@ -581,7 +582,7 @@ class MultiAgentSystem:
         Returns:
             List of per-turn result dictionaries.
         """
-        history: List[Dict[str, List[Dict[str, Any]]]] = []
+        history: list[dict[str, list[dict[str, Any]]]] = []
         for _ in range(n_turns):
             results = self.step(dt)
             history.append(results)

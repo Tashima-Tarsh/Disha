@@ -6,10 +6,10 @@ the resolver that processes every active interaction each simulation step.
 """
 
 from .interaction import (
-    Interaction,
     CollisionInteraction,
     CommunicationInteraction,
     ForceInteraction,
+    Interaction,
     InteractionResolver,
 )
 

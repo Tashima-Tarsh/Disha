@@ -6,14 +6,14 @@ import logging
 import time
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
 REJECT_THRESHOLD = 60
 TEMPORARY_THRESHOLD = 80
 
-DEFAULT_SOURCE_CREDIBILITY: Dict[str, float] = {
+DEFAULT_SOURCE_CREDIBILITY: dict[str, float] = {
     "github": 0.75,
     "arxiv": 0.90,
     "wikipedia": 0.70,
@@ -27,7 +27,7 @@ DEFAULT_SOURCE_CREDIBILITY: Dict[str, float] = {
 class DataItem:
     text: str
     source: str = "unknown"
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    metadata: dict[str, Any] = field(default_factory=dict)
     content_hash: str = ""
     quality_score: int = -1
     classification: str = ""
@@ -41,7 +41,7 @@ class DataItem:
 class QualityScorer:
     def __init__(
         self,
-        source_credibility: Optional[Dict[str, float]] = None,
+        source_credibility: dict[str, float] | None = None,
     ) -> None:
         self._source_cred = source_credibility or DEFAULT_SOURCE_CREDIBILITY
         self._seen_hashes: set = set()
@@ -105,7 +105,7 @@ class LearningController:
     def __init__(
         self,
         rag_pipeline: Any = None,
-        scorer: Optional[QualityScorer] = None,
+        scorer: QualityScorer | None = None,
         reject_threshold: int = REJECT_THRESHOLD,
         permanent_threshold: int = TEMPORARY_THRESHOLD,
         state_dir: str = "data/learning_state",
@@ -117,16 +117,16 @@ class LearningController:
         self._state_dir = Path(state_dir)
         self._state_dir.mkdir(parents=True, exist_ok=True)
 
-        self.permanent_store: List[DataItem] = []
-        self.temporary_store: List[DataItem] = []
-        self.rejected_store: List[DataItem] = []
+        self.permanent_store: list[DataItem] = []
+        self.temporary_store: list[DataItem] = []
+        self.rejected_store: list[DataItem] = []
 
-        self._audit_log: List[Dict[str, Any]] = []
+        self._audit_log: list[dict[str, Any]] = []
 
-        self._finetuning_queue: List[DataItem] = []
+        self._finetuning_queue: list[DataItem] = []
         self._finetuning_approved: bool = False
 
-    def ingest(self, item: DataItem) -> Dict[str, Any]:
+    def ingest(self, item: DataItem) -> dict[str, Any]:
 
         score = self._scorer.score(item)
         item.quality_score = score
@@ -178,7 +178,7 @@ class LearningController:
         )
         return entry
 
-    def ingest_batch(self, items: List[DataItem]) -> Dict[str, Any]:
+    def ingest_batch(self, items: list[DataItem]) -> dict[str, Any]:
         results = [self.ingest(item) for item in items]
         summary = {
             "total": len(results),
@@ -192,16 +192,16 @@ class LearningController:
 
     def ingest_texts(
         self,
-        texts: List[str],
+        texts: list[str],
         source: str = "unknown",
-        metadata: Optional[Dict[str, Any]] = None,
-    ) -> Dict[str, Any]:
+        metadata: dict[str, Any] | None = None,
+    ) -> dict[str, Any]:
         items = [
             DataItem(text=t, source=source, metadata=metadata or {}) for t in texts
         ]
         return self.ingest_batch(items)
 
-    def request_finetuning_approval(self) -> Dict[str, Any]:
+    def request_finetuning_approval(self) -> dict[str, Any]:
         candidates = list(self.permanent_store)
         return {
             "candidate_count": len(candidates),
@@ -218,7 +218,7 @@ class LearningController:
             ),
         }
 
-    def approve_finetuning(self, approved: bool = True) -> Dict[str, Any]:
+    def approve_finetuning(self, approved: bool = True) -> dict[str, Any]:
         self._finetuning_approved = approved
         if approved:
             self._finetuning_queue = list(self.permanent_store)
@@ -231,7 +231,7 @@ class LearningController:
             self._finetuning_queue = []
             return {"status": "rejected"}
 
-    def get_finetuning_dataset(self) -> List[Dict[str, str]]:
+    def get_finetuning_dataset(self) -> list[dict[str, str]]:
         if not self._finetuning_approved or not self._finetuning_queue:
             return []
 
@@ -324,7 +324,7 @@ class LearningController:
         if not path.exists():
             return False
 
-        with open(str(path), "r", encoding="utf-8") as fh:
+        with open(str(path), encoding="utf-8") as fh:
             state = json.load(fh)
 
         self.permanent_store = [DataItem(**item) for item in state.get("permanent", [])]
@@ -332,7 +332,7 @@ class LearningController:
         self._audit_log = state.get("audit_log", [])
         return True
 
-    def stats(self) -> Dict[str, Any]:
+    def stats(self) -> dict[str, Any]:
         return {
             "permanent_count": len(self.permanent_store),
             "temporary_count": len(self.temporary_store),
@@ -342,5 +342,5 @@ class LearningController:
             "finetuning_queue_size": len(self._finetuning_queue),
         }
 
-    def get_audit_log(self, last_n: int = 50) -> List[Dict[str, Any]]:
+    def get_audit_log(self, last_n: int = 50) -> list[dict[str, Any]]:
         return self._audit_log[-last_n:]

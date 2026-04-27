@@ -8,12 +8,12 @@ import logging
 import math
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Dict, List, Optional, Any
+from typing import Any
 
 from simulation.scenarios import (
+    SCENARIOS,
     STRATEGY_COUNTERS,
     TERRAIN_MULTIPLIERS,
-    SCENARIOS,
 )
 
 DATA_FILE = Path(__file__).parent.parent / "data" / "historical_data.json"
@@ -21,7 +21,7 @@ DATA_FILE = Path(__file__).parent.parent / "data" / "historical_data.json"
 logger = logging.getLogger(__name__)
 
 # Historical success rates by strategy and terrain
-STRATEGY_EFFECTIVENESS: Dict[str, Dict[str, float]] = {
+STRATEGY_EFFECTIVENESS: dict[str, dict[str, float]] = {
     "Guerrilla": {
         "Mountains": 0.85,
         "Forest": 0.80,
@@ -104,7 +104,7 @@ STRATEGY_EFFECTIVENESS: Dict[str, Dict[str, float]] = {
     },
 }
 
-WEATHER_MODIFIERS: Dict[str, float] = {
+WEATHER_MODIFIERS: dict[str, float] = {
     "Clear": 1.0,
     "Rain": 0.9,
     "Snow": 0.8,
@@ -112,7 +112,7 @@ WEATHER_MODIFIERS: Dict[str, float] = {
 }
 
 # Tactical advice library by strategy
-TACTICAL_ADVICE: Dict[str, List[str]] = {
+TACTICAL_ADVICE: dict[str, list[str]] = {
     "Guerrilla": [
         "Avoid decisive engagements — strike and withdraw",
         "Use terrain for concealment and ambush positions",
@@ -185,7 +185,7 @@ TACTICAL_ADVICE: Dict[str, List[str]] = {
     ],
 }
 
-RISK_FACTORS: Dict[str, List[str]] = {
+RISK_FACTORS: dict[str, list[str]] = {
     "supply_lines": [
         "Low supply reliability creates logistical crisis under sustained operations",
         "Extended supply lines are vulnerable to guerrilla interdiction",
@@ -220,16 +220,16 @@ class SimulationResult:
 
     victory_probability: float
     recommended_strategy: str
-    alternative_strategies: List[Dict[str, Any]]
-    risk_assessment: Dict[str, Any]
-    historical_parallels: List[Dict[str, Any]]
-    tactical_advice: List[str]
+    alternative_strategies: list[dict[str, Any]]
+    risk_assessment: dict[str, Any]
+    historical_parallels: list[dict[str, Any]]
+    tactical_advice: list[str]
     attacker_score: float
     defender_score: float
     outcome_label: str
     confidence_level: str
     scenario_summary: str
-    strategy_breakdown: Dict[str, float] = field(default_factory=dict)
+    strategy_breakdown: dict[str, float] = field(default_factory=dict)
 
 
 class HistoricalSimulationEngine:
@@ -240,7 +240,7 @@ class HistoricalSimulationEngine:
     """
 
     def __init__(self):
-        self.historical_data: List[Dict[str, Any]] = []
+        self.historical_data: list[dict[str, Any]] = []
         self._load_data()
 
     def _load_data(self):
@@ -252,7 +252,7 @@ class HistoricalSimulationEngine:
         else:
             logger.warning("Data file not found at %s", DATA_FILE)
 
-    def run_simulation(self, scenario_params: Dict[str, Any]) -> SimulationResult:
+    def run_simulation(self, scenario_params: dict[str, Any]) -> SimulationResult:
         """
         Core simulation algorithm. Computes victory probability for attacker.
 
@@ -419,7 +419,7 @@ class HistoricalSimulationEngine:
         ]
         return best, alternatives
 
-    def find_historical_parallels(self, params: Dict[str, Any]) -> List[Dict[str, Any]]:
+    def find_historical_parallels(self, params: dict[str, Any]) -> list[dict[str, Any]]:
         """Find historically similar conflicts based on strategy, terrain, and era."""
         attacker_strategy = params.get("attacker_strategy", "Conventional")
         terrain = params.get("terrain", "Plains")
@@ -452,7 +452,7 @@ class HistoricalSimulationEngine:
         parallels.sort(key=lambda x: -x["similarity_score"])
         return parallels[:5]
 
-    def assess_risk(self, params: Dict[str, Any]) -> Dict[str, Any]:
+    def assess_risk(self, params: dict[str, Any]) -> dict[str, Any]:
         """Comprehensive risk assessment for the given scenario."""
         risks = []
         risk_level = "Low"
@@ -588,8 +588,8 @@ class HistoricalSimulationEngine:
         return round(min(1.0, score), 3)
 
     def compare_strategies(
-        self, strategy_a: str, strategy_b: str, context: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, strategy_a: str, strategy_b: str, context: dict[str, Any]
+    ) -> dict[str, Any]:
         """
         Compare two strategies across all terrains and provide head-to-head analysis.
         """
@@ -671,11 +671,11 @@ class HistoricalSimulationEngine:
             ),
         }
 
-    def get_predefined_scenario(self, scenario_name: str) -> Optional[Dict[str, Any]]:
+    def get_predefined_scenario(self, scenario_name: str) -> dict[str, Any] | None:
         """Return a predefined scenario by name."""
         return SCENARIOS.get(scenario_name)
 
-    def list_scenarios(self) -> List[str]:
+    def list_scenarios(self) -> list[str]:
         """Return list of all predefined scenario names."""
         return list(SCENARIOS.keys())
 

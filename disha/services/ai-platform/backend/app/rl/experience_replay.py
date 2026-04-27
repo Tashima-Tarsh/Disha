@@ -1,7 +1,7 @@
 import random
 from collections import deque
 from dataclasses import dataclass
-from typing import Optional
+
 import numpy as np
 import structlog
 
@@ -55,7 +55,7 @@ class ExperienceReplayBuffer:
         )
         self._episode_buffer.append(transition)
 
-    def end_episode(self, final_reward: Optional[float] = None):
+    def end_episode(self, final_reward: float | None = None):
         if not self._episode_buffer:
             return
 
@@ -90,7 +90,7 @@ class ExperienceReplayBuffer:
         )
         return [self.buffer[i] for i in indices]
 
-    def get_batch_arrays(self, batch_size: int = 32) -> Optional[dict]:
+    def get_batch_arrays(self, batch_size: int = 32) -> dict | None:
         batch = self.sample(batch_size)
         if not batch:
             return None

@@ -12,7 +12,7 @@ from __future__ import annotations
 
 import hashlib
 import uuid
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
 
 alerts_data: list[dict[str, Any]] = []
@@ -76,7 +76,7 @@ def generate_alert(record: dict[str, Any]) -> dict[str, Any] | None:
         "crime": record.get("type", "unknown"),
         "severity": severity,
         "message": message,
-        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "timestamp": datetime.now(UTC).isoformat(),
         "source": record.get("source", "disha-sentinel"),
         "indicator": record.get("indicator", ""),
         "hash": content_hash,

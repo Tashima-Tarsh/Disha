@@ -12,13 +12,14 @@ Demonstrates the ReasoningEngine and DecisionFramework.
 * Uses DecisionFramework for multi-criteria decision analysis.
 """
 
+import os
+import sys
+
+import numpy as np
 from core.reasoning_engine.reasoning import (
     DecisionFramework,
     ReasoningEngine,
 )
-import numpy as np
-import sys
-import os
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))

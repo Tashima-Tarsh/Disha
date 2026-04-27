@@ -1,4 +1,5 @@
-from typing import Any, Dict, List
+from typing import Any
+
 import structlog
 
 logger = structlog.get_logger(__name__)
@@ -38,12 +39,12 @@ class InfrastructureService:
             },
         }
 
-    async def get_asset_details(self, name: str) -> Dict[str, Any] | None:
+    async def get_asset_details(self, name: str) -> dict[str, Any] | None:
         return self.assets.get(name)
 
     async def calculate_environmental_load_force(
         self, asset_name: str, wind_speed_kmh: float
-    ) -> List[float]:
+    ) -> list[float]:
         asset = await self.get_asset_details(asset_name)
         if not asset:
             return [0.0, 0.0, 0.0]
@@ -56,8 +57,8 @@ class InfrastructureService:
         return [force_magnitude, 0.0, 0.0]
 
     async def evaluate_failure_risk(
-        self, asset_name: str, md_diagnostic: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, asset_name: str, md_diagnostic: dict[str, Any]
+    ) -> dict[str, Any]:
         asset = await self.get_asset_details(asset_name)
         if not asset:
             return {"status": "unknown", "risk_score": 0.0}

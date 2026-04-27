@@ -16,7 +16,6 @@ import os
 import sys
 from pathlib import Path
 
-
 # Path setup
 _THIS = Path(__file__).resolve()
 _REPO_ROOT = _THIS.parents[5]  # Disha-main
@@ -144,7 +143,7 @@ class TestKnowledgeLoading:
 
 class TestKnowledgeGraph:
     def test_build_knowledge_graph(self):
-        from knowledge_engine import load_all_knowledge, build_knowledge_graph
+        from knowledge_engine import build_knowledge_graph, load_all_knowledge
 
         corpus = load_all_knowledge()
         kg = build_knowledge_graph(corpus, feature_dim=32)
@@ -157,7 +156,7 @@ class TestKnowledgeGraph:
         assert kg["metadata"]["num_edges"] > 0
 
     def test_graph_has_domain_hubs(self):
-        from knowledge_engine import load_all_knowledge, build_knowledge_graph
+        from knowledge_engine import build_knowledge_graph, load_all_knowledge
 
         corpus = load_all_knowledge()
         kg = build_knowledge_graph(corpus, feature_dim=16)
@@ -166,7 +165,7 @@ class TestKnowledgeGraph:
         assert hub_count >= 6
 
     def test_graph_has_cross_domain_links(self):
-        from knowledge_engine import load_all_knowledge, build_knowledge_graph
+        from knowledge_engine import build_knowledge_graph, load_all_knowledge
 
         corpus = load_all_knowledge()
         kg = build_knowledge_graph(corpus, feature_dim=16)
@@ -179,7 +178,7 @@ class TestKnowledgeGraph:
 
 class TestCrossDomainScenarios:
     def test_generate_cross_domain_scenarios(self):
-        from knowledge_engine import load_all_knowledge, generate_cross_domain_scenarios
+        from knowledge_engine import generate_cross_domain_scenarios, load_all_knowledge
 
         corpus = load_all_knowledge()
         scenarios = generate_cross_domain_scenarios(corpus, n=50, seed=42)
@@ -192,7 +191,7 @@ class TestCrossDomainScenarios:
             assert len(s["domains"]) == 2
 
     def test_scenarios_reference_multiple_domains(self):
-        from knowledge_engine import load_all_knowledge, generate_cross_domain_scenarios
+        from knowledge_engine import generate_cross_domain_scenarios, load_all_knowledge
 
         corpus = load_all_knowledge()
         scenarios = generate_cross_domain_scenarios(corpus, n=100, seed=42)
@@ -203,7 +202,7 @@ class TestCrossDomainScenarios:
         assert len(all_domains) >= 4, f"Only referenced: {all_domains}"
 
     def test_rl_knowledge_scenarios(self):
-        from knowledge_engine import load_all_knowledge, generate_knowledge_rl_scenarios
+        from knowledge_engine import generate_knowledge_rl_scenarios, load_all_knowledge
 
         corpus = load_all_knowledge()
         scenarios = generate_knowledge_rl_scenarios(corpus, n=30, seed=42)
@@ -222,11 +221,11 @@ class TestGraphMerging:
     def test_merge_graphs(self):
         from continuous_train import _merge_graphs
         from data_fetchers import (
-            generate_synthetic_threats,
-            build_graph_from_threats,
             GraphDataset,
+            build_graph_from_threats,
+            generate_synthetic_threats,
         )
-        from knowledge_engine import load_all_knowledge, build_knowledge_graph
+        from knowledge_engine import build_knowledge_graph, load_all_knowledge
 
         threats = generate_synthetic_threats(n=10, seed=42)
         threat_graph = build_graph_from_threats(threats)

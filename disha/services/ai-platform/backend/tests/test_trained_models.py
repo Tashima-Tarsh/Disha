@@ -54,8 +54,8 @@ class TestRLTrainedModel:
         not (CKPT_DIR / "rl_policy.pt").exists(), reason="rl_policy.pt missing"
     )
     def test_load_and_infer(self):
-        from app.rl.policy import PolicyNetwork
         from app.rl.environment import InvestigationEnvironment
+        from app.rl.policy import PolicyNetwork
 
         ckpt = torch.load(self.CKPT_DIR / "rl_policy.pt", weights_only=True)
         policy = PolicyNetwork(

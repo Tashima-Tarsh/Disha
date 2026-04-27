@@ -1,4 +1,5 @@
-from typing import Any, Dict
+from typing import Any
+
 import structlog
 
 logger = structlog.get_logger(__name__)
@@ -15,7 +16,7 @@ class GlobalIntelligenceService:
             "trusted_sovereign_yield": 0.045,
         }
 
-    async def get_global_pulse_summary(self) -> Dict[str, Any]:
+    async def get_global_pulse_summary(self) -> dict[str, Any]:
         return self.state
 
     async def set_global_pulse(self, metric: str, value: float):

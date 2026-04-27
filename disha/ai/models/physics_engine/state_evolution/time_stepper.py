@@ -14,10 +14,8 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass
-from typing import List, Optional, Tuple
 
 import numpy as np
-
 from physics_engine.state_evolution.integrator import (
     DerivativeFn,
     IntegratorBase,
@@ -69,7 +67,7 @@ class TimeStepper:
 
     def __init__(
         self,
-        integrator: Optional[IntegratorBase] = None,
+        integrator: IntegratorBase | None = None,
         initial_dt: float = 0.01,
         adaptive: bool = False,
         tolerance: float = 1e-6,
@@ -88,8 +86,8 @@ class TimeStepper:
         self.max_steps: int = max_steps
 
         self.time: float = 0.0
-        self.state: Optional[np.ndarray] = None
-        self.history: List[StateRecord] = []
+        self.state: np.ndarray | None = None
+        self.history: list[StateRecord] = []
         self._step_count: int = 0
 
         logger.info(
@@ -158,7 +156,7 @@ class TimeStepper:
 
         return self.state
 
-    def _adaptive_step(self, derivative_fn: DerivativeFn) -> Tuple[np.ndarray, float]:
+    def _adaptive_step(self, derivative_fn: DerivativeFn) -> tuple[np.ndarray, float]:
         """Perform one adaptive step via step-doubling error estimation.
 
         Two solutions are computed:

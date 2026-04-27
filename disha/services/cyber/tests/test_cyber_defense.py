@@ -10,12 +10,13 @@ import os
 import sys
 import tempfile
 import unittest
-
 from pathlib import Path
 
 # Path setup
 _THIS = Path(__file__).resolve()
-_REPO_ROOT = _THIS.parents[4]  # disha/services/cyber/tests -> disha/services/cyber -> disha/services -> disha -> root
+_REPO_ROOT = _THIS.parents[
+    4
+]  # disha/services/cyber/tests -> disha/services/cyber -> disha/services -> disha -> root
 _CYBER = _REPO_ROOT / "disha" / "services" / "cyber"
 
 # Add parent dirs to path for imports
@@ -37,7 +38,6 @@ class TestAttackClassifier(unittest.TestCase):
     def test_model_forward_pass(self):
         """Test forward pass produces correct output shape."""
         import torch
-
         from train import AttackClassifier
 
         model = AttackClassifier(input_dim=8, n_classes=5)
@@ -55,7 +55,6 @@ class TestAttackClassifier(unittest.TestCase):
     def test_anomaly_detector_forward(self):
         """Test anomaly detector produces same-shape output."""
         import torch
-
         from train import AnomalyDetector
 
         model = AnomalyDetector(input_dim=8, latent_dim=16)
@@ -118,7 +117,6 @@ class TestAttackClassifier(unittest.TestCase):
     def test_training_with_synthetic_data(self):
         """Test that training runs without errors on synthetic data."""
         import torch
-
         from train import AttackClassifier, _generate_synthetic_dataset
 
         dataset = _generate_synthetic_dataset(100)

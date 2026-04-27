@@ -5,7 +5,7 @@ from __future__ import annotations
 import enum
 import uuid
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
 
 
@@ -71,7 +71,7 @@ class Task:
     result: Any = None
     error: str | None = None
     created_at: str = field(
-        default_factory=lambda: datetime.now(timezone.utc).isoformat()
+        default_factory=lambda: datetime.now(UTC).isoformat()
     )
     completed_at: str | None = None
     metadata: dict[str, Any] = field(default_factory=dict)
@@ -79,12 +79,12 @@ class Task:
     def mark_completed(self, result: Any = None) -> None:
         self.status = TaskStatus.COMPLETED
         self.result = result
-        self.completed_at = datetime.now(timezone.utc).isoformat()
+        self.completed_at = datetime.now(UTC).isoformat()
 
     def mark_failed(self, error: str) -> None:
         self.status = TaskStatus.FAILED
         self.error = error
-        self.completed_at = datetime.now(timezone.utc).isoformat()
+        self.completed_at = datetime.now(UTC).isoformat()
 
 
 @dataclass
@@ -118,7 +118,7 @@ class MemoryEntry:
     value: Any = None
     tags: list[str] = field(default_factory=list)
     created_at: str = field(
-        default_factory=lambda: datetime.now(timezone.utc).isoformat()
+        default_factory=lambda: datetime.now(UTC).isoformat()
     )
     expires_at: str | None = None
     access_count: int = 0
@@ -136,7 +136,7 @@ class Plan:
     objective: str = ""
     tasks: list[Task] = field(default_factory=list)
     created_at: str = field(
-        default_factory=lambda: datetime.now(timezone.utc).isoformat()
+        default_factory=lambda: datetime.now(UTC).isoformat()
     )
     metadata: dict[str, Any] = field(default_factory=dict)
 

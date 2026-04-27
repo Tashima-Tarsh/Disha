@@ -1,14 +1,15 @@
 from __future__ import annotations
+
 import abc
 import hashlib
 import os
 import sys
-from typing import Dict, Optional, Type
+from typing import Any
 
 
 class BaseLLMProvider(abc.ABC):
     @abc.abstractmethod
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs: Any) -> None:
         pass
 
     @abc.abstractmethod
@@ -17,7 +18,7 @@ class BaseLLMProvider(abc.ABC):
 
 
 class MockProvider(BaseLLMProvider):
-    def __init__(self, seed: int = 42, **kwargs):
+    def __init__(self, seed: int = 42, **kwargs: Any) -> None:
         self.seed = seed
 
     def generate(self, prompt: str, max_tokens: int = 256) -> str:
@@ -30,7 +31,9 @@ class MockProvider(BaseLLMProvider):
 
 
 class LlamaCppProvider(BaseLLMProvider):
-    def __init__(self, model_path: Optional[str] = None, seed: int = 42, **kwargs):
+    def __init__(
+        self, model_path: str | None = None, seed: int = 42, **kwargs: Any
+    ) -> None:
         try:
             from llama_cpp import Llama
 
@@ -61,10 +64,10 @@ class LlamaCppProvider(BaseLLMProvider):
 class AnthropicProvider(BaseLLMProvider):
     def __init__(
         self,
-        api_key: Optional[str] = None,
+        api_key: str | None = None,
         model: str = "claude-3-5-sonnet-20241022",
-        **kwargs,
-    ):
+        **kwargs: Any,
+    ) -> None:
         try:
             from anthropic import Anthropic
 
@@ -95,14 +98,14 @@ class AnthropicProvider(BaseLLMProvider):
 
 
 class ModelRegistry:
-    _providers: Dict[str, Type[BaseLLMProvider]] = {}
+    _providers: dict[str, type[BaseLLMProvider]] = {}
 
     @classmethod
-    def register(cls, name: str, provider_class: Type[BaseLLMProvider]):
+    def register(cls, name: str, provider_class: type[BaseLLMProvider]) -> None:
         cls._providers[name.lower()] = provider_class
 
     @classmethod
-    def get_provider(cls, name: Optional[str] = None, **kwargs) -> BaseLLMProvider:
+    def get_provider(cls, name: str | None = None, **kwargs: Any) -> BaseLLMProvider:
         provider_name = (name or os.getenv("DISHA_MODEL_PROVIDER", "mock")).lower()
 
         if provider_name not in cls._providers:
@@ -111,7 +114,7 @@ class ModelRegistry:
         return cls._providers[provider_name](**kwargs)
 
     @classmethod
-    def get_provider_class(cls, name: str) -> Type[BaseLLMProvider]:
+    def get_provider_class(cls, name: str) -> type[BaseLLMProvider]:
         provider_name = name.lower()
         return cls._providers.get(provider_name, cls._providers["mock"])
 

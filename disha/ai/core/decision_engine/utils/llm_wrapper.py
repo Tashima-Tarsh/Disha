@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from typing import Optional
-
 from disha.ai.core.api.registry import ModelRegistry
 
 try:
@@ -22,9 +20,9 @@ LlamaCppLLM = ModelRegistry.get_provider_class("llama_cpp")
 
 
 def get_llm(
-    provider: Optional[str] = None,
-    model_path: Optional[str] = None,
-    seed: Optional[int] = None,
+    provider: str | None = None,
+    model_path: str | None = None,
+    seed: int | None = None,
     **kwargs,
 ):
     return ModelRegistry.get_provider(

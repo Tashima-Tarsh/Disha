@@ -8,10 +8,9 @@ Cyber Intelligence Dashboard — FastAPI service.
 
 import logging
 
+from alerts.alert_engine import alerts_data
 from fastapi import FastAPI
 from fastapi.responses import HTMLResponse, JSONResponse
-
-from alerts.alert_engine import alerts_data
 
 logger = logging.getLogger(__name__)
 

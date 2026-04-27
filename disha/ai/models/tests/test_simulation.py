@@ -3,7 +3,9 @@ from pathlib import Path
 
 # Path setup
 _THIS = Path(__file__).resolve()
-_REPO_ROOT = _THIS.parents[4]  # disha/ai/models/tests -> disha/ai/models -> disha/ai -> disha -> root
+_REPO_ROOT = _THIS.parents[
+    4
+]  # disha/ai/models/tests -> disha/ai/models -> disha/ai -> disha -> root
 _MODELS = _REPO_ROOT / "disha" / "ai" / "models"
 
 # Ensure repo root and models are in path
@@ -11,16 +13,19 @@ for p in [str(_REPO_ROOT), str(_MODELS)]:
     if p not in sys.path:
         sys.path.insert(0, p)
 
-from core.simulation_engine.simulator import Simulator, SimulationConfig  # noqa: E402
+import unittest  # noqa: E402
+
+import numpy as np  # noqa: E402
+from core.simulation_engine.simulator import SimulationConfig, Simulator  # noqa: E402
+from simulation.event_engine.events import Event, EventEngine, EventQueue  # noqa: E402
+from simulation.monte_carlo.monte_carlo import MonteCarloSimulation  # noqa: E402
+from simulation.scenarios.scenario import (
+    Entity as ScenarioEntity,
+)
 from simulation.scenarios.scenario import (  # noqa: E402
     ScenarioBuilder,
     ScheduledEvent,
-    Entity as ScenarioEntity,
 )
-from simulation.monte_carlo.monte_carlo import MonteCarloSimulation  # noqa: E402
-from simulation.event_engine.events import Event, EventQueue, EventEngine  # noqa: E402
-import unittest  # noqa: E402
-import numpy as np  # noqa: E402
 
 
 class TestSimulation(unittest.TestCase):

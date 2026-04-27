@@ -10,12 +10,13 @@ Demonstrates Monte Carlo simulation techniques:
 Shows convergence behaviour and confidence intervals.
 """
 
+import os
+import sys
+
+import numpy as np
 from simulation.monte_carlo.monte_carlo import (
     MonteCarloSimulation,
 )
-import numpy as np
-import sys
-import os
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))

@@ -17,8 +17,8 @@ class ReasoningAgent(BaseAgent):
     def _get_cognitive_engine(self):
         if self._cognitive_engine is None:
             # Import here to avoid circular dependencies and path issues at startup
-            import sys
             import os
+            import sys
 
             # Ensure the root 'disha' package is available
             root_path = os.path.abspath(

@@ -1,12 +1,14 @@
-import subprocess
 import datetime
+import subprocess
+
 import structlog
 
 logger = structlog.get_logger("changelog_generator")
 
+
 class ChangelogGenerator:
     """Automates the generation of elite, narrative-driven changelogs from Git history."""
-    
+
     def __init__(self, repo_path: str):
         self.repo_path = repo_path
 
@@ -24,7 +26,7 @@ class ChangelogGenerator:
 
         header = f"# DISHA OS: Intelligence Update - {datetime.date.today()}\n"
         header += "## System Evolution Summary\n"
-        
+
         # Categorization logic (Simple version)
         categories = {"feat": [], "fix": [], "chore": [], "docs": []}
         for line in commits.split("\n"):
@@ -43,14 +45,15 @@ class ChangelogGenerator:
                 report += f"\n### {cat.upper()}\n"
                 for item in items:
                     report += f"- {item}\n"
-                    
+
         return report
+
 
 if __name__ == "__main__":
     gen = ChangelogGenerator("c:/Users/lenovo/Downloads/Disha-main")
     report = gen.generate_elite_report()
-    
+
     with open("CHANGELOG_AGI.md", "w") as f:
         f.write(report)
-    
+
     logger.info("changelog_generated", path="CHANGELOG_AGI.md")

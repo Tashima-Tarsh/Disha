@@ -3,7 +3,9 @@ from pathlib import Path
 
 # Path setup
 _THIS = Path(__file__).resolve()
-_REPO_ROOT = _THIS.parents[4]  # disha/ai/models/tests -> disha/ai/models -> disha/ai -> disha -> root
+_REPO_ROOT = _THIS.parents[
+    4
+]  # disha/ai/models/tests -> disha/ai/models -> disha/ai -> disha -> root
 _MODELS = _REPO_ROOT / "disha" / "ai" / "models"
 
 # Ensure repo root and models are in path
@@ -11,13 +13,19 @@ for p in [str(_REPO_ROOT), str(_MODELS)]:
     if p not in sys.path:
         sys.path.insert(0, p)
 
-from world_model.world_manager.world import World  # noqa: E402
-from world_model.interactions.interaction import CollisionInteraction  # noqa: E402
-from world_model.environments.environment import Environment  # noqa: E402
-from world_model.entities.entity_registry import EntityRegistry  # noqa: E402
-from world_model.entities.entity import Entity, AgentEntity, ObjectEntity, EntityState  # noqa: E402
 import unittest  # noqa: E402
+
 import numpy as np  # noqa: E402
+from world_model.entities.entity import (  # noqa: E402
+    AgentEntity,
+    Entity,
+    EntityState,
+    ObjectEntity,
+)
+from world_model.entities.entity_registry import EntityRegistry  # noqa: E402
+from world_model.environments.environment import Environment  # noqa: E402
+from world_model.interactions.interaction import CollisionInteraction  # noqa: E402
+from world_model.world_manager.world import World  # noqa: E402
 
 
 class TestWorldModel(unittest.TestCase):

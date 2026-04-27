@@ -1,17 +1,17 @@
-from fastapi import APIRouter, Depends, Query
-from app.core.security import get_current_user
-from app.models.schemas import (
-    InvestigationRequest,
-    MultiInvestigationRequest,
-    GraphInsightRequest,
-    GraphInsightResponse,
-)
 from app.api.deps import (
-    get_orchestrator,
-    get_vector_store,
     get_alert_manager,
     get_knowledge_graph,
+    get_orchestrator,
+    get_vector_store,
 )
+from app.core.security import get_current_user
+from app.models.schemas import (
+    GraphInsightRequest,
+    GraphInsightResponse,
+    InvestigationRequest,
+    MultiInvestigationRequest,
+)
+from fastapi import APIRouter, Depends, Query
 
 router = APIRouter()
 

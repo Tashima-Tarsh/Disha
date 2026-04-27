@@ -6,7 +6,7 @@ Requires: pip install python-docx
 
 import logging
 import os
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 logger = logging.getLogger(__name__)
 
@@ -28,7 +28,7 @@ def generate_report(data: list, output_dir: str = ".") -> str:
         logger.error("python-docx is not installed. Run: pip install python-docx")
         raise
 
-    timestamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+    timestamp = datetime.now(UTC).strftime("%Y%m%dT%H%M%SZ")
     filename = f"cyber_intelligence_report_{timestamp}.docx"
     output_path = os.path.abspath(os.path.join(output_dir, filename))
 

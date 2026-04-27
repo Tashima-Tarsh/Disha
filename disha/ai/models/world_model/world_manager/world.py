@@ -11,7 +11,8 @@ It also provides an event/callback system and full serialisation support.
 from __future__ import annotations
 
 import logging
-from typing import Any, Callable, Dict, List, Optional
+from collections.abc import Callable
+from typing import Any
 
 import numpy as np
 
@@ -40,7 +41,7 @@ class World:
 
     def __init__(
         self,
-        environment: Optional[Environment] = None,
+        environment: Environment | None = None,
         grid_cell_size: float = 20.0,
     ) -> None:
         # Reset the singleton so each World gets a fresh registry
@@ -52,9 +53,9 @@ class World:
         self._step_count: int = 0
 
         # Callback lists
-        self._on_entity_added: List[Callable[[Entity], None]] = []
-        self._on_entity_removed: List[Callable[[Entity], None]] = []
-        self._on_collision: List[Callable[[Interaction], None]] = []
+        self._on_entity_added: list[Callable[[Entity], None]] = []
+        self._on_entity_removed: list[Callable[[Entity], None]] = []
+        self._on_collision: list[Callable[[Interaction], None]] = []
 
         logger.info("World initialised with environment '%s'", self.environment.name)
 
@@ -88,7 +89,7 @@ class World:
         logger.debug("Entity added to world: %s", entity.name)
         return entity
 
-    def remove_entity(self, entity_id: str) -> Optional[Entity]:
+    def remove_entity(self, entity_id: str) -> Entity | None:
         """Remove the entity with *entity_id* from the world."""
         entity = self.registry.unregister(entity_id)
         if entity is not None:
@@ -102,7 +103,7 @@ class World:
 
     # -- Simulation ---------------------------------------------------------
 
-    def step(self, dt: float) -> Dict[str, Any]:
+    def step(self, dt: float) -> dict[str, Any]:
         """Advance the simulation by *dt* seconds.
 
         The step proceeds in four phases:
@@ -117,7 +118,7 @@ class World:
         Returns a summary dict with step statistics.
         """
         # --- 1. Resolve interactions ---------------------------------------
-        entity_lookup: Dict[str, Entity] = {e.id: e for e in self.registry.get_all()}
+        entity_lookup: dict[str, Entity] = {e.id: e for e in self.registry.get_all()}
 
         def _collision_cb(interaction: Interaction) -> None:
             for cb in self._on_collision:
@@ -133,7 +134,7 @@ class World:
         )
 
         # --- 2. Agent behaviour + 3. Physics integration -------------------
-        destroyed_ids: List[str] = []
+        destroyed_ids: list[str] = []
         for entity in self.registry.get_all():
             if entity.state is EntityState.DESTROYED:
                 destroyed_ids.append(entity.id)
@@ -185,7 +186,7 @@ class World:
         """Number of active (not yet expired) interactions."""
         return self.resolver.active_count
 
-    def get_world_state(self) -> Dict[str, Any]:
+    def get_world_state(self) -> dict[str, Any]:
         """Return a high-level snapshot of the current world state."""
         return {
             "simulation_time": self.simulation_time,
@@ -209,9 +210,9 @@ class World:
 
     # -- Serialisation ------------------------------------------------------
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Serialise the complete world state to a plain dict."""
-        entities_data: List[Dict[str, Any]] = []
+        entities_data: list[dict[str, Any]] = []
         for entity in self.registry.get_all():
             entry = entity.get_state_dict()
             entry["_class"] = entity.__class__.__name__
@@ -229,7 +230,7 @@ class World:
         }
 
     @classmethod
-    def from_dict(cls, data: Dict[str, Any]) -> "World":
+    def from_dict(cls, data: dict[str, Any]) -> World:
         """Reconstruct a :class:`World` from a dict produced by
         :meth:`to_dict`.
 

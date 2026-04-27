@@ -11,7 +11,7 @@ def parse_prompts(prompts_dir):
     for file in os.listdir(prompts_dir):
         if file.endswith(".md"):
             path = os.path.join(prompts_dir, file)
-            with open(path, "r", encoding="utf-8") as f:
+            with open(path, encoding="utf-8") as f:
                 content = f.read()
 
             title_match = re.search(r"# (.*)", content)

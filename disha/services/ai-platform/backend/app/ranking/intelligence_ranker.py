@@ -1,8 +1,8 @@
 import math
 import time
-from dataclasses import dataclass, field
-from typing import Optional
 from collections import Counter
+from dataclasses import dataclass, field
+
 import structlog
 
 logger = structlog.get_logger(__name__)
@@ -78,7 +78,7 @@ class IntelligenceRanker:
     def __init__(self):
         self.entities: dict = {}
         self.agent_reliability: dict = {}
-        self.rankings_cache: Optional[list] = None
+        self.rankings_cache: list | None = None
         self._cache_time = 0.0
 
     def index_entity(
@@ -174,7 +174,7 @@ class IntelligenceRanker:
     def get_rankings(
         self,
         top_n: int = 50,
-        entity_type: Optional[str] = None,
+        entity_type: str | None = None,
         min_score: float = 0.0,
     ) -> list:
 

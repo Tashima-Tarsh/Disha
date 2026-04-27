@@ -1,11 +1,12 @@
 # Core
+import json
 import logging
 import os
-import json
+
+from gpt_api import GPT, GPT3Turbo_16K
 
 # Project
 from translation_service import TranslationService
-from gpt_api import GPT, GPT3Turbo_16K
 
 # =========================================================================== #
 

@@ -4,10 +4,10 @@
 import re
 import sys
 from functools import lru_cache
-from typing import List, Dict, Any, Optional
+from typing import Any
 
 # Import from local module
-from hookify.core.config_loader import Rule, Condition
+from hookify.core.config_loader import Condition, Rule
 
 
 # Cache compiled regexes (max 128 patterns)
@@ -33,8 +33,8 @@ class RuleEngine:
         pass
 
     def evaluate_rules(
-        self, rules: List[Rule], input_data: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, rules: list[Rule], input_data: dict[str, Any]
+    ) -> dict[str, Any]:
         """Evaluate all rules and return combined results.
 
         Checks all rules and accumulates matches. Blocking rules take priority
@@ -91,7 +91,7 @@ class RuleEngine:
         # No matches - allow operation
         return {}
 
-    def _rule_matches(self, rule: Rule, input_data: Dict[str, Any]) -> bool:
+    def _rule_matches(self, rule: Rule, input_data: dict[str, Any]) -> bool:
         """Check if rule matches input data.
 
         Args:
@@ -143,8 +143,8 @@ class RuleEngine:
         self,
         condition: Condition,
         tool_name: str,
-        tool_input: Dict[str, Any],
-        input_data: Dict[str, Any] = None,
+        tool_input: dict[str, Any],
+        input_data: dict[str, Any] = None,
     ) -> bool:
         """Check if a single condition matches.
 
@@ -188,9 +188,9 @@ class RuleEngine:
         self,
         field: str,
         tool_name: str,
-        tool_input: Dict[str, Any],
-        input_data: Dict[str, Any] = None,
-    ) -> Optional[str]:
+        tool_input: dict[str, Any],
+        input_data: dict[str, Any] = None,
+    ) -> str | None:
         """Extract field value from tool input or hook input data.
 
         Args:
@@ -219,7 +219,7 @@ class RuleEngine:
                 transcript_path = input_data.get("transcript_path")
                 if transcript_path:
                     try:
-                        with open(transcript_path, "r") as f:
+                        with open(transcript_path) as f:
                             return f.read()
                     except FileNotFoundError:
                         print(
@@ -233,7 +233,7 @@ class RuleEngine:
                             file=sys.stderr,
                         )
                         return ""
-                    except (IOError, OSError) as e:
+                    except OSError as e:
                         print(
                             f"Warning: Error reading transcript {transcript_path}: {e}",
                             file=sys.stderr,

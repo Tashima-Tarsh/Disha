@@ -1,9 +1,8 @@
 import base64
 import io
-from typing import Optional
-import structlog
-import httpx
 
+import httpx
+import structlog
 from app.agents.base_agent import BaseAgent
 from app.core.config import get_settings
 
@@ -17,14 +16,14 @@ class AudioAgent(BaseAgent):
             description="Analyzes audio content for threat intelligence using speech AI models",
         )
         self.settings = get_settings()
-        self._client: Optional[httpx.AsyncClient] = None
+        self._client: httpx.AsyncClient | None = None
 
     async def _get_client(self) -> httpx.AsyncClient:
         if self._client is None or self._client.is_closed:
             self._client = httpx.AsyncClient(timeout=120.0)
         return self._client
 
-    async def execute(self, target: str, context: Optional[dict] = None) -> dict:
+    async def execute(self, target: str, context: dict | None = None) -> dict:
         context = context or {}
         analysis_type = context.get("analysis_type", "transcribe")
 
@@ -77,7 +76,7 @@ class AudioAgent(BaseAgent):
             "risk_score": self._compute_audio_risk(results),
         }
 
-    async def _fetch_audio(self, url: str) -> Optional[str]:
+    async def _fetch_audio(self, url: str) -> str | None:
         try:
             client = await self._get_client()
             response = await client.get(url)
@@ -88,7 +87,7 @@ class AudioAgent(BaseAgent):
             return None
 
     async def _transcribe(
-        self, audio_base64: str, language: Optional[str] = None
+        self, audio_base64: str, language: str | None = None
     ) -> dict:
         try:
             client = await self._get_client()

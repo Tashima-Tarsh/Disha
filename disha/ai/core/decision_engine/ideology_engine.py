@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any, Dict
+from typing import Any
 
 from .utils.llm_wrapper import get_llm
 
@@ -9,7 +9,7 @@ class IdeologyAgent:
     def __init__(self, llm: Any | None = None) -> None:
         self.llm = llm or get_llm()
 
-    def analyze(self, scenario: str) -> Dict[str, Any]:
+    def analyze(self, scenario: str) -> dict[str, Any]:
         prompt = (
             "You are an ethics scholar familiar with Gandhian philosophy, "
             "Marxist theory, Utilitarian calculus, and Rawlsian justice. "

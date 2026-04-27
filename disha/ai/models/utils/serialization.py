@@ -13,7 +13,7 @@ import json
 import logging
 from dataclasses import asdict, is_dataclass
 from pathlib import Path
-from typing import Any, Dict, Union
+from typing import Any
 
 import numpy as np
 
@@ -57,7 +57,7 @@ def to_json(obj: Any, *, indent: int = 2) -> str:
     return json.dumps(obj, cls=_ExtendedEncoder, indent=indent)
 
 
-def from_json(json_str: str) -> Dict[str, Any]:
+def from_json(json_str: str) -> dict[str, Any]:
     """Deserialize a JSON string to a Python dictionary.
 
     Args:
@@ -72,7 +72,7 @@ def from_json(json_str: str) -> Dict[str, Any]:
     return json.loads(json_str)
 
 
-def save_state(state_dict: Dict[str, Any], filepath: Union[str, Path]) -> None:
+def save_state(state_dict: dict[str, Any], filepath: str | Path) -> None:
     """Persist *state_dict* to *filepath* as gzip-compressed JSON.
 
     Args:
@@ -91,7 +91,7 @@ def save_state(state_dict: Dict[str, Any], filepath: Union[str, Path]) -> None:
     )
 
 
-def load_state(filepath: Union[str, Path]) -> Dict[str, Any]:
+def load_state(filepath: str | Path) -> dict[str, Any]:
     """Load a state dictionary from a gzip-compressed JSON file.
 
     Args:

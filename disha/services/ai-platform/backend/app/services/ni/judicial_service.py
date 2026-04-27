@@ -1,4 +1,5 @@
-from typing import Any, Dict
+from typing import Any
+
 import structlog
 
 logger = structlog.get_logger(__name__)
@@ -29,7 +30,7 @@ class JudicialService:
             },
         }
 
-    async def get_district_governance_score(self, region: str) -> Dict[str, Any]:
+    async def get_district_governance_score(self, region: str) -> dict[str, Any]:
         metrics = self.district_metrics.get(
             region,
             {

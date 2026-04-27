@@ -17,7 +17,6 @@ from __future__ import annotations
 
 import logging
 import uuid
-from typing import Dict, List, Optional
 
 import numpy as np
 
@@ -48,11 +47,11 @@ class QuantumState:
 
     def __init__(
         self,
-        amplitudes: Optional[Dict[str, complex]] = None,
-        name: Optional[str] = None,
+        amplitudes: dict[str, complex] | None = None,
+        name: str | None = None,
     ) -> None:
         self.name: str = name or str(uuid.uuid4())[:8]
-        self._labels: List[str] = []
+        self._labels: list[str] = []
         self._amplitudes: np.ndarray = np.array([], dtype=np.complex128)
 
         if amplitudes:
@@ -140,7 +139,7 @@ class QuantumState:
     # ------------------------------------------------------------------
 
     @property
-    def labels(self) -> List[str]:
+    def labels(self) -> list[str]:
         """Ordered list of basis-state labels."""
         return list(self._labels)
 
@@ -154,7 +153,7 @@ class QuantumState:
         """Number of basis states."""
         return len(self._labels)
 
-    def probabilities(self) -> Dict[str, float]:
+    def probabilities(self) -> dict[str, float]:
         """Return the measurement probability for each basis state.
 
         Returns
@@ -165,7 +164,7 @@ class QuantumState:
         probs = np.abs(self._amplitudes) ** 2
         return dict(zip(self._labels, probs.tolist()))
 
-    def measure(self, rng: Optional[np.random.Generator] = None) -> str:
+    def measure(self, rng: np.random.Generator | None = None) -> str:
         """Perform a measurement, collapsing the state.
 
         A basis state is chosen at random according to the probability
@@ -256,7 +255,7 @@ class SuperpositionManager:
     """
 
     def __init__(self) -> None:
-        self._states: Dict[str, QuantumState] = {}
+        self._states: dict[str, QuantumState] = {}
         logger.info("SuperpositionManager initialised")
 
     def register(self, state: QuantumState) -> None:
@@ -281,11 +280,11 @@ class SuperpositionManager:
         return self._states[name]
 
     @property
-    def states(self) -> List[QuantumState]:
+    def states(self) -> list[QuantumState]:
         """All registered states."""
         return list(self._states.values())
 
-    def measure_all(self, rng: Optional[np.random.Generator] = None) -> Dict[str, str]:
+    def measure_all(self, rng: np.random.Generator | None = None) -> dict[str, str]:
         """Measure all registered states and return the results.
 
         Returns
@@ -294,7 +293,7 @@ class SuperpositionManager:
             ``{state_name: measured_label}``.
         """
         rng = rng or np.random.default_rng()
-        results: Dict[str, str] = {}
+        results: dict[str, str] = {}
         for name, qs in self._states.items():
             results[name] = qs.measure(rng=rng)
         return results

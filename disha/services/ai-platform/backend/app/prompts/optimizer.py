@@ -1,9 +1,9 @@
+import random
 import time
 import uuid
-import random
-from dataclasses import dataclass, field
-from typing import Optional
 from collections import defaultdict
+from dataclasses import dataclass, field
+
 import structlog
 
 logger = structlog.get_logger(__name__)
@@ -205,7 +205,7 @@ class PromptOptimizer:
 
     def _mutate(
         self, parent: PromptVariant, prompt_type: str
-    ) -> Optional[PromptVariant]:
+    ) -> PromptVariant | None:
         mutations = [
             ("Add specificity", "Be very specific and detailed in your analysis. "),
             (
@@ -242,7 +242,7 @@ class PromptOptimizer:
 
     def _crossover(
         self, parent1: PromptVariant, parent2: PromptVariant, prompt_type: str
-    ) -> Optional[PromptVariant]:
+    ) -> PromptVariant | None:
 
         sections1 = parent1.template.split("\n\n")
         sections2 = parent2.template.split("\n\n")

@@ -14,7 +14,7 @@ from __future__ import annotations
 
 import logging
 import math
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 
 import numpy as np
 
@@ -33,9 +33,9 @@ class EntityRegistry:
         speed up radius queries at the cost of memory.
     """
 
-    _instance: Optional["EntityRegistry"] = None
+    _instance: EntityRegistry | None = None
 
-    def __new__(cls, *args: Any, **kwargs: Any) -> "EntityRegistry":
+    def __new__(cls, *args: Any, **kwargs: Any) -> EntityRegistry:
         if cls._instance is None:
             cls._instance = super().__new__(cls)
             cls._instance._initialised = False
@@ -44,11 +44,11 @@ class EntityRegistry:
     def __init__(self, grid_cell_size: float = 20.0) -> None:
         if self._initialised:
             return
-        self._entities: Dict[str, Entity] = {}
-        self._type_index: Dict[str, Dict[str, Entity]] = {}
+        self._entities: dict[str, Entity] = {}
+        self._type_index: dict[str, dict[str, Entity]] = {}
         self._grid_cell_size: float = grid_cell_size
         # Spatial grid: cell_key -> set of entity ids
-        self._grid: Dict[Tuple[int, int, int], set] = {}
+        self._grid: dict[tuple[int, int, int], set] = {}
         self._initialised: bool = True
         logger.debug("EntityRegistry initialised (cell_size=%.1f)", grid_cell_size)
 
@@ -61,7 +61,7 @@ class EntityRegistry:
 
     # -- Grid helpers -------------------------------------------------------
 
-    def _cell_key(self, position: np.ndarray) -> Tuple[int, int, int]:
+    def _cell_key(self, position: np.ndarray) -> tuple[int, int, int]:
         """Map a 3-D position to an integer grid cell key."""
         cs = self._grid_cell_size
         return (
@@ -115,7 +115,7 @@ class EntityRegistry:
         self._insert_into_grid(entity)
         logger.debug("Registered entity %s (%s)", entity.name, entity.id)
 
-    def unregister(self, entity_id: str) -> Optional[Entity]:
+    def unregister(self, entity_id: str) -> Entity | None:
         """Remove the entity with *entity_id* and return it, or ``None``."""
         entity = self._entities.pop(entity_id, None)
         if entity is None:
@@ -130,22 +130,22 @@ class EntityRegistry:
         logger.debug("Unregistered entity %s (%s)", entity.name, entity.id)
         return entity
 
-    def get(self, entity_id: str) -> Optional[Entity]:
+    def get(self, entity_id: str) -> Entity | None:
         """Return the entity with *entity_id*, or ``None``."""
         return self._entities.get(entity_id)
 
-    def get_by_type(self, entity_type: str) -> List[Entity]:
+    def get_by_type(self, entity_type: str) -> list[Entity]:
         """Return all entities whose *entity_type* matches."""
         bucket = self._type_index.get(entity_type)
         if bucket is None:
             return []
         return list(bucket.values())
 
-    def get_all(self) -> List[Entity]:
+    def get_all(self) -> list[Entity]:
         """Return every registered entity."""
         return list(self._entities.values())
 
-    def get_in_radius(self, position: np.ndarray, radius: float) -> List[Entity]:
+    def get_in_radius(self, position: np.ndarray, radius: float) -> list[Entity]:
         """Return entities within *radius* of *position* (grid-accelerated).
 
         The method inspects only the grid cells that could possibly overlap
@@ -167,7 +167,7 @@ class EntityRegistry:
             int(math.floor((position[2] + radius) / cs)),
         )
 
-        results: List[Entity] = []
+        results: list[Entity] = []
         for cx in range(min_cell[0], max_cell[0] + 1):
             for cy in range(min_cell[1], max_cell[1] + 1):
                 for cz in range(min_cell[2], max_cell[2] + 1):

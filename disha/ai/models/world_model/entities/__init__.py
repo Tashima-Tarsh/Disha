@@ -5,7 +5,7 @@ Provides the core entity types and the spatial entity registry used to
 track every object that exists inside the simulated world.
 """
 
-from .entity import Entity, AgentEntity, ObjectEntity, EntityState
+from .entity import AgentEntity, Entity, EntityState, ObjectEntity
 from .entity_registry import EntityRegistry
 
 __all__ = [

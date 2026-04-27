@@ -7,8 +7,9 @@ evaluates with cross-validation, and saves models and metrics.
 import json
 import logging
 import sys
-import numpy as np
 from pathlib import Path
+
+import numpy as np
 
 # Configure logging so messages are visible when running as a script
 logging.basicConfig(
@@ -19,14 +20,14 @@ logging.basicConfig(
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from sklearn.model_selection import cross_val_score, StratifiedKFold  # noqa: E402
+import joblib  # noqa: E402
 from sklearn.metrics import (  # noqa: E402
+    accuracy_score,
     classification_report,
     confusion_matrix,
-    accuracy_score,
 )
+from sklearn.model_selection import StratifiedKFold, cross_val_score  # noqa: E402
 from sklearn.neural_network import MLPClassifier  # noqa: E402
-import joblib  # noqa: E402
 
 from model.classifier import StrategyClassifier  # noqa: E402
 

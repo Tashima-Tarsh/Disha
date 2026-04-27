@@ -10,6 +10,7 @@ if "cognitive_engine" not in sys.modules:
         str(_pkg_dir / "__init__.py"),
         submodule_search_locations=[str(_pkg_dir)],
     )
-    mod = importlib.util.module_from_spec(spec)
-    sys.modules["cognitive_engine"] = mod
-    spec.loader.exec_module(mod)
+    if spec and spec.loader:
+        mod = importlib.util.module_from_spec(spec)
+        sys.modules["cognitive_engine"] = mod
+        spec.loader.exec_module(mod)

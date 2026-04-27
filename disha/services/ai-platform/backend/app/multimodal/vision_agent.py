@@ -1,8 +1,7 @@
 import base64
-from typing import Optional
-import structlog
-import httpx
 
+import httpx
+import structlog
 from app.agents.base_agent import BaseAgent
 from app.core.config import get_settings
 
@@ -16,14 +15,14 @@ class VisionAgent(BaseAgent):
             description="Analyzes images for threat intelligence using multimodal AI models",
         )
         self.settings = get_settings()
-        self._client: Optional[httpx.AsyncClient] = None
+        self._client: httpx.AsyncClient | None = None
 
     async def _get_client(self) -> httpx.AsyncClient:
         if self._client is None or self._client.is_closed:
             self._client = httpx.AsyncClient(timeout=60.0)
         return self._client
 
-    async def execute(self, target: str, context: Optional[dict] = None) -> dict:
+    async def execute(self, target: str, context: dict | None = None) -> dict:
         context = context or {}
         analysis_type = context.get("analysis_type", "classify")
 
@@ -62,7 +61,7 @@ class VisionAgent(BaseAgent):
             "risk_score": risk_score,
         }
 
-    async def _fetch_image(self, url: str) -> Optional[str]:
+    async def _fetch_image(self, url: str) -> str | None:
         try:
             client = await self._get_client()
             response = await client.get(url)
@@ -149,10 +148,11 @@ class VisionAgent(BaseAgent):
                 "analysis_type": analysis_type,
             }
 
-    async def _compute_visual_embedding(self, image_base64: str) -> Optional[list]:
+    async def _compute_visual_embedding(self, image_base64: str) -> list | None:
         try:
             image_bytes = base64.b64decode(image_base64)
             import hashlib
+
             import numpy as np
 
             hash_bytes = hashlib.sha512(image_bytes).digest()

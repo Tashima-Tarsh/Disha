@@ -1,7 +1,7 @@
-import numpy as np
 from dataclasses import dataclass, field
-from typing import Optional
 from enum import IntEnum
+
+import numpy as np
 
 
 class ActionType(IntEnum):
@@ -67,7 +67,7 @@ class InvestigationEnvironment:
         self._total_reward = 0.0
         return self.state.to_vector()
 
-    def step(self, action: int, outcome: Optional[dict] = None) -> tuple:
+    def step(self, action: int, outcome: dict | None = None) -> tuple:
         reward = 0.0
         info = {"action": ActionType(action).name}
 

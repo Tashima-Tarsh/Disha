@@ -1,7 +1,8 @@
-import torch
+from typing import Any
+
 import numpy as np
-from typing import Dict, List, Tuple, Any
 import structlog
+import torch
 
 logger = structlog.get_logger(__name__)
 
@@ -19,7 +20,7 @@ class MDEngine:
         sigma: float = 1.0,
         cutoff: float = 3.0,
         external_stress: torch.Tensor = None,
-    ) -> Tuple[torch.Tensor, torch.Tensor]:
+    ) -> tuple[torch.Tensor, torch.Tensor]:
         n_atoms = pos.shape[0]
 
         diff = pos.unsqueeze(1) - pos.unsqueeze(0)
@@ -63,9 +64,9 @@ class MDEngine:
         dt: float = 0.005,
         target_temp: float = 1.0,
         langevin_gamma: float = 0.1,
-        material_params: Dict[str, Any] = None,
-        external_stress: List[float] | None = None,
-    ) -> Dict[str, Any]:
+        material_params: dict[str, Any] = None,
+        external_stress: list[float] | None = None,
+    ) -> dict[str, Any]:
         params = material_params or {"epsilon": 1.0, "sigma": 1.0, "mass": 1.0}
         epsilon = params.get("epsilon", 1.0)
         sigma = params.get("sigma", 1.0)

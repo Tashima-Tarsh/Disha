@@ -1,10 +1,11 @@
-from typing import Any, Dict, List
+from typing import Any
+
 import structlog
 from app.agents.base_agent import BaseAgent
-from app.services.ni.infrastructure_service import InfrastructureService
-from app.services.ni.judicial_service import JudicialService
 from app.services.ni.disaster_service import DisasterService
 from app.services.ni.global_intelligence_service import GlobalIntelligenceService
+from app.services.ni.infrastructure_service import InfrastructureService
+from app.services.ni.judicial_service import JudicialService
 
 logger = structlog.get_logger(__name__)
 
@@ -89,7 +90,7 @@ class GrowthAgent(BaseAgent):
             return "STRATEGIC INVESTMENT - TIER 2"
         return "MAINTENANCE & MONITORING - TIER 3"
 
-    def _get_growth_entities(self, priorities: List[Dict]) -> List[Dict]:
+    def _get_growth_entities(self, priorities: list[dict]) -> list[dict]:
         entities = []
         for p in priorities:
             entities.append(

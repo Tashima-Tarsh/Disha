@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import logging
 import uuid
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -27,7 +27,7 @@ except ImportError:  # pragma: no cover
         """Minimal stub when FastAPI is not installed."""
 
         def __init__(self, **kwargs: Any) -> None:
-            self._routes: List[Dict[str, Any]] = []
+            self._routes: list[dict[str, Any]] = []
 
         def get(self, path: str, **kwargs: Any):  # type: ignore[override]
             def _decorator(func):  # type: ignore[no-untyped-def]
@@ -69,10 +69,10 @@ class EntityCreate(BaseModel):  # type: ignore[misc]
 
     name: str = Field(default="entity")
     entity_type: str = Field(default="generic")
-    position: List[float] = Field(default=[0.0, 0.0, 0.0])
-    velocity: List[float] = Field(default=[0.0, 0.0, 0.0])
+    position: list[float] = Field(default=[0.0, 0.0, 0.0])
+    velocity: list[float] = Field(default=[0.0, 0.0, 0.0])
     mass: float = Field(default=1.0)
-    properties: Dict[str, Any] = Field(default={})
+    properties: dict[str, Any] = Field(default={})
 
 
 class SimulationRunRequest(BaseModel):  # type: ignore[misc]
@@ -80,7 +80,7 @@ class SimulationRunRequest(BaseModel):  # type: ignore[misc]
 
     dt: float = Field(default=0.01)
     max_steps: int = Field(default=1000)
-    seed: Optional[int] = Field(default=None)
+    seed: int | None = Field(default=None)
 
 
 class HypothesisRequest(BaseModel):  # type: ignore[misc]
@@ -88,7 +88,7 @@ class HypothesisRequest(BaseModel):  # type: ignore[misc]
 
     description: str = Field(default="")
     confidence: float = Field(default=0.5)
-    evidence: List[str] = Field(default=[])
+    evidence: list[str] = Field(default=[])
 
 
 class CollapseRequest(BaseModel):  # type: ignore[misc]
@@ -100,17 +100,17 @@ class CollapseRequest(BaseModel):  # type: ignore[misc]
 class PipelineRunRequest(BaseModel):  # type: ignore[misc]
     """Payload for executing the AI pipeline."""
 
-    stages: List[str] = Field(default=["all"])
-    parameters: Dict[str, Any] = Field(default={})
+    stages: list[str] = Field(default=["all"])
+    parameters: dict[str, Any] = Field(default={})
 
 
 # ---------------------------------------------------------------------------
 # In-memory stores (replaced by real backends in production)
 # ---------------------------------------------------------------------------
-_simulation_results: Dict[str, Dict[str, Any]] = {}
-_entities: List[Dict[str, Any]] = []
-_hypotheses: List[Dict[str, Any]] = []
-_tracks: List[Dict[str, Any]] = []
+_simulation_results: dict[str, dict[str, Any]] = {}
+_entities: list[dict[str, Any]] = []
+_hypotheses: list[dict[str, Any]] = []
+_tracks: list[dict[str, Any]] = []
 
 # ---------------------------------------------------------------------------
 # Router
@@ -119,7 +119,7 @@ router = APIRouter(prefix="/api/v1", tags=["disha"])
 
 
 @router.get("/system/status", summary="System status")
-async def system_status() -> Dict[str, Any]:
+async def system_status() -> dict[str, Any]:
     """Return high-level system health information."""
     return {
         "status": "ok",
@@ -131,7 +131,7 @@ async def system_status() -> Dict[str, Any]:
 
 
 @router.get("/world/state", summary="Current world state")
-async def world_state() -> Dict[str, Any]:
+async def world_state() -> dict[str, Any]:
     """Return the full current world state including all entities."""
     return {
         "entity_count": len(_entities),
@@ -140,10 +140,10 @@ async def world_state() -> Dict[str, Any]:
 
 
 @router.post("/world/entity", summary="Add entity")
-async def add_entity(entity: EntityCreate) -> Dict[str, Any]:
+async def add_entity(entity: EntityCreate) -> dict[str, Any]:
     """Add a new entity to the world."""
     try:
-        entry: Dict[str, Any] = {
+        entry: dict[str, Any] = {
             "id": str(uuid.uuid4()),
             "name": entity.name,
             "entity_type": entity.entity_type,
@@ -161,7 +161,7 @@ async def add_entity(entity: EntityCreate) -> Dict[str, Any]:
 
 
 @router.post("/simulation/run", summary="Run simulation")
-async def run_simulation(req: SimulationRunRequest) -> Dict[str, Any]:
+async def run_simulation(req: SimulationRunRequest) -> dict[str, Any]:
     """Launch a simulation run with the provided configuration."""
     try:
         run_id = str(uuid.uuid4())
@@ -182,7 +182,7 @@ async def run_simulation(req: SimulationRunRequest) -> Dict[str, Any]:
 
 
 @router.get("/simulation/results/{run_id}", summary="Get simulation results")
-async def get_simulation_results(run_id: str) -> Dict[str, Any]:
+async def get_simulation_results(run_id: str) -> dict[str, Any]:
     """Retrieve results for a previous simulation run."""
     result = _simulation_results.get(run_id)
     if result is None:
@@ -191,7 +191,7 @@ async def get_simulation_results(run_id: str) -> Dict[str, Any]:
 
 
 @router.post("/reasoning/hypothesis", summary="Add hypothesis")
-async def add_hypothesis(req: HypothesisRequest) -> Dict[str, Any]:
+async def add_hypothesis(req: HypothesisRequest) -> dict[str, Any]:
     """Register a new reasoning hypothesis."""
     try:
         entry = {
@@ -209,7 +209,7 @@ async def add_hypothesis(req: HypothesisRequest) -> Dict[str, Any]:
 
 
 @router.post("/reasoning/collapse", summary="Collapse to decision")
-async def collapse_hypotheses(req: CollapseRequest) -> Dict[str, Any]:
+async def collapse_hypotheses(req: CollapseRequest) -> dict[str, Any]:
     """Collapse current hypotheses to a single decision."""
     if not _hypotheses:
         raise HTTPException(status_code=400, detail="No hypotheses to collapse")
@@ -233,13 +233,13 @@ async def collapse_hypotheses(req: CollapseRequest) -> Dict[str, Any]:
 
 
 @router.get("/geospatial/tracks", summary="List active tracks")
-async def list_tracks() -> Dict[str, Any]:
+async def list_tracks() -> dict[str, Any]:
     """Return all currently active geospatial tracks."""
     return {"tracks": _tracks, "count": len(_tracks)}
 
 
 @router.post("/pipeline/run", summary="Run AI pipeline")
-async def run_pipeline(req: PipelineRunRequest) -> Dict[str, Any]:
+async def run_pipeline(req: PipelineRunRequest) -> dict[str, Any]:
     """Execute the full AI reasoning/simulation pipeline."""
     try:
         pipeline_id = str(uuid.uuid4())

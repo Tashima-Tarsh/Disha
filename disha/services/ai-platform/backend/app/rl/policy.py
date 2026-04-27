@@ -1,5 +1,5 @@
+
 import numpy as np
-from typing import Optional
 import structlog
 
 logger = structlog.get_logger(__name__)
@@ -69,7 +69,7 @@ class PolicyNetwork:
     def select_action(
         self,
         state: np.ndarray,
-        valid_actions: Optional[list] = None,
+        valid_actions: list | None = None,
     ) -> tuple:
         if not TORCH_AVAILABLE or self.actor is None:
             return self._heuristic_action(state, valid_actions)
@@ -99,7 +99,7 @@ class PolicyNetwork:
     def _heuristic_action(
         self,
         state: np.ndarray,
-        valid_actions: Optional[list] = None,
+        valid_actions: list | None = None,
     ) -> tuple:
         agents_used = state[5:10] if len(state) >= 12 else [0] * 5
         _ = int(state[10] * 20) if len(state) >= 12 else 0

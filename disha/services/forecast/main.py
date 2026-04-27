@@ -1,16 +1,16 @@
-from fastapi import FastAPI
-from pydantic import BaseModel
-from typing import Optional, List
 import datetime
 import random
+
+from fastapi import FastAPI
+from pydantic import BaseModel
 
 app = FastAPI(title="DISHA Forecast Service", version="6.0.0")
 
 
 class ForecastRequest(BaseModel):
     region: str
-    target_date: Optional[str] = None
-    indicators: List[str] = ["weather", "crime", "traffic"]
+    target_date: str | None = None
+    indicators: list[str] = ["weather", "crime", "traffic"]
 
 
 @app.get("/")

@@ -3,7 +3,6 @@ import os
 import sys
 
 import torch
-
 from train import (
     LABEL_NAMES,
     AnomalyDetector,

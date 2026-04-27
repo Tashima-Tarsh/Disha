@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import os
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from .utils.llm_wrapper import get_llm
 from .utils.simple_retriever import SimpleRetriever
@@ -46,26 +46,26 @@ def _make_retriever(
 class LegalAgent:
     def __init__(
         self,
-        clause_index: Optional[str] = None,
-        clause_meta: Optional[str] = None,
-        case_index: Optional[str] = None,
-        case_meta: Optional[str] = None,
-        llm: Optional[Any] = None,
+        clause_index: str | None = None,
+        clause_meta: str | None = None,
+        case_index: str | None = None,
+        case_meta: str | None = None,
+        llm: Any | None = None,
     ) -> None:
         self.llm = llm or get_llm()
         self.clause_retriever = _make_retriever(
             clause_index or _DEFAULT_CLAUSE_INDEX,
             clause_meta or _DEFAULT_CLAUSE_META,
         )
-        self.case_retriever: Optional[Any] = None
+        self.case_retriever: Any | None = None
         ci = case_index or _DEFAULT_CASE_INDEX
         cm = case_meta or _DEFAULT_CASE_META
         if os.path.exists(cm):
             self.case_retriever = _make_retriever(ci, cm)
 
-    def analyze(self, scenario: str, top_k: int = 5) -> Dict[str, Any]:
+    def analyze(self, scenario: str, top_k: int = 5) -> dict[str, Any]:
         clause_hits = self.clause_retriever.query(scenario, top_k=top_k)
-        case_hits: List[Dict] = []
+        case_hits: list[dict[str, Any]] = []
         if self.case_retriever is not None:
             case_hits = self.case_retriever.query(scenario, top_k=top_k)
 
@@ -87,7 +87,7 @@ class LegalAgent:
         )
         raw = self.llm.generate(prompt)
 
-        sources: List[Dict[str, Any]] = []
+        sources: list[dict[str, Any]] = []
         for h in clause_hits:
             sources.append(
                 {"type": "clause", "id": h.get("id"), "text": h.get("text", "")[:200]}

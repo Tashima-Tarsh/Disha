@@ -1,6 +1,6 @@
-from fastapi import APIRouter, HTTPException, status
 from app.core.security import create_access_token, hash_password, verify_password
 from app.models.schemas import AuthRequest, AuthResponse
+from fastapi import APIRouter, HTTPException, status
 
 router = APIRouter()
 

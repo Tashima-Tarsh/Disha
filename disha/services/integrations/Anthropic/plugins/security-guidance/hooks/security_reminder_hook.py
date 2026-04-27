@@ -152,7 +152,7 @@ def cleanup_old_state_files():
                     file_mtime = os.path.getmtime(file_path)
                     if file_mtime < thirty_days_ago:
                         os.remove(file_path)
-                except (OSError, IOError):
+                except OSError:
                     pass  # Ignore errors for individual file cleanup
     except Exception:
         pass  # Silently ignore cleanup errors
@@ -163,9 +163,9 @@ def load_state(session_id):
     state_file = get_state_file(session_id)
     if os.path.exists(state_file):
         try:
-            with open(state_file, "r") as f:
+            with open(state_file) as f:
                 return set(json.load(f))
-        except (json.JSONDecodeError, IOError):
+        except (OSError, json.JSONDecodeError):
             return set()
     return set()
 
@@ -177,7 +177,7 @@ def save_state(session_id, shown_warnings):
         os.makedirs(os.path.dirname(state_file), exist_ok=True)
         with open(state_file, "w") as f:
             json.dump(list(shown_warnings), f)
-    except IOError as e:
+    except OSError as e:
         debug_log(f"Failed to save state file: {e}")
         pass  # Fail silently if we can't save state
 

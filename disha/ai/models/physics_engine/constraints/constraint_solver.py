@@ -21,7 +21,7 @@ from __future__ import annotations
 
 import abc
 import logging
-from typing import Any, List, Protocol
+from typing import Any, Protocol
 
 import numpy as np
 
@@ -235,7 +235,7 @@ class ConstraintSolver:
         iterations: int = 10,
         tolerance: float = 1e-8,
     ) -> None:
-        self._constraints: List[Constraint] = []
+        self._constraints: list[Constraint] = []
         self.iterations: int = iterations
         self.tolerance: float = tolerance
         logger.info(
@@ -254,7 +254,7 @@ class ConstraintSolver:
         self._constraints.remove(constraint)
 
     @property
-    def constraints(self) -> List[Constraint]:
+    def constraints(self) -> list[Constraint]:
         """All registered constraints."""
         return list(self._constraints)
 

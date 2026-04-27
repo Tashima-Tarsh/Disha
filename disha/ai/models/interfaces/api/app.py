@@ -6,7 +6,7 @@ If :pypi:`fastapi` is not installed, :func:`create_app` returns ``None``.
 from __future__ import annotations
 
 import logging
-from typing import Any, Dict, Optional
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -20,7 +20,7 @@ except ImportError:  # pragma: no cover
     FastAPI = None  # type: ignore[assignment,misc]
 
 
-def create_app() -> Optional[Any]:
+def create_app() -> Any | None:
     """Create and configure a FastAPI application.
 
     Returns:
@@ -53,7 +53,7 @@ def create_app() -> Optional[Any]:
 
     # -- Health check ------------------------------------------------------ #
     @app.get("/health", tags=["health"])
-    async def health_check() -> Dict[str, str]:
+    async def health_check() -> dict[str, str]:
         """Simple liveness probe."""
         return {"status": "healthy"}
 

@@ -7,22 +7,20 @@ from __future__ import annotations
 import logging
 import sys
 from pathlib import Path
-from typing import List
 
 # Make engines importable when running from api/ directory
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from fastapi import FastAPI, HTTPException  # noqa: E402
-from fastapi.middleware.cors import CORSMiddleware  # noqa: E402
-from pydantic import BaseModel, ConfigDict  # noqa: E402
-
-from engines.quantum_engine import QuantumEngine  # noqa: E402
+from engines.grafify import Grafify  # noqa: E402
+from engines.gravity_engine import GravityEngine  # noqa: E402
 from engines.physics_classifier import PhysicsClassifier  # noqa: E402
+from engines.quantum_engine import QuantumEngine  # noqa: E402
 from engines.space_engine import SpaceEngine  # noqa: E402
 from engines.suppressed_physics import SuppressedPhysicsEngine  # noqa: E402
 from engines.unified_field import UnifiedFieldEngine  # noqa: E402
-from engines.gravity_engine import GravityEngine  # noqa: E402
-from engines.grafify import Grafify  # noqa: E402
+from fastapi import FastAPI, HTTPException  # noqa: E402
+from fastapi.middleware.cors import CORSMiddleware  # noqa: E402
+from pydantic import BaseModel, ConfigDict  # noqa: E402
 
 logger = logging.getLogger(__name__)
 
@@ -63,7 +61,7 @@ class ClassifyRequest(BaseModel):
 
 class SimulateRequest(BaseModel):
     model_config = ConfigDict(extra="ignore")
-    gates: List[dict] = []
+    gates: list[dict] = []
     num_qubits: int = 2
 
 
@@ -143,7 +141,7 @@ class LensingRequest(BaseModel):
 
 class NBodyRequest(BaseModel):
     model_config = ConfigDict(extra="ignore")
-    bodies: List[dict]
+    bodies: list[dict]
     dt: float = 3600.0
     steps: int = 100
 

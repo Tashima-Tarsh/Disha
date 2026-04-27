@@ -1,6 +1,7 @@
 """National Intelligence Agent - Master Coordinator for Project BHARAT."""
 
 from typing import Any
+
 import structlog
 from app.agents.base_agent import BaseAgent
 from app.core.config import get_settings

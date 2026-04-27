@@ -1,7 +1,8 @@
-from fastapi import FastAPI, Request
-import json
 import datetime
+import json
 import os
+
+from fastapi import FastAPI, Request
 
 app = FastAPI(title="DISHA Audit Log Service", version="6.0.0")
 
@@ -29,7 +30,7 @@ async def log_event(request: Request):
 async def get_logs(limit: int = 100):
     logs = []
     if os.path.exists(LOG_FILE):
-        with open(LOG_FILE, "r") as f:
+        with open(LOG_FILE) as f:
             lines = f.readlines()
             for line in lines[-limit:]:
                 logs.append(json.loads(line))

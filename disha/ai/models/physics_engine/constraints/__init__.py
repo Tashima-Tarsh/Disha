@@ -7,10 +7,10 @@ physical constraints on simulation objects.
 """
 
 from physics_engine.constraints.constraint_solver import (
-    Constraint,
-    DistanceConstraint,
     BoundaryConstraint,
+    Constraint,
     ConstraintSolver,
+    DistanceConstraint,
 )
 
 __all__ = [

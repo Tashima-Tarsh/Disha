@@ -1,7 +1,8 @@
 import asyncio
-import httpx
 import logging
 import os
+
+import httpx
 
 # Configure logging
 logging.basicConfig(

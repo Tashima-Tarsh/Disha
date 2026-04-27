@@ -14,9 +14,10 @@ from __future__ import annotations
 
 import logging
 import uuid
+from collections.abc import Callable
 from enum import Enum
 from time import time
-from typing import Any, Callable, Dict, List, Optional
+from typing import Any
 
 import numpy as np
 
@@ -62,9 +63,9 @@ class Entity:
         self,
         name: str,
         entity_type: str,
-        position: Optional[np.ndarray] = None,
-        velocity: Optional[np.ndarray] = None,
-        properties: Optional[Dict[str, Any]] = None,
+        position: np.ndarray | None = None,
+        velocity: np.ndarray | None = None,
+        properties: dict[str, Any] | None = None,
     ) -> None:
         self.id: str = str(uuid.uuid4())
         self.name: str = name
@@ -79,7 +80,7 @@ class Entity:
             if velocity is not None
             else np.zeros(3, dtype=np.float64)
         )
-        self.properties: Dict[str, Any] = properties if properties is not None else {}
+        self.properties: dict[str, Any] = properties if properties is not None else {}
         self.state: EntityState = EntityState.ACTIVE
         self.created_at: float = time()
 
@@ -103,7 +104,7 @@ class Entity:
         diff: np.ndarray = self.position - other.position
         return float(np.linalg.norm(diff))
 
-    def apply_action(self, action: Dict[str, Any]) -> None:
+    def apply_action(self, action: dict[str, Any]) -> None:
         """Apply a generic action dictionary to this entity.
 
         Recognised keys
@@ -133,7 +134,7 @@ class Entity:
 
     # -- Serialisation ------------------------------------------------------
 
-    def get_state_dict(self) -> Dict[str, Any]:
+    def get_state_dict(self) -> dict[str, Any]:
         """Return a JSON-serialisable snapshot of this entity."""
         return {
             "id": self.id,
@@ -179,13 +180,11 @@ class AgentEntity(Entity):
         self,
         name: str,
         goal: str = "",
-        behavior_fn: Optional[
-            Callable[["AgentEntity", float, List[Entity]], None]
-        ] = None,
+        behavior_fn: Callable[[AgentEntity, float, list[Entity]], None] | None = None,
         perception_radius: float = 10.0,
-        position: Optional[np.ndarray] = None,
-        velocity: Optional[np.ndarray] = None,
-        properties: Optional[Dict[str, Any]] = None,
+        position: np.ndarray | None = None,
+        velocity: np.ndarray | None = None,
+        properties: dict[str, Any] | None = None,
     ) -> None:
         super().__init__(
             name=name,
@@ -195,17 +194,15 @@ class AgentEntity(Entity):
             properties=properties,
         )
         self.goal: str = goal
-        self.behavior_fn: Optional[
-            Callable[["AgentEntity", float, List[Entity]], None]
-        ] = behavior_fn
+        self.behavior_fn: Callable[[AgentEntity, float, list[Entity]], None] | None = behavior_fn
         self.perception_radius: float = perception_radius
-        self.memory: List[Dict[str, Any]] = []
+        self.memory: list[dict[str, Any]] = []
 
-    def observe(self, observation: Dict[str, Any]) -> None:
+    def observe(self, observation: dict[str, Any]) -> None:
         """Record an observation into the agent's memory buffer."""
         self.memory.append(observation)
 
-    def update(self, dt: float, nearby_entities: Optional[List[Entity]] = None) -> None:  # type: ignore[override]
+    def update(self, dt: float, nearby_entities: list[Entity] | None = None) -> None:  # type: ignore[override]
         """Advance the agent, optionally running its behaviour function.
 
         Parameters
@@ -231,7 +228,7 @@ class AgentEntity(Entity):
         # Physics integration (base class)
         super().update(dt)
 
-    def get_state_dict(self) -> Dict[str, Any]:
+    def get_state_dict(self) -> dict[str, Any]:
         """Extend base snapshot with agent-specific fields."""
         state = super().get_state_dict()
         state.update(
@@ -279,9 +276,9 @@ class ObjectEntity(Entity):
         material: str = "default",
         is_static: bool = False,
         durability: float = 100.0,
-        position: Optional[np.ndarray] = None,
-        velocity: Optional[np.ndarray] = None,
-        properties: Optional[Dict[str, Any]] = None,
+        position: np.ndarray | None = None,
+        velocity: np.ndarray | None = None,
+        properties: dict[str, Any] | None = None,
     ) -> None:
         super().__init__(
             name=name,
@@ -310,7 +307,7 @@ class ObjectEntity(Entity):
             self.state = EntityState.DESTROYED
             logger.info("Object %s (%s) destroyed.", self.name, self.id)
 
-    def get_state_dict(self) -> Dict[str, Any]:
+    def get_state_dict(self) -> dict[str, Any]:
         """Extend base snapshot with object-specific fields."""
         state = super().get_state_dict()
         state.update(

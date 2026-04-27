@@ -5,7 +5,7 @@ for proper error handling and to avoid shell-injection risks.
 
 import logging
 import subprocess
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 logger = logging.getLogger(__name__)
 
@@ -20,7 +20,7 @@ def git_sync(repo_path: str = ".") -> bool:
     Returns:
         True if all operations succeeded, False otherwise.
     """
-    timestamp = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    timestamp = datetime.now(UTC).strftime("%Y-%m-%dT%H:%M:%SZ")
     commit_msg = f"chore: auto-update {timestamp}"
 
     commands = [

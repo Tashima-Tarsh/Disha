@@ -6,9 +6,9 @@ from typing import Any
 
 import structlog
 
-from disha.ai.core.memory.working import WorkingMemory
 from disha.ai.core.memory.episodic import EpisodicMemory
 from disha.ai.core.memory.semantic import SemanticMemory
+from disha.ai.core.memory.working import WorkingMemory
 
 log = structlog.get_logger(__name__)
 

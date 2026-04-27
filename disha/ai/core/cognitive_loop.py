@@ -7,12 +7,12 @@ from typing import Any
 
 import structlog
 
-from .memory.memory_manager import MemoryManager
 from .agents.deliberation import AgentDeliberator
+from .decision_engine.main_decision_engine import DecisionEngine
+from .intelligence.goal_engine import GoalEngine
 from .intelligence.hybrid_reasoner import HybridReasoner
 from .intelligence.quantum_decision import QuantumDecisionEngine
-from .intelligence.goal_engine import GoalEngine
-from .decision_engine.main_decision_engine import DecisionEngine
+from .memory.memory_manager import MemoryManager
 
 logger = structlog.get_logger("cognitive_loop")
 
@@ -28,21 +28,21 @@ class CognitiveState:
     context: dict[str, Any] = field(default_factory=dict)
     uncertainty: float = 0.5
 
-    working_memory: list[dict] = field(default_factory=list)
-    recalled_episodes: list[dict] = field(default_factory=list)
-    recalled_concepts: list[dict] = field(default_factory=list)
+    working_memory: list[dict[str, Any]] = field(default_factory=list)
+    recalled_episodes: list[dict[str, Any]] = field(default_factory=list)
+    recalled_concepts: list[dict[str, Any]] = field(default_factory=list)
 
-    hypotheses: list[dict] = field(default_factory=list)
-    selected_hypothesis: dict | None = None
+    hypotheses: list[dict[str, Any]] = field(default_factory=list)
+    selected_hypothesis: dict[str, Any] | None = None
 
-    agent_deliberations: list[dict] = field(default_factory=list)
-    consensus: dict | None = None
-    dissenting_view: dict | None = None
+    agent_deliberations: list[dict[str, Any]] = field(default_factory=list)
+    consensus: dict[str, Any] | None = None
+    dissenting_view: dict[str, Any] | None = None
 
-    action: dict | None = None
+    action: dict[str, Any] | None = None
     confidence: float = 0.0
 
-    reflection: dict | None = None
+    reflection: dict[str, Any] | None = None
     learning_triggers: list[str] = field(default_factory=list)
 
     consolidated_episodes: int = 0
@@ -51,7 +51,7 @@ class CognitiveState:
     stage_durations: dict[str, float] = field(default_factory=dict)
     timestamp: float = field(default_factory=time.time)
 
-    def to_dict(self) -> dict:
+    def to_dict(self) -> dict[str, Any]:
         return {k: v for k, v in self.__dict__.items()}
 
 
@@ -59,7 +59,7 @@ class CognitiveEngine:
     CONFIDENCE_THRESHOLD = 0.45
     WORKING_MEMORY_DECAY = 0.92
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.memory = MemoryManager()
         self.deliberator = AgentDeliberator()
         self.reasoner = HybridReasoner()
@@ -324,7 +324,7 @@ class CognitiveEngine:
                 )
                 state.new_concepts_learned += 1
 
-    def get_introspection_report(self, session_id: str) -> dict:
+    def get_introspection_report(self, session_id: str) -> dict[str, Any]:
         turns = self._traces.get(session_id, [])
         return {
             "session_id": session_id,

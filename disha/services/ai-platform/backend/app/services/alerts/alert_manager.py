@@ -1,11 +1,10 @@
 import uuid
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
 
 import structlog
-from fastapi import WebSocket
-
 from app.core.config import get_settings
+from fastapi import WebSocket
 
 logger = structlog.get_logger(__name__)
 
@@ -60,7 +59,7 @@ class AlertManager:
             "source": source,
             "entity_id": entity_id,
             "metadata": metadata or {},
-            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "timestamp": datetime.now(UTC).isoformat(),
         }
 
         self.alerts.append(alert)

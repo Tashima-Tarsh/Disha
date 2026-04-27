@@ -11,8 +11,9 @@ from __future__ import annotations
 import copy
 import heapq
 import logging
+from collections.abc import Callable
 from dataclasses import dataclass, field
-from typing import Any, Callable, Dict, List, Optional, Tuple
+from typing import Any
 
 import numpy as np
 
@@ -41,7 +42,7 @@ class SimulationConfig:
 
     max_steps: int = 1000
     dt: float = 0.01
-    seed: Optional[int] = None
+    seed: int | None = None
     logging_interval: int = 100
 
 
@@ -58,8 +59,8 @@ class SimulationState:
 
     time: float = 0.0
     step_count: int = 0
-    entities_state: Dict[str, Any] = field(default_factory=dict)
-    metrics: Dict[str, float] = field(default_factory=dict)
+    entities_state: dict[str, Any] = field(default_factory=dict)
+    metrics: dict[str, float] = field(default_factory=dict)
 
 
 # =========================================================================
@@ -91,14 +92,14 @@ class Simulator:
     def __init__(self) -> None:
         self._config: SimulationConfig = SimulationConfig()
         self._state: SimulationState = SimulationState()
-        self._systems: List[SystemFn] = []
+        self._systems: list[SystemFn] = []
         self._rng: np.random.Generator = np.random.default_rng(None)
 
         # Event queue – elements are (scheduled_time, sequence_no, callback)
-        self._events: List[Tuple[float, int, EventCallback]] = []
+        self._events: list[tuple[float, int, EventCallback]] = []
         self._event_seq: int = 0
 
-        self._history: List[Dict[str, Any]] = []
+        self._history: list[dict[str, Any]] = []
 
     # -- Configuration ------------------------------------------------------
 
@@ -180,7 +181,7 @@ class Simulator:
 
     def _record_snapshot(self) -> None:
         """Append a deep-copied snapshot to the history list."""
-        snapshot: Dict[str, Any] = {
+        snapshot: dict[str, Any] = {
             "time": self._state.time,
             "step": self._state.step_count,
             "entities_state": copy.deepcopy(self._state.entities_state),
@@ -190,7 +191,7 @@ class Simulator:
 
     # -- Run ----------------------------------------------------------------
 
-    def run(self, n_steps: Optional[int] = None) -> List[Dict[str, Any]]:
+    def run(self, n_steps: int | None = None) -> list[dict[str, Any]]:
         """Run the simulation for *n_steps* (or ``config.max_steps``).
 
         Args:
@@ -219,7 +220,7 @@ class Simulator:
 
     # -- Results ------------------------------------------------------------
 
-    def get_results(self) -> List[Dict[str, Any]]:
+    def get_results(self) -> list[dict[str, Any]]:
         """Return the full recorded history."""
         return list(self._history)
 
@@ -242,10 +243,10 @@ class BatchSimulator:
 
     def run_batch(
         self,
-        configs: List[SimulationConfig],
-        systems: Optional[List[SystemFn]] = None,
-        events: Optional[List[Tuple[float, EventCallback]]] = None,
-    ) -> List[List[Dict[str, Any]]]:
+        configs: list[SimulationConfig],
+        systems: list[SystemFn] | None = None,
+        events: list[tuple[float, EventCallback]] | None = None,
+    ) -> list[list[dict[str, Any]]]:
         """Run one simulation per config and return all result histories.
 
         Args:
@@ -258,7 +259,7 @@ class BatchSimulator:
         """
         systems = systems or []
         events = events or []
-        all_results: List[List[Dict[str, Any]]] = []
+        all_results: list[list[dict[str, Any]]] = []
 
         for idx, cfg in enumerate(configs):
             sim = Simulator()

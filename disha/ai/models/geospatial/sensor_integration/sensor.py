@@ -10,7 +10,6 @@ from __future__ import annotations
 import logging
 from dataclasses import dataclass, field
 from enum import Enum, auto
-from typing import Dict, List, Optional
 
 import numpy as np
 
@@ -45,7 +44,7 @@ class SensorReading:
     sensor_type: SensorType
     timestamp: float
     position: np.ndarray
-    raw_data: Dict[str, float] = field(default_factory=dict)
+    raw_data: dict[str, float] = field(default_factory=dict)
     confidence: float = 1.0
 
     def __post_init__(self) -> None:
@@ -77,8 +76,8 @@ class Sensor:
         position: np.ndarray,
         sensor_range: float = 10_000.0,
         accuracy: float = 5.0,
-        noise_model: Optional[object] = None,
-        seed: Optional[int] = None,
+        noise_model: object | None = None,
+        seed: int | None = None,
     ) -> None:
         self.id: str = sensor_id
         self.type: SensorType = sensor_type
@@ -114,7 +113,7 @@ class Sensor:
     def generate_reading(
         self,
         target_position: np.ndarray,
-        timestamp: Optional[float] = None,
+        timestamp: float | None = None,
     ) -> SensorReading:
         """Produce a noisy observation of a target.
 
@@ -178,10 +177,10 @@ class SensorFusion:
     """
 
     def __init__(self, process_noise: float = 1.0) -> None:
-        self._readings: List[SensorReading] = []
+        self._readings: list[SensorReading] = []
         # Kalman state (3-D position)
-        self._state: Optional[np.ndarray] = None
-        self._covariance: Optional[np.ndarray] = None
+        self._state: np.ndarray | None = None
+        self._covariance: np.ndarray | None = None
         self._process_noise: float = process_noise
         logger.info("SensorFusion initialised (process_noise=%f)", process_noise)
 
@@ -276,6 +275,6 @@ class SensorFusion:
         return len(self._readings)
 
     @property
-    def estimate(self) -> Optional[np.ndarray]:
+    def estimate(self) -> np.ndarray | None:
         """Current Kalman state estimate, or ``None`` if uninitialised."""
         return self._state.copy() if self._state is not None else None

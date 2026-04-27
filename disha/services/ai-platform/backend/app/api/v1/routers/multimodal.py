@@ -1,16 +1,16 @@
-from fastapi import APIRouter, Depends
-from app.core.security import get_current_user
-from app.models.schemas import (
-    VisionAnalysisRequest,
-    AudioAnalysisRequest,
-    MultimodalRequest,
-)
 from app.api.deps import (
-    get_vision_agent,
     get_audio_agent,
     get_multimodal_fusion,
     get_orchestrator,
+    get_vision_agent,
 )
+from app.core.security import get_current_user
+from app.models.schemas import (
+    AudioAnalysisRequest,
+    MultimodalRequest,
+    VisionAnalysisRequest,
+)
+from fastapi import APIRouter, Depends
 
 router = APIRouter()
 

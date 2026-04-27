@@ -6,7 +6,8 @@ Uses :pypi:`matplotlib` when available; falls back to ASCII-art rendering.
 from __future__ import annotations
 
 import logging
-from typing import Any, Dict, List, Optional, Sequence, Tuple
+from collections.abc import Sequence
+from typing import Any
 
 import numpy as np
 
@@ -41,8 +42,8 @@ class SimulationPlotter:
     """
 
     def __init__(self) -> None:
-        self._fig: Optional[Any] = None
-        self._ax: Optional[Any] = None
+        self._fig: Any | None = None
+        self._ax: Any | None = None
         self._fallback = TextVisualizer()
 
     def _ensure_mpl(self) -> bool:
@@ -156,7 +157,7 @@ class SimulationPlotter:
 
     def plot_world_state(
         self,
-        world: Dict[str, Any],
+        world: dict[str, Any],
         *,
         title: str = "World State",
     ) -> None:
@@ -226,8 +227,8 @@ class TextVisualizer:
 
     def render_grid(
         self,
-        entities: Sequence[Dict[str, Any]],
-        bounds: Tuple[float, float] = (100.0, 100.0),
+        entities: Sequence[dict[str, Any]],
+        bounds: tuple[float, float] = (100.0, 100.0),
         *,
         width: int = 60,
         height: int = 30,
@@ -264,7 +265,7 @@ class TextVisualizer:
 
     def render_bar_chart(
         self,
-        data: Dict[str, float],
+        data: dict[str, float],
         *,
         bar_char: str = "█",
         max_width: int = 50,
@@ -285,7 +286,7 @@ class TextVisualizer:
         max_val = max(abs(v) for v in data.values()) or 1
         max_label_len = max(len(str(k)) for k in data)
 
-        lines: List[str] = []
+        lines: list[str] = []
         for label, value in data.items():
             bar_len = int(abs(value) / max_val * max_width)
             bar = bar_char * bar_len

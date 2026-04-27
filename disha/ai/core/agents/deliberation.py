@@ -84,7 +84,7 @@ class AgentDeliberator:
     def __init__(self) -> None:
         log.info("agent_deliberator.initialized")
 
-    async def deliberate(self, state: "CognitiveState") -> dict[str, Any]:
+    async def deliberate(self, state: CognitiveState) -> dict[str, Any]:
         log.info(
             "agent_deliberator.deliberating",
             session_id=state.session_id,
@@ -109,7 +109,7 @@ class AgentDeliberator:
         )
         return result
 
-    async def _planner_agent(self, state: "CognitiveState") -> dict[str, Any]:
+    async def _planner_agent(self, state: CognitiveState) -> dict[str, Any]:
         intent = state.intent or "default"
         steps = _STRATEGIC_TEMPLATES.get(intent, _STRATEGIC_TEMPLATES["default"])
 
@@ -147,7 +147,7 @@ class AgentDeliberator:
             "timestamp": time.time(),
         }
 
-    async def _executor_agent(self, state: "CognitiveState") -> dict[str, Any]:
+    async def _executor_agent(self, state: CognitiveState) -> dict[str, Any]:
         intent = state.intent or "default"
         action_type = _EXECUTOR_ACTIONS.get(intent, _EXECUTOR_ACTIONS["default"])
 
@@ -190,7 +190,7 @@ class AgentDeliberator:
             "timestamp": time.time(),
         }
 
-    async def _critic_agent(self, state: "CognitiveState") -> dict[str, Any]:
+    async def _critic_agent(self, state: CognitiveState) -> dict[str, Any]:
         raw = state.raw_input or ""
 
         risk_flags: list[str] = []
@@ -281,7 +281,7 @@ class AgentDeliberator:
             executor_opinion = next(
                 (o for o in opinions if o.get("agent") == "executor"), None
             )
-            dissent = executor_opinion if executor_opinion else None
+            dissent_view = executor_opinion if executor_opinion else None
 
             total_weight = sum(o.get("confidence", 0.5) for o in opinions)
             consensus = total_weight / len(opinions)
@@ -290,7 +290,7 @@ class AgentDeliberator:
                 "winner": critic_opinion,
                 "all_opinions": opinions,
                 "consensus_confidence": round(consensus, 3),
-                "dissenting_view": dissent,
+                "dissenting_view": dissent_view,
                 "recommended_action": "request_clarification_or_abort",
                 "veto_active": True,
                 "timestamp": time.time(),

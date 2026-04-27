@@ -16,7 +16,8 @@ from __future__ import annotations
 
 import logging
 import uuid
-from typing import Any, Callable, Dict, List, Optional
+from collections.abc import Callable
+from typing import Any
 
 import numpy as np
 
@@ -72,7 +73,7 @@ class Interaction:
         """Advance the internal timer by *dt* seconds."""
         self._elapsed += dt
 
-    def resolve(self, entities: Dict[str, Any], dt: float = 0.0) -> None:
+    def resolve(self, entities: dict[str, Any], dt: float = 0.0) -> None:
         """Apply the interaction's effect.  Must be overridden by sub-classes.
 
         Parameters
@@ -85,7 +86,7 @@ class Interaction:
         """
         raise NotImplementedError
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         return {
             "id": self.id,
             "source_id": self.source_id,
@@ -134,7 +135,7 @@ class CollisionInteraction(Interaction):
         )
         self.restitution: float = max(0.0, min(1.0, restitution))
 
-    def resolve(self, entities: Dict[str, Any], dt: float = 0.0) -> None:
+    def resolve(self, entities: dict[str, Any], dt: float = 0.0) -> None:
         """Compute post-collision velocities using 1-D formulas projected
         along the collision normal, then apply them to both entities.
         """
@@ -205,7 +206,7 @@ class CommunicationInteraction(Interaction):
         self,
         source_id: str,
         target_id: str,
-        message: Optional[Dict[str, Any]] = None,
+        message: dict[str, Any] | None = None,
         strength: float = 1.0,
     ) -> None:
         super().__init__(
@@ -215,16 +216,16 @@ class CommunicationInteraction(Interaction):
             strength=strength,
             duration=0.0,
         )
-        self.message: Dict[str, Any] = message if message is not None else {}
+        self.message: dict[str, Any] = message if message is not None else {}
 
-    def resolve(self, entities: Dict[str, Any], dt: float = 0.0) -> None:
+    def resolve(self, entities: dict[str, Any], dt: float = 0.0) -> None:
         source = entities.get(self.source_id)
         target = entities.get(self.target_id)
         if target is None:
             logger.warning("Communication target %s not found.", self.target_id)
             return
 
-        observation: Dict[str, Any] = {
+        observation: dict[str, Any] = {
             "type": "communication",
             "from_id": self.source_id,
             "from_name": getattr(source, "name", "unknown") if source else "unknown",
@@ -283,7 +284,7 @@ class ForceInteraction(Interaction):
         self.force_magnitude: float = force_magnitude
         self.attractive: bool = attractive
 
-    def resolve(self, entities: Dict[str, Any], dt: float = 0.0) -> None:
+    def resolve(self, entities: dict[str, Any], dt: float = 0.0) -> None:
         source = entities.get(self.source_id)
         target = entities.get(self.target_id)
         if source is None or target is None:
@@ -332,7 +333,7 @@ class InteractionResolver:
     """
 
     def __init__(self) -> None:
-        self._active: List[Interaction] = []
+        self._active: list[Interaction] = []
         self._resolved_count: int = 0
 
     def add(self, interaction: Interaction) -> None:
@@ -341,9 +342,9 @@ class InteractionResolver:
 
     def resolve_all(
         self,
-        entities: Dict[str, Any],
+        entities: dict[str, Any],
         dt: float,
-        on_collision: Optional[Callable[[Interaction], None]] = None,
+        on_collision: Callable[[Interaction], None] | None = None,
     ) -> int:
         """Resolve every active interaction and return how many were processed.
 
@@ -362,7 +363,7 @@ class InteractionResolver:
             Number of interactions resolved this tick.
         """
         resolved_this_tick = 0
-        still_active: List[Interaction] = []
+        still_active: list[Interaction] = []
 
         for interaction in self._active:
             try:
@@ -400,7 +401,7 @@ class InteractionResolver:
     def total_resolved(self) -> int:
         return self._resolved_count
 
-    def get_active(self) -> List[Interaction]:
+    def get_active(self) -> list[Interaction]:
         """Return a shallow copy of the active interaction list."""
         return list(self._active)
 

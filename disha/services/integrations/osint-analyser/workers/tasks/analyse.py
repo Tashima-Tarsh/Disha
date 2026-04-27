@@ -1,16 +1,17 @@
 #!/usr/bin/env python3
 
 # Core
+import importlib
 import logging
 import os
-import importlib
+
+from analysis_service import AnalysisException, AnalysisService
 
 # Third-party
 from celery import Celery, shared_task
 
 # Project
 from database import Database, connect_db
-from analysis_service import AnalysisService, AnalysisException
 
 app = Celery("analyse", broker="amqp://localhost", backend="rpc://")
 

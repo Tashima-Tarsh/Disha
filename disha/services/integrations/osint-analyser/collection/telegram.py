@@ -1,17 +1,18 @@
 #!/usr/bin/env python3
 
 # Core
-import os
 import logging
+import os
 
-# Third-party
-from telethon import TelegramClient, events
-import telethon
 import requests
+import telethon
 from celery import Celery
 
 # Project
-from collector import Collector, CollectionException
+from collector import CollectionException, Collector
+
+# Third-party
+from telethon import TelegramClient, events
 
 app = Celery(broker="amqp://localhost", backend="rpc://")
 

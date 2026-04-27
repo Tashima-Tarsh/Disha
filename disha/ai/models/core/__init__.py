@@ -8,23 +8,23 @@ Provides the foundational components for the AI system:
 - agent_framework: Multi-agent system with perception, deliberation, and communication
 """
 
+from core.agent_framework.agent import (
+    AgentCommunicationBus,
+    AgentState,
+    MultiAgentSystem,
+    SimAgent,
+)
 from core.pipeline_engine.pipeline import Pipeline, PipelineStage
 from core.reasoning_engine.reasoning import (
-    ReasoningEngine,
     DecisionFramework,
     Hypothesis,
+    ReasoningEngine,
 )
 from core.simulation_engine.simulator import (
-    Simulator,
     BatchSimulator,
     SimulationConfig,
     SimulationState,
-)
-from core.agent_framework.agent import (
-    SimAgent,
-    MultiAgentSystem,
-    AgentCommunicationBus,
-    AgentState,
+    Simulator,
 )
 
 __all__ = [

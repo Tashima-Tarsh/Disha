@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import re
-from typing import List
 
 _CLAUSE_PATTERN = re.compile(
     r"^(?:"
@@ -17,10 +16,10 @@ _CLAUSE_PATTERN = re.compile(
 )
 
 
-def segment(text: str) -> List[str]:
+def segment(text: str) -> list[str]:
     lines = text.splitlines()
-    clauses: List[str] = []
-    current: List[str] = []
+    clauses: list[str] = []
+    current: list[str] = []
 
     for line in lines:
         stripped = line.strip()
@@ -42,7 +41,7 @@ def segment(text: str) -> List[str]:
 
 
 def segment_file(input_path: str, output_path: str) -> int:
-    with open(input_path, "r", encoding="utf-8") as fh:
+    with open(input_path, encoding="utf-8") as fh:
         text = fh.read()
 
     clauses = segment(text)

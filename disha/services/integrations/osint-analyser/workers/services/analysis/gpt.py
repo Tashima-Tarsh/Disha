@@ -1,12 +1,12 @@
 # Core
+import json
 import logging
 import os
-import json
 
 # Project
-from analysis_service import AnalysisService, AnalysisException
+from analysis_service import AnalysisException, AnalysisService
 from gpt_api import GPT, GPT3Turbo_16K
-from openai import APIConnectionError, RateLimitError, APIStatusError
+from openai import APIConnectionError, APIStatusError, RateLimitError
 
 # =========================================================================== #
 

@@ -17,7 +17,7 @@ from __future__ import annotations
 
 import logging
 import uuid
-from typing import Callable, Dict, List, Optional
+from collections.abc import Callable
 
 import numpy as np
 
@@ -55,9 +55,9 @@ class ChargedParticle:
         self,
         mass: float,
         charge: float,
-        position: Optional[np.ndarray] = None,
-        velocity: Optional[np.ndarray] = None,
-        name: Optional[str] = None,
+        position: np.ndarray | None = None,
+        velocity: np.ndarray | None = None,
+        name: str | None = None,
     ) -> None:
         if mass <= 0.0:
             raise ValueError(f"Mass must be positive, got {mass}")
@@ -130,10 +130,10 @@ class ElectromagneticEngine:
     def __init__(
         self,
         softening_length: float = 1e-12,
-        external_E_field: Optional[Callable[[np.ndarray], np.ndarray]] = None,
-        external_B_field: Optional[Callable[[np.ndarray], np.ndarray]] = None,
+        external_E_field: Callable[[np.ndarray], np.ndarray] | None = None,
+        external_B_field: Callable[[np.ndarray], np.ndarray] | None = None,
     ) -> None:
-        self._particles: Dict[str, ChargedParticle] = {}
+        self._particles: dict[str, ChargedParticle] = {}
         self.softening: float = softening_length
         self._external_E: Callable[[np.ndarray], np.ndarray] = (
             external_E_field
@@ -166,7 +166,7 @@ class ElectromagneticEngine:
         return p
 
     @property
-    def particles(self) -> List[ChargedParticle]:
+    def particles(self) -> list[ChargedParticle]:
         """List of all registered particles."""
         return list(self._particles.values())
 
@@ -327,7 +327,7 @@ class ElectromagneticEngine:
         self.time += dt
         logger.debug("EM engine stepped to t=%.6e s", self.time)
 
-    def get_state(self) -> Dict[str, Dict[str, object]]:
+    def get_state(self) -> dict[str, dict[str, object]]:
         """Return a snapshot of particle states."""
         return {
             name: {

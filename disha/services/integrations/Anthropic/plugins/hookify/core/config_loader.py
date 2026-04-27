@@ -4,11 +4,11 @@
 Loads and parses .claude/hookify.*.local.md files.
 """
 
+import glob
 import os
 import sys
-import glob
-from typing import List, Optional, Dict, Any
 from dataclasses import dataclass, field
+from typing import Any
 
 
 @dataclass
@@ -20,7 +20,7 @@ class Condition:
     pattern: str  # Pattern to match
 
     @classmethod
-    def from_dict(cls, data: Dict[str, Any]) -> "Condition":
+    def from_dict(cls, data: dict[str, Any]) -> "Condition":
         """Create Condition from dict."""
         return cls(
             field=data.get("field", ""),
@@ -36,14 +36,14 @@ class Rule:
     name: str
     enabled: bool
     event: str  # "bash", "file", "stop", "all", etc.
-    pattern: Optional[str] = None  # Simple pattern (legacy)
-    conditions: List[Condition] = field(default_factory=list)
+    pattern: str | None = None  # Simple pattern (legacy)
+    conditions: list[Condition] = field(default_factory=list)
     action: str = "warn"  # "warn" or "block" (future)
-    tool_matcher: Optional[str] = None  # Override tool matching
+    tool_matcher: str | None = None  # Override tool matching
     message: str = ""  # Message body from markdown
 
     @classmethod
-    def from_dict(cls, frontmatter: Dict[str, Any], message: str) -> "Rule":
+    def from_dict(cls, frontmatter: dict[str, Any], message: str) -> "Rule":
         """Create Rule from frontmatter dict and message body."""
         # Handle both simple pattern and complex conditions
         conditions = []
@@ -83,7 +83,7 @@ class Rule:
         )
 
 
-def extract_frontmatter(content: str) -> tuple[Dict[str, Any], str]:
+def extract_frontmatter(content: str) -> tuple[dict[str, Any], str]:
     """Extract YAML frontmatter and message body from markdown.
 
     Returns (frontmatter_dict, message_body).
@@ -194,7 +194,7 @@ def extract_frontmatter(content: str) -> tuple[Dict[str, Any], str]:
     return frontmatter, message
 
 
-def load_rules(event: Optional[str] = None) -> List[Rule]:
+def load_rules(event: str | None = None) -> list[Rule]:
     """Load all hookify rules from .claude directory.
 
     Args:
@@ -224,7 +224,7 @@ def load_rules(event: Optional[str] = None) -> List[Rule]:
             if rule.enabled:
                 rules.append(rule)
 
-        except (IOError, OSError, PermissionError) as e:
+        except (OSError, PermissionError) as e:
             # File I/O errors - log and continue
             print(f"Warning: Failed to read {file_path}: {e}", file=sys.stderr)
             continue
@@ -243,14 +243,14 @@ def load_rules(event: Optional[str] = None) -> List[Rule]:
     return rules
 
 
-def load_rule_file(file_path: str) -> Optional[Rule]:
+def load_rule_file(file_path: str) -> Rule | None:
     """Load a single rule file.
 
     Returns:
         Rule object or None if file is invalid.
     """
     try:
-        with open(file_path, "r") as f:
+        with open(file_path) as f:
             content = f.read()
 
         frontmatter, message = extract_frontmatter(content)
@@ -265,7 +265,7 @@ def load_rule_file(file_path: str) -> Optional[Rule]:
         rule = Rule.from_dict(frontmatter, message)
         return rule
 
-    except (IOError, OSError, PermissionError) as e:
+    except (OSError, PermissionError) as e:
         print(f"Error: Cannot read {file_path}: {e}", file=sys.stderr)
         return None
     except (ValueError, KeyError, AttributeError, TypeError) as e:

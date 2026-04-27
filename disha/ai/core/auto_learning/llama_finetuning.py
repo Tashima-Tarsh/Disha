@@ -5,7 +5,7 @@ import logging
 import time
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -52,7 +52,7 @@ class LoRAConfig:
     r: int = 16
     lora_alpha: int = 32
     lora_dropout: float = 0.05
-    target_modules: List[str] = field(
+    target_modules: list[str] = field(
         default_factory=lambda: ["q_proj", "v_proj", "k_proj", "o_proj"]
     )
     bias: str = "none"
@@ -95,7 +95,7 @@ class DatasetPreparer:
     REQUIRED_FIELDS = {"instruction", "output"}
 
     @staticmethod
-    def validate_sample(sample: Dict[str, Any]) -> bool:
+    def validate_sample(sample: dict[str, Any]) -> bool:
         if not isinstance(sample, dict):
             return False
         if not all(k in sample for k in DatasetPreparer.REQUIRED_FIELDS):
@@ -107,11 +107,11 @@ class DatasetPreparer:
         return True
 
     @staticmethod
-    def load_jsonl(path: str) -> List[Dict[str, Any]]:
-        samples: List[Dict[str, Any]] = []
+    def load_jsonl(path: str) -> list[dict[str, Any]]:
+        samples: list[dict[str, Any]] = []
         invalid_count = 0
 
-        with open(path, "r", encoding="utf-8") as fh:
+        with open(path, encoding="utf-8") as fh:
             for line_num, line in enumerate(fh, 1):
                 line = line.strip()
                 if not line:
@@ -138,7 +138,7 @@ class DatasetPreparer:
 
     @staticmethod
     def format_prompt(
-        sample: Dict[str, Any], template: str = DatasetConfig().prompt_template
+        sample: dict[str, Any], template: str = DatasetConfig().prompt_template
     ) -> str:
         return template.format(
             instruction=sample.get("instruction", ""),
@@ -149,8 +149,8 @@ class DatasetPreparer:
     @staticmethod
     def prepare_dataset(
         config: DatasetConfig,
-    ) -> Dict[str, List[Dict[str, str]]]:
-        result: Dict[str, List[Dict[str, str]]] = {"train": [], "eval": []}
+    ) -> dict[str, list[dict[str, str]]]:
+        result: dict[str, list[dict[str, str]]] = {"train": [], "eval": []}
 
         if config.train_file:
             raw = DatasetPreparer.load_jsonl(config.train_file)
@@ -180,8 +180,8 @@ class LLaMAFineTuner:
     def __init__(
         self,
         model_name_or_path: str = "meta-llama/Llama-2-7b-hf",
-        lora_config: Optional[LoRAConfig] = None,
-        training_config: Optional[TrainingConfig] = None,
+        lora_config: LoRAConfig | None = None,
+        training_config: TrainingConfig | None = None,
     ) -> None:
         self.model_name_or_path = model_name_or_path
         self.lora_config = lora_config or LoRAConfig()
@@ -190,7 +190,7 @@ class LLaMAFineTuner:
         self._tokenizer = None
         self._trainer = None
 
-    def check_environment(self) -> Dict[str, Any]:
+    def check_environment(self) -> dict[str, Any]:
         gpu_available = _TORCH_AVAILABLE and torch.cuda.is_available()
         return {
             "torch": _TORCH_AVAILABLE,
@@ -202,7 +202,7 @@ class LLaMAFineTuner:
             "ready": finetuning_deps_available(),
         }
 
-    def setup_model(self) -> Dict[str, Any]:
+    def setup_model(self) -> dict[str, Any]:
         if not finetuning_deps_available():
             return {
                 "status": "skipped",
@@ -224,7 +224,7 @@ class LLaMAFineTuner:
                 bnb_4bit_use_double_quant=True,
             )
 
-        model_kwargs: Dict[str, Any] = {
+        model_kwargs: dict[str, Any] = {
             "pretrained_model_name_or_path": self.model_name_or_path,
             "torch_dtype": torch.bfloat16,
             "trust_remote_code": False,
@@ -272,21 +272,20 @@ class LLaMAFineTuner:
             "qlora": self.lora_config.use_qlora,
         }
 
-    def train(self, dataset: Dict[str, List[Dict[str, str]]]) -> Dict[str, Any]:
+    def train(self, dataset: dict[str, list[dict[str, str]]]) -> dict[str, Any]:
         if not finetuning_deps_available():
             return {"status": "skipped", "reason": "Missing dependencies"}
 
         if self._model is None or self._tokenizer is None:
             return {"status": "error", "reason": "Call setup_model() first"}
 
-        from transformers import Trainer, TrainingArguments
-
         from datasets import Dataset as HFDataset
+        from transformers import Trainer, TrainingArguments
 
         train_ds = HFDataset.from_list(dataset["train"])
         eval_ds = HFDataset.from_list(dataset["eval"]) if dataset.get("eval") else None
 
-        def tokenize(batch: Dict) -> Dict:
+        def tokenize(batch: dict) -> dict:
             return self._tokenizer(
                 batch["text"],
                 truncation=True,
@@ -340,7 +339,7 @@ class LLaMAFineTuner:
         logger.info("training_completed", **metrics)
         return metrics
 
-    def save_adapter(self, output_dir: Optional[str] = None) -> Dict[str, Any]:
+    def save_adapter(self, output_dir: str | None = None) -> dict[str, Any]:
         if self._model is None:
             return {"status": "error", "reason": "No model loaded"}
 

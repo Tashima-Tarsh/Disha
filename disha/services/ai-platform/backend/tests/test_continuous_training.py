@@ -15,7 +15,6 @@ import os
 import sys
 from pathlib import Path
 
-
 # Path setup
 _THIS = Path(__file__).resolve()
 _REPO_ROOT = _THIS.parents[5]
@@ -50,7 +49,7 @@ class TestDataFetchers:
             assert t.indicator_type in ("ip", "domain", "url", "hash")
 
     def test_graph_from_threats(self):
-        from data_fetchers import generate_synthetic_threats, build_graph_from_threats
+        from data_fetchers import build_graph_from_threats, generate_synthetic_threats
 
         threats = generate_synthetic_threats(n=20, seed=42)
         graph = build_graph_from_threats(threats)

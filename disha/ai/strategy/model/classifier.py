@@ -4,12 +4,13 @@ Wraps RandomForestClassifier with additional utilities for strategy recommendati
 """
 
 import logging
-import numpy as np
-import joblib
 from pathlib import Path
+from typing import Any
+
+import joblib
+import numpy as np
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.preprocessing import LabelEncoder
-from typing import List, Dict, Any, Optional
 
 logger = logging.getLogger(__name__)
 
@@ -31,12 +32,12 @@ class StrategyClassifier:
             min_samples_split=2,
             min_samples_leaf=1,
         )
-        self.classes_: Optional[np.ndarray] = None
-        self.feature_names_: Optional[List[str]] = None
+        self.classes_: np.ndarray | None = None
+        self.feature_names_: list[str] | None = None
         self.is_trained: bool = False
 
     def train(
-        self, X: np.ndarray, y: np.ndarray, feature_names: Optional[List[str]] = None
+        self, X: np.ndarray, y: np.ndarray, feature_names: list[str] | None = None
     ) -> "StrategyClassifier":
         """
         Train the classifier on feature matrix X and labels y.
@@ -67,7 +68,7 @@ class StrategyClassifier:
             raise RuntimeError("Model must be trained before prediction.")
         return self.model.predict_proba(X)
 
-    def get_feature_importance(self) -> Dict[str, float]:
+    def get_feature_importance(self) -> dict[str, float]:
         """Return feature importances as a dict sorted descending."""
         if not self.is_trained:
             raise RuntimeError(
@@ -110,7 +111,7 @@ class StrategyRecommender:
     human-readable strategy recommendations with confidence scores.
     """
 
-    STRATEGY_DESCRIPTIONS: Dict[str, str] = {
+    STRATEGY_DESCRIPTIONS: dict[str, str] = {
         "Guerrilla": "Irregular warfare using small mobile forces for hit-and-run attacks. Highly effective in forests and mountains.",
         "Conventional": "Standard large-scale military operations using organized armies. Best on open terrain with technological parity.",
         "Naval": "Sea-based power projection and control of maritime lanes. Decisive for island campaigns and trade disruption.",
@@ -125,13 +126,13 @@ class StrategyRecommender:
 
     def __init__(
         self,
-        classifier: Optional[StrategyClassifier] = None,
-        label_encoder: Optional[LabelEncoder] = None,
+        classifier: StrategyClassifier | None = None,
+        label_encoder: LabelEncoder | None = None,
     ):
         self.classifier = classifier
         self.label_encoder = label_encoder
 
-    def recommend(self, X: np.ndarray, top_k: int = 3) -> List[Dict[str, Any]]:
+    def recommend(self, X: np.ndarray, top_k: int = 3) -> list[dict[str, Any]]:
         """
         Given feature vector(s), return top-k strategy recommendations with confidence scores.
 
@@ -170,10 +171,10 @@ class StrategyRecommender:
 
     def recommend_from_params(
         self,
-        params: Dict[str, Any],
-        encoders: Dict[str, LabelEncoder],
-        feature_names: List[str],
-    ) -> List[Dict[str, Any]]:
+        params: dict[str, Any],
+        encoders: dict[str, LabelEncoder],
+        feature_names: list[str],
+    ) -> list[dict[str, Any]]:
         """
         Recommend strategies from a raw parameter dictionary.
         Handles encoding and normalization internally.
@@ -186,12 +187,12 @@ class StrategyRecommender:
 
     def _encode_params(
         self,
-        params: Dict[str, Any],
-        encoders: Dict[str, LabelEncoder],
-        feature_names: List[str],
+        params: dict[str, Any],
+        encoders: dict[str, LabelEncoder],
+        feature_names: list[str],
     ) -> np.ndarray:
         """Encode raw parameters into feature vector."""
-        feature_map: Dict[str, float] = {}
+        feature_map: dict[str, float] = {}
 
         categorical_fields = ["era", "region", "terrain", "technology_level"]
         for field in categorical_fields:

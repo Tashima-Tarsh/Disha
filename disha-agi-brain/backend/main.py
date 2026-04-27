@@ -18,18 +18,24 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 @app.get("/")
 def health_check():
     return {
         "status": "online",
         "service": "disha-agi-brain",
-        "mission": "god_mode_engaged"
+        "mission": "god_mode_engaged",
     }
+
 
 @app.post("/api/v1/query")
 def query_repository(query: str):
     # TODO: Connect to RAG pipeline and Agent Orchestrator
-    return {"query": query, "response": "RAG pipeline currently initializing. Awaiting embeddings."}
+    return {
+        "query": query,
+        "response": "RAG pipeline currently initializing. Awaiting embeddings.",
+    }
+
 
 @app.websocket("/api/v1/voice")
 async def voice_endpoint(websocket: WebSocket):
@@ -39,9 +45,12 @@ async def voice_endpoint(websocket: WebSocket):
             # Receive audio/binary data from client (e.g. WebRTC stream)
             _data = await websocket.receive_bytes()
             # Placeholder for Whisper/TTS logic
-            await websocket.send_text("Voice signal received. Processing command via DishaOS...")
+            await websocket.send_text(
+                "Voice signal received. Processing command via DishaOS..."
+            )
     except Exception:
         pass
+
 
 if __name__ == "__main__":
     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)

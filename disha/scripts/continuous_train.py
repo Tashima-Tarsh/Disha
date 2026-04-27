@@ -152,8 +152,8 @@ def _train_rl(
         return {"status": "skipped", "reason": "torch_not_available"}
 
     from app.rl.environment import InvestigationEnvironment
-    from app.rl.policy import PolicyNetwork, TORCH_AVAILABLE
     from app.rl.experience_replay import ExperienceReplayBuffer
+    from app.rl.policy import TORCH_AVAILABLE, PolicyNetwork
     from app.rl.reward import RewardComputer
 
     if not TORCH_AVAILABLE:
@@ -629,15 +629,15 @@ def run_continuous_training(
     offline: bool = False,
 ) -> dict:
     from data_fetchers import (
-        fetch_all_rl_data,
-        generate_synthetic_threats,
         build_graph_from_threats,
+        fetch_all_rl_data,
         generate_advanced_scenarios,
+        generate_synthetic_threats,
     )
     from knowledge_engine import (
-        load_all_knowledge,
         build_knowledge_graph,
         generate_cross_domain_scenarios,
+        load_all_knowledge,
     )
 
     scheduler = HyperparamScheduler()

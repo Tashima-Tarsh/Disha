@@ -1,19 +1,20 @@
 """Physics engine tests."""
 
-from physics_engine.quantum_inspired.superposition import QuantumState
+import os
+import sys
+import unittest
+
+import numpy as np
+from physics_engine.classical.mechanics import ClassicalMechanicsEngine, PhysicsObject
 from physics_engine.constraints.constraint_solver import (
-    DistanceConstraint,
     ConstraintSolver,
+    DistanceConstraint,
 )
+from physics_engine.quantum_inspired.superposition import QuantumState
 from physics_engine.state_evolution.integrator import (
     EulerIntegrator,
     RungeKutta4Integrator,
 )
-from physics_engine.classical.mechanics import PhysicsObject, ClassicalMechanicsEngine
-import sys
-import os
-import unittest
-import numpy as np
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 

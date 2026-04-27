@@ -1,25 +1,28 @@
-import os
 import base64
+import os
+
 import structlog
-from typing import Dict, Optional
 from cryptography.fernet import Fernet
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 
 logger = structlog.get_logger("vault_service")
 
+
 class SecretsVault:
     """Secure, encrypted storage for sensitive platform credentials."""
-    
+
     def __init__(self, master_key: str = None):
         # In production, the master key would come from a secure env var or HSM
-        self.master_key = master_key or os.getenv("DISHA_VAULT_KEY", "disha-default-unsafe-key")
+        self.master_key = master_key or os.getenv(
+            "DISHA_VAULT_KEY", "disha-default-unsafe-key"
+        )
         self._fernet = self._initialize_fernet()
-        self._store: Dict[str, str] = {} # Key name to encrypted value
+        self._store: dict[str, str] = {}  # Key name to encrypted value
 
     def _initialize_fernet(self) -> Fernet:
         """Derives a strong key from the master password."""
-        salt = b'disha_salt_v1'
+        salt = b"disha_salt_v1"
         kdf = PBKDF2HMAC(
             algorithm=hashes.SHA256(),
             length=32,
@@ -35,7 +38,7 @@ class SecretsVault:
         self._store[name] = encrypted
         logger.info("secret_stored", name=name)
 
-    def get_secret(self, name: str) -> Optional[str]:
+    def get_secret(self, name: str) -> str | None:
         """Decrypts and retrieves a secret."""
         encrypted = self._store.get(name)
         if encrypted:

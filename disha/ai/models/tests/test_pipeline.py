@@ -1,17 +1,18 @@
 """Pipeline tests."""
 
-from core.pipeline_engine.pipeline import (
-    Pipeline,
-    InputStage,
-    ParsingStage,
-    SymbolicStage,
-    NumericalStage,
-    SimulationStage,
-    OutputStage,
-)
-import sys
 import os
+import sys
 import unittest
+
+from core.pipeline_engine.pipeline import (
+    InputStage,
+    NumericalStage,
+    OutputStage,
+    ParsingStage,
+    Pipeline,
+    SimulationStage,
+    SymbolicStage,
+)
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 

@@ -3,18 +3,17 @@ import uuid
 from typing import Any
 
 import structlog
-
-from app.agents.osint_agent import OSINTAgent
 from app.agents.crypto_agent import CryptoAgent
 from app.agents.detection_agent import DetectionAgent
-from app.agents.graph_agent import GraphAgent
-from app.agents.reasoning_agent import ReasoningAgent
-from app.agents.legal_agent import LegalAgent
 from app.agents.education_agent import EducationAgent
-from app.agents.sentinel_agent import SentinelAgent
-from app.agents.national_intelligence_agent import NationalIntelligenceAgent
-from app.agents.physics_agent import PhysicsAgent
+from app.agents.graph_agent import GraphAgent
 from app.agents.growth_agent import GrowthAgent
+from app.agents.legal_agent import LegalAgent
+from app.agents.national_intelligence_agent import NationalIntelligenceAgent
+from app.agents.osint_agent import OSINTAgent
+from app.agents.physics_agent import PhysicsAgent
+from app.agents.reasoning_agent import ReasoningAgent
+from app.agents.sentinel_agent import SentinelAgent
 
 logger = structlog.get_logger(__name__)
 

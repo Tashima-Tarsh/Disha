@@ -9,6 +9,9 @@ write::
 __version__ = "1.0.0"
 
 # -- Utils ----------------------------------------------------------------- #
+# -- Interfaces (lazy / optional imports) ---------------------------------- #
+from .interfaces.cli.cli import main as cli_main
+from .interfaces.visualization.plotter import SimulationPlotter, TextVisualizer
 from .utils import (
     GeoSettings,
     LoggingSettings,
@@ -35,10 +38,6 @@ from .utils import (
     smooth_step,
     to_json,
 )
-
-# -- Interfaces (lazy / optional imports) ---------------------------------- #
-from .interfaces.cli.cli import main as cli_main
-from .interfaces.visualization.plotter import SimulationPlotter, TextVisualizer
 
 __all__ = [
     "__version__",

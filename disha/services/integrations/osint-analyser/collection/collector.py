@@ -1,16 +1,15 @@
 #!/usr/bin/env python3
 
 # Core
-from abc import ABC, abstractmethod
-from datetime import datetime
-from typing import Optional
 import logging
 import os
+from abc import ABC, abstractmethod
+from datetime import datetime
 
 # Third-party
 # Project
 from database import Database
-from models import CollectorModel, SourceModel, ContentModel
+from models import CollectorModel, ContentModel, SourceModel
 
 # =========================================================================== #
 
@@ -126,7 +125,7 @@ class Collector(ABC):
 
     # ----------------------------------------------------------------------- #
 
-    def add_source(self, uid: str, friendly_name: str) -> Optional[SourceModel]:
+    def add_source(self, uid: str, friendly_name: str) -> SourceModel | None:
         """
         Adds a new source to the database if it doesn't already exist.
 

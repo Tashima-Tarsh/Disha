@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 
 # Core
+import importlib
 import logging
 import os
-import importlib
 import time
 
 # Third-party

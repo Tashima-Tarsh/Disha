@@ -1,13 +1,14 @@
 from __future__ import annotations
 
 import hashlib
-import logging
 import time
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Any, Dict, List, Optional
+from typing import Any
 
-logger = logging.getLogger(__name__)
+import structlog
+
+logger = structlog.get_logger(__name__)
 
 
 class MessageType(Enum):
@@ -22,7 +23,7 @@ class AgentMessage:
     sender: str
     receiver: str
     msg_type: MessageType
-    payload: Dict[str, Any] = field(default_factory=dict)
+    payload: dict[str, Any] = field(default_factory=dict)
     timestamp: float = field(default_factory=time.time)
     message_id: str = ""
 
@@ -35,14 +36,14 @@ class AgentMessage:
 class BaseAgent:
     def __init__(self, name: str) -> None:
         self.name = name
-        self._inbox: List[AgentMessage] = []
-        self._outbox: List[AgentMessage] = []
+        self._inbox: list[AgentMessage] = []
+        self._outbox: list[AgentMessage] = []
 
     def receive(self, message: AgentMessage) -> None:
         self._inbox.append(message)
 
     def send(
-        self, receiver: str, msg_type: MessageType, payload: Dict[str, Any]
+        self, receiver: str, msg_type: MessageType, payload: dict[str, Any]
     ) -> AgentMessage:
         msg = AgentMessage(
             sender=self.name,
@@ -53,10 +54,10 @@ class BaseAgent:
         self._outbox.append(msg)
         return msg
 
-    def process(self) -> List[AgentMessage]:
+    def process(self) -> list[AgentMessage]:
         raise NotImplementedError
 
-    def status(self) -> Dict[str, Any]:
+    def status(self) -> dict[str, Any]:
         return {
             "name": self.name,
             "inbox_size": len(self._inbox),
@@ -67,11 +68,11 @@ class BaseAgent:
 class DataCollectorAgent(BaseAgent):
     def __init__(self) -> None:
         super().__init__("data_collector")
-        self.collected: List[Dict[str, Any]] = []
+        self.collected: list[dict[str, Any]] = []
 
     def collect_from_text(
-        self, texts: List[str], source: str = "manual"
-    ) -> List[Dict[str, Any]]:
+        self, texts: list[str], source: str = "manual"
+    ) -> list[dict[str, Any]]:
         items = []
         for text in texts:
             item = {
@@ -85,8 +86,8 @@ class DataCollectorAgent(BaseAgent):
         logger.info("data_collected", count=len(items), source=source)
         return items
 
-    def process(self) -> List[AgentMessage]:
-        results: List[AgentMessage] = []
+    def process(self) -> list[AgentMessage]:
+        results: list[AgentMessage] = []
         while self._inbox:
             msg = self._inbox.pop(0)
             if msg.msg_type == MessageType.TASK:
@@ -106,15 +107,15 @@ class DataCollectorAgent(BaseAgent):
 class QualityAnalystAgent(BaseAgent):
     def __init__(self) -> None:
         super().__init__("quality_analyst")
-        self._seen_hashes: set = set()
-        self._source_weights: Dict[str, float] = {
+        self._seen_hashes: set[str] = set()
+        self._source_weights: dict[str, float] = {
             "github": 0.8,
             "arxiv": 0.9,
             "manual": 0.6,
             "unknown": 0.3,
         }
 
-    def score(self, item: Dict[str, Any]) -> Dict[str, Any]:
+    def score(self, item: dict[str, Any]) -> dict[str, Any]:
         text = item.get("text", "")
         source = item.get("source", "unknown")
         content_hash = item.get(
@@ -158,8 +159,8 @@ class QualityAnalystAgent(BaseAgent):
         item["quality_reason"] = "scored"
         return item
 
-    def process(self) -> List[AgentMessage]:
-        results: List[AgentMessage] = []
+    def process(self) -> list[AgentMessage]:
+        results: list[AgentMessage] = []
         while self._inbox:
             msg = self._inbox.pop(0)
             if msg.msg_type == MessageType.TASK:
@@ -180,7 +181,7 @@ class EmbeddingAgent(BaseAgent):
         super().__init__("embedding_agent")
         self._pipeline = rag_pipeline
 
-    def embed_items(self, items: List[Dict[str, Any]]) -> Dict[str, Any]:
+    def embed_items(self, items: list[dict[str, Any]]) -> dict[str, Any]:
         if self._pipeline is None:
             return {"status": "skipped", "reason": "No RAG pipeline configured"}
 
@@ -199,8 +200,8 @@ class EmbeddingAgent(BaseAgent):
             "total": self._pipeline.document_count,
         }
 
-    def process(self) -> List[AgentMessage]:
-        results: List[AgentMessage] = []
+    def process(self) -> list[AgentMessage]:
+        results: list[AgentMessage] = []
         while self._inbox:
             msg = self._inbox.pop(0)
             if msg.msg_type == MessageType.TASK:
@@ -214,7 +215,7 @@ class ReasoningAgent(BaseAgent):
     def __init__(self) -> None:
         super().__init__("reasoning_agent")
 
-    def reason(self, problem: str, context: str = "") -> Dict[str, Any]:
+    def reason(self, problem: str, context: str = "") -> dict[str, Any]:
 
         sub_problems = self._decompose(problem)
 
@@ -244,7 +245,7 @@ class ReasoningAgent(BaseAgent):
             "confidence": self._compute_confidence(best_solutions),
         }
 
-    def _decompose(self, problem: str) -> List[str]:
+    def _decompose(self, problem: str) -> list[str]:
 
         parts = []
         sentences = problem.replace("?", ".").split(".")
@@ -256,7 +257,7 @@ class ReasoningAgent(BaseAgent):
 
     def _generate_solutions(
         self, sub_problem: str, context: str
-    ) -> List[Dict[str, Any]]:
+    ) -> list[dict[str, Any]]:
 
         approaches = [
             {"approach": "direct", "description": f"Directly address: {sub_problem}"},
@@ -271,7 +272,7 @@ class ReasoningAgent(BaseAgent):
         ]
         return approaches
 
-    def _evaluate_solution(self, solution: Dict[str, Any]) -> Dict[str, Any]:
+    def _evaluate_solution(self, solution: dict[str, Any]) -> dict[str, Any]:
 
         scores = {
             "direct": {"time_complexity": 8, "space_complexity": 9, "scalability": 6},
@@ -293,7 +294,7 @@ class ReasoningAgent(BaseAgent):
         total = sum(criteria.values())
         return {**solution, **criteria, "total_score": total}
 
-    def _identify_edge_cases(self, problem: str) -> List[str]:
+    def _identify_edge_cases(self, problem: str) -> list[str]:
         cases = ["Empty input", "Extremely large input", "Concurrent access"]
         if "data" in problem.lower():
             cases.append("Corrupted or malformed data")
@@ -301,15 +302,15 @@ class ReasoningAgent(BaseAgent):
             cases.append("Adversarial training data")
         return cases
 
-    def _compute_confidence(self, solutions: List[Dict[str, Any]]) -> float:
+    def _compute_confidence(self, solutions: list[dict[str, Any]]) -> float:
         if not solutions:
             return 0.0
         avg_score = sum(s.get("total_score", 0) for s in solutions) / len(solutions)
 
-        return round(min(avg_score / 27.0, 1.0), 3)
+        return float(round(min(avg_score / 27.0, 1.0), 3))
 
-    def process(self) -> List[AgentMessage]:
-        results: List[AgentMessage] = []
+    def process(self) -> list[AgentMessage]:
+        results: list[AgentMessage] = []
         while self._inbox:
             msg = self._inbox.pop(0)
             if msg.msg_type == MessageType.TASK:
@@ -323,11 +324,11 @@ class ReasoningAgent(BaseAgent):
 class KnowledgeManagerAgent(BaseAgent):
     def __init__(self) -> None:
         super().__init__("knowledge_manager")
-        self.permanent_store: List[Dict[str, Any]] = []
-        self.temporary_store: List[Dict[str, Any]] = []
-        self.rejected: List[Dict[str, Any]] = []
+        self.permanent_store: list[dict[str, Any]] = []
+        self.temporary_store: list[dict[str, Any]] = []
+        self.rejected: list[dict[str, Any]] = []
 
-    def classify_and_store(self, items: List[Dict[str, Any]]) -> Dict[str, int]:
+    def classify_and_store(self, items: list[dict[str, Any]]) -> dict[str, int]:
         counts = {"permanent": 0, "temporary": 0, "rejected": 0}
 
         for item in items:
@@ -345,7 +346,7 @@ class KnowledgeManagerAgent(BaseAgent):
         logger.info("knowledge_classified", **counts)
         return counts
 
-    def get_approved_for_finetuning(self) -> List[Dict[str, Any]]:
+    def get_approved_for_finetuning(self) -> list[dict[str, Any]]:
         return list(self.permanent_store)
 
     def promote_temporary(self, min_score: int = 80) -> int:
@@ -360,15 +361,15 @@ class KnowledgeManagerAgent(BaseAgent):
         self.temporary_store = remaining
         return promoted
 
-    def stats(self) -> Dict[str, int]:
+    def stats(self) -> dict[str, int]:
         return {
             "permanent": len(self.permanent_store),
             "temporary": len(self.temporary_store),
             "rejected": len(self.rejected),
         }
 
-    def process(self) -> List[AgentMessage]:
-        results: List[AgentMessage] = []
+    def process(self) -> list[AgentMessage]:
+        results: list[AgentMessage] = []
         while self._inbox:
             msg = self._inbox.pop(0)
             if msg.msg_type == MessageType.TASK:
@@ -386,8 +387,8 @@ class KnowledgeManagerAgent(BaseAgent):
 
 class AgentOrchestrator:
     def __init__(self) -> None:
-        self._agents: Dict[str, BaseAgent] = {}
-        self._message_log: List[AgentMessage] = []
+        self._agents: dict[str, BaseAgent] = {}
+        self._message_log: list[AgentMessage] = []
 
     def register(self, agent: BaseAgent) -> None:
         self._agents[agent.name] = agent
@@ -401,8 +402,8 @@ class AgentOrchestrator:
         else:
             logger.warning("agent_not_found", receiver=message.receiver)
 
-    def run_cycle(self) -> List[AgentMessage]:
-        all_outgoing: List[AgentMessage] = []
+    def run_cycle(self) -> list[AgentMessage]:
+        all_outgoing: list[AgentMessage] = []
         for agent in self._agents.values():
             outgoing = agent.process()
             all_outgoing.extend(outgoing)
@@ -414,10 +415,10 @@ class AgentOrchestrator:
 
     def run_pipeline(
         self,
-        texts: List[str],
+        texts: list[str],
         source: str = "manual",
         rag_pipeline: Any = None,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
 
         if "data_collector" not in self._agents:
             self.register(DataCollectorAgent())
@@ -461,13 +462,13 @@ class AgentOrchestrator:
             "scores": [i.get("quality_score", 0) for i in scored_items],
         }
 
-    def get_agent(self, name: str) -> Optional[BaseAgent]:
+    def get_agent(self, name: str) -> BaseAgent | None:
         return self._agents.get(name)
 
-    def list_agents(self) -> List[str]:
+    def list_agents(self) -> list[str]:
         return list(self._agents.keys())
 
-    def stats(self) -> Dict[str, Any]:
+    def stats(self) -> dict[str, Any]:
         return {
             "agents": {name: agent.status() for name, agent in self._agents.items()},
             "total_messages": len(self._message_log),

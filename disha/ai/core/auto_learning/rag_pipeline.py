@@ -6,7 +6,7 @@ import logging
 import time
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -39,7 +39,7 @@ def dependencies_available() -> bool:
 @dataclass
 class Document:
     text: str
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    metadata: dict[str, Any] = field(default_factory=dict)
     doc_id: str = ""
 
     def __post_init__(self) -> None:
@@ -51,7 +51,7 @@ class Document:
 class SearchResult:
     text: str
     score: float
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    metadata: dict[str, Any] = field(default_factory=dict)
     doc_id: str = ""
 
 
@@ -60,12 +60,12 @@ class _FallbackEmbedder:
         self.dim = dim
 
     def encode(
-        self, texts: List[str], show_progress_bar: bool = False
-    ) -> List[List[float]]:
+        self, texts: list[str], show_progress_bar: bool = False
+    ) -> list[list[float]]:
         import math
         import struct
 
-        vectors: List[List[float]] = []
+        vectors: list[list[float]] = []
         for text in texts:
             digest = hashlib.sha256(text.encode()).digest()
 
@@ -79,7 +79,7 @@ class _FallbackEmbedder:
 
 class _FallbackIndex:
     def __init__(self) -> None:
-        self._vectors: List[List[float]] = []
+        self._vectors: list[list[float]] = []
 
     @property
     def ntotal(self) -> int:
@@ -96,7 +96,7 @@ class _FallbackIndex:
         if hasattr(query, "tolist"):
             query = query.tolist()
         qvec = query[0]
-        scores: List[tuple] = []
+        scores: list[tuple] = []
         for idx, vec in enumerate(self._vectors):
             dot = sum(a * b for a, b in zip(qvec, vec))
             norm_q = math.sqrt(sum(a * a for a in qvec)) or 1.0
@@ -142,12 +142,12 @@ class RAGPipeline:
             logger.warning("FAISS not installed — using fallback brute-force index")
             self._index = _FallbackIndex()
 
-        self._documents: List[Document] = []
+        self._documents: list[Document] = []
         self._dedup_hashes: set = set()
 
-    def add_documents(self, documents: List[Document]) -> int:
-        new_docs: List[Document] = []
-        new_texts: List[str] = []
+    def add_documents(self, documents: list[Document]) -> int:
+        new_docs: list[Document] = []
+        new_texts: list[str] = []
 
         for doc in documents:
             if doc.doc_id in self._dedup_hashes:
@@ -178,13 +178,13 @@ class RAGPipeline:
         return len(new_docs)
 
     def add_texts(
-        self, texts: List[str], metadatas: Optional[List[Dict[str, Any]]] = None
+        self, texts: list[str], metadatas: list[dict[str, Any]] | None = None
     ) -> int:
         metadatas = metadatas or [{}] * len(texts)
         docs = [Document(text=t, metadata=m) for t, m in zip(texts, metadatas)]
         return self.add_documents(docs)
 
-    def query(self, query_text: str, top_k: int = 5) -> List[SearchResult]:
+    def query(self, query_text: str, top_k: int = 5) -> list[SearchResult]:
         if self._index.ntotal == 0:
             return []
 
@@ -201,7 +201,7 @@ class RAGPipeline:
         k = min(top_k, self._index.ntotal)
         distances, indices = self._index.search(vec, k)
 
-        results: List[SearchResult] = []
+        results: list[SearchResult] = []
         dist_list = distances[0] if hasattr(distances[0], "__iter__") else distances
         idx_list = indices[0] if hasattr(indices[0], "__iter__") else indices
 
@@ -272,7 +272,7 @@ class RAGPipeline:
             logger.warning("index_not_found: %s", name)
             return False
 
-        with open(str(meta_path), "r", encoding="utf-8") as fh:
+        with open(str(meta_path), encoding="utf-8") as fh:
             meta = json.load(fh)
 
         self._documents = [
@@ -284,7 +284,7 @@ class RAGPipeline:
         if _FAISS_AVAILABLE and index_path.exists():
             self._index = faiss.read_index(str(index_path))
         elif index_path.exists():
-            with open(str(index_path), "r", encoding="utf-8") as fh:
+            with open(str(index_path), encoding="utf-8") as fh:
                 vectors = json.load(fh)
             self._index = _FallbackIndex()
             self._index._vectors = vectors
@@ -296,7 +296,7 @@ class RAGPipeline:
     def document_count(self) -> int:
         return len(self._documents)
 
-    def stats(self) -> Dict[str, Any]:
+    def stats(self) -> dict[str, Any]:
         return {
             "document_count": self.document_count,
             "index_size": self._index.ntotal,

@@ -17,7 +17,7 @@ _KNOWLEDGE_DIR = Path(__file__).parent.parent / "knowledge"
 def _load_suppressed_json() -> dict:
     try:
         with open(
-            _KNOWLEDGE_DIR / "suppressed_physics.json", "r", encoding="utf-8"
+            _KNOWLEDGE_DIR / "suppressed_physics.json", encoding="utf-8"
         ) as f:
             return json.load(f)
     except Exception:

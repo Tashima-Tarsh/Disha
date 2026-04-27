@@ -16,10 +16,8 @@ four canonical Bell states.
 from __future__ import annotations
 
 import logging
-from typing import Dict, List, Optional, Tuple
 
 import numpy as np
-
 from physics_engine.quantum_inspired.superposition import QuantumState
 
 logger = logging.getLogger(__name__)
@@ -53,12 +51,12 @@ class EntangledPair:
         self,
         state_a: QuantumState,
         state_b: QuantumState,
-        correlation_map: Dict[str, str],
+        correlation_map: dict[str, str],
     ) -> None:
         self.state_a: QuantumState = state_a
         self.state_b: QuantumState = state_b
-        self.correlation_map: Dict[str, str] = dict(correlation_map)
-        self.measurement_history: List[Tuple[str, str]] = []
+        self.correlation_map: dict[str, str] = dict(correlation_map)
+        self.measurement_history: list[tuple[str, str]] = []
         logger.info(
             "EntangledPair created: '%s' <-> '%s' with %d correlations",
             state_a.name,
@@ -70,7 +68,7 @@ class EntangledPair:
     # Measurement
     # ------------------------------------------------------------------
 
-    def measure(self, rng: Optional[np.random.Generator] = None) -> Tuple[str, str]:
+    def measure(self, rng: np.random.Generator | None = None) -> tuple[str, str]:
         """Measure state_a and collapse state_b according to the correlation.
 
         Parameters
@@ -129,7 +127,7 @@ class EntangledPair:
     # Correlation statistics
     # ------------------------------------------------------------------
 
-    def correlation_count(self) -> Dict[Tuple[str, str], int]:
+    def correlation_count(self) -> dict[tuple[str, str], int]:
         """Return frequency counts for each ``(outcome_a, outcome_b)`` pair.
 
         Returns
@@ -137,7 +135,7 @@ class EntangledPair:
         dict[tuple[str, str], int]
             Count of each observed outcome pair.
         """
-        counts: Dict[Tuple[str, str], int] = {}
+        counts: dict[tuple[str, str], int] = {}
         for pair in self.measurement_history:
             counts[pair] = counts.get(pair, 0) + 1
         return counts

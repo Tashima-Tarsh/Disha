@@ -3,12 +3,10 @@
 from typing import Any
 
 import numpy as np
-import torch
-from torch import optim
-
 import structlog
-
+import torch
 from graph_ai.models import GCNEncoder, LinkPredictor
+from torch import optim
 
 logger = structlog.get_logger(__name__)
 

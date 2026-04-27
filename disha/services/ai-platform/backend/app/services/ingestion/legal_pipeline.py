@@ -1,5 +1,6 @@
 import uuid
 from typing import Any
+
 import structlog
 from app.services.memory.vector_store import VectorStore
 

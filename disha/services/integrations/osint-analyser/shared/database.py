@@ -1,23 +1,23 @@
 #!/usr/bin/env python3
 
 # Core
+import logging
+import os
 from contextlib import contextmanager
 from urllib.parse import quote_plus
-import os
-import logging
+
+# Project
+from models import (
+    AnalysisRequirementModel,
+    AnalysisResultModel,
+    Base,
+    ContentModel,
+    SourceModel,
+)
 
 # Third-party
 from sqlalchemy import create_engine, exc
 from sqlalchemy.orm import sessionmaker
-
-# Project
-from models import (
-    Base,
-    ContentModel,
-    AnalysisResultModel,
-    AnalysisRequirementModel,
-    SourceModel,
-)
 
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"

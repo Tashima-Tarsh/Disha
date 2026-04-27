@@ -6,7 +6,7 @@ All functions operate on :mod:`numpy` arrays where appropriate.
 from __future__ import annotations
 
 import logging
-from typing import List, Union
+from typing import Union
 
 import numpy as np
 from numpy.typing import NDArray
@@ -14,7 +14,7 @@ from numpy.typing import NDArray
 logger = logging.getLogger(__name__)
 
 # Type alias for numeric array-likes accepted by helpers.
-ArrayLike = Union[NDArray[np.floating], List[float]]
+ArrayLike = Union[NDArray[np.floating], list[float]]
 
 
 def normalize_vector(v: ArrayLike) -> NDArray[np.floating]:

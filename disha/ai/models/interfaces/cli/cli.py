@@ -10,7 +10,8 @@ import json
 import logging
 import sys
 import textwrap
-from typing import Any, Dict, List, Optional, Sequence
+from collections.abc import Sequence
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -34,7 +35,7 @@ def _json_block(data: Any) -> str:
     return json.dumps(data, indent=2, default=str)
 
 
-def _print_result(title: str, data: Dict[str, Any]) -> None:
+def _print_result(title: str, data: dict[str, Any]) -> None:
     print(_header(title))
     for k, v in data.items():
         if isinstance(v, (dict, list)):
@@ -125,7 +126,7 @@ def _cmd_monte_carlo(args: argparse.Namespace) -> None:
     import random
 
     rng = random.Random(args.seed)
-    results: List[float] = [rng.gauss(0, 1) for _ in range(args.samples)]
+    results: list[float] = [rng.gauss(0, 1) for _ in range(args.samples)]
     mean = sum(results) / len(results)
     _print_result(
         "Monte-Carlo Sampling",
@@ -209,7 +210,7 @@ def _build_parser() -> argparse.ArgumentParser:
 # ---------------------------------------------------------------------------
 
 
-def main(argv: Optional[Sequence[str]] = None) -> None:
+def main(argv: Sequence[str] | None = None) -> None:
     """CLI entry point.
 
     Args:

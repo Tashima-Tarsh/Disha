@@ -1,8 +1,7 @@
 import asyncio
 import time
-from typing import Optional
-import structlog
 
+import structlog
 from app.collaboration.protocol import (
     AgentMessage,
     Conversation,
@@ -60,7 +59,7 @@ class ClusterCoordinator:
         self,
         target: str,
         task_description: str,
-        context: Optional[dict] = None,
+        context: dict | None = None,
     ) -> dict:
         conversation = self.router.create_conversation(topic=target)
         context = context or {}

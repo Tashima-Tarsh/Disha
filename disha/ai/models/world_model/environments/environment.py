@@ -13,7 +13,7 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 
 import numpy as np
 
@@ -45,7 +45,7 @@ class EnvironmentConditions:
     visibility: float = 1000.0
     time_of_day: float = 12.0
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         return {
             "wind_vector": self.wind_vector.tolist(),
             "visibility": self.visibility,
@@ -53,7 +53,7 @@ class EnvironmentConditions:
         }
 
     @classmethod
-    def from_dict(cls, data: Dict[str, Any]) -> "EnvironmentConditions":
+    def from_dict(cls, data: dict[str, Any]) -> EnvironmentConditions:
         return cls(
             wind_vector=np.array(data.get("wind_vector", [0, 0, 0]), dtype=np.float64),
             visibility=float(data.get("visibility", 1000.0)),
@@ -84,7 +84,7 @@ class Region:
     bounds_max: np.ndarray = field(
         default_factory=lambda: np.ones(3, dtype=np.float64) * 100.0
     )
-    properties: Dict[str, Any] = field(default_factory=dict)
+    properties: dict[str, Any] = field(default_factory=dict)
 
     def contains(self, position: np.ndarray) -> bool:
         """Return ``True`` if *position* lies within this region."""
@@ -92,7 +92,7 @@ class Region:
             np.all(position >= self.bounds_min) and np.all(position <= self.bounds_max)
         )
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         return {
             "name": self.name,
             "bounds_min": self.bounds_min.tolist(),
@@ -101,7 +101,7 @@ class Region:
         }
 
     @classmethod
-    def from_dict(cls, data: Dict[str, Any]) -> "Region":
+    def from_dict(cls, data: dict[str, Any]) -> Region:
         return cls(
             name=data.get("name", "default"),
             bounds_min=np.array(data.get("bounds_min", [0, 0, 0]), dtype=np.float64),
@@ -133,7 +133,7 @@ class Environment:
         :class:`Region`.
     """
 
-    DEFAULT_PROPERTIES: Dict[str, float] = {
+    DEFAULT_PROPERTIES: dict[str, float] = {
         "temperature": 20.0,
         "gravity_strength": 9.81,
         "friction": 0.5,
@@ -143,10 +143,10 @@ class Environment:
     def __init__(
         self,
         name: str = "default_env",
-        bounds_min: Optional[np.ndarray] = None,
-        bounds_max: Optional[np.ndarray] = None,
-        terrain_resolution: Tuple[int, int] = (64, 64),
-        properties: Optional[Dict[str, Any]] = None,
+        bounds_min: np.ndarray | None = None,
+        bounds_max: np.ndarray | None = None,
+        terrain_resolution: tuple[int, int] = (64, 64),
+        properties: dict[str, Any] | None = None,
     ) -> None:
         self.name: str = name
         self.bounds_min: np.ndarray = (
@@ -160,16 +160,16 @@ class Environment:
             else np.array([100.0, 100.0, 100.0], dtype=np.float64)
         )
 
-        self.properties: Dict[str, Any] = {**self.DEFAULT_PROPERTIES}
+        self.properties: dict[str, Any] = {**self.DEFAULT_PROPERTIES}
         if properties:
             self.properties.update(properties)
 
         # Terrain height-map (rows × cols).  Initialised to zero (flat).
-        self.terrain_resolution: Tuple[int, int] = terrain_resolution
+        self.terrain_resolution: tuple[int, int] = terrain_resolution
         self.terrain_map: np.ndarray = np.zeros(terrain_resolution, dtype=np.float64)
 
         # Named regions with local property overrides
-        self._regions: Dict[str, Region] = {}
+        self._regions: dict[str, Region] = {}
 
         # Dynamic conditions
         self.conditions: EnvironmentConditions = EnvironmentConditions()
@@ -243,15 +243,15 @@ class Environment:
         self._regions[region.name] = region
         logger.debug("Region '%s' added to environment '%s'", region.name, self.name)
 
-    def remove_region(self, name: str) -> Optional[Region]:
+    def remove_region(self, name: str) -> Region | None:
         """Remove and return the region with *name*, or ``None``."""
         return self._regions.pop(name, None)
 
-    def get_regions(self) -> List[Region]:
+    def get_regions(self) -> list[Region]:
         """Return all registered regions."""
         return list(self._regions.values())
 
-    def get_local_properties(self, position: np.ndarray) -> Dict[str, Any]:
+    def get_local_properties(self, position: np.ndarray) -> dict[str, Any]:
         """Return the effective properties at *position*.
 
         Starts with the environment defaults, then overlays properties from
@@ -259,7 +259,7 @@ class Environment:
         duplicate keys).
         """
         position = np.asarray(position, dtype=np.float64)
-        props: Dict[str, Any] = dict(self.properties)
+        props: dict[str, Any] = dict(self.properties)
         for region in self._regions.values():
             if region.contains(position):
                 props.update(region.properties)
@@ -267,7 +267,7 @@ class Environment:
 
     # -- Serialisation ------------------------------------------------------
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Serialise the full environment state to a plain dict."""
         return {
             "name": self.name,
@@ -281,7 +281,7 @@ class Environment:
         }
 
     @classmethod
-    def from_dict(cls, data: Dict[str, Any]) -> "Environment":
+    def from_dict(cls, data: dict[str, Any]) -> Environment:
         """Reconstruct an :class:`Environment` from a dict produced by
         :meth:`to_dict`."""
         resolution = tuple(data.get("terrain_resolution", [64, 64]))

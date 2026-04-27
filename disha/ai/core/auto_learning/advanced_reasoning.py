@@ -1,13 +1,14 @@
 from __future__ import annotations
 
 import hashlib
-import logging
 import time
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Any, List, Optional
+from typing import Any
 
-logger = logging.getLogger(__name__)
+import structlog
+
+logger = structlog.get_logger(__name__)
 
 
 class ComplexityClass(Enum):
@@ -45,30 +46,30 @@ class SolutionPath:
     name: str
     description: str
     approach: str
-    steps: List[str] = field(default_factory=list)
+    steps: list[str] = field(default_factory=list)
     evaluation: SolutionEvaluation = field(default_factory=SolutionEvaluation)
-    edge_cases: List[str] = field(default_factory=list)
-    assumptions: List[str] = field(default_factory=list)
+    edge_cases: list[str] = field(default_factory=list)
+    assumptions: list[str] = field(default_factory=list)
     rank: int = 0
 
 
 @dataclass
 class SubProblem:
     description: str
-    dependencies: List[str] = field(default_factory=list)
-    solutions: List[SolutionPath] = field(default_factory=list)
-    selected_solution: Optional[SolutionPath] = None
+    dependencies: list[str] = field(default_factory=list)
+    solutions: list[SolutionPath] = field(default_factory=list)
+    selected_solution: SolutionPath | None = None
 
 
 @dataclass
 class ReasoningResult:
     problem: str
-    sub_problems: List[SubProblem] = field(default_factory=list)
-    all_solutions: List[SolutionPath] = field(default_factory=list)
-    selected_approach: Optional[SolutionPath] = None
+    sub_problems: list[SubProblem] = field(default_factory=list)
+    all_solutions: list[SolutionPath] = field(default_factory=list)
+    selected_approach: SolutionPath | None = None
     ambiguity_detected: bool = False
-    alternative_solutions: List[SolutionPath] = field(default_factory=list)
-    edge_cases: List[str] = field(default_factory=list)
+    alternative_solutions: list[SolutionPath] = field(default_factory=list)
+    edge_cases: list[str] = field(default_factory=list)
     confidence: float = 0.0
     reasoning_time: float = 0.0
     reasoning_id: str = ""
@@ -91,7 +92,7 @@ _COMPLEXITY_RANK = {
 }
 
 
-def _estimate_complexity(approach: str) -> tuple:
+def _estimate_complexity(approach: str) -> tuple[ComplexityClass, ComplexityClass]:
     lookup = {
         "direct": (ComplexityClass.O_N, ComplexityClass.O_1),
         "brute_force": (ComplexityClass.O_N2, ComplexityClass.O_N),
@@ -124,7 +125,7 @@ class AdvancedReasoningEngine:
     ) -> None:
         self._context_retriever = context_retriever
 
-    def decompose(self, problem: str) -> List[SubProblem]:
+    def decompose(self, problem: str) -> list[SubProblem]:
 
         for sep in [".", "?", ";"]:
             problem = problem.replace(sep, sep + "|||")
@@ -143,11 +144,11 @@ class AdvancedReasoningEngine:
         logger.info("problem_decomposed", count=len(sub_problems))
         return sub_problems
 
-    def generate_solutions(self, sub_problem: SubProblem) -> List[SolutionPath]:
+    def generate_solutions(self, sub_problem: SubProblem) -> list[SolutionPath]:
         solutions = []
         desc = sub_problem.description.lower()
 
-        applicable: List[str] = []
+        applicable: list[str] = []
         if any(kw in desc for kw in ["search", "find", "locate", "lookup"]):
             applicable.extend(["binary_search", "direct", "heuristic"])
         elif any(kw in desc for kw in ["sort", "order", "rank", "arrange"]):
@@ -219,7 +220,7 @@ class AdvancedReasoningEngine:
 
         return solution
 
-    def select_optimal(self, solutions: List[SolutionPath]) -> SolutionPath:
+    def select_optimal(self, solutions: list[SolutionPath]) -> SolutionPath:
         if not solutions:
             return SolutionPath(
                 name="none", description="No solutions available", approach="none"
@@ -236,7 +237,7 @@ class AdvancedReasoningEngine:
 
         return ranked[0]
 
-    def identify_edge_cases(self, problem: str) -> List[str]:
+    def identify_edge_cases(self, problem: str) -> list[str]:
         cases = [
             "Empty or null input",
             "Single-element input",
@@ -269,7 +270,7 @@ class AdvancedReasoningEngine:
 
         return cases
 
-    def detect_ambiguity(self, solutions: List[SolutionPath]) -> bool:
+    def detect_ambiguity(self, solutions: list[SolutionPath]) -> bool:
         if len(solutions) < 2:
             return False
 
@@ -291,7 +292,7 @@ class AdvancedReasoningEngine:
 
         sub_problems = self.decompose(problem)
 
-        all_solutions: List[SolutionPath] = []
+        all_solutions: list[SolutionPath] = []
         for sp in sub_problems:
             solutions = self.generate_solutions(sp)
             evaluated = [self.evaluate_solution(s) for s in solutions]
@@ -346,11 +347,11 @@ class AdvancedReasoningEngine:
         return result
 
     def reason_with_context(
-        self, problem: str, context_texts: List[str]
+        self, problem: str, context_texts: list[str]
     ) -> ReasoningResult:
 
         class _TempRetriever:
-            def query(self_, query: str, top_k: int = 3) -> list:
+            def query(self_, query: str, top_k: int = 3) -> list[Any]:
                 @dataclass
                 class _R:
                     text: str

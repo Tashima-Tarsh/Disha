@@ -2,9 +2,9 @@
 Each persona aligns with the Antigravity/DISHA 7-stage cognitive loop.
 """
 
-from typing import Dict, Any
+from typing import Any
 
-PERSONAS: Dict[str, Dict[str, Any]] = {
+PERSONAS: dict[str, dict[str, Any]] = {
     "developer": {
         "role": "Lead Software Engineer",
         "focus": "Repository architecture, coding standards, feature implementation, and refactoring.",

@@ -40,7 +40,7 @@ def crawl_repo(root_dir):
             file_path = Path(current_root) / file
             if file_path.suffix in allowed_extensions:
                 try:
-                    with open(file_path, "r", encoding="utf-8") as f:
+                    with open(file_path, encoding="utf-8") as f:
                         content = f.read()
 
                     repo_data.append(

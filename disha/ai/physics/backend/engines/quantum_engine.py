@@ -5,9 +5,9 @@ Falls back to numpy when qiskit/pennylane are not installed.
 
 from __future__ import annotations
 
+import cmath
 import logging
 import math
-import cmath
 from typing import Any
 
 import numpy as np

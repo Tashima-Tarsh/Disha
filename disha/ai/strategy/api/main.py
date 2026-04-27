@@ -8,7 +8,7 @@ import logging
 import sys
 from contextlib import asynccontextmanager
 from pathlib import Path
-from typing import List, Optional, Dict, Any
+from typing import Any
 
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
@@ -17,7 +17,10 @@ from pydantic import BaseModel, Field
 # Add project root to sys.path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from simulation.engine import HistoricalSimulationEngine, STRATEGY_EFFECTIVENESS  # noqa: E402
+from simulation.engine import (  # noqa: E402
+    STRATEGY_EFFECTIVENESS,
+    HistoricalSimulationEngine,
+)
 from simulation.scenarios import SCENARIOS  # noqa: E402
 
 DATA_FILE = Path(__file__).parent.parent / "data" / "historical_data.json"
@@ -25,8 +28,8 @@ DATA_FILE = Path(__file__).parent.parent / "data" / "historical_data.json"
 logger = logging.getLogger(__name__)
 
 # Global state
-conflicts_db: List[Dict[str, Any]] = []
-engine: Optional[HistoricalSimulationEngine] = None
+conflicts_db: list[dict[str, Any]] = []
+engine: HistoricalSimulationEngine | None = None
 
 
 @asynccontextmanager
@@ -86,11 +89,11 @@ class SimulationRequest(BaseModel):
 
 
 class AnalysisRequest(BaseModel):
-    era: Optional[str] = None
-    region: Optional[str] = None
-    terrain: Optional[str] = None
-    technology_level: Optional[str] = None
-    year: Optional[int] = None
+    era: str | None = None
+    region: str | None = None
+    terrain: str | None = None
+    technology_level: str | None = None
+    year: int | None = None
     top_k: int = Field(3, ge=1, le=10)
 
 
@@ -144,14 +147,14 @@ async def root():
 
 @app.get("/api/conflicts", tags=["Conflicts"])
 async def list_conflicts(
-    era: Optional[str] = Query(None, description="Filter by era"),
-    region: Optional[str] = Query(None, description="Filter by region"),
-    strategy_type: Optional[str] = Query(None, description="Filter by strategy type"),
-    country: Optional[str] = Query(
+    era: str | None = Query(None, description="Filter by era"),
+    region: str | None = Query(None, description="Filter by region"),
+    strategy_type: str | None = Query(None, description="Filter by strategy type"),
+    country: str | None = Query(
         None, description="Filter by country (searches both sides)"
     ),
-    outcome: Optional[str] = Query(None, description="Filter by outcome"),
-    terrain: Optional[str] = Query(None, description="Filter by terrain"),
+    outcome: str | None = Query(None, description="Filter by outcome"),
+    terrain: str | None = Query(None, description="Filter by terrain"),
     limit: int = Query(100, ge=1, le=1000),
     offset: int = Query(0, ge=0),
 ):
@@ -186,7 +189,7 @@ async def list_conflicts(
         ]
 
     total = len(results)
-    results = results[offset: offset + limit]
+    results = results[offset : offset + limit]
 
     return {
         "total": total,
@@ -217,7 +220,7 @@ async def get_stats():
     outcome_counts = Counter(c.get("outcome") for c in conflicts_db)
 
     # Win rates by strategy
-    strategy_wins: Dict[str, list] = defaultdict(list)
+    strategy_wins: dict[str, list] = defaultdict(list)
     for c in conflicts_db:
         strategy = c.get("strategy_type", "Unknown")
         won = 1 if c.get("outcome") == "Victory" else 0
@@ -233,7 +236,7 @@ async def get_stats():
     }
 
     # Average casualties by era
-    era_casualties: Dict[str, list] = defaultdict(list)
+    era_casualties: dict[str, list] = defaultdict(list)
     for c in conflicts_db:
         era_casualties[c.get("era", "Unknown")].append(c.get("casualties_estimate", 0))
     avg_casualties_by_era = {
@@ -241,7 +244,7 @@ async def get_stats():
     }
 
     # Strategy effectiveness by terrain from actual data
-    terrain_strategy: Dict[str, Dict[str, list]] = defaultdict(
+    terrain_strategy: dict[str, dict[str, list]] = defaultdict(
         lambda: defaultdict(list)
     )
     for c in conflicts_db:
@@ -492,7 +495,7 @@ async def list_strategies():
     # Add historical effectiveness from data
     from collections import defaultdict
 
-    strategy_wins: Dict[str, list] = defaultdict(list)
+    strategy_wins: dict[str, list] = defaultdict(list)
     for c in conflicts_db:
         strategy = c.get("strategy_type", "Unknown")
         won = 1 if c.get("outcome") == "Victory" else 0
@@ -585,7 +588,7 @@ async def analyze_scenario(request: AnalysisRequest):
     """
     terrain = request.terrain or "Plains"
 
-    scores: Dict[str, float] = {}
+    scores: dict[str, float] = {}
     for strategy, terrain_map in STRATEGY_EFFECTIVENESS.items():
         scores[strategy] = terrain_map.get(terrain, 0.5)
 
@@ -609,7 +612,7 @@ async def analyze_scenario(request: AnalysisRequest):
     # Compute win rates from filtered data
     from collections import defaultdict
 
-    strategy_wins: Dict[str, list] = defaultdict(list)
+    strategy_wins: dict[str, list] = defaultdict(list)
     for c in filtered:
         s = c.get("strategy_type", "Unknown")
         won = 1 if c.get("outcome") == "Victory" else 0
@@ -653,9 +656,9 @@ async def analyze_scenario(request: AnalysisRequest):
 @app.get("/api/eras", tags=["Analytics"])
 async def get_eras():
     """List all historical eras with conflict counts and statistics."""
-    from collections import defaultdict, Counter
+    from collections import Counter, defaultdict
 
-    era_data: Dict[str, Any] = defaultdict(
+    era_data: dict[str, Any] = defaultdict(
         lambda: {"conflicts": [], "win_count": 0, "total": 0}
     )
     for c in conflicts_db:
@@ -705,7 +708,7 @@ async def get_leaders():
     """List notable historical leaders with their associated conflicts."""
     from collections import defaultdict
 
-    leader_conflicts: Dict[str, list] = defaultdict(list)
+    leader_conflicts: dict[str, list] = defaultdict(list)
     for c in conflicts_db:
         for leader in c.get("notable_leaders", []):
             leader_conflicts[leader].append(

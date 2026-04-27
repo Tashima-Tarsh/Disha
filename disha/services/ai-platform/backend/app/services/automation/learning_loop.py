@@ -1,6 +1,7 @@
-import structlog
+from datetime import UTC, datetime
 from typing import Any
-from datetime import datetime, timezone
+
+import structlog
 
 logger = structlog.get_logger(__name__)
 
@@ -22,7 +23,7 @@ class LearningLoop:
             "query": query,
             "results_count": results_count,
             "avg_distance": avg_distance,
-            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "timestamp": datetime.now(UTC).isoformat(),
             "user_id": user_id,
             "is_knowledge_gap": is_knowledge_gap,
         }

@@ -5,9 +5,9 @@ This script is called by Claude Code when agent wants to stop.
 It reads .claude/hookify.*.local.md files and evaluates stop rules.
 """
 
+import json
 import os
 import sys
-import json
 
 # CRITICAL: Add plugin root to Python path for imports
 PLUGIN_ROOT = os.environ.get("CLAUDE_PLUGIN_ROOT")

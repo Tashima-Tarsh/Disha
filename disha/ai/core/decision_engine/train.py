@@ -1,10 +1,11 @@
 from __future__ import annotations
+
 import json
 import os
 import sys
 from pathlib import Path
-import numpy as np
 
+import numpy as np
 from main_decision_engine import DecisionEngine
 
 _SCRIPT_DIR = Path(__file__).resolve().parent
@@ -200,7 +201,7 @@ class CalibrationModel:
         }
 
     @classmethod
-    def from_dict(cls, d: dict) -> "CalibrationModel":
+    def from_dict(cls, d: dict) -> CalibrationModel:
         m = cls()
         m.weights = np.array(d["weights"]) if d.get("weights") is not None else None
         m.bias = d.get("bias", 0.0)

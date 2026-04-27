@@ -2,9 +2,9 @@
 Enables semantic retrieval across code, docs, and architecture.
 """
 
-from typing import List, Dict, Any
 import json
 import os
+from typing import Any
 
 
 # Mocking the VectorDB/Embedding logic as it depends on runtime environment
@@ -16,12 +16,12 @@ class RepositoryRAG:
 
     def _load_metadata(self):
         if os.path.exists(self.meta_data_path):
-            with open(self.meta_data_path, "r") as f:
+            with open(self.meta_data_path) as f:
                 self.metadata = json.load(f)
         else:
             self.metadata = {}
 
-    def query(self, text: str, top_k: int = 5) -> List[Dict[str, Any]]:
+    def query(self, text: str, top_k: int = 5) -> list[dict[str, Any]]:
         """
         Queries the vector store for relevant repo snippets.
         In production, this would call ChromaDB/Neo4j.

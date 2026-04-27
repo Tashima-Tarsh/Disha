@@ -12,11 +12,11 @@ import logging
 import os
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Optional, Tuple
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
-_config_instance: Optional[SystemConfig] = None
+_config_instance: SystemConfig | None = None
 
 
 @dataclass
@@ -25,7 +25,7 @@ class SimulationSettings:
 
     dt: float = 0.01
     max_steps: int = 10000
-    seed: Optional[int] = None
+    seed: int | None = None
 
 
 @dataclass
@@ -41,7 +41,7 @@ class PhysicsSettings:
 class WorldSettings:
     """Settings controlling the world model."""
 
-    bounds: Tuple[float, float, float] = (100.0, 100.0, 100.0)
+    bounds: tuple[float, float, float] = (100.0, 100.0, 100.0)
     max_entities: int = 1000
 
 
@@ -50,7 +50,7 @@ class LoggingSettings:
     """Settings controlling logging behaviour."""
 
     level: str = "INFO"
-    file_path: Optional[str] = None
+    file_path: str | None = None
     console_output: bool = True
 
 
@@ -118,7 +118,7 @@ class SystemConfig:
         """
         path = Path(path)
         logger.info("Loading configuration from %s", path)
-        with open(path, "r", encoding="utf-8") as fh:
+        with open(path, encoding="utf-8") as fh:
             data = json.load(fh)
         return cls.from_dict(data)
 

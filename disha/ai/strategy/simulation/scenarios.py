@@ -3,9 +3,9 @@ Predefined simulation scenarios for the Historical Strategy Intelligence System.
 Each scenario represents a realistic historical or hypothetical combat situation.
 """
 
-from typing import Dict, Any
+from typing import Any
 
-SCENARIOS: Dict[str, Dict[str, Any]] = {
+SCENARIOS: dict[str, dict[str, Any]] = {
     "blitzkrieg_plains": {
         "name": "Blitzkrieg on the Plains",
         "description": "Rapid armored penetration across open plains against a conventional defender with inferior technology.",
@@ -219,7 +219,7 @@ SCENARIOS: Dict[str, Dict[str, Any]] = {
 }
 
 # Strategy counter-relationships (historical effectiveness)
-STRATEGY_COUNTERS: Dict[str, Dict[str, float]] = {
+STRATEGY_COUNTERS: dict[str, dict[str, float]] = {
     "Guerrilla": {
         "Conventional": 1.3,
         "Attrition": 0.8,
@@ -343,7 +343,7 @@ STRATEGY_COUNTERS: Dict[str, Dict[str, float]] = {
 }
 
 # Terrain advantage multipliers for each strategy
-TERRAIN_MULTIPLIERS: Dict[str, Dict[str, float]] = {
+TERRAIN_MULTIPLIERS: dict[str, dict[str, float]] = {
     "Guerrilla": {
         "Mountains": 1.3,
         "Forest": 1.25,

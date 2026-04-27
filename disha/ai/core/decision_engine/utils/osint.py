@@ -3,11 +3,11 @@ from __future__ import annotations
 import json
 import urllib.request
 import xml.etree.ElementTree as ET
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 
 class OSINTClient:
-    DEFAULT_FEEDS: List[Dict[str, str]] = [
+    DEFAULT_FEEDS: list[dict[str, str]] = [
         {
             "name": "Feodo-Tracker",
             "url": "https://feodotracker.abuse.ch/downloads/ipblocklist_recommended.txt",
@@ -17,14 +17,14 @@ class OSINTClient:
 
     def __init__(
         self,
-        feeds: Optional[List[Dict[str, str]]] = None,
+        feeds: list[dict[str, str]] | None = None,
         timeout: int = 10,
     ) -> None:
         self.feeds = feeds if feeds is not None else self.DEFAULT_FEEDS
         self.timeout = timeout
 
-    def fetch_all(self) -> List[Dict[str, Any]]:
-        indicators: List[Dict[str, Any]] = []
+    def fetch_all(self) -> list[dict[str, Any]]:
+        indicators: list[dict[str, Any]] = []
         for feed in self.feeds:
             try:
                 items = self._fetch_feed(feed)
@@ -38,7 +38,7 @@ class OSINTClient:
                 )
         return indicators
 
-    def _fetch_feed(self, feed: Dict[str, str]) -> List[Dict[str, Any]]:
+    def _fetch_feed(self, feed: dict[str, str]) -> list[dict[str, Any]]:
         url = feed["url"]
         feed_type = feed.get("type", "json")
         name = feed.get("name", url)
@@ -54,9 +54,9 @@ class OSINTClient:
         return self._parse_text(raw, name)
 
     @staticmethod
-    def _parse_rss(raw: str, source: str) -> List[Dict[str, Any]]:
+    def _parse_rss(raw: str, source: str) -> list[dict[str, Any]]:
         root = ET.fromstring(raw)
-        items: List[Dict[str, Any]] = []
+        items: list[dict[str, Any]] = []
         for item in root.iter("item"):
             title = item.findtext("title", "")
             link = item.findtext("link", "")
@@ -72,15 +72,15 @@ class OSINTClient:
         return items
 
     @staticmethod
-    def _parse_json(raw: str, source: str) -> List[Dict[str, Any]]:
+    def _parse_json(raw: str, source: str) -> list[dict[str, Any]]:
         data = json.loads(raw)
         if isinstance(data, list):
             return [{"source": source, **entry} for entry in data]
         return [{"source": source, "data": data}]
 
     @staticmethod
-    def _parse_text(raw: str, source: str) -> List[Dict[str, Any]]:
-        indicators: List[Dict[str, Any]] = []
+    def _parse_text(raw: str, source: str) -> list[dict[str, Any]]:
+        indicators: list[dict[str, Any]] = []
         for line in raw.splitlines():
             line = line.strip()
             if line and not line.startswith("#"):

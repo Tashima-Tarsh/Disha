@@ -1,11 +1,11 @@
 """Legal Intelligence Agent - Specializes in Constitutional and Legislative research."""
 
 from typing import Any
-import structlog
 
+import structlog
 from app.agents.base_agent import BaseAgent
-from app.services.memory.vector_store import VectorStore
 from app.core.config import get_settings
+from app.services.memory.vector_store import VectorStore
 
 logger = structlog.get_logger(__name__)
 

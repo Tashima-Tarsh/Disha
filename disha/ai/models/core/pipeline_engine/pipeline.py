@@ -15,8 +15,9 @@ import logging
 import os
 import re
 import time
+from collections.abc import Callable
 from dataclasses import dataclass, field
-from typing import Any, Callable, Dict, List, Optional, Tuple
+from typing import Any
 
 import numpy as np
 
@@ -25,7 +26,7 @@ logger = logging.getLogger(__name__)
 # ---------------------------------------------------------------------------
 # Type aliases
 # ---------------------------------------------------------------------------
-StageCallback = Callable[["PipelineStage", Dict[str, Any]], None]
+StageCallback = Callable[["PipelineStage", dict[str, Any]], None]
 
 
 # =========================================================================
@@ -38,7 +39,7 @@ class PipelineStage(abc.ABC):
         self.name = name
 
     @abc.abstractmethod
-    def process(self, data: Dict[str, Any]) -> Dict[str, Any]:
+    def process(self, data: dict[str, Any]) -> dict[str, Any]:
         """Transform *data* and return the updated dictionary.
 
         Args:
@@ -48,7 +49,7 @@ class PipelineStage(abc.ABC):
             The (possibly modified) data dictionary.
         """
 
-    def validate(self, data: Dict[str, Any]) -> bool:
+    def validate(self, data: dict[str, Any]) -> bool:
         """Check whether *data* satisfies the pre-conditions for this stage.
 
         The default implementation accepts any dictionary.  Override in
@@ -75,10 +76,10 @@ class InputStage(PipelineStage):
     def __init__(self, name: str = "input") -> None:
         super().__init__(name)
 
-    def validate(self, data: Dict[str, Any]) -> bool:
+    def validate(self, data: dict[str, Any]) -> bool:
         return "raw_input" in data
 
-    def process(self, data: Dict[str, Any]) -> Dict[str, Any]:
+    def process(self, data: dict[str, Any]) -> dict[str, Any]:
         """Parse *raw_input* into ``parsed_input``.
 
         Supported raw formats:
@@ -94,7 +95,7 @@ class InputStage(PipelineStage):
         if isinstance(raw, dict):
             parsed = dict(raw)
         elif isinstance(raw, str) and os.path.isfile(raw):
-            with open(raw, "r", encoding="utf-8") as fh:
+            with open(raw, encoding="utf-8") as fh:
                 content = fh.read()
             try:
                 parsed = json.loads(content)
@@ -119,10 +120,10 @@ class ParsingStage(PipelineStage):
     def __init__(self, name: str = "parsing") -> None:
         super().__init__(name)
 
-    def validate(self, data: Dict[str, Any]) -> bool:
+    def validate(self, data: dict[str, Any]) -> bool:
         return "parsed_input" in data
 
-    def process(self, data: Dict[str, Any]) -> Dict[str, Any]:
+    def process(self, data: dict[str, Any]) -> dict[str, Any]:
         """Tokenise and extract structure from ``parsed_input``.
 
         If the parsed input contains a ``text`` key its value is tokenised
@@ -130,8 +131,8 @@ class ParsingStage(PipelineStage):
         are passed through with type annotations.
         """
         parsed = data.get("parsed_input", {})
-        tokens: List[Dict[str, Any]] = []
-        structure: Dict[str, Any] = {}
+        tokens: list[dict[str, Any]] = []
+        structure: dict[str, Any] = {}
 
         text = parsed.get("text", "")
         if text:
@@ -168,9 +169,9 @@ class _ExprNode:
 
     kind: str  # "num", "var", "op"
     value: Any = None
-    children: List["_ExprNode"] = field(default_factory=list)
+    children: list[_ExprNode] = field(default_factory=list)
 
-    def evaluate(self, variables: Dict[str, float]) -> float:
+    def evaluate(self, variables: dict[str, float]) -> float:
         """Recursively evaluate the expression tree."""
         if self.kind == "num":
             return float(self.value)
@@ -200,14 +201,14 @@ class _ExprNode:
         return f"({self.children[0]} {self.value} {self.children[1]})"
 
 
-def _tokens_to_expr(tokens: List[Dict[str, Any]]) -> Optional[_ExprNode]:
+def _tokens_to_expr(tokens: list[dict[str, Any]]) -> _ExprNode | None:
     """Build a flat left-associative expression tree from a token list.
 
     This intentionally does *not* implement full precedence parsing – it is
     a lightweight helper for the symbolic stage.
     """
-    nodes: List[_ExprNode] = []
-    operators: List[str] = []
+    nodes: list[_ExprNode] = []
+    operators: list[str] = []
 
     for tok in tokens:
         if tok["type"] == "number":
@@ -276,10 +277,10 @@ class SymbolicStage(PipelineStage):
     def __init__(self, name: str = "symbolic") -> None:
         super().__init__(name)
 
-    def validate(self, data: Dict[str, Any]) -> bool:
+    def validate(self, data: dict[str, Any]) -> bool:
         return "tokens" in data
 
-    def process(self, data: Dict[str, Any]) -> Dict[str, Any]:
+    def process(self, data: dict[str, Any]) -> dict[str, Any]:
         """Convert tokens into an expression tree and apply simplification rules."""
         tokens = data.get("tokens", [])
         tree = _tokens_to_expr(tokens)
@@ -301,10 +302,10 @@ class NumericalStage(PipelineStage):
     def __init__(self, name: str = "numerical") -> None:
         super().__init__(name)
 
-    def validate(self, data: Dict[str, Any]) -> bool:
+    def validate(self, data: dict[str, Any]) -> bool:
         return "simplified_tree" in data or "tokens" in data
 
-    def process(self, data: Dict[str, Any]) -> Dict[str, Any]:
+    def process(self, data: dict[str, Any]) -> dict[str, Any]:
         """Evaluate the simplified expression tree to a numerical result.
 
         If variable values are provided under ``data["variables"]`` they are
@@ -312,8 +313,8 @@ class NumericalStage(PipelineStage):
         ``data["numerical_result"]``.  Additional numpy-based statistics are
         computed when the parsed input contains array-like data.
         """
-        variables: Dict[str, float] = data.get("variables", {})
-        tree: Optional[_ExprNode] = data.get("simplified_tree")
+        variables: dict[str, float] = data.get("variables", {})
+        tree: _ExprNode | None = data.get("simplified_tree")
 
         if tree is not None:
             try:
@@ -329,7 +330,7 @@ class NumericalStage(PipelineStage):
 
         # Compute numpy statistics over any numeric arrays in parsed_input
         parsed = data.get("parsed_input", {})
-        stats: Dict[str, Any] = {}
+        stats: dict[str, Any] = {}
         for key, value in parsed.items():
             try:
                 arr = np.asarray(value, dtype=np.float64)
@@ -362,17 +363,17 @@ class SimulationStage(PipelineStage):
         self.n_steps = n_steps
         self.dt = dt
 
-    def validate(self, data: Dict[str, Any]) -> bool:
+    def validate(self, data: dict[str, Any]) -> bool:
         return True  # simulation can always run with defaults
 
-    def process(self, data: Dict[str, Any]) -> Dict[str, Any]:
+    def process(self, data: dict[str, Any]) -> dict[str, Any]:
         """Execute a simple numerical simulation.
 
         If ``data["simulation_fn"]`` is present it is called with the current
         state array at every step.  Otherwise a default damped-oscillator
         simulation is run using the numerical result as the initial amplitude.
         """
-        sim_fn: Optional[Callable] = data.get("simulation_fn")
+        sim_fn: Callable | None = data.get("simulation_fn")
         initial_value = data.get("numerical_result", 1.0) or 1.0
 
         steps = data.get("sim_steps", self.n_steps)
@@ -390,7 +391,7 @@ class SimulationStage(PipelineStage):
             zeta = 0.1
             x = float(initial_value)
             v = 0.0
-            history_x: List[float] = [x]
+            history_x: list[float] = [x]
             for _ in range(steps):
                 a = -2.0 * zeta * omega * v - omega**2 * x
                 v += a * dt
@@ -412,15 +413,15 @@ class OutputStage(PipelineStage):
         super().__init__(name)
         self.fmt = fmt
 
-    def validate(self, data: Dict[str, Any]) -> bool:
+    def validate(self, data: dict[str, Any]) -> bool:
         return True
 
-    def process(self, data: Dict[str, Any]) -> Dict[str, Any]:
+    def process(self, data: dict[str, Any]) -> dict[str, Any]:
         """Produce a formatted summary of the pipeline results.
 
         Supported formats: ``"dict"`` (default), ``"json"``, ``"text"``.
         """
-        summary: Dict[str, Any] = {
+        summary: dict[str, Any] = {
             "numerical_result": data.get("numerical_result"),
             "expression": (
                 str(data["simplified_tree"]) if data.get("simplified_tree") else None
@@ -471,19 +472,19 @@ class Pipeline:
 
     def __init__(self, name: str = "pipeline") -> None:
         self.name = name
-        self._stages: List[PipelineStage] = []
-        self._before_hooks: List[StageCallback] = []
-        self._after_hooks: List[StageCallback] = []
+        self._stages: list[PipelineStage] = []
+        self._before_hooks: list[StageCallback] = []
+        self._after_hooks: list[StageCallback] = []
 
     # -- Stage management ---------------------------------------------------
 
-    def add_stage(self, stage: PipelineStage) -> "Pipeline":
+    def add_stage(self, stage: PipelineStage) -> Pipeline:
         """Append a stage to the pipeline.  Returns *self* for chaining."""
         self._stages.append(stage)
         logger.info("Pipeline '%s': added stage '%s'", self.name, stage.name)
         return self
 
-    def remove_stage(self, name: str) -> "Pipeline":
+    def remove_stage(self, name: str) -> Pipeline:
         """Remove the first stage matching *name*.  Returns *self*."""
         for i, stage in enumerate(self._stages):
             if stage.name == name:
@@ -493,7 +494,7 @@ class Pipeline:
         raise KeyError(f"No stage named '{name}' in pipeline '{self.name}'")
 
     @property
-    def stages(self) -> Tuple[PipelineStage, ...]:
+    def stages(self) -> tuple[PipelineStage, ...]:
         """Return an immutable view of current stages."""
         return tuple(self._stages)
 
@@ -509,7 +510,7 @@ class Pipeline:
 
     # -- Execution ----------------------------------------------------------
 
-    def run(self, input_data: Dict[str, Any]) -> Dict[str, Any]:
+    def run(self, input_data: dict[str, Any]) -> dict[str, Any]:
         """Execute the full pipeline on *input_data*.
 
         Each stage's :meth:`validate` is called before :meth:`process`.  The

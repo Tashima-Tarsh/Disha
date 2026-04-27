@@ -5,9 +5,9 @@ import logging
 logger = logging.getLogger(__name__)
 
 try:
-    from openai import OpenAI
     import openai
     import tiktoken
+    from openai import OpenAI
 except ImportError:
     logger.error("'openai' or 'tiktoken' Python libraries not installed!")
     raise
@@ -79,7 +79,7 @@ class GPT:
         if params is None:
             params = {}
 
-        with open(template_path, "r") as file_handle:
+        with open(template_path) as file_handle:
             template = file_handle.read()
             # Perform substitutions
             for key, value in params.items():

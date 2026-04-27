@@ -1,8 +1,8 @@
 import json
-from typing import Any, Callable
+from collections.abc import Callable
+from typing import Any
 
 import structlog
-
 from app.core.config import get_settings
 
 logger = structlog.get_logger(__name__)

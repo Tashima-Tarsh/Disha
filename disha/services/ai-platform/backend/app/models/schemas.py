@@ -1,7 +1,8 @@
-from pydantic import BaseModel, Field
-from typing import Optional, Any
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from enum import Enum
+from typing import Any
+
+from pydantic import BaseModel, Field
 
 
 class InvestigationType(str, Enum):
@@ -57,7 +58,7 @@ class InvestigationResult(BaseModel):
     risk_score: float = Field(default=0.0, ge=0.0, le=1.0)
     summary: str = ""
     raw_data: dict[str, Any] = Field(default_factory=dict)
-    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    timestamp: datetime = Field(default_factory=lambda: datetime.now(UTC))
 
 
 class AlertLevel(str, Enum):
@@ -73,13 +74,13 @@ class Alert(BaseModel):
     title: str
     description: str
     source: str
-    entity_id: Optional[str] = None
+    entity_id: str | None = None
     metadata: dict[str, Any] = Field(default_factory=dict)
-    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    timestamp: datetime = Field(default_factory=lambda: datetime.now(UTC))
 
 
 class GraphInsightRequest(BaseModel):
-    entity_id: Optional[str] = None
+    entity_id: str | None = None
     insight_type: str = Field(
         default="community", description="Type: community, link_prediction, centrality"
     )
@@ -114,7 +115,7 @@ class VisionAnalysisRequest(BaseModel):
     analysis_type: str = Field(
         default="classify", description="classify | ocr | detect | similarity"
     )
-    image_data: Optional[str] = Field(
+    image_data: str | None = Field(
         default=None, description="Base64-encoded image data"
     )
 
@@ -124,19 +125,19 @@ class AudioAnalysisRequest(BaseModel):
     analysis_type: str = Field(
         default="transcribe", description="transcribe | analyze | keywords"
     )
-    audio_data: Optional[str] = Field(
+    audio_data: str | None = Field(
         default=None, description="Base64-encoded audio data"
     )
-    language: Optional[str] = Field(default=None, description="Expected language code")
+    language: str | None = Field(default=None, description="Expected language code")
 
 
 class MultimodalRequest(BaseModel):
     target: str = Field(..., description="Primary target identifier")
-    text_target: Optional[str] = None
-    image_url: Optional[str] = None
-    image_data: Optional[str] = None
-    audio_url: Optional[str] = None
-    audio_data: Optional[str] = None
+    text_target: str | None = None
+    image_url: str | None = None
+    image_data: str | None = None
+    audio_url: str | None = None
+    audio_data: str | None = None
     investigation_type: InvestigationType = Field(default=InvestigationType.FULL)
 
 
@@ -150,12 +151,12 @@ class CollaborativeRequest(BaseModel):
 
 class FeedbackRequest(BaseModel):
     investigation_id: str
-    true_positive: Optional[bool] = None
-    user_rating: Optional[float] = Field(default=None, ge=0.0, le=1.0)
+    true_positive: bool | None = None
+    user_rating: float | None = Field(default=None, ge=0.0, le=1.0)
     actionable_findings: int = Field(default=0, ge=0)
 
 
 class RankingRequest(BaseModel):
     top_n: int = Field(default=50, ge=1, le=500)
-    entity_type: Optional[str] = None
+    entity_type: str | None = None
     min_score: float = Field(default=0.0, ge=0.0, le=1.0)

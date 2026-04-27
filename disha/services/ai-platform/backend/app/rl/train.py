@@ -1,13 +1,14 @@
 from __future__ import annotations
+
 import json
 import sys
 from pathlib import Path
+
 import numpy as np
 import structlog
-
-from app.rl.environment import InvestigationEnvironment, ActionType
-from app.rl.policy import PolicyNetwork, TORCH_AVAILABLE
+from app.rl.environment import ActionType, InvestigationEnvironment
 from app.rl.experience_replay import ExperienceReplayBuffer
+from app.rl.policy import TORCH_AVAILABLE, PolicyNetwork
 from app.rl.reward import RewardComputer
 
 _SCRIPT_DIR = Path(__file__).resolve().parent

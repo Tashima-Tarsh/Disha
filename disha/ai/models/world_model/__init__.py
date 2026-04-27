@@ -12,7 +12,7 @@ Modules:
     world_manager: Top-level World class that ties all subsystems together.
 """
 
-from .entities.entity import Entity, AgentEntity, ObjectEntity, EntityState
+from .entities.entity import AgentEntity, Entity, EntityState, ObjectEntity
 from .entities.entity_registry import EntityRegistry
 from .environments.environment import (
     Environment,
@@ -20,10 +20,10 @@ from .environments.environment import (
     Region,
 )
 from .interactions.interaction import (
-    Interaction,
     CollisionInteraction,
     CommunicationInteraction,
     ForceInteraction,
+    Interaction,
     InteractionResolver,
 )
 from .world_manager.world import World

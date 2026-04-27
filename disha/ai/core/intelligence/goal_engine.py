@@ -83,15 +83,15 @@ class _GoalEntry:
         self.timestamp = goal["created_at"]
         self.goal = goal
 
-    def __lt__(self, other: "_GoalEntry") -> bool:
+    def __lt__(self, other: _GoalEntry) -> bool:
         if self.priority != other.priority:
-            return self.priority < other.priority
-        return self.timestamp < other.timestamp
+            return bool(self.priority < other.priority)
+        return bool(self.timestamp < other.timestamp)
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, _GoalEntry):
             return False
-        return self.goal["goal_id"] == other.goal["goal_id"]
+        return bool(self.goal["goal_id"] == other.goal["goal_id"])
 
 
 class GoalEngine:

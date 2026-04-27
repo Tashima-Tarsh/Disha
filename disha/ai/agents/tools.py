@@ -20,14 +20,14 @@ from .types import ToolCategory, ToolResult
 # Registry
 # ---------------------------------------------------------------------------
 
-_TOOL_REGISTRY: dict[str, "BaseTool"] = {}
+_TOOL_REGISTRY: dict[str, BaseTool] = {}
 
 
-def register_tool(name: str, tool: "BaseTool") -> None:
+def register_tool(name: str, tool: BaseTool) -> None:
     _TOOL_REGISTRY[name] = tool
 
 
-def get_tool(name: str) -> "BaseTool | None":
+def get_tool(name: str) -> BaseTool | None:
     return _TOOL_REGISTRY.get(name)
 
 

@@ -11,16 +11,16 @@ Demonstrates multi-agent simulation with different behaviours.
 * Runs for 50 steps and prints agent states, interactions, and positions.
 """
 
-from world_model.world_manager.world import World
+import os
+import sys
+
+import numpy as np
+from world_model.entities.entity import AgentEntity, Entity, EntityState
+from world_model.environments.environment import Environment
 from world_model.interactions.interaction import (
     CommunicationInteraction,
 )
-from world_model.environments.environment import Environment
-from world_model.entities.entity import AgentEntity, Entity, EntityState
-import numpy as np
-from typing import List
-import sys
-import os
+from world_model.world_manager.world import World
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
@@ -29,7 +29,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 # --- Agent behaviour functions ---
 
 
-def patrol_behavior(agent: AgentEntity, dt: float, nearby: List[Entity]) -> None:
+def patrol_behavior(agent: AgentEntity, dt: float, nearby: list[Entity]) -> None:
     """Moves in a rectangular patrol pattern."""
     step = agent.properties.get("patrol_step", 0)
     waypoints = [
@@ -53,7 +53,7 @@ def patrol_behavior(agent: AgentEntity, dt: float, nearby: List[Entity]) -> None
         agent.observe({"event": "detected_entities", "count": len(nearby)})
 
 
-def gather_behavior(agent: AgentEntity, dt: float, nearby: List[Entity]) -> None:
+def gather_behavior(agent: AgentEntity, dt: float, nearby: list[Entity]) -> None:
     """Moves toward a resource point and 'gathers'."""
     resource_pos = np.array([250.0, 250.0, 0.0])
     direction = resource_pos - agent.position
@@ -75,7 +75,7 @@ def gather_behavior(agent: AgentEntity, dt: float, nearby: List[Entity]) -> None
         agent.velocity = (direction / dist) * 8.0
 
 
-def defend_behavior(agent: AgentEntity, dt: float, nearby: List[Entity]) -> None:
+def defend_behavior(agent: AgentEntity, dt: float, nearby: list[Entity]) -> None:
     """Stays near a defense point, reacts to nearby entities."""
     defense_pos = np.array([300.0, 300.0, 0.0])
     direction = defense_pos - agent.position

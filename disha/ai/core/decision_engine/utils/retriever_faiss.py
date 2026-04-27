@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import json
 import os
-from typing import Dict, List, Optional
 
 try:
     import faiss
@@ -26,8 +25,8 @@ class FAISSRetriever:
                 "Install them with: pip install faiss-cpu sentence-transformers"
             )
         self.model = SentenceTransformer(model_name)
-        self.index: Optional[faiss.Index] = None
-        self.metadata: List[Dict] = []
+        self.index: faiss.Index | None = None
+        self.metadata: list[dict] = []
 
     def build_index(
         self,
@@ -35,7 +34,7 @@ class FAISSRetriever:
         index_path: str,
         metadata_path: str,
     ) -> None:
-        with open(input_path, "r", encoding="utf-8") as fh:
+        with open(input_path, encoding="utf-8") as fh:
             lines = [line.strip() for line in fh if line.strip()]
 
         embeddings = self.model.encode(lines, show_progress_bar=False)
@@ -57,10 +56,10 @@ class FAISSRetriever:
                 f"Index or metadata not found: {index_path}, {metadata_path}"
             )
         self.index = faiss.read_index(index_path)
-        with open(metadata_path, "r", encoding="utf-8") as fh:
+        with open(metadata_path, encoding="utf-8") as fh:
             self.metadata = json.load(fh)
 
-    def query(self, query_text: str, top_k: int = 5) -> List[Dict]:
+    def query(self, query_text: str, top_k: int = 5) -> list[dict]:
         if self.index is None or not self.metadata:
             return []
 
@@ -68,7 +67,7 @@ class FAISSRetriever:
         vec = np.array(vec, dtype="float32")
 
         distances, indices = self.index.search(vec, min(top_k, self.index.ntotal))
-        results: List[Dict] = []
+        results: list[dict] = []
         for dist, idx in zip(distances[0], indices[0]):
             if idx < 0:
                 continue

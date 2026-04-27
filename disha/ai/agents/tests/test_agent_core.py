@@ -7,6 +7,7 @@ import os
 import tempfile
 from pathlib import Path
 
+from agent_core.agent import Agent
 
 # ---------------------------------------------------------------------------
 # Import all modules under test
@@ -18,6 +19,20 @@ from agent_core.config import (
     ExecutorConfig,
     MemoryConfig,
 )
+from agent_core.controller import Controller
+from agent_core.executor import Executor
+from agent_core.memory import MemoryStore
+from agent_core.planner import Planner
+from agent_core.tools import (
+    AnalyzeStructureTool,
+    ListDirectoryTool,
+    ReadFileTool,
+    RunCommandTool,
+    SearchFilesTool,
+    WriteFileTool,
+    init_tools,
+    list_tools,
+)
 from agent_core.types import (
     AgentState,
     LogLevel,
@@ -28,22 +43,6 @@ from agent_core.types import (
     TaskPriority,
     TaskStatus,
 )
-from agent_core.memory import MemoryStore
-from agent_core.tools import (
-    ReadFileTool,
-    WriteFileTool,
-    ListDirectoryTool,
-    SearchFilesTool,
-    RunCommandTool,
-    AnalyzeStructureTool,
-    init_tools,
-    list_tools,
-)
-from agent_core.planner import Planner
-from agent_core.executor import Executor
-from agent_core.controller import Controller
-from agent_core.agent import Agent
-
 
 # ===========================================================================
 # Types tests

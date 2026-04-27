@@ -10,8 +10,9 @@ from __future__ import annotations
 
 import logging
 import math
+from collections.abc import Callable
 from concurrent.futures import ProcessPoolExecutor, as_completed
-from typing import Any, Callable, Optional, Tuple
+from typing import Any
 
 import numpy as np
 
@@ -20,7 +21,7 @@ logger = logging.getLogger(__name__)
 SimulationFn = Callable[[np.random.Generator], float]
 
 
-def _run_single(args: Tuple[Any, int]) -> float:
+def _run_single(args: tuple[Any, int]) -> float:
     """Top-level helper for parallel execution (must be picklable).
 
     Args:
@@ -80,7 +81,7 @@ class MonteCarloResults:
     def max(self) -> float:
         return float(np.max(self._results))
 
-    def confidence_interval(self, level: float = 0.95) -> Tuple[float, float]:
+    def confidence_interval(self, level: float = 0.95) -> tuple[float, float]:
         """Compute a symmetric confidence interval for the mean.
 
         Uses the normal approximation (valid for large *n*).
@@ -114,7 +115,7 @@ class MonteCarloResults:
             raise ValueError(f"Percentile must be in [0, 100], got {p}")
         return float(np.percentile(self._results, p))
 
-    def histogram_data(self, bins: int = 50) -> Tuple[np.ndarray, np.ndarray]:
+    def histogram_data(self, bins: int = 50) -> tuple[np.ndarray, np.ndarray]:
         """Compute histogram counts and bin edges.
 
         Args:
@@ -209,13 +210,13 @@ class MonteCarloSimulation:
         self,
         simulation_fn: SimulationFn,
         n_iterations: int = 1000,
-        seed: Optional[int] = None,
+        seed: int | None = None,
     ) -> None:
         if n_iterations < 1:
             raise ValueError(f"n_iterations must be >= 1, got {n_iterations}")
         self._simulation_fn: SimulationFn = simulation_fn
         self._n_iterations: int = n_iterations
-        self._seed: Optional[int] = seed
+        self._seed: int | None = seed
         logger.info(
             "MonteCarloSimulation created: n_iterations=%d seed=%s",
             n_iterations,

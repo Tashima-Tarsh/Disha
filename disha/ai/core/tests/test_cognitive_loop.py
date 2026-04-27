@@ -11,11 +11,11 @@ Tests cover:
 
 from __future__ import annotations
 
-import pytest
 from unittest.mock import AsyncMock, MagicMock, patch
 
-from disha.ai.core.cognitive_loop import CognitiveEngine, CognitiveState
+import pytest
 
+from disha.ai.core.cognitive_loop import CognitiveEngine, CognitiveState
 
 # ── Fixtures ───────────────────────────────────────────────────────────────────
 

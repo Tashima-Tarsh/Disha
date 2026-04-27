@@ -3,15 +3,18 @@ from pathlib import Path
 
 # Path setup
 _THIS = Path(__file__).resolve()
-_REPO_ROOT = _THIS.parents[4]  # disha/services/ai-platform/backend/tests -> disha/services/ai-platform/backend -> disha/services/ai-platform -> disha/services -> disha -> root
+_REPO_ROOT = _THIS.parents[
+    4
+]  # disha/services/ai-platform/backend/tests -> disha/services/ai-platform/backend -> disha/services/ai-platform -> disha/services -> disha -> root
 _BACKEND = _THIS.parents[1]
 
 for p in [str(_REPO_ROOT), str(_BACKEND)]:
     if p not in sys.path:
         sys.path.insert(0, p)
 
-import pytest  # noqa: E402
 from unittest.mock import AsyncMock, patch  # noqa: E402
+
+import pytest  # noqa: E402
 from app.agents.sentinel_agent import SentinelAgent  # noqa: E402
 
 

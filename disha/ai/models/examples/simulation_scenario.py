@@ -11,14 +11,15 @@ Demonstrates an N-body gravitational simulation using the physics engine.
 * Prints trajectory summaries and energy over time.
 """
 
-from world_model.environments.environment import Environment
+import os
+import sys
+
+import numpy as np
 from physics_engine.classical.mechanics import (
     ClassicalMechanicsEngine,
     PhysicsObject,
 )
-import numpy as np
-import sys
-import os
+from world_model.environments.environment import Environment
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))

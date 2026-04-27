@@ -77,7 +77,7 @@ _FALLBACK_NEO = {
 
 def _load_space_json() -> dict:
     try:
-        with open(_KNOWLEDGE_DIR / "space_science.json", "r", encoding="utf-8") as f:
+        with open(_KNOWLEDGE_DIR / "space_science.json", encoding="utf-8") as f:
             return json.load(f)
     except Exception:
         return {}

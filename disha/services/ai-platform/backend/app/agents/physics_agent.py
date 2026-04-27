@@ -1,4 +1,5 @@
-from typing import Any, Dict, List
+from typing import Any
+
 import structlog
 from app.agents.base_agent import BaseAgent
 from app.services.physics.md_engine import MDEngine
@@ -82,7 +83,7 @@ class PhysicsAgent(BaseAgent):
             "entities": self._get_atomic_entities(simulation_data),
         }
 
-    def _calculate_energy_drift(self, diagnostics: List[Dict]) -> float:
+    def _calculate_energy_drift(self, diagnostics: list[dict]) -> float:
         if not diagnostics:
             return 1.0
 
@@ -98,7 +99,7 @@ class PhysicsAgent(BaseAgent):
 
         return abs((final - initial) / initial)
 
-    def _get_atomic_entities(self, simulation_data: Dict) -> List[Dict]:
+    def _get_atomic_entities(self, simulation_data: dict) -> list[dict]:
         return [
             {
                 "id": f"material-sim-{simulation_data['n_atoms']}-atoms",

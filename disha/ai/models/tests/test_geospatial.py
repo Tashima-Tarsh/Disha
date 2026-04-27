@@ -1,16 +1,17 @@
 """Geospatial tests."""
 
-from geospatial.tracking.tracker import ObjectTracker
-from geospatial.sensor_integration.sensor import Sensor, SensorType
-from geospatial.gis_processing.spatial_index import SpatialGrid, Point2D
-from geospatial.gis_processing.coordinate_system import (
-    GeoCoordinate,
-    CoordinateTransformer,
-)
-import sys
 import os
+import sys
 import unittest
+
 import numpy as np
+from geospatial.gis_processing.coordinate_system import (
+    CoordinateTransformer,
+    GeoCoordinate,
+)
+from geospatial.gis_processing.spatial_index import Point2D, SpatialGrid
+from geospatial.sensor_integration.sensor import Sensor, SensorType
+from geospatial.tracking.tracker import ObjectTracker
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 

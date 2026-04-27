@@ -27,7 +27,7 @@ _KNOWLEDGE_DIR = Path(__file__).parent.parent / "knowledge"
 
 def _load_json(filename: str) -> dict:
     try:
-        with open(_KNOWLEDGE_DIR / filename, "r", encoding="utf-8") as f:
+        with open(_KNOWLEDGE_DIR / filename, encoding="utf-8") as f:
             return json.load(f)
     except Exception:
         return {}

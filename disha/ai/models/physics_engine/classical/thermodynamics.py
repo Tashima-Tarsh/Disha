@@ -19,8 +19,6 @@ from __future__ import annotations
 import logging
 import math
 import uuid
-from typing import Dict, List, Optional, Tuple
-
 
 logger = logging.getLogger(__name__)
 
@@ -50,7 +48,7 @@ class ThermalBody:
         mass: float,
         specific_heat: float,
         temperature: float,
-        name: Optional[str] = None,
+        name: str | None = None,
     ) -> None:
         if mass <= 0.0:
             raise ValueError(f"Mass must be positive, got {mass}")
@@ -157,8 +155,8 @@ class ThermodynamicsEngine:
     """
 
     def __init__(self, default_conductance: float = 1.0) -> None:
-        self._bodies: Dict[str, ThermalBody] = {}
-        self._conductances: Dict[Tuple[str, str], float] = {}
+        self._bodies: dict[str, ThermalBody] = {}
+        self._conductances: dict[tuple[str, str], float] = {}
         self.default_conductance: float = default_conductance
         self.time: float = 0.0
         logger.info(
@@ -193,7 +191,7 @@ class ThermodynamicsEngine:
         return body
 
     @property
-    def bodies(self) -> List[ThermalBody]:
+    def bodies(self) -> list[ThermalBody]:
         """All registered thermal bodies."""
         return list(self._bodies.values())
 
@@ -237,7 +235,7 @@ class ThermodynamicsEngine:
             raise ValueError(f"Time step must be positive, got {dt}")
 
         # Compute heat deltas first (explicit Euler on energy)
-        energy_deltas: Dict[str, float] = {name: 0.0 for name in self._bodies}
+        energy_deltas: dict[str, float] = {name: 0.0 for name in self._bodies}
         body_list = self.bodies
         n = len(body_list)
 
@@ -268,7 +266,7 @@ class ThermodynamicsEngine:
         """Total entropy across all bodies (J/K)."""
         return sum(b.entropy(reference_temperature) for b in self._bodies.values())
 
-    def get_state(self) -> Dict[str, Dict[str, float]]:
+    def get_state(self) -> dict[str, dict[str, float]]:
         """Snapshot of temperatures and energies."""
         return {
             name: {

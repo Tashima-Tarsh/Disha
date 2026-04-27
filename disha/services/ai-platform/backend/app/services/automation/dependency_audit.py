@@ -1,5 +1,6 @@
-import structlog
 from typing import Any
+
+import structlog
 
 logger = structlog.get_logger(__name__)
 
@@ -43,7 +44,7 @@ class DependencyAudit:
     def _parse_requirements(self) -> list[dict[str, str]]:
         packages = []
         try:
-            with open(self.requirements_path, "r") as f:
+            with open(self.requirements_path) as f:
                 for line in f:
                     line = line.strip()
                     if line and not line.startswith("#"):

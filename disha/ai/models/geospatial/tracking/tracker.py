@@ -10,7 +10,6 @@ from __future__ import annotations
 import logging
 from dataclasses import dataclass, field
 from enum import Enum, auto
-from typing import Dict, List, Optional
 
 import numpy as np
 
@@ -38,23 +37,23 @@ class Track:
     """
 
     track_id: str
-    positions: List[np.ndarray] = field(default_factory=list)
-    velocities: List[np.ndarray] = field(default_factory=list)
-    timestamps: List[float] = field(default_factory=list)
+    positions: list[np.ndarray] = field(default_factory=list)
+    velocities: list[np.ndarray] = field(default_factory=list)
+    timestamps: list[float] = field(default_factory=list)
     status: TrackStatus = TrackStatus.ACTIVE
 
     @property
-    def last_position(self) -> Optional[np.ndarray]:
+    def last_position(self) -> np.ndarray | None:
         """Most recent position, or ``None`` if the track is empty."""
         return self.positions[-1] if self.positions else None
 
     @property
-    def last_velocity(self) -> Optional[np.ndarray]:
+    def last_velocity(self) -> np.ndarray | None:
         """Most recent velocity, or ``None`` if unavailable."""
         return self.velocities[-1] if self.velocities else None
 
     @property
-    def last_timestamp(self) -> Optional[float]:
+    def last_timestamp(self) -> float | None:
         """Most recent timestamp, or ``None`` if the track is empty."""
         return self.timestamps[-1] if self.timestamps else None
 
@@ -78,7 +77,7 @@ class ObjectTracker:
     """
 
     def __init__(self) -> None:
-        self._tracks: Dict[str, Track] = {}
+        self._tracks: dict[str, Track] = {}
         logger.info("ObjectTracker initialised")
 
     def update(
@@ -189,7 +188,7 @@ class ObjectTracker:
         """
         return self._get_track_or_raise(track_id)
 
-    def get_all_active(self) -> List[Track]:
+    def get_all_active(self) -> list[Track]:
         """Return all tracks with :attr:`TrackStatus.ACTIVE` status.
 
         Returns:
@@ -199,7 +198,7 @@ class ObjectTracker:
         logger.debug("Active tracks: %d / %d", len(active), len(self._tracks))
         return active
 
-    def prune_stale(self, max_age: float, current_time: float) -> List[str]:
+    def prune_stale(self, max_age: float, current_time: float) -> list[str]:
         """Remove tracks that have not been updated recently.
 
         Tracks whose last observation is older than
@@ -213,7 +212,7 @@ class ObjectTracker:
         Returns:
             List of pruned track IDs.
         """
-        pruned: List[str] = []
+        pruned: list[str] = []
         for tid, track in list(self._tracks.items()):
             if track.timestamps and (current_time - track.timestamps[-1]) > max_age:
                 track.status = TrackStatus.LOST

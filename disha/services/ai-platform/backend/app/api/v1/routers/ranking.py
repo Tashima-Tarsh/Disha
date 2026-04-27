@@ -1,18 +1,18 @@
-from fastapi import APIRouter, Depends
+from app.api.deps import get_cluster_coordinator, get_intelligence_ranker
 from app.core.security import get_current_user
-from app.models.schemas import RankingRequest, CollaborativeRequest
-from app.api.deps import get_intelligence_ranker, get_cluster_coordinator
+from app.models.schemas import CollaborativeRequest, RankingRequest
+from fastapi import APIRouter, Depends
 
 router = APIRouter()
 
 
 def _register_cluster_agents(cluster_coordinator):
-    from app.agents.osint_agent import OSINTAgent
     from app.agents.crypto_agent import CryptoAgent
     from app.agents.detection_agent import DetectionAgent
     from app.agents.graph_agent import GraphAgent
+    from app.agents.osint_agent import OSINTAgent
     from app.agents.reasoning_agent import ReasoningAgent
-    from app.api.deps import get_vision_agent, get_audio_agent
+    from app.api.deps import get_audio_agent, get_vision_agent
 
     cluster_coordinator.register_agent(
         "osint", OSINTAgent(), ["osint", "dns", "shodan", "reconnaissance"]

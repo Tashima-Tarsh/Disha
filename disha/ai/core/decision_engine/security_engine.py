@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from .utils.llm_wrapper import get_llm
 from .utils.osint import OSINTClient
@@ -9,14 +9,14 @@ from .utils.osint import OSINTClient
 class SecurityAgent:
     def __init__(
         self,
-        osint_client: Optional[OSINTClient] = None,
-        llm: Optional[Any] = None,
+        osint_client: OSINTClient | None = None,
+        llm: Any | None = None,
     ) -> None:
         self.llm = llm or get_llm()
         self.osint_client = osint_client
 
-    def analyze(self, scenario: str) -> Dict[str, Any]:
-        osint_findings: List[Dict[str, Any]] = []
+    def analyze(self, scenario: str) -> dict[str, Any]:
+        osint_findings: list[dict[str, Any]] = []
         if self.osint_client is not None:
             try:
                 osint_findings = self.osint_client.fetch_all()
@@ -40,7 +40,7 @@ class SecurityAgent:
         )
         raw = self.llm.generate(prompt)
 
-        sources: List[Dict[str, Any]] = []
+        sources: list[dict[str, Any]] = []
         for f in osint_findings:
             sources.append(
                 {

@@ -1,14 +1,16 @@
 import json
+from typing import Any
+
 import redis
 import structlog
-from typing import Any, Optional
 from app.core.config import get_settings
 
 logger = structlog.get_logger("cache_service")
 
+
 class CacheService:
     """High-performance Redis caching for DISHA OS."""
-    
+
     def __init__(self) -> None:
         settings = get_settings()
         try:
@@ -18,7 +20,7 @@ class CacheService:
             logger.warning("cache_connection_failed", error=str(e))
             self.redis = None
 
-    def get(self, key: str) -> Optional[Any]:
+    def get(self, key: str) -> Any | None:
         if not self.redis:
             return None
         data = self.redis.get(key)

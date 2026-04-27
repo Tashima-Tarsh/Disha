@@ -1,6 +1,7 @@
+from datetime import UTC, datetime
 from typing import Any
+
 import structlog
-from datetime import datetime, timezone
 
 logger = structlog.get_logger(__name__)
 
@@ -18,7 +19,7 @@ class DisasterService:
             "type": "flood",
             "severity": "extreme",
             "region": "Assam, Brahmaputra Basin",
-            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "timestamp": datetime.now(UTC).isoformat(),
             "description": "Critical flood levels expected in 48 hours due to concentrated rainfall.",
             "source": "SACHET",
             "status": "active",

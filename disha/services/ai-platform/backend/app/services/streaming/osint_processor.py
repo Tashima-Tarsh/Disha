@@ -1,8 +1,9 @@
 import asyncio
+
 import structlog
+from app.api.deps import get_connection_manager
 from app.core.config import get_settings
 from app.services.streaming.kafka_service import KafkaConsumer
-from app.api.deps import get_connection_manager
 
 logger = structlog.get_logger(__name__)
 

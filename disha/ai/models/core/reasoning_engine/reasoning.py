@@ -12,7 +12,7 @@ import math
 import random
 import uuid
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 
 import numpy as np
 
@@ -37,8 +37,8 @@ class Hypothesis:
     description: str
     probability: float = 0.5
     id: str = field(default_factory=lambda: uuid.uuid4().hex[:12])
-    evidence: List[Tuple[str, float]] = field(default_factory=list)
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    evidence: list[tuple[str, float]] = field(default_factory=list)
+    metadata: dict[str, Any] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
         self.probability = max(0.0, min(1.0, self.probability))
@@ -63,8 +63,8 @@ class ReasoningEngine:
         best = engine.collapse()
     """
 
-    def __init__(self, seed: Optional[int] = None) -> None:
-        self._hypotheses: Dict[str, Hypothesis] = {}
+    def __init__(self, seed: int | None = None) -> None:
+        self._hypotheses: dict[str, Hypothesis] = {}
         self._rng = random.Random(seed)
 
     # -- Hypothesis management ----------------------------------------------
@@ -73,7 +73,7 @@ class ReasoningEngine:
         self,
         description: str,
         initial_prob: float = 0.5,
-        metadata: Optional[Dict[str, Any]] = None,
+        metadata: dict[str, Any] | None = None,
     ) -> str:
         """Create a new hypothesis and return its id.
 
@@ -143,7 +143,7 @@ class ReasoningEngine:
         if not self._hypotheses:
             return
 
-        likelihoods: Dict[str, float] = {}
+        likelihoods: dict[str, float] = {}
         for hid, h in self._hypotheses.items():
             cumulative = sum(w for _, w in h.evidence) if h.evidence else 0.0
             # Sigmoid mapping: higher cumulative weight → higher likelihood
@@ -167,7 +167,7 @@ class ReasoningEngine:
 
     # -- Superposition & collapse -------------------------------------------
 
-    def get_superposition(self) -> List[Tuple[str, str, float]]:
+    def get_superposition(self) -> list[tuple[str, str, float]]:
         """Return all hypotheses with their current probabilities.
 
         Returns:
@@ -230,7 +230,7 @@ class ReasoningEngine:
 
     # -- Pruning ------------------------------------------------------------
 
-    def prune(self, threshold: float = 0.01) -> List[str]:
+    def prune(self, threshold: float = 0.01) -> list[str]:
         """Remove hypotheses with probability below *threshold*.
 
         Args:
@@ -263,9 +263,9 @@ class DecisionFramework:
 
     def evaluate_options(
         self,
-        options: List[Dict[str, Any]],
-        criteria_weights: Dict[str, float],
-    ) -> List[Dict[str, Any]]:
+        options: list[dict[str, Any]],
+        criteria_weights: dict[str, float],
+    ) -> list[dict[str, Any]]:
         """Score and rank a list of options against weighted criteria.
 
         Each option is a dict with at least a ``"name"`` key and numeric
@@ -285,7 +285,7 @@ class DecisionFramework:
         total_weight = sum(abs(w) for w in criteria_weights.values()) or 1.0
         normed_weights = {k: w / total_weight for k, w in criteria_weights.items()}
 
-        scored: List[Dict[str, Any]] = []
+        scored: list[dict[str, Any]] = []
         for opt in options:
             score = 0.0
             for criterion, weight in normed_weights.items():
@@ -304,7 +304,7 @@ class DecisionFramework:
         self,
         matrix: np.ndarray,
         weights: np.ndarray,
-        beneficial: Optional[np.ndarray] = None,
+        beneficial: np.ndarray | None = None,
     ) -> np.ndarray:
         """Rank alternatives using the TOPSIS method.
 
@@ -364,8 +364,8 @@ class DecisionFramework:
         base_weights: np.ndarray,
         vary_index: int,
         n_samples: int = 50,
-        beneficial: Optional[np.ndarray] = None,
-    ) -> Dict[str, np.ndarray]:
+        beneficial: np.ndarray | None = None,
+    ) -> dict[str, np.ndarray]:
         """Vary one criterion weight and observe changes in TOPSIS ranking.
 
         The weight at *vary_index* is swept from 0 to 1 while the remaining
@@ -387,7 +387,7 @@ class DecisionFramework:
             raise IndexError(f"vary_index {vary_index} out of range [0, {n_cri})")
 
         weight_values = np.linspace(0.0, 1.0, n_samples)
-        all_closeness: List[np.ndarray] = []
+        all_closeness: list[np.ndarray] = []
 
         others_total = base_w.sum() - base_w[vary_index]
 
