@@ -78,7 +78,7 @@ class HyperparamScheduler:
 
 
 def _merge_graphs(threat_graph, knowledge_graph: dict):
-    from data_fetchers import GraphDataset
+    from data_fetchers import GraphDataset  # type: ignore[import-not-found]
 
     tg_feats = threat_graph.node_features
     tg_edges = threat_graph.edge_index
@@ -151,10 +151,17 @@ def _train_rl(
     except ImportError:
         return {"status": "skipped", "reason": "torch_not_available"}
 
-    from app.rl.environment import InvestigationEnvironment
-    from app.rl.experience_replay import ExperienceReplayBuffer
-    from app.rl.policy import TORCH_AVAILABLE, PolicyNetwork
-    from app.rl.reward import RewardComputer
+    from app.rl.environment import (
+        InvestigationEnvironment,  # type: ignore[import-not-found]
+    )
+    from app.rl.experience_replay import (
+        ExperienceReplayBuffer,  # type: ignore[import-not-found]
+    )
+    from app.rl.policy import (  # type: ignore[import-not-found]
+        TORCH_AVAILABLE,
+        PolicyNetwork,
+    )
+    from app.rl.reward import RewardComputer  # type: ignore[import-not-found]
 
     if not TORCH_AVAILABLE:
         return {"status": "skipped", "reason": "torch_not_available"}
@@ -309,7 +316,9 @@ def _train_gnn(
     _models_spec = importlib.util.spec_from_file_location(
         "graph_ai.models", _GRAPH_DIR / "models.py"
     )
+    assert _models_spec is not None, f"Cannot find models.py in {_GRAPH_DIR}"
     _models = importlib.util.module_from_spec(_models_spec)
+    assert _models_spec.loader is not None
     _models_spec.loader.exec_module(_models)
 
     _trainer_spec = importlib.util.spec_from_file_location(
@@ -317,8 +326,10 @@ def _train_gnn(
         _GRAPH_DIR / "trainer.py",
         submodule_search_locations=[],
     )
+    assert _trainer_spec is not None, f"Cannot find trainer.py in {_GRAPH_DIR}"
     sys.modules["graph_ai.models"] = _models
     _trainer_mod = importlib.util.module_from_spec(_trainer_spec)
+    assert _trainer_spec.loader is not None
     _trainer_spec.loader.exec_module(_trainer_mod)
 
     GNNTrainer = _trainer_mod.GNNTrainer
@@ -516,7 +527,9 @@ def _train_decision_engine(
     import importlib.util
 
     spec = importlib.util.spec_from_file_location("de_train", de_train_path)
+    assert spec is not None, f"Cannot find train.py in {DECISION_DIR}"
     de_train = importlib.util.module_from_spec(spec)
+    assert spec.loader is not None
     spec.loader.exec_module(de_train)
     CalibrationModel = de_train.CalibrationModel
     _extract_features = de_train._extract_features
@@ -628,13 +641,13 @@ def run_continuous_training(
     component: str | None = None,
     offline: bool = False,
 ) -> dict:
-    from data_fetchers import (
+    from data_fetchers import (  # type: ignore[import-not-found]
         build_graph_from_threats,
         fetch_all_rl_data,
         generate_advanced_scenarios,
         generate_synthetic_threats,
     )
-    from knowledge_engine import (
+    from knowledge_engine import (  # type: ignore[import-not-found]
         build_knowledge_graph,
         generate_cross_domain_scenarios,
         load_all_knowledge,
