@@ -16,10 +16,10 @@ BACKEND = REPO_ROOT / "disha" / "services" / "ai-platform" / "backend"
 DECISION_DIR = REPO_ROOT / "disha" / "ai" / "core" / "decision_engine"
 SCRIPTS_DIR = REPO_ROOT / "disha" / "scripts"
 
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
 if str(BACKEND) not in sys.path:
     sys.path.insert(0, str(BACKEND))
-if str(DECISION_DIR) not in sys.path:
-    sys.path.insert(0, str(DECISION_DIR))
 if str(SCRIPTS_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPTS_DIR))
 
@@ -510,7 +510,7 @@ def _train_decision_engine(
     params: dict,
     checkpoint_dir: Path,
 ) -> dict:
-    from main_decision_engine import DecisionEngine
+    from disha.ai.core.decision_engine.main_decision_engine import DecisionEngine
 
     de_train_path = DECISION_DIR / "train.py"
     import importlib.util

@@ -40,6 +40,6 @@ jobs:
       - name: Run tests
         env:
           PYTHONPATH: ${{ github.workspace }}
+          DISHA_MODEL_PROVIDER: mock
         run: |
-          cd disha/ai/core/decision_engine
-          python -m pytest tests/ -v --tb=short
+          python -m pytest disha/ai/core/decision_engine/tests/ -v --tb=short
