@@ -38,3 +38,18 @@ class TenantManager:
             logger.info("usage_recorded", tenant=tenant_id, tokens=tokens, total=tenant.used_ai_tokens)
             return True
         return False
+
+    def check_feature_access(self, tenant_id: str, feature_id: str) -> bool:
+        """Enforces tier-based access to elite features (Monetization)."""
+        tenant = self.get_tenant(tenant_id)
+        if not tenant: return False
+        
+        # Elite features reserved for Pro/Enterprise
+        elite_features = ["agent_collaboration", "cross_repo_rag", "audit_logs"]
+        
+        if feature_id in elite_features and tenant.tier == "free":
+            logger.warning("access_denied_feature_locked", tenant=tenant_id, feature=feature_id)
+            return False
+            
+        logger.info("feature_access_granted", tenant=tenant_id, feature=feature_id)
+        return True
