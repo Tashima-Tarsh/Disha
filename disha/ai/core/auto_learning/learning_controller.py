@@ -2,11 +2,12 @@ from __future__ import annotations
 
 import hashlib
 import json
-import structlog
 import time
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Dict, List, Set
+from typing import Any
+
+import structlog
 
 logger = structlog.get_logger(__name__)
 
@@ -44,7 +45,7 @@ class QualityScorer:
         source_credibility: dict[str, float] | None = None,
     ) -> None:
         self._source_cred = source_credibility or DEFAULT_SOURCE_CREDIBILITY
-        self._seen_hashes: Set[str] = set()
+        self._seen_hashes: set[str] = set()
 
     def score(self, item: DataItem) -> int:
 

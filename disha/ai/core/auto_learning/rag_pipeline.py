@@ -2,11 +2,12 @@ from __future__ import annotations
 
 import hashlib
 import json
-import structlog
 import time
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Dict, List, Set, Tuple
+from typing import Any
+
+import structlog
 
 logger = structlog.get_logger(__name__)
 
@@ -90,13 +91,13 @@ class _FallbackIndex:
             vectors = vectors.tolist()
         self._vectors.extend(vectors)
 
-    def search(self, query: Any, k: int) -> Tuple[List[List[float]], List[List[int]]]:
+    def search(self, query: Any, k: int) -> tuple[list[list[float]], list[list[int]]]:
         import math
 
         if hasattr(query, "tolist"):
             query = query.tolist()
         qvec = query[0]
-        scores: List[Tuple[float, int]] = []
+        scores: list[tuple[float, int]] = []
         for idx, vec in enumerate(self._vectors):
             dot = sum(a * b for a, b in zip(qvec, vec))
             norm_q = math.sqrt(sum(a * a for a in qvec)) or 1.0
@@ -143,7 +144,7 @@ class RAGPipeline:
             self._index = _FallbackIndex()
 
         self._documents: list[Document] = []
-        self._dedup_hashes: Set[str] = set()
+        self._dedup_hashes: set[str] = set()
 
     def add_documents(self, documents: list[Document]) -> int:
         new_docs: list[Document] = []

@@ -183,7 +183,11 @@ class CalibrationModel:
         return {"mse": mse, "mae": mae, "r2": r2}
 
     def predict(self, X: np.ndarray) -> np.ndarray:
-        if self.weights is None or self.feature_mean is None or self.feature_std is None:
+        if (
+            self.weights is None
+            or self.feature_mean is None
+            or self.feature_std is None
+        ):
             return np.full(X.shape[0], 0.5)
         X_norm = (X - self.feature_mean) / self.feature_std
         raw = X_norm @ self.weights + self.bias
