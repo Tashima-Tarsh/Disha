@@ -242,7 +242,9 @@ class ReasoningAgent(BaseAgent):
             "solution_paths": paths,
             "selected_approach": best_solutions,
             "edge_cases": edge_cases,
-            "confidence": self._compute_confidence(best_solutions),
+            "confidence": self._compute_confidence(
+                [s for s in best_solutions if isinstance(s, dict)]
+            ),
         }
 
     def _decompose(self, problem: str) -> list[str]:

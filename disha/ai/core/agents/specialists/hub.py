@@ -105,7 +105,7 @@ if __name__ == "__main__":
     hub = SpecialistHub()
 
     # Scenario: Fix a bug and then update documentation
-    async def run_demo():
+    async def run_demo() -> None:
         results = await hub.collaborate(
             "Fix JSX parse error in Jarvis UI", ["engineer", "architect", "growth"]
         )

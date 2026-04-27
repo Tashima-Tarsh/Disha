@@ -96,8 +96,6 @@ class DatasetPreparer:
 
     @staticmethod
     def validate_sample(sample: dict[str, Any]) -> bool:
-        if not isinstance(sample, dict):
-            return False
         if not all(k in sample for k in DatasetPreparer.REQUIRED_FIELDS):
             return False
         if not sample.get("instruction", "").strip():
@@ -222,7 +220,7 @@ class LLaMAFineTuner:
                 bnb_4bit_quant_type="nf4",
                 bnb_4bit_compute_dtype=torch.bfloat16,
                 bnb_4bit_use_double_quant=True,
-            )
+            )  # type: ignore[no-untyped-call]
 
         model_kwargs: dict[str, Any] = {
             "pretrained_model_name_or_path": self.model_name_or_path,
@@ -285,12 +283,14 @@ class LLaMAFineTuner:
         train_ds = HFDataset.from_list(dataset["train"])
         eval_ds = HFDataset.from_list(dataset["eval"]) if dataset.get("eval") else None
 
-        def tokenize(batch: dict) -> dict:
-            return self._tokenizer(
-                batch["text"],
-                truncation=True,
-                max_length=self.training_config.max_seq_length,
-                padding="max_length",
+        def tokenize(batch: dict[str, Any]) -> dict[str, Any]:
+            return dict(
+                self._tokenizer(
+                    batch["text"],
+                    truncation=True,
+                    max_length=self.training_config.max_seq_length,
+                    padding="max_length",
+                )
             )
 
         train_ds = train_ds.map(tokenize, batched=True, remove_columns=["text"])
@@ -308,7 +308,7 @@ class LLaMAFineTuner:
             logging_steps=self.training_config.logging_steps,
             save_steps=self.training_config.save_steps,
             eval_steps=self.training_config.eval_steps if eval_ds else None,
-            evaluation_strategy="steps" if eval_ds else "no",
+            eval_strategy="steps" if eval_ds else "no",
             fp16=self.training_config.fp16,
             bf16=self.training_config.bf16,
             seed=self.training_config.seed,

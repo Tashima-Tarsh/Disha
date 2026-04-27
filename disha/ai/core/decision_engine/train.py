@@ -183,11 +183,11 @@ class CalibrationModel:
         return {"mse": mse, "mae": mae, "r2": r2}
 
     def predict(self, X: np.ndarray) -> np.ndarray:
-        if self.weights is None:
+        if self.weights is None or self.feature_mean is None or self.feature_std is None:
             return np.full(X.shape[0], 0.5)
         X_norm = (X - self.feature_mean) / self.feature_std
         raw = X_norm @ self.weights + self.bias
-        return np.clip(raw, 0.0, 1.0)
+        return np.array(np.clip(raw, 0.0, 1.0), dtype=np.float32)
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -202,10 +202,10 @@ class CalibrationModel:
         }
 
     @classmethod
-    def from_dict(cls, d: dict) -> CalibrationModel:
+    def from_dict(cls, d: dict[str, Any]) -> CalibrationModel:
         m = cls()
         m.weights = np.array(d["weights"]) if d.get("weights") is not None else None
-        m.bias = d.get("bias", 0.0)
+        m.bias = float(d.get("bias", 0.0))
         m.feature_mean = (
             np.array(d["feature_mean"]) if d.get("feature_mean") is not None else None
         )

@@ -58,7 +58,7 @@ class LlamaCppProvider(BaseLLMProvider):
             temperature=0.0,
             top_p=1.0,
         )
-        return output["choices"][0]["text"].strip()
+        return str(output["choices"][0]["text"]).strip()
 
 
 class AnthropicProvider(BaseLLMProvider):
@@ -106,7 +106,8 @@ class ModelRegistry:
 
     @classmethod
     def get_provider(cls, name: str | None = None, **kwargs: Any) -> BaseLLMProvider:
-        provider_name = (name or os.getenv("DISHA_MODEL_PROVIDER", "mock")).lower()
+        raw_name = name or os.getenv("DISHA_MODEL_PROVIDER", "mock") or "mock"
+        provider_name = raw_name.lower()
 
         if provider_name not in cls._providers:
             return cls._providers["mock"](**kwargs)

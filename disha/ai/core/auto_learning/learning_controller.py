@@ -98,7 +98,7 @@ class QualityScorer:
             meta_score += 2
         total += min(meta_score, 25)
 
-        return min(round(total), 100)
+        return int(min(round(total), 100))
 
 
 class LearningController:
