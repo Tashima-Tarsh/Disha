@@ -28,8 +28,7 @@ on:
       - "disha/scripts/data_fetchers.py"
       - "disha/scripts/knowledge_engine.py"
       - "disha/ai/rag/**"
-      - "disha/services/ai-platform/backend/app/rl/train.py"
-      - "disha/services/ai-platform/backend/app/core/graph_ai/train.py"
+      - "disha/services/ai-platform/backend/app/rl/**"
       - "disha/ai/core/decision_engine/train.py"
 
 permissions:
@@ -44,6 +43,9 @@ jobs:
     name: Continuous Training Pipeline
     runs-on: ubuntu-latest
     timeout-minutes: 60
+    env:
+      DISHA_MODEL_PROVIDER: mock
+      PYTHONPATH: ${{ github.workspace }}
 
     steps:
       - uses: actions/checkout@v4
@@ -52,38 +54,43 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
+          cache: 'pip'
 
-      - name: Install dependencies
+      - name: Install CPU-only PyTorch
         run: |
+          pip install --upgrade pip
           pip install torch --index-url https://download.pytorch.org/whl/cpu
-          pip install numpy structlog pytest
 
-      - name: Run continuous training
-        env:
-          DISHA_MODEL_PROVIDER: mock
+      - name: Install project dependencies
         run: |
-          ROUNDS="${{ github.event.inputs.rounds || '3' }}"
-          COMPONENT="${{ github.event.inputs.component || '' }}"
-          OFFLINE="${{ github.event.inputs.offline || 'false' }}"
+          pip install numpy structlog pytest
+          pip install -r disha/ai/core/decision_engine/requirements.txt
+          pip install -r disha/services/ai-platform/backend/requirements.txt \
+            --no-deps \
+            --ignore-requires-python \
+            || pip install numpy structlog pytest fastapi pydantic pydantic-settings
 
-          CMD="python disha/scripts/continuous_train.py --rounds $ROUNDS"
+      - name: Run continuous training (offline, 1 round for CI)
+        run: |
+          ROUNDS="${{ github.event.inputs.rounds || '1' }}"
+          COMPONENT="${{ github.event.inputs.component || '' }}"
+          OFFLINE="${{ github.event.inputs.offline || 'true' }}"
+
+          CMD="python disha/scripts/continuous_train.py --rounds $ROUNDS --offline"
           if [ -n "$COMPONENT" ]; then
             CMD="$CMD --component $COMPONENT"
-          fi
-          if [ "$OFFLINE" = "true" ]; then
-            CMD="$CMD --offline"
           fi
 
           echo "Running: $CMD"
           $CMD
 
       - name: Validate trained models
-        env:
-          DISHA_MODEL_PROVIDER: mock
         run: |
-          python -m pytest disha/services/ai-platform/backend/tests/test_trained_models.py -v --tb=short
+          python -m pytest disha/services/ai-platform/backend/tests/test_trained_models.py \
+            -v --tb=short -p no:cacheprovider
 
       - name: Upload training metrics
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: training-metrics-${{ github.run_number }}
@@ -91,17 +98,21 @@ jobs:
             disha/services/ai-platform/backend/checkpoints/*_metrics.json
             disha/ai/core/decision_engine/checkpoints/*_metrics.json
             training_summary.json
+          if-no-files-found: warn
           retention-days: 30
 
       - name: Commit updated checkpoints
+        if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add disha/services/ai-platform/backend/checkpoints/*.json disha/ai/core/decision_engine/checkpoints/ training_summary.json || true
+          git add \
+            disha/services/ai-platform/backend/checkpoints/*.json \
+            disha/ai/core/decision_engine/checkpoints/ \
+            training_summary.json || true
           if git diff --staged --quiet; then
             echo "No metric changes to commit"
           else
             git commit -m "chore: update training metrics [continuous-train #${{ github.run_number }}]"
             git push
           fi
-

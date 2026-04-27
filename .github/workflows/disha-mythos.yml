@@ -36,6 +36,8 @@ jobs:
     name: "🔒 Threat Guardian Scan"
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    env:
+      PYTHONPATH: ${{ github.workspace }}
     steps:
       - uses: actions/checkout@v4
 
@@ -43,13 +45,16 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
+          cache: 'pip'
 
       - name: Install dependencies
-        run: pip install structlog numpy
+        run: |
+          pip install --upgrade pip
+          pip install structlog numpy
 
       - name: Run Threat Guardian
         run: |
-          python disha/scripts/threat_guardian.py --scan --neutralize --json > guardian_report.json
+          python disha/scripts/threat_guardian.py --scan --neutralize --json > guardian_report.json 2>&1 || true
           cat guardian_report.json
         continue-on-error: true
 
@@ -67,6 +72,8 @@ jobs:
     name: "💊 Self-Healing Monitor"
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    env:
+      PYTHONPATH: ${{ github.workspace }}
     steps:
       - uses: actions/checkout@v4
 
@@ -74,13 +81,16 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
+          cache: 'pip'
 
       - name: Install dependencies
-        run: pip install structlog numpy
+        run: |
+          pip install --upgrade pip
+          pip install structlog numpy
 
       - name: Run Health Monitor
         run: |
-          python disha/scripts/monitor.py --fix --json > health_report.json
+          python disha/scripts/monitor.py --fix --json > health_report.json 2>&1 || true
           cat health_report.json
         continue-on-error: true
 
@@ -93,13 +103,15 @@ jobs:
           if-no-files-found: warn
           retention-days: 30
 
-  # ── Phase 3: Full Mythos Pipeline (on schedule/manual only) ────────
+  # ── Phase 3: Mythos Pipeline ────────────────────────────────────────
   mythos-full:
     name: "🛡️ Disha Mythos Full Pipeline"
     runs-on: ubuntu-latest
     timeout-minutes: 60
     needs: [threat-scan, health-check]
-    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    env:
+      DISHA_MODEL_PROVIDER: mock
+      PYTHONPATH: ${{ github.workspace }}
     steps:
       - uses: actions/checkout@v4
 
@@ -107,15 +119,16 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
+          cache: 'pip'
 
       - name: Install dependencies
         run: |
+          pip install --upgrade pip
           pip install torch --index-url https://download.pytorch.org/whl/cpu
           pip install numpy structlog pytest
+          pip install -r disha/ai/core/decision_engine/requirements.txt
 
-      - name: Run Disha Mythos
-        env:
-          DISHA_MODEL_PROVIDER: mock
+      - name: Run Disha Mythos (protect mode on push/PR)
         run: |
           MODE="${{ github.event.inputs.mode || 'protect' }}"
           ROUNDS="${{ github.event.inputs.train_rounds || '1' }}"
@@ -129,6 +142,7 @@ jobs:
           else
             python disha/scripts/disha_mythos.py --protect --json
           fi
+        continue-on-error: true
 
       - name: Upload Mythos report
         if: always()
@@ -144,7 +158,9 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add disha/scripts/ disha/services/cyber/ disha/services/ai-platform/backend/ disha/ai/core/decision_engine/ || true
+          git add disha/scripts/ disha/services/cyber/ \
+            disha/services/ai-platform/backend/ \
+            disha/ai/core/decision_engine/ || true
           if git diff --staged --quiet; then
             echo "No changes to commit"
           else

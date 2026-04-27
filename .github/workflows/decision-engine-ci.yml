@@ -5,10 +5,12 @@ on:
     branches: [main]
     paths:
       - 'disha/ai/core/decision_engine/**'
+      - 'disha/ai/core/api/**'
   pull_request:
     branches: [main]
     paths:
       - 'disha/ai/core/decision_engine/**'
+      - 'disha/ai/core/api/**'
 
 permissions:
   contents: read
@@ -19,6 +21,8 @@ jobs:
     runs-on: ubuntu-latest
     env:
       DISHA_MODEL_PROVIDER: mock
+      PYTHONPATH: ${{ github.workspace }}
+
     steps:
       - uses: actions/checkout@v4
 
@@ -26,9 +30,11 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
+          cache: 'pip'
 
       - name: Install dependencies
         run: |
+          pip install --upgrade pip
           pip install -r disha/ai/core/decision_engine/requirements.txt
 
       - name: Lint with ruff
@@ -38,8 +44,6 @@ jobs:
           ruff format disha/ai/core/decision_engine/ --check
 
       - name: Run tests
-        env:
-          PYTHONPATH: ${{ github.workspace }}
-          DISHA_MODEL_PROVIDER: mock
         run: |
-          python -m pytest disha/ai/core/decision_engine/tests/ -v --tb=short
+          python -m pytest disha/ai/core/decision_engine/tests/ -v --tb=short \
+            -p no:cacheprovider

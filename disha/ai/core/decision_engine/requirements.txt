@@ -1,5 +1,6 @@
 # Core (always required)
 numpy>=1.24
+structlog>=21.0
 pytest>=7.0
 
 # Optional — FAISS retriever (uncomment or install separately)

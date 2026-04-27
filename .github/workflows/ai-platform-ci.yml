@@ -5,10 +5,14 @@ on:
     branches: [main]
     paths:
       - 'disha/services/ai-platform/**'
+      - 'disha/scripts/**'
+      - 'disha/ai/core/**'
   pull_request:
     branches: [main]
     paths:
       - 'disha/services/ai-platform/**'
+      - 'disha/scripts/**'
+      - 'disha/ai/core/**'
 
 permissions:
   contents: read
@@ -30,12 +34,17 @@ jobs:
 
       - name: Lint with ruff
         run: ruff check disha/services/ai-platform/backend/app/ --output-format=github
+
       - name: Format check with ruff
         run: ruff format disha/services/ai-platform/backend/app/ --check
 
   test-python:
     name: Test Python (AI Platform)
     runs-on: ubuntu-latest
+    env:
+      PYTHONPATH: ${{ github.workspace }}
+      DISHA_MODEL_PROVIDER: mock
+
     steps:
       - uses: actions/checkout@v4
 
@@ -45,15 +54,24 @@ jobs:
           python-version: "3.11"
           cache: 'pip'
 
-      - name: Install dependencies
+      - name: Install CPU-only PyTorch
         run: |
           pip install --upgrade pip
+          pip install torch --index-url https://download.pytorch.org/whl/cpu
+
+      - name: Install project dependencies
+        run: |
           pip install -r disha/services/ai-platform/backend/requirements.txt
+          pip install -r disha/ai/core/decision_engine/requirements.txt
 
       - name: Run tests
-        env:
-          PYTHONPATH: ${{ github.workspace }}
-          DISHA_MODEL_PROVIDER: mock
         run: |
-          cd disha/services/ai-platform/backend
-          python -m pytest tests/ -v --tb=short
+          python -m pytest disha/services/ai-platform/backend/tests/ \
+            -v --tb=short -p no:cacheprovider \
+            --ignore=disha/services/ai-platform/backend/tests/test_trained_models.py
+      
+      - name: Run trained-model tests (checkpoint-dependent)
+        run: |
+          python -m pytest \
+            disha/services/ai-platform/backend/tests/test_trained_models.py \
+            -v --tb=short -p no:cacheprovider
