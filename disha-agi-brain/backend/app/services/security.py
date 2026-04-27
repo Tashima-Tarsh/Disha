@@ -29,10 +29,10 @@ ROLE_PERMISSIONS = {
 class SecurityService:
     """Enterprise-grade security management for DISHA OS."""
     
-    def __init__(self):
+    def __init__(self) -> None:
         self.audit_log: List[Dict[str, Any]] = []
 
-    def log_event(self, user_id: str, action: str, resource: str, status: str):
+    def log_event(self, user_id: str, action: str, resource: str, status: str) -> None:
         """Logs a security audit event."""
         event = {
             "timestamp": datetime.now().isoformat(),

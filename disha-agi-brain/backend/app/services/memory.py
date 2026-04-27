@@ -7,13 +7,13 @@ logger = structlog.get_logger("memory_service")
 class MemoryService:
     """Manages session-aware short-term memory and vectorized long-term context."""
     
-    def __init__(self, session_id: str):
+    def __init__(self, session_id: str) -> None:
         self.session_id = session_id
         self.cache = CacheService()
         self.history_key = f"session_history:{session_id}"
         self.max_history = 20
 
-    def add_turn(self, role: str, content: str):
+    def add_turn(self, role: str, content: str) -> None:
         """Adds a turn to the session history in Redis."""
         history = self.get_history()
         history.append({"role": role, "content": content})
@@ -30,7 +30,7 @@ class MemoryService:
         history = self.cache.get(self.history_key)
         return history if history else []
 
-    def clear_session(self):
+    def clear_session(self) -> None:
         """Wipes the current session memory."""
         self.cache.invalidate(self.history_key)
         logger.info("memory_session_cleared", session_id=self.session_id)

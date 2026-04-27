@@ -38,9 +38,6 @@ class GraphReasoner:
 
     async def execute(self, user_input: str, session_id: str = "default", user_role: UserRole = UserRole.VIEWER) -> str:
         """Executes a multi-step reasoning graph with session memory and reflection."""
-        memory = MemoryService(session_id)
-        session_context = memory.get_formatted_context()
-        
         logger.info("reasoning_graph_start", user_input=user_input, role=user_role.value, session=session_id)
         
         # 1. Security Gate Node
@@ -58,8 +55,10 @@ class GraphReasoner:
         self.state["thought_stream"].append("Starting multi-agent deliberation...")
         
         # Inject session context into task
-        task_with_context = f"Session Context:\n{session_context}\n\nCurrent Task: {user_input}"
-        agent_results = await self.hub.collaborate(task_with_context, ["architect", "engineer", "security"])
+        memory_ctx: MemoryService = MemoryService(session_id)
+        session_context_str: str = memory_ctx.get_formatted_context()
+        task_with_context = f"Session Context:\n{session_context_str}\n\nCurrent Task: {user_input}"
+        agent_results: Dict[str, str] = await self.hub.collaborate(task_with_context, ["architect", "engineer", "security"])
         
         # 4. Reflection Node (Frontier Capability)
         self.state["thought_stream"].append("Reflecting on agent outputs for safety and accuracy...")

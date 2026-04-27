@@ -9,7 +9,7 @@ logger = structlog.get_logger("cache_service")
 class CacheService:
     """High-performance Redis caching for DISHA OS."""
     
-    def __init__(self):
+    def __init__(self) -> None:
         settings = get_settings()
         try:
             self.redis = redis.from_url(settings.REDIS_URL, decode_responses=True)
@@ -27,13 +27,13 @@ class CacheService:
             return json.loads(data)
         return None
 
-    def set(self, key: str, value: Any, expire_seconds: int = 3600):
+    def set(self, key: str, value: Any, expire_seconds: int = 3600) -> None:
         if not self.redis:
             return
         self.redis.set(key, json.dumps(value), ex=expire_seconds)
         logger.info("cache_set", key=key, ttl=expire_seconds)
 
-    def invalidate(self, key: str):
+    def invalidate(self, key: str) -> None:
         if not self.redis:
             return
         self.redis.delete(key)

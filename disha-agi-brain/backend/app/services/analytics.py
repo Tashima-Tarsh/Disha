@@ -7,10 +7,10 @@ logger = structlog.get_logger("analytics_service")
 class AnalyticsService:
     """Intelligent analytics engine for DISHA OS usage and AI performance."""
     
-    def __init__(self):
+    def __init__(self) -> None:
         self.events: List[Dict[str, Any]] = []
 
-    def track_event(self, event_type: str, metadata: Dict[str, Any]):
+    def track_event(self, event_type: str, metadata: Dict[str, Any]) -> None:
         """Tracks a specific usage or AI event."""
         event = {
             "timestamp": datetime.now().isoformat(),
@@ -34,7 +34,7 @@ class AnalyticsService:
             "system_health_score": 100 # Placeholder for complex logic
         }
 
-    def track_ai_interaction(self, query: str, response_time_ms: float, confidence: float):
+    def track_ai_interaction(self, query: str, response_time_ms: float, confidence: float) -> None:
         """Specifically tracks AI reasoning performance."""
         self.track_event("AI_INTERACTION", {
             "query_len": len(query),
@@ -42,7 +42,7 @@ class AnalyticsService:
             "confidence": confidence
         })
 
-    def track_error(self, component: str, error_msg: str, severity: str = "ERROR"):
+    def track_error(self, component: str, error_msg: str, severity: str = "ERROR") -> None:
         """Tracks system errors for 'Error Intelligence' mapping."""
         self.track_event("SYSTEM_ERROR", {
             "component": component,
