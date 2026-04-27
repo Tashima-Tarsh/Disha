@@ -1,11 +1,11 @@
 import structlog
-from typing import Dict, List, Any
+from typing import Dict, List, Any, Optional
 
 logger = structlog.get_logger("agent_hub")
 
 class BaseSpecialist:
     """Base class for all DISHA OS Specialized Agents."""
-    def __init__(self, name: str, role: str):
+    def __init__(self, name: str, role: str) -> None:
         self.name = name
         self.role = role
         self.capabilities: List[str] = []
@@ -14,7 +14,7 @@ class BaseSpecialist:
         raise NotImplementedError("Each specialist must implement execute_task.")
 
 class EngineerAgent(BaseSpecialist):
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__("Engineer", "Principal Software Engineer")
         self.capabilities = ["refactoring", "bug_fixing", "unit_testing", "pr_generation"]
 
@@ -24,7 +24,7 @@ class EngineerAgent(BaseSpecialist):
         return f"Engineering Fix proposed for: {task}"
 
 class SecurityAgent(BaseSpecialist):
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__("Security", "Cyber Defense Lead")
         self.capabilities = ["vulnerability_scanning", "threat_neutralization", "audit"]
 
@@ -34,7 +34,7 @@ class SecurityAgent(BaseSpecialist):
         return f"Security Audit complete for: {task}. No active threats."
 
 class GrowthAgent(BaseSpecialist):
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__("Growth", "Elite Repository Strategist")
         self.capabilities = ["seo_optimization", "conversion_design", "documentation_storytelling"]
 
@@ -44,7 +44,7 @@ class GrowthAgent(BaseSpecialist):
         return f"Growth Strategy updated for: {task}"
 
 class ArchitectAgent(BaseSpecialist):
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__("Architect", "Systems Architect")
         self.capabilities = ["structural_design", "dependency_mapping", "monorepo_orchestration"]
 
@@ -54,7 +54,7 @@ class ArchitectAgent(BaseSpecialist):
 
 class SpecialistHub:
     """Orchestrates multiple specialist agents for collaborative problem solving."""
-    def __init__(self):
+    def __init__(self) -> None:
         self.agents: Dict[str, BaseSpecialist] = {
             "engineer": EngineerAgent(),
             "security": SecurityAgent(),
@@ -62,7 +62,7 @@ class SpecialistHub:
             "architect": ArchitectAgent()
         }
 
-    def get_agent(self, agent_id: str) -> BaseSpecialist:
+    def get_agent(self, agent_id: str) -> Optional[BaseSpecialist]:
         return self.agents.get(agent_id)
 
     async def collaborate(self, task: str, workflow: List[str]) -> Dict[str, str]:

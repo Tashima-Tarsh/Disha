@@ -22,7 +22,7 @@ class AgentState(TypedDict):
 class GraphReasoner:
     """Advanced Reasoning Engine using a directed graph for multi-agent collaboration."""
     
-    def __init__(self):
+    def __init__(self) -> None:
         self.hub = SpecialistHub()
         self.security = SecurityService()
         self.analytics = AnalyticsService()
@@ -36,7 +36,7 @@ class GraphReasoner:
             "thought_stream": []
         }
 
-    async def execute(self, user_input: str, session_id: str = "default", user_role: UserRole = UserRole.VIEWER):
+    async def execute(self, user_input: str, session_id: str = "default", user_role: UserRole = UserRole.VIEWER) -> str:
         """Executes a multi-step reasoning graph with session memory and reflection."""
         memory = MemoryService(session_id)
         session_context = memory.get_formatted_context()

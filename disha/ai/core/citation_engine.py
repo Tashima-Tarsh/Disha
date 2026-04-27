@@ -7,7 +7,7 @@ logger = structlog.get_logger("citation_engine")
 class CitationEngine:
     """Maps AI outputs back to repository source files and line numbers."""
     
-    def __init__(self, repo_path: str):
+    def __init__(self, repo_path: str) -> None:
         self.repo_path = repo_path
 
     def extract_sources(self, text: str) -> List[Dict[str, Any]]:

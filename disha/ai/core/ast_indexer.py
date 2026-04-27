@@ -10,7 +10,7 @@ logger = structlog.get_logger("ast_indexer")
 class ASTIndexer:
     """Sovereign Repository Indexer using Tree-Sitter for deep structural understanding."""
     
-    def __init__(self):
+    def __init__(self) -> None:
         # Initialize parsers
         self.py_language = Language(tspython.language())
         self.js_language = Language(tsjs.language())
@@ -39,7 +39,7 @@ class ASTIndexer:
         
         return {"error": "Unsupported file type"}
 
-    def _extract_python_metadata(self, node, content) -> Dict[str, Any]:
+    def _extract_python_metadata(self, node: Any, content: bytes) -> Dict[str, Any]:
         metadata = {"classes": [], "functions": [], "imports": []}
         
         for child in node.children:
@@ -56,7 +56,7 @@ class ASTIndexer:
                 
         return metadata
 
-    def _extract_javascript_metadata(self, node, content) -> Dict[str, Any]:
+    def _extract_javascript_metadata(self, node: Any, content: bytes) -> Dict[str, Any]:
         # Similar logic for JS/TS
         metadata = {"classes": [], "functions": [], "imports": []}
         # Simplified for demonstration; frontier implementation would use more complex queries

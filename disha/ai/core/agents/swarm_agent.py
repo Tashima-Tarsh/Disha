@@ -1,13 +1,14 @@
 import os
 import structlog
 from github import Github, Auth
+from typing import Optional
 
 logger = structlog.get_logger("swarm_agent")
 
 class SwarmEngineer:
     """The Autonomous PR Agent - Capable of fixing repository issues and proposing PRs."""
     
-    def __init__(self, token: str = None):
+    def __init__(self, token: Optional[str] = None) -> None:
         self.token = token or os.getenv("GITHUB_TOKEN")
         if not self.token:
             logger.warning("no_github_token_found", action="skipping_remote_ops")
@@ -16,7 +17,7 @@ class SwarmEngineer:
             auth = Auth.Token(self.token)
             self.github = Github(auth=auth)
 
-    def propose_fix(self, repo_name: str, branch_name: str, file_path: str, new_content: str, commit_msg: str):
+    def propose_fix(self, repo_name: str, branch_name: str, file_path: str, new_content: str, commit_msg: str) -> str:
         """Creates a new branch, pushes a fix, and opens a Pull Request."""
         if not self.github:
             return "Failed: No GitHub Authentication."
