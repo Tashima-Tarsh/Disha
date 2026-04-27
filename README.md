@@ -7,6 +7,7 @@
 ---
 
 ## 💎 The v3.0 "Frontier" Evolution
+
 We have successfully completed the transformation of DishaOS into a **Frontier-Grade AGI Platform**.
 
 ### 🚀 Key Milestones Completed
