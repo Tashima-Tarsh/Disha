@@ -1,20 +1,20 @@
 import asyncio
 from contextlib import asynccontextmanager
 
-from app.api.v1.endpoints import router as v1_router
-from app.core.config import get_settings
-from app.core.logging import setup_logging
+from app.api.v1.endpoints import router as v1_router  # type: ignore
+from app.core.config import get_settings  # type: ignore
+from app.core.observability import setup_observability  # type: ignore
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    settings = get_settings()
-    setup_logging(debug=settings.DEBUG)
+    get_settings()
+    setup_observability()
 
-    from app.services.streaming.osint_emitter import OSINTFeedEmitter
-    from app.services.streaming.osint_processor import OSINTStreamProcessor
+    from app.services.streaming.osint_emitter import OSINTFeedEmitter  # type: ignore
+    from app.services.streaming.osint_processor import OSINTStreamProcessor  # type: ignore
 
     emitter = OSINTFeedEmitter()
     processor = OSINTStreamProcessor()
@@ -40,7 +40,7 @@ def create_app() -> FastAPI:
         lifespan=lifespan,
     )
 
-    from app.core.middleware.security import SentinelSecurityMiddleware
+    from app.middleware.security import SentinelSecurityMiddleware  # type: ignore
 
     app.add_middleware(SentinelSecurityMiddleware)
 

@@ -43,7 +43,8 @@ KNOWLEDGE = {
 }
 
 
-from app.services.intelligence import IntelligenceService
+from app.services.intelligence import IntelligenceService  # type: ignore
+
 
 service = IntelligenceService()
 OSINT_SAMPLES = service.osint_samples
