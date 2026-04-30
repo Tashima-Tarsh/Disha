@@ -1,61 +1,42 @@
-# DISHA Project Governance & Architecture
+# DISHA Engineering Rules
 
-## Objective
+## Architecture
 
-DISHA (Digital Intelligence & Sovereign Healing Architecture) is a production-grade AGI platform. This document defines the rules for development, architecture, and system integrity.
+- First production scope is the root TypeScript CLI/runtime in `src/` and the Next.js app in `web/`.
+- Keep route handlers thin. Controllers validate input, call services, and return responses.
+- Put web business logic in `web/services/`; server-only auth, policy, persistence, audit, rate limit, and validation live in `web/lib/server/`.
+- Put CLI pure rules in `src/domain/`, workflow services in `src/services/`, policy/storage contracts in `src/security/`, and audit helpers in `src/observability/`.
+- Frontend screens live in app routes, reusable UI in `components/`, feature workflows in `features/`, layout shells in `layout/`, and API access in `services/` or `lib/api`.
+- Document new request flows when they cross authentication, authorization, persistence, or AI decision boundaries.
 
-## Architecture Standards (Clean Architecture)
+## Security
 
-### 1. Backend Layering
+- Authenticate every non-health request and authorize every sensitive action.
+- Validate all external input with typed schemas before business logic executes.
+- Never trust client-supplied paths, URLs, roles, model names, or user IDs.
+- Hash passwords with bcrypt, argon2, or scrypt. Never store raw secrets.
+- Encrypt sensitive data with authenticated encryption. Keep keys in environment variables or a managed secret store.
+- Do not store CLI credentials in plaintext in production. Plaintext fallback requires explicit local-dev opt-in.
+- Emit audit logs for auth events, data changes, admin actions, and AI decisions.
 
-- **API**: Controllers and route handlers. Zero business logic. Uses Pydantic for input/output.
-- **Services**: Pure business logic. Interacts with models and external integrations.
-- **Models**: Database schemas (SQLAlchemy/Neo4j) and Pydantic validation schemas.
-- **Utils**: Shared helpers (logging, crypto, formatting).
-- **Core**: Global configuration, security protocols, and shared constants.
+## AI Safety
 
-### 2. Frontend Layering
+- Use prompt templates from a controlled module, not ad hoc strings in controllers.
+- Validate AI outputs before storing, ranking, or returning them.
+- Critical flows must have deterministic fallback logic and explain why fallback was used.
+- Log model inputs by reference or hash when possible; avoid logging raw secrets or sensitive payloads.
 
-- **Components**: Reusable, atomic UI elements.
-- **Layout**: Persistent UI structures (Sidebar, Navbar).
-- **Pages**: Screen-level components and state orchestration.
-- **Hooks**: Logic separation from UI components.
+## Observability
 
-## Coding Standards
+- Every request gets an `X-Request-ID`.
+- Logs are structured JSON in production and include request ID, user ID where available, action, status, and duration.
+- Health checks must verify process readiness without requiring authentication.
+- Metrics and traces should preserve enough context to debug failures without exposing secrets.
 
-- **Python**:
-  - Mandatory type hints (`from __future__ import annotations`).
-  - Async/Await for all I/O bound operations.
-  - Pydantic v2 for all data validation.
-  - Follow PEP8 via Ruff/Flake8.
-- **JavaScript/React**:
-  - TypeScript mandatory.
-  - Functional components with hooks.
-  - Tailwind CSS for styling using the Design System.
+## Delivery
 
-## Design System
-
-- **Primary Color**: `#4F46E5` (Indigo-600)
-- **Background**: `#0F172A` (Slate-900)
-- **Accent**: `#10B981` (Emerald-500)
-- **Text**: White (Primary), Slate-400 (Secondary)
-
-## Security Principles (Zero Trust)
-
-- **Authenticate Every Request**: No endpoint is public by default.
-- **Authorize Every Action**: RBAC must be enforced at the service layer.
-- **Data Protection**: AES-256 for data at rest, TLS 1.3 for data in transit.
-- **Defense in Depth**: Secure headers (CSP, HSTS) and rate limiting on all gateways.
-
-## AI Workflow (4-Stage Cognitive Loop)
-
-1. **Ingestion**: Structured input parsing and audit logging.
-2. **Processing**: Prompt optimization and multi-agent deliberation.
-3. **Decision**: Explainable reasoning with confidence scoring.
-4. **Validation**: Output sanitization and fallback execution.
-
-## Auto-Improvement Behavior
-
-- Every refactor must include an audit of dependencies.
-- Any new feature must follow the 7-stage cognitive loop (Perception -> Action -> Reflection).
-- Security first: No PII logging, mandatory Argon2id for hashing.
+- Keep changes scoped and testable.
+- Run backend tests for Python changes and frontend type checks/builds for TypeScript changes.
+- For this scope, run `npm run test`, `npm run type-check`, and `npm run build` under `web/`. Use `npm run type-check:full` to track legacy UI type debt.
+- Container images must run as non-root users and include health checks.
+- CI should run build, lint/typecheck, unit tests, dependency audit, and security scanning before deploy.

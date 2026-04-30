@@ -1,15 +1,13 @@
-# Cyber Security Skill: DISHA Zero Trust
+# Cyber Security Skill
 
-## Capabilities
+Use this skill when reviewing or changing DISHA security-sensitive code.
 
-- Implementing JWT-based stateless authentication.
-- Designing RBAC (Role Based Access Control) logic.
-- Mitigating OWASP Top 10 vulnerabilities (XSS, Injection, Broken Auth).
-- Enforcing AES-256 encryption for sensitive system state.
+## Checklist
 
-## Workflow: Security Audit
-
-1. **Request Interception**: Use `SentinelSecurityMiddleware` to validate all headers.
-2. **Access Control**: Check user permissions before calling any service.
-3. **Data Sanitization**: Validate all inputs using Pydantic strict mode.
-4. **Audit Logging**: Record every auth event in the structured JSON logs.
+- Authenticate every non-health endpoint.
+- Authorize every privileged action with RBAC.
+- Validate and bound all external input.
+- Protect filesystem, URL, and command boundaries from injection and traversal.
+- Hash passwords and encrypt sensitive data with managed secrets.
+- Emit audit logs for auth, admin, data mutation, and AI decision events.
+- Deny production plaintext credential storage. Local plaintext fallback must be explicit and documented.
