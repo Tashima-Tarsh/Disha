@@ -12,8 +12,19 @@ const envSchema = z.object({
   DISHA_WORKSPACE_ROOT: z.string().optional(),
   DISHA_ALLOWED_ORIGINS: z.string().optional(),
   DISHA_BACKEND_URL: z.string().url().default("http://localhost:3001"),
+  DISHA_BRAIN_URL: z.string().url().optional(),
   DISHA_WEB_RATE_LIMIT: z.coerce.number().int().positive().default(120),
   DISHA_WEB_API_TOKEN: z.string().optional(),
+
+  // Token economy + agent runtime
+  DISHA_AGENT_MODE: z.enum(["eco", "balanced", "deep"]).default("balanced"),
+  DISHA_AGENT_INPUT_BUDGET_TOKENS: z.coerce.number().int().positive().default(8_000),
+  DISHA_AGENT_CACHE_TTL_SECONDS: z.coerce.number().int().positive().default(3600),
+  DISHA_AGENT_MAX_CACHE_BYTES: z.coerce.number().int().positive().default(250_000),
+  DISHA_WORKFLOW_NODE_TIMEOUT_MS: z.coerce.number().int().positive().default(15_000),
+  DISHA_WORKFLOW_TOTAL_TIMEOUT_MS: z.coerce.number().int().positive().default(60_000),
+  // Comma-separated allowlist of hosts for workflow HTTP nodes. Empty => deny all.
+  DISHA_WORKFLOW_ALLOWED_HOSTS: z.string().optional(),
   NODE_ENV: z.string().default("development"),
 });
 

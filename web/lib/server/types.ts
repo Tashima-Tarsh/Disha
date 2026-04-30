@@ -2,6 +2,8 @@ export type Role = "admin" | "operator" | "analyst" | "viewer";
 
 export type PolicyAction =
   | "chat"
+  | "agent:read"
+  | "agent:run"
   | "file:read"
   | "file:write"
   | "share:create"

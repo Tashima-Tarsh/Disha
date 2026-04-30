@@ -59,6 +59,14 @@ flowchart LR
     CORE[AI Core Modules] --> B
 ```
 
+## Agent Runtime (Token-Efficient)
+
+DISHA Web includes a small “agent runtime” focused on reducing LLM token spend while keeping behavior auditable and deterministic for critical flows.
+
+- Token economy: automatic context compaction + Redis-backed response cache (`DISHA_AGENT_MODE`, `DISHA_AGENT_INPUT_BUDGET_TOKENS`)
+- Memory graph: privacy-first entity graph updated from user messages (`GET /api/agent/memory-graph`)
+- Workflow runner: n8n-like node pipeline with per-node + total timeouts (`POST /api/agent/workflows/run`)
+
 The production-ready platform path is `web/` + `src/` + `disha/brain/`. Other folders remain in the repo as legacy or experimental surfaces and are progressively converged or retired behind stable interfaces.
 
 ## Tech Stack

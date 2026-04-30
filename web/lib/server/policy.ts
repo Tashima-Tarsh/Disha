@@ -1,10 +1,31 @@
 import type { PolicyAction, Principal, Role } from "./types";
 
 const roleActions: Record<Role, readonly PolicyAction[]> = {
-  admin: ["chat", "file:read", "file:write", "share:create", "share:read", "share:delete", "export", "audit:read"],
-  operator: ["chat", "file:read", "file:write", "share:create", "share:read", "share:delete", "export"],
-  analyst: ["chat", "file:read", "share:create", "share:read", "export"],
-  viewer: ["share:read", "export"],
+  admin: [
+    "chat",
+    "agent:read",
+    "agent:run",
+    "file:read",
+    "file:write",
+    "share:create",
+    "share:read",
+    "share:delete",
+    "export",
+    "audit:read",
+  ],
+  operator: [
+    "chat",
+    "agent:read",
+    "agent:run",
+    "file:read",
+    "file:write",
+    "share:create",
+    "share:read",
+    "share:delete",
+    "export",
+  ],
+  analyst: ["chat", "agent:read", "agent:run", "file:read", "share:create", "share:read", "export"],
+  viewer: ["agent:read", "share:read", "export"],
 };
 
 export function can(principal: Principal, action: PolicyAction): boolean {
