@@ -16,32 +16,36 @@ For image export, paste the diagram into Mermaid Live Editor, choose `PNG` or `S
 flowchart LR
     User[Operator or Browser User]
     Web[Next.js Web App]
+    Brain[DISHA Brain API]
     API[Route Controllers]
     Services[Service Layer]
     Security[Auth RBAC CSRF Rate Limit Audit]
     Postgres[(Postgres)]
     Redis[(Redis)]
-    Model[External Model or Backend Service]
+    Modules[Subsystem Modules]
+    Model[External Model Providers]
     CLI[TypeScript CLI Runtime]
     MCP[MCP Entrypoint]
     Storage[Secure Storage Policy]
-    Legacy[Legacy FastAPI and AI Modules]
+    Legacy[Legacy and Prototypes (legacy/)]
 
     User --> Web
     Web --> API
     API --> Services
     Services --> Security
+    Services --> Brain
     Security --> Postgres
     Security --> Redis
-    Services --> Model
+    Brain --> Modules
+    Modules --> Model
 
     User --> CLI
     CLI --> MCP
     MCP --> Storage
     MCP --> Security
+    MCP --> Brain
 
-    Legacy --> Model
-    Legacy --> Postgres
+    Legacy --> Modules
 ```
 
 ## Data Flow
@@ -108,9 +112,15 @@ flowchart TD
     end
 
     subgraph Python
-        FastAPI[backend/app]
+        Brain[disha/brain]
+        Edge[disha/edge_agent]
         AICore[disha/ai/core]
-        AIPlatform[disha-agi-brain/backend]
+        Strategy[disha/ai/strategy]
+        Physics[disha/ai/physics]
+        Cyber[disha/services/cyber]
+        MCPServer[disha/services/mcp]
+        AIPlatform[disha/services/ai-platform]
+        Legacy[legacy/*]
     end
 
     Route --> WebSvc
@@ -122,6 +132,13 @@ flowchart TD
     Entry --> Sec
     Sec --> Store
 
-    FastAPI --> AICore
-    AIPlatform --> AICore
+    Route --> Brain
+    Brain --> AICore
+    Brain --> Strategy
+    Brain --> Physics
+    Brain --> Cyber
+    Brain --> MCPServer
+    Brain --> AIPlatform
+    Edge --> Brain
+    Legacy --> Brain
 ```

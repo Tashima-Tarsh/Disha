@@ -57,22 +57,22 @@
   <text x="660" y="626" class="cardText">`src/security` and secure storage enforcement</text>
 
   <rect x="1088" y="190" width="416" height="600" rx="30" fill="url(#panel)" stroke="#24324A"/>
-  <text x="1120" y="232" class="section">PYTHON AND DATA SURFACES</text>
+  <text x="1120" y="232" class="section">BRAIN AND MODULES</text>
   <rect x="1120" y="280" width="352" height="96" rx="22" fill="#111C33" stroke="#334155" filter="url(#shadow)"/>
-  <text x="1156" y="320" class="cardTitle">Legacy FastAPI</text>
-  <text x="1156" y="346" class="cardText">`backend/app` with agents, routes, streaming, ranking, RL</text>
+  <text x="1156" y="320" class="cardTitle">DISHA Brain</text>
+  <text x="1156" y="346" class="cardText">`disha/brain` brains, policy, events, websocket alerts</text>
 
   <rect x="1120" y="404" width="352" height="96" rx="22" fill="#111C33" stroke="#334155" filter="url(#shadow)"/>
   <text x="1156" y="444" class="cardTitle">AI Core</text>
-  <text x="1156" y="470" class="cardText">`disha/ai/core` cognitive loop, API, memory, reasoning</text>
+  <text x="1156" y="470" class="cardText">`disha/ai/core` reasoning kernel and decisioning modules</text>
 
   <rect x="1120" y="528" width="352" height="96" rx="22" fill="#111C33" stroke="#334155" filter="url(#shadow)"/>
-  <text x="1156" y="568" class="cardTitle">AI Platform Prototype</text>
-  <text x="1156" y="594" class="cardText">`disha-agi-brain/backend` support services and experiments</text>
+  <text x="1156" y="568" class="cardTitle">Subsystem Modules</text>
+  <text x="1156" y="594" class="cardText">`disha/services/*`, `disha/ai/strategy`, `disha/ai/physics`, MCP</text>
 
   <rect x="1120" y="652" width="352" height="96" rx="22" fill="#111C33" stroke="#334155" filter="url(#shadow)"/>
-  <text x="1156" y="692" class="cardTitle">Data and Infra</text>
-  <text x="1156" y="718" class="cardText">Postgres, Redis, Compose, OpenTelemetry collector</text>
+  <text x="1156" y="692" class="cardTitle">Edge and Infra</text>
+  <text x="1156" y="718" class="cardText">`disha/edge_agent`, Postgres, Redis, Compose, telemetry</text>
 
   <path d="M304 376V392" stroke="#38BDF8" stroke-width="4" marker-end="url(#arrow)"/>
   <path d="M304 500V516" stroke="#38BDF8" stroke-width="4" marker-end="url(#arrow)"/>
@@ -86,5 +86,5 @@
   <path d="M480 712H580C630 712 630 608 624 608" stroke="#38BDF8" stroke-width="4" marker-end="url(#arrow)"/>
 
   <rect x="96" y="820" width="1408" height="26" rx="13" fill="#111827"/>
-  <text x="118" y="838" class="subtitle">Primary production ownership is concentrated in the Web and CLI surfaces; Python surfaces remain broader and partially legacy</text>
+  <text x="118" y="838" class="subtitle">Platform ownership is concentrated in Web, CLI, and DISHA Brain; legacy stacks live under legacy/</text>
 </svg>

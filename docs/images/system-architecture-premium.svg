@@ -28,7 +28,7 @@
   <rect width="1600" height="900" rx="28" fill="#0F172A"/>
   <rect x="64" y="54" width="1472" height="792" rx="32" stroke="#1E293B" stroke-width="1.5"/>
   <text x="96" y="112" class="title">System Architecture</text>
-  <text x="96" y="142" class="subtitle">DISHA production path with web, CLI, security, storage, and external service boundaries</text>
+  <text x="96" y="142" class="subtitle">DISHA Brain platform path with web, CLI, brain modules, security, storage, and subsystem boundaries</text>
 
   <rect x="96" y="190" width="320" height="580" rx="28" fill="url(#panel)" stroke="#24324A" filter="url(#shadow)"/>
   <text x="128" y="232" class="section">CLIENT LAYER</text>
@@ -49,7 +49,7 @@
   <rect x="96" y="190" width="320" height="8" rx="4" fill="url(#accentLine)"/>
 
   <rect x="480" y="190" width="470" height="580" rx="28" fill="url(#panel)" stroke="#24324A" filter="url(#shadow)"/>
-  <text x="512" y="232" class="section">APPLICATION AND SECURITY</text>
+  <text x="512" y="232" class="section">CONTROL PLANE</text>
   <rect x="512" y="272" width="406" height="86" rx="22" fill="#111C33" stroke="#334155"/>
   <circle cx="554" cy="315" r="18" fill="#4F46E5"/>
   <text x="544" y="320" class="mini">API</text>
@@ -60,8 +60,8 @@
   <circle cx="554" cy="443" r="18" fill="#22C55E"/>
   <text x="541" y="448" class="mini">SVC</text>
   <text x="588" y="433" class="cardTitle">Service Layer</text>
-  <text x="588" y="456" class="cardText">Chat, export, file access, sharing workflows</text>
-  <text x="588" y="479" class="cardText">Business logic and orchestration</text>
+  <text x="588" y="456" class="cardText">Chat, export, files, sharing, module actions</text>
+  <text x="588" y="479" class="cardText">Orchestrates DISHA Brain and subsystems</text>
 
   <rect x="512" y="532" width="406" height="176" rx="22" fill="#111C33" stroke="#334155"/>
   <circle cx="554" cy="588" r="18" fill="#38BDF8"/>
@@ -90,9 +90,9 @@
   <rect x="1046" y="492" width="426" height="164" rx="24" fill="#111C33" stroke="#334155"/>
   <circle cx="1090" cy="554" r="22" fill="#38BDF8"/>
   <text x="1078" y="559" class="chipText">AI</text>
-  <text x="1126" y="542" class="cardTitle">External Services</text>
-  <text x="1126" y="567" class="cardText">Model providers, backend integrations, legacy modules</text>
-  <text x="1126" y="590" class="cardText">Consumed behind validated and audited service calls</text>
+  <text x="1126" y="542" class="cardTitle">Brain and Subsystems</text>
+  <text x="1126" y="567" class="cardText">DISHA Brain API, MCP server, cyber defense, strategy, physics</text>
+  <text x="1126" y="590" class="cardText">Model providers and integrations behind audited calls</text>
 
   <path d="M384 332H492" stroke="#38BDF8" stroke-width="4" marker-end="url(#arrow)"/>
   <path d="M384 490H492" stroke="#38BDF8" stroke-width="4" marker-end="url(#arrow)"/>
