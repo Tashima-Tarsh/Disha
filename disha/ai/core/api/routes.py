@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+# mypy: disable-error-code=untyped-decorator
 import asyncio
 import json
 import uuid

@@ -1,15 +1,13 @@
-# AI Architect Skill: DISHA Cognitive Engine
+# AI Architect Skill
 
-## Capabilities
+Use this skill when adding or modifying DISHA AI workflows.
 
-- Designing multi-agent decision loops with explainable reasoning.
-- Implementing prompt optimization layers for LLM resilience.
-- Designing deterministic fallbacks for high-confidence AI operations.
-- Auditing AI decision paths via structured telemetry.
+## Checklist
 
-## Workflow: AI Deployment
-
-1. **Model Selection**: Choose the appropriate agent based on input intent.
-2. **Context Injection**: Enrich prompts with localized knowledge graph data.
-3. **Reasoning Audit**: Log the "Chain of Thought" reasoning for every decision.
-4. **Output Validation**: Check response formats and confidence scores before delivery.
+- Start from a controlled prompt template.
+- Use deterministic settings for critical decisions.
+- Validate model output with a typed schema or guard function.
+- Provide fallback logic for invalid, unsafe, or unavailable model output.
+- Log the decision, explanation, fallback status, and request ID.
+- Avoid logging raw sensitive prompts or secrets.
+- Critical web chat flows must validate input and output before streaming a response.

@@ -1,16 +1,17 @@
+from fastapi import APIRouter
+
 from app.api.v1.routers import (
     auth,
+    intelligence,
     investigate,
     multimodal,
     osint_stream,
     physics,
     ranking,
     rl,
-    intelligence,
 )
 from app.core.config import get_settings
 from app.models.schemas import HealthResponse
-from fastapi import APIRouter
 
 router = APIRouter()
 

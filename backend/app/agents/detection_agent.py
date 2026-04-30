@@ -1,6 +1,7 @@
 from typing import Any
 
 import numpy as np
+
 from app.agents.base_agent import BaseAgent
 
 

@@ -3,6 +3,7 @@ import uuid
 from typing import Any
 
 import structlog
+
 from app.agents.crypto_agent import CryptoAgent
 from app.agents.detection_agent import DetectionAgent
 from app.agents.education_agent import EducationAgent

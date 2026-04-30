@@ -1,15 +1,13 @@
-# DevOps Deploy Skill: DISHA Infrastructure
+# DevOps Deploy Skill
 
-## Capabilities
+Use this skill when changing DISHA deployment, CI, or runtime operations.
 
-- Orchestrating multi-stage Docker builds for production environments.
-- Designing health-conscious CI/CD pipelines with rollback capabilities.
-- Implementing structured monitoring and centralized logging.
-- Hardening container environments (non-root users, minimal footprints).
+## Checklist
 
-## Workflow: Deployment
-
-1. **Containerization**: Build the production image using `Dockerfile.prod`.
-2. **Health Verification**: Check system readiness via `/api/v1/health`.
-3. **Log Aggregation**: Ensure all JSON logs are routed to the central sink.
-4. **Environment Sync**: Validate `.env` variables against production secrets.
+- Containers run as non-root users.
+- Services expose health checks.
+- Secrets come from environment variables or a managed secret store.
+- CI runs build, lint/typecheck, tests, dependency audit, SAST, and image scan.
+- Production logs are structured and centrally shipped.
+- Rollbacks and deployment promotion are documented before release.
+- DISHA web production requires Postgres, Redis, and a configured auth secret before deploy.

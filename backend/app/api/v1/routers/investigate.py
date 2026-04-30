@@ -1,3 +1,5 @@
+from fastapi import APIRouter, Depends, Query
+
 from app.api.deps import (
     get_alert_manager,
     get_knowledge_graph,
@@ -11,7 +13,6 @@ from app.models.schemas import (
     InvestigationRequest,
     MultiInvestigationRequest,
 )
-from fastapi import APIRouter, Depends, Query
 
 router = APIRouter()
 

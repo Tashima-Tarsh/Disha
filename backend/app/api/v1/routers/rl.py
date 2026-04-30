@@ -1,8 +1,9 @@
+from fastapi import APIRouter, Depends
+
 from app.api.deps import get_policy_network, get_prompt_optimizer, get_reward_computer
 from app.core.security import get_current_user
 from app.models.schemas import FeedbackRequest
 from app.rl.reward import InvestigationFeedback
-from fastapi import APIRouter, Depends
 
 router = APIRouter()
 

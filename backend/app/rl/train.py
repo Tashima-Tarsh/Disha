@@ -6,6 +6,7 @@ from pathlib import Path
 
 import numpy as np
 import structlog
+
 from app.rl.environment import ActionType, InvestigationEnvironment
 from app.rl.experience_replay import ExperienceReplayBuffer
 from app.rl.policy import TORCH_AVAILABLE, PolicyNetwork

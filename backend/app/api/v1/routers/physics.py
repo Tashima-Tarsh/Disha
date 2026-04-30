@@ -1,8 +1,9 @@
 from typing import Any
 
+from fastapi import APIRouter, Depends, HTTPException
+
 from app.agents.physics_agent import PhysicsAgent
 from app.api.deps import get_current_user
-from fastapi import APIRouter, Depends, HTTPException
 
 router = APIRouter()
 

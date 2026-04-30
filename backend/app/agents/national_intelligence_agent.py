@@ -3,6 +3,7 @@
 from typing import Any
 
 import structlog
+
 from app.agents.base_agent import BaseAgent
 from app.core.config import get_settings
 from app.services.ni.infrastructure_service import InfrastructureService

@@ -1,6 +1,7 @@
 from typing import Any
 
 import structlog
+
 from app.agents.base_agent import BaseAgent
 from app.services.ni.disaster_service import DisasterService
 from app.services.ni.global_intelligence_service import GlobalIntelligenceService

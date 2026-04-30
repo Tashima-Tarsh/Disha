@@ -1,23 +1,12 @@
-# Fullstack Development Skill: DISHA Clean Architecture
+# Fullstack Dev Skill
 
-## Capabilities
-- Architecting scalable FastAPI backends with Pydantic v2.
-- Designing high-performance Next.js frontends with Indigo-Slate design system.
-- Refactoring legacy scripts into modular service layers.
-- Implementing zero-PII security protocols using Argon2id.
+Use this skill when implementing DISHA frontend or backend features.
 
-## Workflow: Backend
-1. **Model Definition**: Define Pydantic schemas in `models/`.
-2. **Logic Implementation**: Build stateless business logic in `services/`.
-3. **API Exposure**: Create async routes in `api/` that call services.
-4. **Error Handling**: Use global exception handlers for standardized JSON responses.
+## Rules
 
-## Workflow: Frontend
-1. **Component Design**: Build atomic components in `components/`.
-2. **Page Orchestration**: Manage state and effects in `pages/`.
-3. **API Integration**: Use standardized Axios/Fetch hooks for backend communication.
-
-## Quality Gate
-- All Python code must pass `mypy --strict`.
-- All CSS must use variables from the Design System (`--primary`, `--bg-deep`).
-- Documentation must be updated for every major architectural change.
+- Keep controllers thin and move business logic into services.
+- Use typed schemas for every request and response.
+- Add or update tests for user-facing behavior.
+- Preserve frontend API calls in service/client modules instead of embedding fetch logic across components.
+- Do not introduce new global state unless the feature needs shared lifecycle management.
+- For DISHA production work, keep first-pass scope to `src/` and `web/` unless explicitly expanded.

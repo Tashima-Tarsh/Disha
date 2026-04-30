@@ -3,8 +3,9 @@ from datetime import UTC, datetime
 from typing import Any
 
 import structlog
-from app.core.config import get_settings
 from fastapi import WebSocket
+
+from app.core.config import get_settings
 
 logger = structlog.get_logger(__name__)
 

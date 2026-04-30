@@ -4,11 +4,12 @@ import sys
 # Add backend to path before any app imports
 sys.path.append(os.path.join(os.path.dirname(__file__), "..", "backend"))
 
-from fastapi import FastAPI, Query
-from fastapi.middleware.cors import CORSMiddleware
-from app.services.intelligence import IntelligenceService  # type: ignore
 import json
 import random
+
+from app.services.intelligence import IntelligenceService  # type: ignore
+from fastapi import FastAPI, Query
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
 
@@ -27,11 +28,11 @@ KNOWLEDGE = {
         "apps": "Next.js Command Center (UX Layer) with Leaflet telemetry.",
         "services": "Microservices for AI Platform, Alerts, Forecast, Cyber (Sentinel Shield), and MCP.",
         "ai": "Sovereign Intelligence Core. DISHA-MIND 7-stage loop. Includes Physics (Molecular Dynamics) and Strategy engines.",
-        "infra": "Docker Swarm orchestration and bare-metal kernel optimization."
+        "infra": "Docker Swarm orchestration and bare-metal kernel optimization.",
     },
     "osint": {
         "engine": "FastAPI Multi-Agent OSINT Emitter & Processor.",
-        "capacity": "Real-time signals from Kafka streams, web fetchers, and blockchain node analysis."
+        "capacity": "Real-time signals from Kafka streams, web fetchers, and blockchain node analysis.",
     },
     "layers": {
         "L1: User Layer": "Identity & Session Management via Microsoft-partnered protocols.",
@@ -40,8 +41,8 @@ KNOWLEDGE = {
         "L4: Authentication Layer": "Argon2id Blind Hash Protocols (Zero-PII).",
         "L5: Database Layer": "Neo4j Graph & Upstash Redis Ephemeral Storage.",
         "L6: Network Layer": "Sentinel Honeypot Mesh (Cowrie/Dionaea).",
-        "L7: Infrastructure Layer": "Docker Swarm / Bare Metal Kernels."
-    }
+        "L7: Infrastructure Layer": "Docker Swarm / Bare Metal Kernels.",
+    },
 }
 
 
@@ -58,12 +59,27 @@ async def ask(q: str = Query(...)):
             "answer": "Initiating Walkthrough Protocol DISHA-6.0. Prepare for cognitive orientation.",
             "action": "start_walkthrough",
             "steps": [
-                {"msg": "Stage 1: INGESTION. Signals arrive via CLI or Kafka telemetry streams.", "element": "step1"},
-                {"msg": "Stage 2: PERCEPTION. The Intelligence Core classifies intent and extracts entities.", "element": "core-view"},
-                {"msg": "Stage 3: DELIBERATION. Planner, Critic, and Executor agents vote on the path.", "element": "chat-panel"},
-                {"msg": "Stage 4: ACTION. Confident results are executed as system fixes or UX updates.", "element": "alert-center"},
-                {"msg": "Stage 5: AUDIT. Every decision is immutably logged for review.", "element": "status-bar"}
-            ]
+                {
+                    "msg": "Stage 1: INGESTION. Signals arrive via CLI or Kafka telemetry streams.",
+                    "element": "step1",
+                },
+                {
+                    "msg": "Stage 2: PERCEPTION. The Intelligence Core classifies intent and extracts entities.",
+                    "element": "core-view",
+                },
+                {
+                    "msg": "Stage 3: DELIBERATION. Planner, Critic, and Executor agents vote on the path.",
+                    "element": "chat-panel",
+                },
+                {
+                    "msg": "Stage 4: ACTION. Confident results are executed as system fixes or UX updates.",
+                    "element": "alert-center",
+                },
+                {
+                    "msg": "Stage 5: AUDIT. Every decision is immutably logged for review.",
+                    "element": "status-bar",
+                },
+            ],
         }
 
     if "osint" in q:
@@ -74,17 +90,24 @@ async def ask(q: str = Query(...)):
         return {"answer": KNOWLEDGE["disha"]}
 
     if "arch" in q:
-        return {"answer": f"Architecture Overview: {json.dumps(KNOWLEDGE['architecture'], indent=2)}"}
+        return {
+            "answer": f"Architecture Overview: {json.dumps(KNOWLEDGE['architecture'], indent=2)}"
+        }
 
     if "layer" in q:
         for k, v in KNOWLEDGE["layers"].items():
-            if k.lower() in q or k.split(':')[0].lower() in q:
+            if k.lower() in q or k.split(":")[0].lower() in q:
                 return {"answer": f"{k}: {v}"}
-        return {"answer": "The system operates on a 7-layer defense-in-depth architecture."}
+        return {
+            "answer": "The system operates on a 7-layer defense-in-depth architecture."
+        }
 
-    return {"answer": "I am cross-referencing your request with the DISHA Mythos framework. Please specify if you want an OSINT scan or a system Walkthrough."}
+    return {
+        "answer": "I am cross-referencing your request with the DISHA Mythos framework. Please specify if you want an OSINT scan or a system Walkthrough."
+    }
 
 
 if __name__ == "__main__":
     import uvicorn
+
     uvicorn.run(app, host="0.0.0.0", port=3001)

@@ -1,3 +1,5 @@
+from fastapi import APIRouter, Depends
+
 from app.api.deps import (
     get_audio_agent,
     get_multimodal_fusion,
@@ -10,7 +12,6 @@ from app.models.schemas import (
     MultimodalRequest,
     VisionAnalysisRequest,
 )
-from fastapi import APIRouter, Depends
 
 router = APIRouter()
 

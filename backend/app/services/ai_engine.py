@@ -1,11 +1,13 @@
-from typing import Any, Dict, Optional
-from app.core.observability import AuditLogger  # type: ignore
+from typing import Any
+
 from pydantic import BaseModel
+
+from app.core.observability import AuditLogger  # type: ignore
 
 
 class AIInput(BaseModel):
     query: str
-    context: Optional[Dict[str, Any]] = None
+    context: dict[str, Any] | None = None
 
 
 class AIDecision(BaseModel):
@@ -20,7 +22,7 @@ class AIEngine:
         self.audit = AuditLogger("ai_engine")
         self.prompt_templates = {
             "threat_analysis": "Analyze the following OSINT signal for potential threats: {input}",
-            "system_orientation": "Provide architectural guidance for the DISHA platform based on: {input}"
+            "system_orientation": "Provide architectural guidance for the DISHA platform based on: {input}",
         }
 
     async def process_directive(self, ai_input: AIInput) -> AIDecision:
@@ -37,7 +39,7 @@ class AIEngine:
             intent=intent,
             confidence=confidence,
             reasoning="Query matches known DISHA architectural patterns.",
-            output="Processed DISHA intelligence."
+            output="Processed DISHA intelligence.",
         )
 
         # Stage 4: VALIDATION & OUTPUT
@@ -45,9 +47,10 @@ class AIEngine:
             self.audit.log_event("ai_fallback", "system", {"reason": "low_confidence"})
             decision.output = "Fallback: Manual review required for this query."
 
-        self.audit.log_event("ai_decision", "system", {
-            "intent": decision.intent,
-            "confidence": decision.confidence
-        })
+        self.audit.log_event(
+            "ai_decision",
+            "system",
+            {"intent": decision.intent, "confidence": decision.confidence},
+        )
 
         return decision

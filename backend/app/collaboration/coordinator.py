@@ -2,6 +2,7 @@ import asyncio
 import time
 
 import structlog
+
 from app.collaboration.protocol import (
     AgentMessage,
     Conversation,
