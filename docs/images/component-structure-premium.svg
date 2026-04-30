@@ -1,0 +1,90 @@
+<svg width="1600" height="900" viewBox="0 0 1600 900" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="panel" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#172036"/>
+      <stop offset="100%" stop-color="#0F172A"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="160%">
+      <feDropShadow dx="0" dy="18" stdDeviation="18" flood-color="#020617" flood-opacity="0.45"/>
+    </filter>
+    <marker id="arrow" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="12" markerHeight="12" orient="auto">
+      <path d="M2 2L10 6L2 10V2Z" fill="#38BDF8"/>
+    </marker>
+    <style>
+      .title { font: 700 34px 'Inter', 'Segoe UI', sans-serif; fill: #F8FAFC; }
+      .subtitle { font: 500 16px 'Inter', 'Segoe UI', sans-serif; fill: #94A3B8; }
+      .section { font: 600 14px 'Inter', 'Segoe UI', sans-serif; fill: #CBD5E1; letter-spacing: 0.12em; }
+      .cardTitle { font: 700 18px 'Inter', 'Segoe UI', sans-serif; fill: #F8FAFC; }
+      .cardText { font: 500 14px 'Inter', 'Segoe UI', sans-serif; fill: #CBD5E1; }
+      .mini { font: 700 12px 'Inter', 'Segoe UI', sans-serif; fill: #E2E8F0; letter-spacing: 0.08em; }
+    </style>
+  </defs>
+
+  <rect width="1600" height="900" rx="28" fill="#0F172A"/>
+  <text x="96" y="110" class="title">Component Structure</text>
+  <text x="96" y="140" class="subtitle">Repository surfaces grouped by UI, API, service, and data responsibilities</text>
+
+  <rect x="96" y="190" width="416" height="600" rx="30" fill="url(#panel)" stroke="#24324A"/>
+  <text x="128" y="232" class="section">WEB SURFACE</text>
+  <rect x="128" y="280" width="352" height="96" rx="22" fill="#111C33" stroke="#334155" filter="url(#shadow)"/>
+  <text x="164" y="320" class="cardTitle">UI and Hooks</text>
+  <text x="164" y="346" class="cardText">`hooks/` and browser-driven interaction state</text>
+
+  <rect x="128" y="404" width="352" height="96" rx="22" fill="#111C33" stroke="#334155" filter="url(#shadow)"/>
+  <text x="164" y="444" class="cardTitle">API Controllers</text>
+  <text x="164" y="470" class="cardText">`app/api` route handlers and transport formatting</text>
+
+  <rect x="128" y="528" width="352" height="108" rx="22" fill="#111C33" stroke="#334155" filter="url(#shadow)"/>
+  <text x="164" y="568" class="cardTitle">Workflow Services</text>
+  <text x="164" y="594" class="cardText">`services/` for chat, export, file, and share logic</text>
+
+  <rect x="128" y="664" width="352" height="96" rx="22" fill="#111C33" stroke="#334155" filter="url(#shadow)"/>
+  <text x="164" y="704" class="cardTitle">Server Library</text>
+  <text x="164" y="730" class="cardText">`lib/server` for auth, policy, audit, CSRF, DB, Redis</text>
+
+  <rect x="592" y="190" width="416" height="600" rx="30" fill="url(#panel)" stroke="#24324A"/>
+  <text x="624" y="232" class="section">CLI SURFACE</text>
+  <rect x="624" y="300" width="352" height="96" rx="22" fill="#111C33" stroke="#334155" filter="url(#shadow)"/>
+  <text x="660" y="340" class="cardTitle">Entrypoints</text>
+  <text x="660" y="366" class="cardText">`src/entrypoints` for MCP and runtime startup</text>
+
+  <rect x="624" y="430" width="352" height="96" rx="22" fill="#111C33" stroke="#334155" filter="url(#shadow)"/>
+  <text x="660" y="470" class="cardTitle">Observability</text>
+  <text x="660" y="496" class="cardText">`src/observability` for audit and action records</text>
+
+  <rect x="624" y="560" width="352" height="96" rx="22" fill="#111C33" stroke="#334155" filter="url(#shadow)"/>
+  <text x="660" y="600" class="cardTitle">Security Policy</text>
+  <text x="660" y="626" class="cardText">`src/security` and secure storage enforcement</text>
+
+  <rect x="1088" y="190" width="416" height="600" rx="30" fill="url(#panel)" stroke="#24324A"/>
+  <text x="1120" y="232" class="section">PYTHON AND DATA SURFACES</text>
+  <rect x="1120" y="280" width="352" height="96" rx="22" fill="#111C33" stroke="#334155" filter="url(#shadow)"/>
+  <text x="1156" y="320" class="cardTitle">Legacy FastAPI</text>
+  <text x="1156" y="346" class="cardText">`backend/app` with agents, routes, streaming, ranking, RL</text>
+
+  <rect x="1120" y="404" width="352" height="96" rx="22" fill="#111C33" stroke="#334155" filter="url(#shadow)"/>
+  <text x="1156" y="444" class="cardTitle">AI Core</text>
+  <text x="1156" y="470" class="cardText">`disha/ai/core` cognitive loop, API, memory, reasoning</text>
+
+  <rect x="1120" y="528" width="352" height="96" rx="22" fill="#111C33" stroke="#334155" filter="url(#shadow)"/>
+  <text x="1156" y="568" class="cardTitle">AI Platform Prototype</text>
+  <text x="1156" y="594" class="cardText">`disha-agi-brain/backend` support services and experiments</text>
+
+  <rect x="1120" y="652" width="352" height="96" rx="22" fill="#111C33" stroke="#334155" filter="url(#shadow)"/>
+  <text x="1156" y="692" class="cardTitle">Data and Infra</text>
+  <text x="1156" y="718" class="cardText">Postgres, Redis, Compose, OpenTelemetry collector</text>
+
+  <path d="M304 376V392" stroke="#38BDF8" stroke-width="4" marker-end="url(#arrow)"/>
+  <path d="M304 500V516" stroke="#38BDF8" stroke-width="4" marker-end="url(#arrow)"/>
+  <path d="M304 636V652" stroke="#38BDF8" stroke-width="4" marker-end="url(#arrow)"/>
+
+  <path d="M800 396V418" stroke="#38BDF8" stroke-width="4" marker-end="url(#arrow)"/>
+  <path d="M800 526V548" stroke="#38BDF8" stroke-width="4" marker-end="url(#arrow)"/>
+
+  <path d="M1008 350H1080" stroke="#38BDF8" stroke-width="4" marker-end="url(#arrow)"/>
+  <path d="M1008 608H1080" stroke="#38BDF8" stroke-width="4" marker-end="url(#arrow)"/>
+  <path d="M480 712H580C630 712 630 608 624 608" stroke="#38BDF8" stroke-width="4" marker-end="url(#arrow)"/>
+
+  <rect x="96" y="820" width="1408" height="26" rx="13" fill="#111827"/>
+  <text x="118" y="838" class="subtitle">Primary production ownership is concentrated in the Web and CLI surfaces; Python surfaces remain broader and partially legacy</text>
+</svg>

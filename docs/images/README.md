@@ -10,3 +10,10 @@ Recommended assets:
 - `system-architecture.svg`
 - `data-flow.svg`
 - `component-diagram.svg`
+
+Generated premium SVG assets:
+
+- `system-architecture-premium.svg`
+- `data-flow-premium.svg`
+- `auth-flow-premium.svg`
+- `component-structure-premium.svg`
