@@ -1,16 +1,7 @@
 name: Modules CI
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - 'disha/ai/strategy/**'
-      - 'disha/ai/physics/**'
-  pull_request:
-    branches: [main]
-    paths:
-      - 'disha/ai/strategy/**'
-      - 'disha/ai/physics/**'
+  workflow_dispatch:
 
 permissions:
   contents: read

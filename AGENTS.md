@@ -2,10 +2,11 @@
 
 ## Architecture
 
-- First production scope is the root TypeScript CLI/runtime in `src/` and the Next.js app in `web/`.
+- Primary production scope is the Next.js app in `web/`, the TypeScript CLI/runtime in `src/`, and the unified brain backend in `disha/brain/`.
 - Keep route handlers thin. Controllers validate input, call services, and return responses.
 - Put web business logic in `web/services/`; server-only auth, policy, persistence, audit, rate limit, and validation live in `web/lib/server/`.
 - Put CLI pure rules in `src/domain/`, workflow services in `src/services/`, policy/storage contracts in `src/security/`, and audit helpers in `src/observability/`.
+- Put brain business logic in `disha/brain/brain/`; API controllers live in `disha/brain/api/`; security/policy in `disha/brain/security/`; persistence in `disha/brain/database/`; websocket alerts in `disha/brain/websocket/`.
 - Frontend screens live in app routes, reusable UI in `components/`, feature workflows in `features/`, layout shells in `layout/`, and API access in `services/` or `lib/api`.
 - Document new request flows when they cross authentication, authorization, persistence, or AI decision boundaries.
 

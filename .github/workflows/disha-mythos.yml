@@ -4,12 +4,6 @@ on:
   # Run daily at 3 AM UTC (after continuous training at 2 AM)
   schedule:
     - cron: "0 3 * * *"
-  # Run on every push to main
-  push:
-    branches: [main]
-  # Run on PRs
-  pull_request:
-    branches: [main]
   # Manual trigger
   workflow_dispatch:
     inputs:

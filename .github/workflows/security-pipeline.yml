@@ -32,7 +32,7 @@ jobs:
       - name: Install Bandit
         run: pip install bandit
       - name: Run Bandit
-        run: bandit -r disha-agi-brain/backend disha/services/cyber disha/ai/core disha/brain -f json -o bandit-results.json || true
+        run: bandit -r disha/services/cyber disha/ai/core disha/brain -f json -o bandit-results.json || true
       - name: Upload Bandit Results
         uses: actions/upload-artifact@v4
         with:
@@ -52,9 +52,14 @@ jobs:
         run: pip install pip-audit
       - name: Run pip-audit (AI Platform backend)
         run: |
-          pip-audit -r disha-agi-brain/backend/requirements.txt \
-            --format json --output safety-results-service.json \
-            --skip-editable || true
+          if [ -f "disha/brain/requirements.txt" ]; then
+            pip-audit -r disha/brain/requirements.txt \
+              --format json --output safety-results-service.json \
+              --skip-editable || true
+          else
+            echo "{}" > safety-results-service.json
+            echo "No disha/brain/requirements.txt found; skipping."
+          fi
       - name: Run pip-audit (AI Core)
         run: |
           pip-audit -r disha/ai/core/requirements.txt \
@@ -79,13 +84,18 @@ jobs:
         run: pip install cyclonedx-bom
       - name: Generate SBOM (CycloneDX)
         run: |
-          pip install -r disha-agi-brain/backend/requirements.txt --dry-run 2>/dev/null || true
-          cyclonedx-py pip --outfile bom.json --format json \
-            disha-agi-brain/backend/requirements.txt || \
-          python -m cyclonedx_py.command requirements \
-            disha-agi-brain/backend/requirements.txt \
-            --output-format JSON --outfile bom.json || \
-          echo "SBOM generation skipped — check cyclonedx-bom version compatibility"
+          if [ -f "disha/brain/requirements.txt" ]; then
+            pip install -r disha/brain/requirements.txt --dry-run 2>/dev/null || true
+            cyclonedx-py pip --outfile bom.json --format json \
+              disha/brain/requirements.txt || \
+            python -m cyclonedx_py.command requirements \
+              disha/brain/requirements.txt \
+              --output-format JSON --outfile bom.json || \
+            echo "SBOM generation skipped — check cyclonedx-bom version compatibility"
+          else
+            echo "{}" > bom.json
+            echo "No disha/brain/requirements.txt found; skipping SBOM."
+          fi
       - name: Upload SBOM
         uses: actions/upload-artifact@v4
         with:

@@ -2,8 +2,6 @@ name: Continuous AI Training
 
 on:
   # Run daily at 2 AM UTC — low-traffic period for open-source data fetching
-  schedule:
-    - cron: "0 2 * * *"
   # Allow manual trigger
   workflow_dispatch:
     inputs:
@@ -21,15 +19,6 @@ on:
         type: boolean
         default: false
   # Also run on pushes to training scripts
-  push:
-    branches: [main]
-    paths:
-      - "disha/scripts/continuous_train.py"
-      - "disha/scripts/data_fetchers.py"
-      - "disha/scripts/knowledge_engine.py"
-      - "disha/ai/rag/**"
-      - "disha/services/ai-platform/backend/app/rl/**"
-      - "disha/ai/core/decision_engine/train.py"
 
 permissions:
   contents: write
