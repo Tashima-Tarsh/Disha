@@ -42,8 +42,6 @@ Search keywords:
 
 ## Architecture Summary
 
-Premium platform diagram:
-
 ![DISHA Brain Platform Architecture](docs/images/disha-brain-platform-premium.svg)
 
 ```mermaid
