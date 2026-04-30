@@ -22,3 +22,5 @@ This wiki documents the repository as it exists today and defines the target pro
 - [Architecture Diagrams](architecture-diagrams.md)
 - [Technical Design Document](TDD.md)
 - [Design System](design-system.md)
+- [DISHA Brain Architecture](disha-brain-architecture.md)
+- [DISHA Brain Enterprise Architecture](disha-brain-enterprise-architecture.md)
