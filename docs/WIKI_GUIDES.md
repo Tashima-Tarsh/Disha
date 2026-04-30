@@ -1,31 +1,24 @@
-# DishaOS: Technical Guides
+# Wiki Guides
 
-## 🎨 Frontend Guide (Next.js 15)
-The DISHA frontend is built for **Observability**.
-- **Directory:** `disha/apps/web/`
-- **Core Component:** `JarvisCommandCenter.tsx`
-- **Theme:** Dark Luxury Cybernetics. Use the CSS variables in `globals.css` to maintain brand integrity.
-- **WebSocket:** Connects to `ws://localhost:8000/api/v1/osint-stream/ws` for live threat visualization.
+This file now serves as a lightweight index for the maintained documentation set.
 
----
+## Core Guides
 
-## 🧠 Backend Guide (FastAPI)
-The backend is an **Agentic Orchestrator**.
-- **Directory:** `disha/services/ai-platform/backend/`
-- **Logic:** `cognitive_loop.py`
-- **Agent Addition:** To add a new agent, register it in `disha/ai/core/agents/` and add its cross-examination logic to the `DecisionNexus`.
-- **RAG:** Use the `CodeChunker` in `disha-agi-brain/` to ingest new repository logic.
+- [System Overview](wiki/01-system-overview.md)
+- [Architecture Explanation](wiki/02-architecture-explanation.md)
+- [Backend Design](wiki/03-backend-design.md)
+- [Frontend Design](wiki/04-frontend-design.md)
+- [Security Model](wiki/05-security-model.md)
+- [API Documentation](wiki/06-api-documentation.md)
+- [Database Schema](wiki/07-database-schema.md)
+- [AI Logic Flow](wiki/08-ai-logic-flow.md)
+- [Deployment Guide](wiki/09-deployment-guide.md)
+- [Troubleshooting](wiki/10-troubleshooting.md)
 
----
+## Reference Documents
 
-## 🛡️ Security Model
-- **SAST:** Every push is audited by `Bandit` (Python) and `Biome` (TS).
-- **Secret Scanning:** `Gitleaks` prevents private key leaks.
-- **Honeypot Integration:** The `Sentinel` agent listens for signals from dockerized Cowrie/Dionaea instances.
-
----
-
-## 🚀 Deployment & Monitoring
-- **Deployment:** Standardized Docker images are provided in the root `Dockerfile`.
-- **Monitoring:** Integrated `structlog` for JSON logging and OpenTelemetry for trace tracking.
-- **Self-Healing:** Ensure `disha_mythos.py` is configured as a cron job to monitor and repair cluster health daily.
+- [Repository Analysis](repository-analysis.md)
+- [Project Structure](project-structure.md)
+- [Architecture Diagrams](architecture-diagrams.md)
+- [Technical Design Document](TDD.md)
+- [Design System](design-system.md)

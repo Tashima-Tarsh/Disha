@@ -1,0 +1,107 @@
+<svg width="1600" height="900" viewBox="0 0 1600 900" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="panel" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#172036"/>
+      <stop offset="100%" stop-color="#0F172A"/>
+    </linearGradient>
+    <linearGradient id="accentLine" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#4F46E5"/>
+      <stop offset="100%" stop-color="#38BDF8"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="160%">
+      <feDropShadow dx="0" dy="18" stdDeviation="18" flood-color="#020617" flood-opacity="0.45"/>
+    </filter>
+    <marker id="arrow" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="12" markerHeight="12" orient="auto-start-reverse">
+      <path d="M2 2L10 6L2 10V2Z" fill="#38BDF8"/>
+    </marker>
+    <style>
+      .title { font: 700 34px 'Inter', 'Segoe UI', sans-serif; fill: #F8FAFC; }
+      .subtitle { font: 500 16px 'Inter', 'Segoe UI', sans-serif; fill: #94A3B8; }
+      .section { font: 600 14px 'Inter', 'Segoe UI', sans-serif; fill: #CBD5E1; letter-spacing: 0.12em; }
+      .cardTitle { font: 700 20px 'Inter', 'Segoe UI', sans-serif; fill: #F8FAFC; }
+      .cardText { font: 500 14px 'Inter', 'Segoe UI', sans-serif; fill: #CBD5E1; }
+      .mini { font: 700 12px 'Inter', 'Segoe UI', sans-serif; fill: #E2E8F0; letter-spacing: 0.08em; }
+      .chipText { font: 700 15px 'Inter', 'Segoe UI', sans-serif; fill: #E2E8F0; }
+    </style>
+  </defs>
+
+  <rect width="1600" height="900" rx="28" fill="#0F172A"/>
+  <rect x="64" y="54" width="1472" height="792" rx="32" stroke="#1E293B" stroke-width="1.5"/>
+  <text x="96" y="112" class="title">System Architecture</text>
+  <text x="96" y="142" class="subtitle">DISHA production path with web, CLI, security, storage, and external service boundaries</text>
+
+  <rect x="96" y="190" width="320" height="580" rx="28" fill="url(#panel)" stroke="#24324A" filter="url(#shadow)"/>
+  <text x="128" y="232" class="section">CLIENT LAYER</text>
+  <rect x="128" y="272" width="256" height="120" rx="24" fill="#111C33" stroke="#334155"/>
+  <circle cx="172" cy="332" r="22" fill="#4F46E5"/>
+  <text x="163" y="337" class="chipText">UI</text>
+  <text x="208" y="320" class="cardTitle">Web Client</text>
+  <text x="208" y="345" class="cardText">Browser dashboard</text>
+  <text x="208" y="368" class="cardText">Protected operator workflows</text>
+
+  <rect x="128" y="430" width="256" height="120" rx="24" fill="#111C33" stroke="#334155"/>
+  <circle cx="172" cy="490" r="22" fill="#38BDF8"/>
+  <text x="162" y="495" class="chipText">CLI</text>
+  <text x="208" y="478" class="cardTitle">CLI Runtime</text>
+  <text x="208" y="503" class="cardText">Local operator entrypoint</text>
+  <text x="208" y="526" class="cardText">MCP and tool execution</text>
+
+  <rect x="96" y="190" width="320" height="8" rx="4" fill="url(#accentLine)"/>
+
+  <rect x="480" y="190" width="470" height="580" rx="28" fill="url(#panel)" stroke="#24324A" filter="url(#shadow)"/>
+  <text x="512" y="232" class="section">APPLICATION AND SECURITY</text>
+  <rect x="512" y="272" width="406" height="86" rx="22" fill="#111C33" stroke="#334155"/>
+  <circle cx="554" cy="315" r="18" fill="#4F46E5"/>
+  <text x="544" y="320" class="mini">API</text>
+  <text x="588" y="309" class="cardTitle">Route Controllers</text>
+  <text x="588" y="332" class="cardText">HTTP parsing, typed responses, thin handlers</text>
+
+  <rect x="512" y="388" width="406" height="110" rx="22" fill="#111C33" stroke="#334155"/>
+  <circle cx="554" cy="443" r="18" fill="#22C55E"/>
+  <text x="541" y="448" class="mini">SVC</text>
+  <text x="588" y="433" class="cardTitle">Service Layer</text>
+  <text x="588" y="456" class="cardText">Chat, export, file access, sharing workflows</text>
+  <text x="588" y="479" class="cardText">Business logic and orchestration</text>
+
+  <rect x="512" y="532" width="406" height="176" rx="22" fill="#111C33" stroke="#334155"/>
+  <circle cx="554" cy="588" r="18" fill="#38BDF8"/>
+  <text x="539" y="593" class="mini">SEC</text>
+  <text x="588" y="578" class="cardTitle">Security Boundary</text>
+  <text x="588" y="601" class="cardText">Authentication, RBAC, CSRF, rate limiting</text>
+  <text x="588" y="624" class="cardText">Audit logging, validation, request context</text>
+  <rect x="588" y="647" width="128" height="34" rx="17" fill="#1E293B"/>
+  <text x="616" y="669" class="cardText">Zero-trust API</text>
+  <rect x="96" y="190" width="854" height="8" rx="4" fill="url(#accentLine)" opacity="0.9"/>
+
+  <rect x="1014" y="190" width="490" height="580" rx="28" fill="url(#panel)" stroke="#24324A" filter="url(#shadow)"/>
+  <text x="1046" y="232" class="section">DATA AND EXTERNAL SYSTEMS</text>
+  <rect x="1046" y="286" width="192" height="146" rx="24" fill="#111C33" stroke="#334155"/>
+  <circle cx="1090" cy="350" r="22" fill="#4F46E5"/>
+  <text x="1082" y="355" class="chipText">DB</text>
+  <text x="1126" y="338" class="cardTitle">Postgres</text>
+  <text x="1126" y="363" class="cardText">Users, sessions, audit, shares</text>
+
+  <rect x="1268" y="286" width="204" height="146" rx="24" fill="#111C33" stroke="#334155"/>
+  <circle cx="1312" cy="350" r="22" fill="#22C55E"/>
+  <text x="1300" y="355" class="chipText">KV</text>
+  <text x="1348" y="338" class="cardTitle">Redis</text>
+  <text x="1348" y="363" class="cardText">Rate limits and ephemeral state</text>
+
+  <rect x="1046" y="492" width="426" height="164" rx="24" fill="#111C33" stroke="#334155"/>
+  <circle cx="1090" cy="554" r="22" fill="#38BDF8"/>
+  <text x="1078" y="559" class="chipText">AI</text>
+  <text x="1126" y="542" class="cardTitle">External Services</text>
+  <text x="1126" y="567" class="cardText">Model providers, backend integrations, legacy modules</text>
+  <text x="1126" y="590" class="cardText">Consumed behind validated and audited service calls</text>
+
+  <path d="M384 332H492" stroke="#38BDF8" stroke-width="4" marker-end="url(#arrow)"/>
+  <path d="M384 490H492" stroke="#38BDF8" stroke-width="4" marker-end="url(#arrow)"/>
+  <path d="M715 358V382" stroke="#38BDF8" stroke-width="4" marker-end="url(#arrow)"/>
+  <path d="M715 498V524" stroke="#38BDF8" stroke-width="4" marker-end="url(#arrow)"/>
+  <path d="M922 350H1032" stroke="#38BDF8" stroke-width="4" marker-end="url(#arrow)"/>
+  <path d="M922 350C980 350 968 350 1014 350" stroke="#38BDF8" stroke-width="4" marker-end="url(#arrow)"/>
+  <path d="M922 592C980 592 980 572 1032 572" stroke="#38BDF8" stroke-width="4" marker-end="url(#arrow)"/>
+
+  <rect x="96" y="798" width="1408" height="28" rx="14" fill="#111827"/>
+  <text x="118" y="817" class="subtitle">Flow: User surfaces -> controllers -> services -> security boundary -> data stores and external systems</text>
+</svg>

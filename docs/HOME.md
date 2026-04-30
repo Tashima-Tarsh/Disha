@@ -1,19 +1,24 @@
-# The DishaOS Manifesto
+# DISHA Wiki
 
-## The End of Wrappers
+This wiki documents the repository as it exists today and defines the target production structure.
 
-For the past two years, the AI ecosystem has been flooded with "agents" that are nothing more than brittle wrappers around single-shot LLM calls. They do not think. They do not deliberate. They simply respond.
+## Start Here
 
-**DishaOS is different.**
+- [System Overview](wiki/01-system-overview.md)
+- [Architecture Explanation](wiki/02-architecture-explanation.md)
+- [Backend Design](wiki/03-backend-design.md)
+- [Frontend Design](wiki/04-frontend-design.md)
+- [Security Model](wiki/05-security-model.md)
+- [API Documentation](wiki/06-api-documentation.md)
+- [Database Schema](wiki/07-database-schema.md)
+- [AI Logic Flow](wiki/08-ai-logic-flow.md)
+- [Deployment Guide](wiki/09-deployment-guide.md)
+- [Troubleshooting](wiki/10-troubleshooting.md)
 
-We believe that for an Artificial Intelligence to earn the right to act autonomously, it must first demonstrate the capacity to reason. It must possess memory that decays naturally. It must generate competing hypotheses. It must submit those hypotheses to a panel of expert sub-agents for cross-examination. It must calculate its own confidence before ever touching an external system.
+## Supporting Documents
 
-## The Sovereign Architecture
-
-DishaOS is built as a **Sovereign Intelligence Platform**. This means:
-
-1. **No External Dependencies for Logic:** While we may use external models for inference, the *reasoning* and *deliberation* occur locally within our 7-stage cognitive loop.
-2. **Absolute Security First:** We assume the environment is hostile. The platform includes a native cyber-defense mesh (honeypots, PyTorch anomaly detection) to isolate threats before they touch the intelligence core.
-3. **Privacy by Default:** Components like our Go4Bid auction engine use ephemeral memory (Redis TTL) and blind authentication (Argon2id). We don't just secure PII; we refuse to store it.
-
-Welcome to the next era of intelligence. Welcome to DishaOS.
+- [Repository Analysis](repository-analysis.md)
+- [Project Structure](project-structure.md)
+- [Architecture Diagrams](architecture-diagrams.md)
+- [Technical Design Document](TDD.md)
+- [Design System](design-system.md)

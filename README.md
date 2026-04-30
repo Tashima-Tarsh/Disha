@@ -1,228 +1,207 @@
-# 🛡️ DishaOS v3.0: Frontier Sovereign Intelligence
+# DISHA
 
-**The world's first self-healing, secure, and repository-aware AGI ecosystem.**
+DISHA is a multi-surface monorepo for sovereign AI tooling, cognitive reasoning services, secure developer workflows, and web-based control surfaces.
 
-**DishaOS** has evolved into a globally elite, production-grade AGI infrastructure. It integrates a biological 7-stage cognitive engine with a multi-agent **Swarm** of specialists (Engineer, Security, Architect, Growth) to deliver autonomous code hardening and enterprise-grade cyber defense.
+The repository currently contains four meaningful runtime families:
 
----
+- `web/`: a hardened Next.js application with authenticated API routes, RBAC, CSRF protection, audit logging, and export/share workflows.
+- `src/`: a TypeScript CLI/runtime surface focused on MCP entrypoints, secure storage policy, and observability adapters.
+- `backend/`: a legacy FastAPI service with agent orchestration, multimodal routes, ranking, RL, and streaming components.
+- `disha/` and `disha-agi-brain/`: broader AI research, orchestration, strategy, physics, and experimental service modules.
 
-## 💎 The v3.0 "Frontier" Evolution
+The codebase is best understood as a monorepo under consolidation, not a single production application. This documentation reflects the current structure and defines a clearer target architecture for ongoing cleanup.
 
-We have successfully completed the transformation of DishaOS into a **Frontier-Grade AGI Platform**.
+## Why DISHA
 
-### 🚀 Key Milestones Completed
+- Secure by default web and CLI foundations.
+- Explicit AI workflow boundaries instead of opaque prompt pipelines.
+- Support for interactive web, CLI, and Python service surfaces in one repository.
+- Operational focus on auditability, local development, and staged hardening.
 
-- [x] **Autonomous Swarm:** Fully operational specialist agents (Engineer, Architect, Security, Growth).
-- [x] **Self-Healing Loop:** Predictive code-hardening using `pydriller`.
-- [x] **Enterprise Security:** RBAC, Audit Logs, and Encrypted Secrets Vault.
-- [x] **Knowledge Mesh:** AST-aware RAG with Citation Grounding and Model Routing.
-- [x] **Frontier Reasoning:** Self-correcting "Reflection" nodes and session-aware memory.
-- [x] **Sovereign Devex:** n8n-style event orchestration and local model support.
+## Repository Map
 
----
-
-## 📖 Table of Contents
-
-- [Product Story](#product-story)
-- [Visual Showcase](#visual-showcase)
-- [Core Features](#core-features)
-- [Architecture Deep Dive](#architecture-deep-dive)
-- [Tech Stack](#tech-stack)
-- [Installation and Setup](#installation-and-setup)
-- [Usage Guide](#usage-guide)
-- [30/60/90 Day Roadmap](#306090-day-roadmap)
-- [Contributing](#contributing)
-
----
-
-## Product Story
-
-### The Pain Point
-
-The current AI landscape is saturated with "chatbots" that lack persistent memory, fail to reason through complex ethics, and have zero defensive capabilities against hostile environments.
-
-### The DISHA Solution
-
-DISHA (Digital Intelligence & Sovereign Heuristic Assistant) was built to be a **Sovereign Guardian**. It treats the digital world as a battleground, using honeypots to learn from attackers and a multi-agent "Decision Nexus" to ensure that AI agency is never unchecked. It doesn't just answer; it **reasons**.
-
----
-
-## Visual Showcase
-
-### 1. The Sovereign Command Center
-
-![Command Center Dashboard](docs/command_center_demo.png)
-
-*Caption: Real-time monitoring of the 7-layer defense architecture and geo-threat radar.*
-
-### 2. The Cognitive Deliberation Flow
-
-```mermaid
-graph TD
-    A[Input] --> B[Perceive]
-    B --> C[Attend]
-    C --> D[Reason]
-    D --> E[Deliberate]
-    E --> F[Act]
-    F --> G[Reflect]
-    G --> H[Consolidate]
-    H --> C
+```text
+.
+|-- web/                 Next.js app and secure API surface
+|-- src/                 TypeScript CLI/runtime hardening modules
+|-- backend/             Legacy FastAPI backend
+|-- disha/               AI core, models, apps, services, prompts
+|-- disha-agi-brain/     AI platform backend prototype
+|-- docker/              Compose and observability assets
+|-- docs/                Architecture, wiki, design, TDD, analysis
+`-- .github/workflows/   CI, CodeQL, security, and module pipelines
 ```
 
-*Caption: The biological state machine driving DishaOS reasoning.*
+## Architecture Summary
 
----
+```mermaid
+flowchart LR
+    U[User] --> W[Next.js Web]
+    U --> C[TypeScript CLI]
+    W --> WS[Web Services Layer]
+    WS --> SEC[Auth RBAC CSRF Rate Limit Audit]
+    WS --> DB[(Postgres)]
+    WS --> REDIS[(Redis)]
+    WS --> EXT[Model or Backend Services]
+    C --> MCP[MCP Entrypoint]
+    MCP --> CSEC[Secure Storage Policy and Audit]
+    LEG[Legacy FastAPI Backend] --> EXT
+    CORE[AI Core Modules] --> LEG
+```
 
-## Core Features
-
-### 1. 7-Stage Cognitive Loop
-
-Unlike standard "Ask-Response" agents, DISHA processes every signal through:
-
-- **Perceive:** Intent & Entity Extraction.
-- **Attend:** Working & Episodic Memory retrieval (with 0.92 decay rate).
-- **Reason:** Competing Hypothesis generation.
-- **Deliberate:** Multi-agent cross-examination (Political, Legal, Security, Ideological).
-- **Act:** Execution with strict Confidence Thresholds (0.45).
-- **Reflect:** Self-quality assessment.
-- **Consolidate:** Long-term memory promotion.
-
-### 2. Sentinel Cyber Defense Mesh
-
-A native blue-team layer featuring:
-
-- **Honeypots:** Cowrie, OpenCanary, and Dionaea integrated directly into the learning loop.
-- **Anomaly Detection:** Unsupervised PyTorch autoencoders detecting zero-day network threats.
-- **Tarpitting:** Adaptive TCP slowing to neutralize brute-force attackers.
-
-### 3. Predictive Intelligence (PyDriller)
-
-Autonomous repository analysis that identifies high-risk, bug-prone files based on historical commit churn and complexity metrics.
-
-### 4. Voice Mode (WebRTC)
-
-Low-latency audio streaming for hands-free "Jarvis-style" commanding using Whisper-based speech-to-text and ultra-fast TTS responses.
-
-### 5. Go4Bid: Ephemeral Commerce
-
-A privacy-first L1 reverse-auction engine:
-
-- **Zero-PII Storage:** Ephemeral Redis memory with 30-minute TTL.
-- **Blind Authentication:** Argon2id hashing for session integrity.
-
----
-
-## Architecture Deep Dive
-
-### Frontend (Next.js 15)
-
-- **Framework:** Next.js with App Router.
-- **State Management:** React Server Components + Client-side hooks for WebSocket streams.
-- **Styling:** "Dark Luxury" Vanilla CSS + Tailwind for minimalist, premium dashboards.
-
-### Backend (FastAPI + Python 3.11)
-
-- **Orchestration:** FastAPI gateway managing asynchronous agent tasks.
-- **RAG Pipeline:** AST-aware code chunking using `tree-sitter` and vectorized retrieval via `chromadb`.
-- **Intelligence:** `HybridReasoner` switching between Symbolic and Neural logic.
-
-### Infrastructure
-
-- **Deployment:** Docker Compose for multi-service isolation.
-- **Package Management:** `uv` by Astral for extreme performance and reproducible environments.
-
----
+The production-ready path in this repository is the `web/` plus `src/` hardening track. The remaining Python surfaces are documented as legacy or experimental modules pending convergence.
 
 ## Tech Stack
 
-| Layer | Technologies |
-| :--- | :--- |
-| **Intelligence** | Python, FastAPI, PyTorch, LangChain, tree-sitter |
-| **Web** | Next.js, React, TypeScript, Tailwind CSS, xterm.js |
-| **Data** | Neo4j (Graph), Redis (Ephemeral), ChromaDB (Vector) |
-| **DevOps** | Docker, Bun, uv, GitHub Actions |
-| **Security** | Gitleaks, Bandit, Ruff, Biome |
+| Area | Stack |
+| --- | --- |
+| Web | Next.js, React, TypeScript, Zod |
+| CLI | TypeScript, MCP, OpenTelemetry APIs |
+| Data | Postgres, Redis |
+| Python Services | FastAPI, Pydantic, PyTorch-adjacent research modules |
+| Tooling | npm, Bun, Docker Compose, GitHub Actions, Ruff, mypy, Bandit, CodeQL |
 
----
-
-## Installation and Setup
+## Local Setup
 
 ### Prerequisites
 
+- Node.js 20+
+- npm 10+
 - Python 3.11+
-- Node.js / Bun
-- Docker & Docker Compose
+- Docker and Docker Compose
 
-### 1. Clone the Repository
+### 1. Clone
 
 ```bash
 git clone https://github.com/Tashima-Tarsh/Disha.git
 cd Disha
 ```
 
-### 2. Initialize Backend (uv)
+### 2. Install web dependencies
 
 ```bash
-cd disha-agi-brain/backend
-uv venv
-source .venv/bin/activate # or .venv\Scripts\activate on Windows
-uv pip install -r requirements.txt
+cd web
+npm install
 ```
 
-### 3. Initialize Frontend (Bun)
+### 3. Configure environment
+
+Use [web/.env.example](web/.env.example) as the baseline. The minimum local values are:
 
 ```bash
-cd disha/apps/web
-bun install
-bun run dev
+DISHA_AUTH_MODE=dev-jwt
+DISHA_JWT_SECRET=<32+ random characters>
+DISHA_DEV_PASSWORD=<local dev password>
+DATABASE_URL=postgresql://disha:postgres@localhost:5432/disha
+REDIS_URL=redis://localhost:6379
+DISHA_WORKSPACE_ROOT=..
 ```
 
----
+### 4. Start infrastructure
 
-## Usage Guide
+```bash
+cd docker
+docker compose up postgres redis -d
+```
 
-To engage the **Cognitive Loop** or deploy the **Sentinel Mesh**, refer to the detailed [Usage Documentation](docs/USAGE.md) or use the interactive terminal in the Command Center.
+### 5. Run the web app
 
----
+```bash
+cd web
+npm run dev
+```
 
-## 30/60/90 Day Roadmap
+### 6. Run validation
 
-### Phase 1: Solidification (Current)
+```bash
+cd web
+npm run test
+npm run type-check
+npm run build
+```
 
-- [x] Establish 7-stage Cognitive Loop.
-- [x] Implement Blue-Team Defense Mesh.
-- [x] Integrate AST-aware RAG.
+## Deployment
 
-### Phase 2: Proactive Intelligence (Current)
+### Docker Compose baseline
 
-- [x] **Voice Mode:** WebRTC + Audio Streaming integration.
-- [x] **Predictive Hardening:** PyDriller-powered risk analysis.
-- [x] **Swarm Expansion:** Adding autonomous PR agents for self-healing code.
-- [x] **Reflection Node:** Self-correcting deliberation loops.
-- [x] **Session Memory:** Persistent Redis-backed conversation context.
+The repository includes [docker/docker-compose.yml](docker/docker-compose.yml) for:
 
----
+- `disha-web`
+- `postgres`
+- `redis`
+- `otel-collector`
 
-## Contributing
+Production deployment expects environment-managed secrets for:
 
-We maintain a **Top 0.1% code quality standard**.
+- `DISHA_JWT_SECRET`
+- `POSTGRES_PASSWORD`
+- `ANTHROPIC_API_KEY`
+- OIDC variables when using federated authentication
 
-1. Fork the repo.
-2. Run `bun run lint` and `ruff check`.
-3. Submit a PR with detailed architecture impact notes.
+### CI
 
----
+GitHub Actions covers:
+
+- quality gate linting and typing
+- module-specific CI
+- security scanning
+- CodeQL analysis
+
+## Environment Variables
+
+Primary web variables are documented in [web/.env.example](web/.env.example). The most important ones are:
+
+| Variable | Purpose |
+| --- | --- |
+| `DISHA_AUTH_MODE` | `dev-jwt` or `oidc` |
+| `DISHA_JWT_SECRET` | JWT signing key for dev JWT mode |
+| `DISHA_DEV_PASSWORD` | bootstrap password for local login |
+| `DISHA_OIDC_ISSUER` | OIDC issuer URL |
+| `DISHA_OIDC_CLIENT_ID` | OIDC client id |
+| `DISHA_OIDC_CLIENT_SECRET` | OIDC client secret |
+| `DATABASE_URL` | Postgres connection string |
+| `REDIS_URL` | Redis connection string |
+| `DISHA_WORKSPACE_ROOT` | allowed filesystem root for web file operations |
+| `DISHA_ALLOWED_ORIGINS` | allowed browser origins |
+
+## Screenshots
+
+Add screenshots to `docs/images/` and wire them here:
+
+- `docs/images/dashboard-overview.png`
+- `docs/images/auth-flow.png`
+- `docs/images/share-export.png`
+
+Recommended capture set:
+
+1. Dashboard or command center overview
+2. Auth and policy-protected API interactions
+3. File, export, and sharing workflows
+
+## Documentation
+
+- [Repository Analysis](docs/repository-analysis.md)
+- [Technical Design Document](docs/TDD.md)
+- [Architecture Diagrams](docs/architecture-diagrams.md)
+- [Design System](docs/design-system.md)
+- [Wiki Home](docs/HOME.md)
+
+## Current State
+
+What is production-oriented now:
+
+- `web/` hardening path
+- `src/` CLI security and observability adapters
+- Compose-based local infrastructure
+- CI hardening across Python and TypeScript surfaces
+
+What remains in transition:
+
+- duplicated backend and AI surfaces
+- legacy FastAPI structure
+- inconsistent naming between `backend/`, `disha/`, and `disha-agi-brain/`
+- uneven documentation quality outside the new docs set
 
 ## License
 
-Proprietary / Unlicensed. See [LICENSE](LICENSE) for details.
-
----
-
-## Maintainer
-
-**DishaOS Architect** — Engineering True Autonomy.
-
----
-
-**[⭐ Star on GitHub](https://github.com/Tashima-Tarsh/Disha)** | **[🍴 Fork Repo](https://github.com/Tashima-Tarsh/Disha/fork)** | **[📖 Read Wiki](docs/HOME.md)**
+See [LICENSE](LICENSE).
