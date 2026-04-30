@@ -1,0 +1,53 @@
+name: Full Stack Smoke (Manual)
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    name: Docker Compose Smoke
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build containers
+        run: docker compose --profile full build
+
+      - name: Start stack
+        run: docker compose --profile full up -d
+
+      - name: Wait for health
+        shell: bash
+        run: |
+          set -euo pipefail
+          for i in {1..60}; do
+            if curl -fsS http://localhost:3000/ >/dev/null 2>&1; then
+              echo "web ok"
+              break
+            fi
+            sleep 2
+          done
+          curl -fsS http://localhost:8080/api/v1/health
+
+      - name: Probe module health (auth required)
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl -fsS \
+            -H "Authorization: Bearer ${DISHA_BRAIN_API_TOKEN}" \
+            http://localhost:8080/api/v1/modules/health
+        env:
+          DISHA_BRAIN_API_TOKEN: change-me
+
+      - name: Dump logs on failure
+        if: failure()
+        run: docker compose --profile full logs --no-color
+
+      - name: Shutdown
+        if: always()
+        run: docker compose --profile full down -v
+

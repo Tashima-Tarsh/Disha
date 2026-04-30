@@ -43,6 +43,14 @@ class Settings:
         ),
     )
 
+    # Optional module endpoints (used by DISHA Brain module adapters).
+    ai_platform_url: str = os.getenv(
+        "DISHA_AI_PLATFORM_URL", "http://127.0.0.1:8000/api/v1"
+    )
+    mcp_http_url: str = os.getenv("DISHA_MCP_HTTP_URL", "http://127.0.0.1:4000")
+    physics_url: str = os.getenv("DISHA_PHYSICS_URL", "http://127.0.0.1:8002")
+    opencanary_url: str = os.getenv("DISHA_OPENCANARY_URL", "http://127.0.0.1:8081")
+
     mobile_sync_key: str = os.getenv(
         "DISHA_BRAIN_SYNC_KEY", os.getenv("JARVIS_X_SYNC_KEY", "")
     ).strip()

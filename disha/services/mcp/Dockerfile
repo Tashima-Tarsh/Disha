@@ -1,32 +1,27 @@
 FROM node:22-slim AS build
 WORKDIR /app
 
-# Copy full repo (src/ is needed at runtime for the MCP explorer)
-COPY . .
+COPY package.json package-lock.json tsconfig.json server.json ./
+COPY src ./src
+COPY api ./api
+COPY README.md ./README.md
 
-# Build MCP server
-WORKDIR /app/mcp-server
-RUN npm ci && npm run build
+RUN npm ci
+RUN npm run build
 
-# ---------------------------------------------------------------------------
 FROM node:22-slim
 WORKDIR /app
-
-# Copy built MCP server and source code it explores
-COPY --from=build /app/mcp-server/dist /app/mcp-server/dist
-COPY --from=build /app/mcp-server/node_modules /app/mcp-server/node_modules
-COPY --from=build /app/mcp-server/package.json /app/mcp-server/package.json
-COPY --from=build /app/src /app/src
-COPY --from=build /app/README.md /app/README.md
-
 ENV NODE_ENV=production
-ENV CLAUDE_CODE_SRC_ROOT=/app/src
-ENV PORT=3000
+ENV PORT=4000
 
-RUN addgroup -S appuser && adduser -S appuser -G appuser
+COPY --from=build /app/dist ./dist
+COPY --from=build /app/node_modules ./node_modules
+COPY --from=build /app/package.json ./package.json
+COPY --from=build /app/README.md ./README.md
+
+RUN addgroup --system --gid 10001 appuser \
+  && adduser --system --uid 10001 appuser
 USER appuser
 
-EXPOSE 3000
-
-WORKDIR /app/mcp-server
+EXPOSE 4000
 CMD ["node", "dist/http.js"]

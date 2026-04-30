@@ -1,8 +1,8 @@
-# JARVIS-X Enterprise Architecture
+# DISHA Brain Enterprise Architecture
 
 ## Purpose
 
-This document defines the complete repository architecture for DISHA when organized around JARVIS-X as the primary intelligent control plane.
+This document defines the complete repository architecture for DISHA Brain as a single platform, with modular subsystems integrated behind a unified control plane.
 
 The design follows an enterprise reference style:
 
@@ -16,12 +16,12 @@ This is a realistic target architecture for the existing repo. It does not assum
 
 ## Executive Summary
 
-JARVIS-X should be the orchestration layer that sits across the repo and turns DISHA into one coherent platform:
+DISHA Brain is the orchestration layer that sits across the repo and turns DISHA into one coherent platform:
 
 - `web/` becomes the secure operator interface
 - `src/` becomes the trusted execution gateway
 - `disha/ai/core` becomes the reasoning and memory kernel
-- `backend/` and `disha-agi-brain/` become specialized backend and intelligence services
+- `legacy/` holds retired prototypes and legacy stacks (not part of the platform baseline)
 - deception sensors and honeypots become a telemetry source for the Security Brain
 
 ## Layered Architecture
@@ -66,7 +66,7 @@ Repo alignment:
 
 - `disha/brain/api/`
 - `disha/brain/event_bus.py`
-- `backend/app/agents/orchestrator.py`
+- `legacy/backend/app/agents/orchestrator.py`
 
 Responsibilities:
 
@@ -151,7 +151,7 @@ Repo alignment:
 
 - `disha/ai/core/citation_engine.py`
 - `disha/ai/core/ast_indexer.py`
-- `disha-agi-brain/backend/app/services/router.py`
+- `disha/services/ai-platform/backend/app/services/router.py`
 - `disha/edge_agent/collector.py`
 
 Responsibilities:
@@ -204,7 +204,7 @@ Repo alignment:
 
 - `disha/edge_agent/`
 - future `disha/sensors/`
-- optional reuse of `backend/app/services/streaming/`
+- optional reuse of `legacy/backend/app/services/streaming/`
 
 Responsibilities:
 
@@ -457,8 +457,8 @@ flowchart LR
 - `disha/brain/database/` -> durable memory and event store
 - `disha/edge_agent/` -> edge monitoring agent
 - `disha/ai/core/` -> advanced reasoning, memory, and intelligence substrate
-- `backend/` -> legacy specialized service set
-- `disha-agi-brain/` -> experimental intelligence services and model routing
+- `legacy/backend/` -> legacy specialized service set
+- `legacy/disha-agi-brain/` -> experimental intelligence services and model routing
 
 ### Recommended Final Convergence
 
@@ -503,7 +503,7 @@ docs/
 
 ## No Failure Architecture Rules
 
-These rules apply across every JARVIS-X layer and should be treated as non-negotiable architecture constraints.
+These rules apply across every DISHA Brain layer and should be treated as non-negotiable architecture constraints.
 
 ### Every module must have a health check
 
@@ -547,7 +547,7 @@ A complete architecture for this repo does not mean every module is already full
 
 ## Final Recommendation
 
-Use JARVIS-X as the repo’s north-star architecture.
+Use DISHA Brain as the repo’s north-star architecture.
 
 In practical terms:
 

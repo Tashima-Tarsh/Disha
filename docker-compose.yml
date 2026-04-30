@@ -36,6 +36,10 @@ services:
       DISHA_WORKSPACE_ROOT: /workspace
       DISHA_ALLOWED_ORIGINS: http://localhost:3000
       DISHA_BRAIN_DB_PATH: /data/disha_brain.db
+      DISHA_AI_PLATFORM_URL: http://ai-platform:8000/api/v1
+      DISHA_MCP_HTTP_URL: http://mcp-server:4000
+      DISHA_PHYSICS_URL: http://quantum-physics:8002
+      DISHA_OPENCANARY_URL: http://opencanary:8080
     volumes:
       - ./data:/data
       - ./:/workspace:ro
@@ -75,3 +79,64 @@ services:
     ports:
       - "3000:3000"
 
+  # Optional modules (enable with: `docker compose --profile full up --build`)
+  mcp-server:
+    profiles: ["full"]
+    build:
+      context: ./disha/services/mcp
+      dockerfile: Dockerfile
+    environment:
+      PORT: 4000
+      DISHA_SRC_ROOT: /workspace
+    volumes:
+      - ./:/workspace:ro
+    ports:
+      - "4000:4000"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:4000/health >/dev/null 2>&1 || exit 1"]
+      interval: 20s
+      timeout: 5s
+      retries: 10
+
+  quantum-physics:
+    profiles: ["full"]
+    build:
+      context: ./disha/ai/physics/backend
+      dockerfile: Dockerfile
+    ports:
+      - "8002:8002"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8002/ >/dev/null 2>&1 || exit 1"]
+      interval: 20s
+      timeout: 5s
+      retries: 10
+
+  ai-platform:
+    profiles: ["full"]
+    build:
+      context: ./disha/services/ai-platform
+      dockerfile: docker/Dockerfile.backend
+    ports:
+      - "8000:8000"
+    environment:
+      DEBUG: ${DEBUG:-false}
+      SECRET_KEY: ${SECRET_KEY:-disha-secret-key-change-me}
+      POSTGRES_URL: postgresql://disha:${POSTGRES_PASSWORD:-postgres}@postgres:5432/disha
+      CORS_ORIGINS: http://localhost:3000
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8000/api/v1/health >/dev/null 2>&1 || exit 1"]
+      interval: 20s
+      timeout: 8s
+      retries: 10
+
+  opencanary:
+    profiles: ["full"]
+    build: ./disha/services/cyber/honeypot/opencanary
+    ports:
+      - "8081:8080"
+      - "2121:21"
+    volumes:
+      - ./disha/services/cyber/logs/opencanary:/var/log/opencanary
