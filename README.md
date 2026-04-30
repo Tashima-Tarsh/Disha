@@ -11,6 +11,15 @@ Primary runtime surfaces:
 - `disha/brain/`: unified FastAPI brain backend (reasoning/planning/execution, anomaly detection, risk scoring, decisioning, events, WebSocket alerts).
 - `disha/edge_agent/`: desktop telemetry agent sending signed telemetry to the brain backend.
 
+Core use cases:
+- Secure “AI ops” command center (audit-first, policy-gated actions)
+- Cross-device assistant runtime (web + agent + brain)
+- Telemetry-driven anomaly detection and explainable alerts
+- Modular subsystem integration (MCP, cyber defense, strategy, quantum physics)
+
+Search keywords:
+`secure ai agent`, `jarvis-like assistant`, `zero trust`, `audit logging`, `policy engine`, `anomaly detection`, `fastapi`, `nextjs`, `mcp`
+
 ## Why DISHA
 
 - Secure by default web and CLI foundations.

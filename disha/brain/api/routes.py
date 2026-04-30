@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import uuid
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException, status
 
 from ..brain.anomaly import AnomalyDetector
 from ..brain.decision import DecisionEngine
@@ -22,8 +22,15 @@ from ..models.schemas import (
     TelemetryEvent,
     UserCommand,
 )
-from ..modules.models import ModulesHealthResponse
+from ..modules.integrations_adapter import describe_integration, list_integrations
+from ..modules.models import (
+    IntegrationDescribeResponse,
+    IntegrationsListResponse,
+    ModulesHealthResponse,
+    StrategyOverviewResponse,
+)
 from ..modules.registry import collect_external_modules_health
+from ..modules.strategy_adapter import strategy_overview
 from ..monitoring.service import MonitoringService
 from ..security.auth import require_api_token
 from ..security.policy import SecurityPolicy
@@ -89,6 +96,95 @@ async def modules_health() -> ModulesHealthResponse:
     modules = await collect_external_modules_health()
     status = "ok" if all(m.status == "ok" for m in modules) else "degraded"
     return ModulesHealthResponse(status=status, modules=modules)
+
+
+@router.get(
+    "/strategy/overview",
+    response_model=StrategyOverviewResponse,
+    dependencies=[Depends(require_api_token)],
+)
+async def strategy_overview_route(
+    app: AppContext = Depends(get_context),
+) -> StrategyOverviewResponse:
+    decision, reasons = app.policy.authorize_module_action("strategy", "overview")
+    if decision is not DecisionAction.allow:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, detail="; ".join(reasons)
+        )
+
+    request_id = str(uuid.uuid4())
+    result = strategy_overview()
+    app.store.add_event(
+        event_type="module_action",
+        source="brain",
+        payload={
+            "request_id": request_id,
+            "module": "strategy",
+            "action": "overview",
+            "status": "ok",
+        },
+    )
+    return result
+
+
+@router.get(
+    "/integrations",
+    response_model=IntegrationsListResponse,
+    dependencies=[Depends(require_api_token)],
+)
+async def integrations_list_route(
+    app: AppContext = Depends(get_context),
+) -> IntegrationsListResponse:
+    decision, reasons = app.policy.authorize_module_action("integrations", "list")
+    if decision is not DecisionAction.allow:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, detail="; ".join(reasons)
+        )
+
+    request_id = str(uuid.uuid4())
+    result = list_integrations()
+    app.store.add_event(
+        event_type="module_action",
+        source="brain",
+        payload={
+            "request_id": request_id,
+            "module": "integrations",
+            "action": "list",
+            "status": "ok",
+            "count": result.total,
+        },
+    )
+    return result
+
+
+@router.get(
+    "/integrations/{name}",
+    response_model=IntegrationDescribeResponse,
+    dependencies=[Depends(require_api_token)],
+)
+async def integrations_describe_route(
+    name: str, app: AppContext = Depends(get_context)
+) -> IntegrationDescribeResponse:
+    decision, reasons = app.policy.authorize_module_action("integrations", "describe")
+    if decision is not DecisionAction.allow:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, detail="; ".join(reasons)
+        )
+
+    request_id = str(uuid.uuid4())
+    result = describe_integration(name=name)
+    app.store.add_event(
+        event_type="module_action",
+        source="brain",
+        payload={
+            "request_id": request_id,
+            "module": "integrations",
+            "action": "describe",
+            "status": "ok" if result.readme else "degraded",
+            "name": name,
+        },
+    )
+    return result
 
 
 @router.post(

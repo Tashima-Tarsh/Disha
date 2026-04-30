@@ -21,6 +21,11 @@ MEDIUM_RISK_PATTERNS = [
     r"run\s+command",
 ]
 
+ALLOWED_MODULE_ACTIONS: dict[str, set[str]] = {
+    "strategy": {"overview"},
+    "integrations": {"list", "describe"},
+}
+
 
 class SecurityPolicy:
     def __init__(self, workspace_root: str | None = None) -> None:
@@ -53,3 +58,11 @@ class SecurityPolicy:
         if not str(candidate).startswith(str(self.workspace_root)):
             raise PermissionError("Path escapes allowed workspace root")
         return candidate
+
+    def authorize_module_action(
+        self, module: str, action: str
+    ) -> tuple[DecisionAction, list[str]]:
+        allowed = ALLOWED_MODULE_ACTIONS.get(module, set())
+        if action in allowed:
+            return DecisionAction.allow, ["Allowed module action"]
+        return DecisionAction.block, [f"Module action not allowed: {module}.{action}"]

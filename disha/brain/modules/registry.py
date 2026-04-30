@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from pathlib import Path
+
 from ..config import settings
 from .models import ModuleHealth
 from .probes import probe_http_json
@@ -50,6 +52,33 @@ async def collect_external_modules_health() -> list[ModuleHealth]:
             status="ok" if ok else "down",
             reason=reason if not ok else "",
             target=settings.opencanary_url,
+        )
+    )
+
+    # Internal assets: strategy + integrations catalog
+    workspace = Path(settings.allowed_workspace).resolve()
+
+    strategy_data = (
+        workspace / "disha" / "ai" / "strategy" / "data" / "historical_data.json"
+    )
+    modules.append(
+        ModuleHealth(
+            name="historical_strategy",
+            status="ok" if strategy_data.is_file() else "degraded",
+            reason="" if strategy_data.is_file() else "Missing strategy dataset",
+            target=str(strategy_data),
+        )
+    )
+
+    integrations_root = workspace / "disha" / "services" / "integrations"
+    modules.append(
+        ModuleHealth(
+            name="integrations_catalog",
+            status="ok" if integrations_root.is_dir() else "degraded",
+            reason=""
+            if integrations_root.is_dir()
+            else "Missing integrations directory",
+            target=str(integrations_root),
         )
     )
 
