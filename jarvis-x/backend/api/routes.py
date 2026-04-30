@@ -41,6 +41,22 @@ class AppContext:
         self.decision_engine = DecisionEngine()
         self.monitoring: MonitoringService | None = None
 
+    def module_health(self) -> dict[str, str]:
+        modules = {
+            "database": "ok" if self.store else "degraded",
+            "security_policy": "ok" if self.policy else "degraded",
+            "reasoning_brain": "ok" if self.reasoning else "degraded",
+            "planner": "ok" if self.planner else "degraded",
+            "intelligence_brain": "ok" if self.intelligence else "degraded",
+            "memory_brain": "ok" if self.memory else "degraded",
+            "executor": "ok" if self.executor else "degraded",
+            "anomaly_detector": "ok" if self.anomaly else "degraded",
+            "risk_engine": "ok" if self.risk_engine else "degraded",
+            "decision_engine": "ok" if self.decision_engine else "degraded",
+            "monitoring": "ok" if self.monitoring else "degraded",
+        }
+        return modules
+
 
 context = AppContext()
 router = APIRouter(prefix="/api/v1")
@@ -52,7 +68,14 @@ def get_context() -> AppContext:
 
 @router.get("/health", response_model=HealthResponse)
 async def health() -> HealthResponse:
-    return HealthResponse(status="ok", version="1.0.0", websocket_path="/ws/alerts")
+    modules = context.module_health()
+    status = "ok" if all(value == "ok" for value in modules.values()) else "degraded"
+    return HealthResponse(
+        status=status,
+        version="1.0.0",
+        websocket_path="/ws/alerts",
+        modules=modules,
+    )
 
 
 @router.post("/command", response_model=CommandResponse, dependencies=[Depends(require_api_token)])
@@ -88,6 +111,14 @@ async def process_command(command: UserCommand, app: AppContext = Depends(get_co
             "decision": decision.value,
             "reasons": reasons,
         },
+    )
+    app.store.add_risk_log(
+        user_id=command.user_id,
+        device_id=command.device_id,
+        risk_level=risk_level.value,
+        score=1.0 if risk_level is RiskLevel.high else 0.5 if risk_level is RiskLevel.medium else 0.1,
+        action=decision.value,
+        reasons=reasons,
     )
 
     return CommandResponse(

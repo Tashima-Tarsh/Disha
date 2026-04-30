@@ -501,6 +501,40 @@ docs/
 - deception telemetry is isolated and read-only from a decision perspective
 - every security-relevant action is auditable
 
+## No Failure Architecture Rules
+
+These rules apply across every JARVIS-X layer and should be treated as non-negotiable architecture constraints.
+
+### Every module must have a health check
+
+- each major module must expose a health state
+- aggregate health endpoints must report degraded status rather than failing silently
+- edge agents, storage, brains, alerts, and sync services all need observable liveness
+
+### Every decision must be logged
+
+- command decisions must persist risk, action, and reasons
+- telemetry decisions must persist anomaly score, decision action, and event linkage
+- audit logs must be correlation-id friendly
+
+### Every alert must have a reason
+
+- alerts must include a deterministic explanation
+- empty or opaque alert payloads are not acceptable
+- a fallback reason must be generated when a lower layer provides insufficient detail
+
+### Every async flow must have a timeout
+
+- event bus handlers must be time-bounded
+- websocket send operations must be time-bounded
+- external model, sync, and tool operations must use explicit timeouts
+
+### Every feature must degrade gracefully
+
+- if ML anomaly detection is unavailable, fall back to statistical baselines
+- if monitoring subscribers are offline, requests should still complete and log degradation
+- if a high-value dependency fails, the system should surface a degraded state instead of crashing silently
+
 ## What “Complete Architecture” Means Here
 
 A complete architecture for this repo does not mean every module is already fully converged. It means:

@@ -112,3 +112,4 @@ class HealthResponse(BaseModel):
     status: str
     version: str
     websocket_path: str
+    modules: dict[str, str] = Field(default_factory=dict)
