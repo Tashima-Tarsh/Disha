@@ -22,6 +22,7 @@
 
         * {
             box-sizing: border-box; margin: 0; padding: 0;
+            -webkit-user-select: none;
             user-select: none;
         }
 
@@ -54,6 +55,7 @@
         .panel {
             background: var(--panel-bg);
             border: 1px solid var(--panel-border);
+            -webkit-backdrop-filter: blur(12px);
             backdrop-filter: blur(12px);
             border-radius: 8px; /* Luxury rounded edges */
             position: relative;
@@ -204,6 +206,8 @@
         @keyframes logFadeIn { to { opacity: 1; } }
         .log-time { color: #555; margin-right: 8px; }
         .log-WARN { color: var(--gold); } .log-CRIT { color: var(--red); font-weight: bold; } .log-INFO { color: var(--blue); }
+        .txt-white { color: #fff; }
+        .log-hex { float: right; color: #444; }
 
         .defcon-status {
             height: 100px; background: rgba(255,0,60,0.1); border: 1px solid var(--red);
@@ -234,7 +238,7 @@
         .msg-jarvis { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); align-self: flex-start; color: #fff; }
 
         /* Layer Modal/Detail */
-        .layer-detail-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(8px); z-index: 2000; display: none; align-items: center; justify-content: center; }
+        .layer-detail-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); z-index: 2000; display: none; align-items: center; justify-content: center; }
         .layer-detail-card { width: 600px; max-width: 90vw; background: var(--panel-bg); border: 1px solid var(--cyan); padding: 30px; border-radius: 12px; position: relative; box-shadow: 0 0 50px rgba(0,255,204,0.2); }
         .close-detail { position: absolute; top: 15px; right: 20px; font-size: 24px; cursor: pointer; color: var(--muted); }
         
@@ -244,6 +248,28 @@
         }
         .core-view { grid-row: 2 / span 2; }
         .alert-center { grid-row: 2 / span 2; }
+        
+        /* Utility Classes for Inline Styles */
+        .txt-muted-spec { color: #aaa; }
+        .txt-red { color: var(--red); }
+        .txt-violet { color: var(--violet); }
+        .txt-cyan { color: var(--cyan); }
+        .command-list { flex: 1; display: flex; flex-direction: column; margin-top: 20px; }
+        .label-small { font-size: 10px; color: #aaa; }
+        .txt-green { color: var(--green); }
+        .txt-gold { color: var(--gold); }
+        .network-desc { color: #ffb3c1; }
+        .radar-hdr { position: absolute; top: 0; width: 100%; border-bottom: 1px solid rgba(255, 0, 60, 0.5); background: rgba(255, 0, 60, 0.1); color: var(--red); }
+        .flex-col { display: flex; flex-direction: column; }
+        .defcon-title { margin-bottom: 5px; }
+        .defcon-desc { font-size: 12px; color: var(--red); letter-spacing: 2px; font-weight: bold; }
+        .voice-status { font-size: 9px; color: var(--muted); }
+        .send-btn { margin: 0; padding: 5px 15px; }
+        .detail-title { font-family: Orbitron; color: #fff; margin-bottom: 10px; }
+        .detail-desc { color: var(--text-silver); font-size: 14px; margin-bottom: 20px; }
+        .detail-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
+        .detail-live { background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(0, 255, 204, 0.1); padding: 15px; border-radius: 6px; font-family: 'Share Tech Mono'; font-size: 12px; }
+        .detail-live-label { color: var(--cyan); }
     </style>
 </head>
 <body>
@@ -252,18 +278,18 @@
     <div class="header-bar">
         <h1>SOVEREIGN_OS</h1>
         <div class="system-specs">
-            <div class="spec-item"><span style="color:#aaa">UPTIME</span><span class="spec-val">99.998%</span></div>
-            <div class="spec-item"><span style="color:#aaa">ACTIVE NODES</span><span class="spec-val">1,402</span></div>
-            <div class="spec-item"><span style="color:#aaa">THREAT INDEX</span><span class="spec-val" style="color:var(--red)">ELEVATED</span></div>
-            <div class="spec-item"><span style="color:#aaa">USER</span><span class="spec-val" style="color:var(--violet)">DISH@MICROSOFT</span></div>
-            <div class="spec-item"><span style="color:#aaa">SYS.CLK</span><span class="spec-val" id="clock" style="color:var(--cyan)">00:00:00.000</span></div>
+            <div class="spec-item"><span class="txt-muted-spec">UPTIME</span><span class="spec-val">99.998%</span></div>
+            <div class="spec-item"><span class="txt-muted-spec">ACTIVE NODES</span><span class="spec-val">1,402</span></div>
+            <div class="spec-item"><span class="txt-muted-spec">THREAT INDEX</span><span class="spec-val txt-red">ELEVATED</span></div>
+            <div class="spec-item"><span class="txt-muted-spec">USER</span><span class="spec-val txt-violet">DISH@MICROSOFT</span></div>
+            <div class="spec-item"><span class="txt-muted-spec">SYS.CLK</span><span class="spec-val txt-cyan" id="clock">00:00:00.000</span></div>
         </div>
     </div>
 
     <!-- LEFT SIDEBAR -->
     <div class="panel sidebar">
-        <div class="panel-header">COMMAND MODULES <span class="blinking-dot" style="color:var(--cyan)">●</span></div>
-        <div style="flex:1; display:flex; flex-direction:column; margin-top:20px;">
+        <div class="panel-header">COMMAND MODULES <span class="blinking-dot txt-cyan">●</span></div>
+        <div class="command-list">
             <div class="nav-btn active">
                 <svg class="nav-icon" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
                 SECURITY STACK
@@ -292,7 +318,7 @@
         <div class="hex-bg"></div>
         <div class="panel-header">
             <span>7-LAYER ARCHITECTURE VISUALIZATION</span>
-            <span style="font-size:10px; color:#aaa">SECURE PIPELINE V6.1</span>
+            <span class="label-small">SECURE PIPELINE V6.1</span>
         </div>
         
         <div class="layer-stack">
@@ -307,7 +333,7 @@
                 </div>
                 <div class="layer-metrics">
                     <div class="metric-line"><span>ACTIVE SESSIONS</span><span class="metric-val">12,408</span></div>
-                    <div class="metric-line"><span>AUTH FAILURES</span><span class="metric-val" style="color:var(--green)">0.02%</span></div>
+                    <div class="metric-line"><span>AUTH FAILURES</span><span class="metric-val txt-green">0.02%</span></div>
                 </div>
                 <div class="layer-shield">
                     <div class="shield-score">99%</div><div class="shield-label">INTEGRITY</div>
@@ -371,7 +397,7 @@
                 </div>
                 <div class="layer-metrics">
                     <div class="metric-line"><span>GRAPH NODES</span><span class="metric-val">1.2M</span></div>
-                    <div class="metric-line"><span>QUERY LOAD</span><span class="metric-val" style="color:var(--gold)">88%</span></div>
+                    <div class="metric-line"><span>QUERY LOAD</span><span class="metric-val txt-gold">88%</span></div>
                 </div>
                 <div class="layer-shield">
                     <div class="shield-score">82%</div><div class="shield-label">INTEGRITY</div>
@@ -383,14 +409,14 @@
                 <div class="layer-icon-box"><span class="layer-num">L6</span><svg width="30" height="30" fill="var(--red)" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"/><rect x="2" y="14" width="20" height="8" rx="2" ry="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg></div>
                 <div class="layer-details">
                     <div class="layer-name">NETWORK LAYER</div>
-                    <div class="layer-desc" style="color:#ffb3c1">Sentinel Honeypot Mesh (Cowrie/Dionaea)</div>
+                    <div class="layer-desc network-desc">Sentinel Honeypot Mesh (Cowrie/Dionaea)</div>
                 </div>
                 <div class="layer-metrics">
-                    <div class="metric-line"><span>INBOUND THREATS</span><span class="metric-val" style="color:var(--red)">14,203</span></div>
-                    <div class="metric-line"><span>TARPIT STATUS</span><span class="metric-val" style="color:var(--red)">ENGAGED</span></div>
+                    <div class="metric-line"><span>INBOUND THREATS</span><span class="metric-val txt-red">14,203</span></div>
+                    <div class="metric-line"><span>TARPIT STATUS</span><span class="metric-val txt-red">ENGAGED</span></div>
                 </div>
                 <div class="layer-shield">
-                    <div class="shield-score">41%</div><div class="shield-label" style="color:var(--red)">UNDER ATTACK</div>
+                    <div class="shield-score">41%</div><div class="shield-label txt-red">UNDER ATTACK</div>
                 </div>
             </div>
 
@@ -417,7 +443,7 @@
     <div class="alert-center">
         <!-- Threat Radar -->
         <div class="panel threat-radar-box">
-            <div class="panel-header" style="position:absolute; top:0; width:100%; border-bottom:1px solid rgba(255,0,60,0.5); background:rgba(255,0,60,0.1); color:var(--red);">
+            <div class="panel-header radar-hdr">
                 GEO-THREAT RADAR
             </div>
             <div class="radar" id="radar">
@@ -427,7 +453,7 @@
         </div>
 
         <!-- Live Terminal -->
-        <div class="panel live-logs-box" style="display:flex; flex-direction:column;">
+        <div class="panel live-logs-box flex-col">
             <div class="panel-header">SECURITY EVENT STREAM</div>
             <div class="live-logs" id="logs-container">
                 <!-- Logs injected via JS -->
@@ -436,21 +462,21 @@
 
         <!-- Defcon Status -->
         <div class="panel defcon-status">
-            <h2 style="margin-bottom:5px;">DEFCON 2</h2>
-            <div style="font-size:12px; color:var(--red); letter-spacing:2px; font-weight:bold;">CYBER-KINETIC THREAT IMMINENT</div>
+            <h2 class="defcon-title">DEFCON 2</h2>
+            <div class="defcon-desc">CYBER-KINETIC THREAT IMMINENT</div>
         </div>
     </div>
 
     <!-- CHAT MODULE -->
     <div class="panel chat-panel">
-        <div class="panel-header">JARVIS COGNITIVE INTERFACE <span id="voice-status" style="font-size:9px; color:var(--muted)">READY</span></div>
+        <div class="panel-header">JARVIS COGNITIVE INTERFACE <span id="voice-status" class="voice-status">READY</span></div>
         <div class="chat-messages" id="chat-msgs">
             <div class="message msg-jarvis">Welcome, Commander. DISHA OS is fully integrated. How may I assist you with the 7-layer architecture today?</div>
         </div>
         <div class="chat-input-box">
-            <button class="voice-btn" id="voice-btn" onclick="toggleVoice()"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/><path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/></svg></button>
+            <button class="voice-btn" id="voice-btn" onclick="toggleVoice()" title="Voice Command"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/><path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/></svg></button>
             <input type="text" class="chat-input" id="chat-input" placeholder="Type a directive or ask about system health..." onkeydown="if(event.key==='Enter') sendChat()">
-            <button class="nav-btn" style="margin:0; padding:5px 15px;" onclick="sendChat()">SEND</button>
+            <button class="nav-btn send-btn" onclick="sendChat()">SEND</button>
         </div>
     </div>
 
@@ -458,13 +484,13 @@
     <div class="layer-detail-overlay" id="layer-overlay">
         <div class="layer-detail-card">
             <span class="close-detail" onclick="closeLayerDetail()">&times;</span>
-            <h2 id="detail-title" style="font-family:Orbitron; color:#fff; margin-bottom:10px;">LAYER DETAIL</h2>
-            <p id="detail-desc" style="color:var(--text-silver); font-size:14px; margin-bottom:20px;"></p>
-            <div id="detail-stats" style="display:grid; grid-template-columns:1fr 1fr; gap:15px; margin-bottom:20px;">
+            <h2 id="detail-title" class="detail-title">LAYER DETAIL</h2>
+            <p id="detail-desc" class="detail-desc"></p>
+            <div id="detail-stats" class="detail-stats">
                 <!-- Stats injected -->
             </div>
-            <div id="detail-live" style="background:rgba(0,0,0,0.4); border:1px solid rgba(0,255,204,0.1); padding:15px; border-radius:6px; font-family:'Share Tech Mono'; font-size:12px;">
-                <span style="color:var(--cyan)">LIVE DATA STREAM:</span><br>
+            <div id="detail-live" class="detail-live">
+                <span class="detail-live-label">LIVE DATA STREAM:</span><br>
                 <div id="detail-stream">INITIALIZING...</div>
             </div>
         </div>
@@ -519,7 +545,7 @@
             
             const div = document.createElement('div');
             div.className = 'log-line';
-            div.innerHTML = `<span class="log-time">[${time}]</span><span class="log-${ev.type}">[${ev.type}]</span> <span style="color:#fff">${ev.text}</span> <span style="float:right; color:#444;">${ev.hex}</span>`;
+            div.innerHTML = `<span class="log-time">[${time}]</span><span class="log-${ev.type}">[${ev.type}]</span> <span class="txt-white">${ev.text}</span> <span class="log-hex">${ev.hex}</span>`;
             
             logBox.appendChild(div);
             logCount++;

@@ -151,11 +151,11 @@ def _train_rl(
     except ImportError:
         return {"status": "skipped", "reason": "torch_not_available"}
 
-    from app.rl.environment import (
-        InvestigationEnvironment,  # type: ignore[import-not-found]
+    from app.rl.environment import (  # type: ignore[import-not-found]
+        InvestigationEnvironment,
     )
-    from app.rl.experience_replay import (
-        ExperienceReplayBuffer,  # type: ignore[import-not-found]
+    from app.rl.experience_replay import (  # type: ignore[import-not-found]
+        ExperienceReplayBuffer,
     )
     from app.rl.policy import (  # type: ignore[import-not-found]
         TORCH_AVAILABLE,
@@ -270,9 +270,9 @@ def _scenario_outcome(action: int, scenario, rng: np.random.RandomState) -> dict
         return {}
 
     base = {
-        "entities_found": int(rng.poisson(3)),
-        "relationships_found": int(rng.poisson(2)),
-        "anomalies_found": int(rng.binomial(1, 0.3)),
+        "entities_found": rng.poisson(3),
+        "relationships_found": rng.poisson(2),
+        "anomalies_found": rng.binomial(1, 0.3),
         "risk_score": float(np.clip(rng.normal(0.4, 0.2), 0.0, 1.0)),
         "time_taken": float(np.clip(rng.exponential(2.0), 0.5, 10.0)),
     }

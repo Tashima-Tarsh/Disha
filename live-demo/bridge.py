@@ -43,6 +43,7 @@ OSINT_SAMPLES = [
     "[OSINT] Blockchain transaction spike detected on Ethereum L2. Volume: 4.2k ETH. Wallet linked to 'Sovereign-Alpha'."
 ]
 
+
 @app.get("/ask")
 async def ask(q: str = Query(...)):
     q = q.lower()
@@ -77,6 +78,7 @@ async def ask(q: str = Query(...)):
         return {"answer": "The system operates on a 7-layer defense-in-depth architecture."}
 
     return {"answer": "I am cross-referencing your request with the DISHA Mythos framework. Please specify if you want an OSINT scan or a system Walkthrough."}
+
 
 if __name__ == "__main__":
     import uvicorn
