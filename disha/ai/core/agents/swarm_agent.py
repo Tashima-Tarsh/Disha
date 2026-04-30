@@ -59,8 +59,9 @@ class SwarmEngineer:
                 head=branch_name,
                 base="main",
             )
-            logger.info("pull_request_created", pr_url=pr.html_url)
-            return pr.html_url
+            pr_url = str(pr.html_url)
+            logger.info("pull_request_created", pr_url=pr_url)
+            return pr_url
 
         except Exception as e:
             logger.error("swarm_operation_failed", error=str(e))

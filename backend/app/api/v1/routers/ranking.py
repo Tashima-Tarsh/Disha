@@ -1,7 +1,8 @@
+from fastapi import APIRouter, Depends
+
 from app.api.deps import get_cluster_coordinator, get_intelligence_ranker
 from app.core.security import get_current_user
 from app.models.schemas import CollaborativeRequest, RankingRequest
-from fastapi import APIRouter, Depends
 
 router = APIRouter()
 

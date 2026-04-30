@@ -3,6 +3,7 @@ import io
 
 import httpx
 import structlog
+
 from app.agents.base_agent import BaseAgent
 from app.core.config import get_settings
 

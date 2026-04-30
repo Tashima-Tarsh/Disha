@@ -1,6 +1,7 @@
 from typing import Any
 
 import structlog
+
 from app.agents.base_agent import BaseAgent
 from app.services.physics.md_engine import MDEngine
 

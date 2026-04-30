@@ -1,7 +1,8 @@
 import structlog
+from fastapi import APIRouter, Depends, WebSocket, WebSocketDisconnect
+
 from app.api.deps import get_connection_manager
 from app.core.security import decode_token
-from fastapi import APIRouter, Depends, WebSocket, WebSocketDisconnect
 
 router = APIRouter()
 logger = structlog.get_logger(__name__)
