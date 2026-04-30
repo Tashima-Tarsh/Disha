@@ -18,3 +18,7 @@ Generated premium SVG assets:
 - `auth-flow-premium.svg`
 - `component-structure-premium.svg`
 - `disha-brain-platform-premium.svg`
+
+Generated premium PNG assets:
+
+- `disha-brain-platform-premium.png`

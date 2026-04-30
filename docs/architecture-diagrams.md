@@ -15,6 +15,7 @@ For image export, paste the diagram into Mermaid Live Editor, choose `PNG` or `S
 Premium poster (SVG):
 
 - `docs/images/disha-brain-platform-premium.svg`
+- `docs/images/disha-brain-platform-premium.png`
 
 ```mermaid
 flowchart LR

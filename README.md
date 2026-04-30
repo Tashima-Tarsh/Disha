@@ -1,6 +1,6 @@
 # DISHA Brain
 
-![DISHA Brain](docs/images/hero.svg)
+![DISHA Brain](docs/images/disha-brain-platform-premium.png)
 
 DISHA Brain is a single platform repository for secure AI execution and operator-grade control surfaces. It combines a hardened web app, a secure CLI/runtime, and a unified Brain backend with an edge telemetry agent.
 
@@ -42,7 +42,7 @@ Search keywords:
 
 ## Architecture Summary
 
-![DISHA Brain Platform Architecture](docs/images/disha-brain-platform-premium.svg)
+![DISHA Brain Platform Architecture](docs/images/disha-brain-platform-premium.png)
 
 ```mermaid
 flowchart LR
