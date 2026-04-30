@@ -122,6 +122,12 @@ Services:
 - Web UI: `http://localhost:3000`
 - Brain API: `http://localhost:8080/api/v1/health`
 
+Optional modules (AI Platform, MCP Server, Quantum Physics, OpenCanary):
+
+```bash
+docker compose --profile full up --build
+```
+
 ### 6. Run validation
 
 ```bash

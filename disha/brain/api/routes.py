@@ -22,6 +22,8 @@ from ..models.schemas import (
     TelemetryEvent,
     UserCommand,
 )
+from ..modules.models import ModulesHealthResponse
+from ..modules.registry import collect_external_modules_health
 from ..monitoring.service import MonitoringService
 from ..security.auth import require_api_token
 from ..security.policy import SecurityPolicy
@@ -76,6 +78,17 @@ async def health() -> HealthResponse:
         websocket_path="/ws/alerts",
         modules=modules,
     )
+
+
+@router.get(
+    "/modules/health",
+    response_model=ModulesHealthResponse,
+    dependencies=[Depends(require_api_token)],
+)
+async def modules_health() -> ModulesHealthResponse:
+    modules = await collect_external_modules_health()
+    status = "ok" if all(m.status == "ok" for m in modules) else "degraded"
+    return ModulesHealthResponse(status=status, modules=modules)
 
 
 @router.post(
