@@ -1,12 +1,14 @@
+import os
+import sys
+
+# Add backend to path before any app imports
+sys.path.append(os.path.join(os.path.dirname(__file__), "..", "backend"))
+
 from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
+from app.services.intelligence import IntelligenceService  # type: ignore
 import json
 import random
-import sys
-import os
-
-# Add backend to path
-sys.path.append(os.path.join(os.path.dirname(__file__), "..", "backend"))
 
 app = FastAPI()
 
@@ -41,9 +43,6 @@ KNOWLEDGE = {
         "L7: Infrastructure Layer": "Docker Swarm / Bare Metal Kernels."
     }
 }
-
-
-from app.services.intelligence import IntelligenceService  # type: ignore
 
 
 service = IntelligenceService()
