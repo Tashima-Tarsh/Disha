@@ -184,6 +184,7 @@ Recommended capture set:
 - [Technical Design Document](docs/TDD.md)
 - [Architecture Diagrams](docs/architecture-diagrams.md)
 - [Design System](docs/design-system.md)
+- [JARVIS-X Architecture](docs/jarvis-x-architecture.md)
 - [Wiki Home](docs/HOME.md)
 
 ## Current State

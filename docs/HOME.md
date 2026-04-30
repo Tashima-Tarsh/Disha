@@ -22,3 +22,4 @@ This wiki documents the repository as it exists today and defines the target pro
 - [Architecture Diagrams](architecture-diagrams.md)
 - [Technical Design Document](TDD.md)
 - [Design System](design-system.md)
+- [JARVIS-X Architecture](jarvis-x-architecture.md)
