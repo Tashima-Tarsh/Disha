@@ -33,8 +33,8 @@ code, pre {
 /* Glassmorphism Styles */
 .glass-panel {
   background: var(--glass-bg);
-  backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
   border: 1px solid var(--glass-border);
   border-radius: 16px;
   padding: 24px;
@@ -57,7 +57,7 @@ code, pre {
 
 /* Base Utility Classes */
 .container {
-  max-w-screen-xl: 1280px;
+  max-width: 1280px;
   margin: 0 auto;
   padding: 0 2rem;
 }

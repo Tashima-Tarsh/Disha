@@ -12,6 +12,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 # Deep Knowledge from REPO_WALKTHROUGH.md and other files
 KNOWLEDGE = {
     "disha": "DISHA (Digital Intelligence & Sovereign Healing Architecture) is a v6.0.0 AGI platform designed for national security, predictive resilience, and cyber-defense. It features a 7-stage cognitive loop (Perception, Attention, Reasoning, Deliberation, Action, Reflection, Consolidation).",
@@ -35,6 +36,7 @@ KNOWLEDGE = {
         "L7: Infrastructure Layer": "Docker Swarm / Bare Metal Kernels."
     }
 }
+
 
 OSINT_SAMPLES = [
     "[OSINT] New threat actor signature detected in sector 7. IP: 103.45.2.19 (Hangzhou, CN).",

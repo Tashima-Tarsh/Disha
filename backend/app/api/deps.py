@@ -1,6 +1,5 @@
-from typing import Generator
-from app.core.config import get_settings
-from app.services.intelligence import IntelligenceService
+from app.services.intelligence import IntelligenceService  # type: ignore
+
 
 def get_intelligence_service() -> IntelligenceService:
     return IntelligenceService()
