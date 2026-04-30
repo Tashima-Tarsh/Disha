@@ -1,15 +1,15 @@
-# DISHA
+# DISHA Brain
 
-DISHA is a multi-surface monorepo for sovereign AI tooling, cognitive reasoning services, secure developer workflows, and web-based control surfaces.
+![DISHA Brain](docs/images/hero.svg)
 
-The repository currently contains four meaningful runtime families:
+DISHA Brain is a single platform repository for secure AI execution and operator-grade control surfaces. It combines a hardened web app, a secure CLI/runtime, and a unified Brain backend with an edge telemetry agent.
 
-- `web/`: a hardened Next.js application with authenticated API routes, RBAC, CSRF protection, audit logging, and export/share workflows.
-- `src/`: a TypeScript CLI/runtime surface focused on MCP entrypoints, secure storage policy, and observability adapters.
-- `backend/`: a legacy FastAPI service with agent orchestration, multimodal routes, ranking, RL, and streaming components.
-- `disha/` and `disha-agi-brain/`: broader AI research, orchestration, strategy, physics, and experimental service modules.
+Primary runtime surfaces:
 
-The codebase is best understood as a monorepo under consolidation, not a single production application. This documentation reflects the current structure and defines a clearer target architecture for ongoing cleanup.
+- `web/`: hardened Next.js application with authenticated API routes, RBAC, CSRF protection, audit logging, and export/share workflows.
+- `src/`: TypeScript CLI/runtime surface focused on secure execution, MCP entrypoints, storage policy, and observability adapters.
+- `disha/brain/`: unified FastAPI brain backend (reasoning/planning/execution, anomaly detection, risk scoring, decisioning, events, WebSocket alerts).
+- `disha/edge_agent/`: desktop telemetry agent sending signed telemetry to the brain backend.
 
 ## Why DISHA
 
@@ -24,9 +24,8 @@ The codebase is best understood as a monorepo under consolidation, not a single 
 .
 |-- web/                 Next.js app and secure API surface
 |-- src/                 TypeScript CLI/runtime hardening modules
-|-- backend/             Legacy FastAPI backend
-|-- disha/               AI core, models, apps, services, prompts
-|-- disha-agi-brain/     AI platform backend prototype
+|-- disha/               Brain backend, AI core modules, agents, and services
+|-- disha-agi-brain/     AI platform backend prototype (legacy surface)
 |-- docker/              Compose and observability assets
 |-- docs/                Architecture, wiki, design, TDD, analysis
 `-- .github/workflows/   CI, CodeQL, security, and module pipelines
@@ -49,7 +48,7 @@ flowchart LR
     CORE[AI Core Modules] --> LEG
 ```
 
-The production-ready path in this repository is the `web/` plus `src/` hardening track. The remaining Python surfaces are documented as legacy or experimental modules pending convergence.
+The production-ready platform path is `web/` + `src/` + `disha/brain/`. Other folders remain in the repo as legacy or experimental surfaces and are progressively converged or retired behind stable interfaces.
 
 ## Tech Stack
 
@@ -184,8 +183,8 @@ Recommended capture set:
 - [Technical Design Document](docs/TDD.md)
 - [Architecture Diagrams](docs/architecture-diagrams.md)
 - [Design System](docs/design-system.md)
-- [JARVIS-X Architecture](docs/jarvis-x-architecture.md)
-- [JARVIS-X Enterprise Architecture](docs/jarvis-x-enterprise-architecture.md)
+- [DISHA Brain Architecture](docs/disha-brain-architecture.md)
+- [DISHA Brain Enterprise Architecture](docs/disha-brain-enterprise-architecture.md)
 - [Wiki Home](docs/HOME.md)
 
 ## Current State
@@ -194,14 +193,13 @@ What is production-oriented now:
 
 - `web/` hardening path
 - `src/` CLI security and observability adapters
+- `disha/brain/` unified brain backend and alerts pipeline
 - Compose-based local infrastructure
 - CI hardening across Python and TypeScript surfaces
 
 What remains in transition:
 
-- duplicated backend and AI surfaces
-- legacy FastAPI structure
-- inconsistent naming between `backend/`, `disha/`, and `disha-agi-brain/`
+- legacy surfaces under `backend/` and `disha-agi-brain/`
 - uneven documentation quality outside the new docs set
 
 ## License

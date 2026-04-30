@@ -10,7 +10,6 @@ from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
 from docx.shared import Inches, Pt, RGBColor
 
-
 OUT_PATH = Path(__file__).resolve().parent / "DISHA_JARVIS_X_TDD.docx"
 ACCENT = RGBColor(79, 70, 229)
 ACCENT_2 = RGBColor(56, 189, 248)
@@ -41,7 +40,12 @@ def style_document(doc: Document) -> None:
     normal.font.size = Pt(10.5)
     normal.font.color.rgb = TEXT
 
-    for style_name, size in [("Title", 28), ("Heading 1", 18), ("Heading 2", 13), ("Heading 3", 11)]:
+    for style_name, size in [
+        ("Title", 28),
+        ("Heading 1", 18),
+        ("Heading 2", 13),
+        ("Heading 3", 11),
+    ]:
         style = doc.styles[style_name]
         style.font.name = "Aptos"
         style.font.color.rgb = ACCENT
@@ -81,7 +85,10 @@ def add_title_page(doc: Document) -> None:
     rows = [
         ("Document Type", "Enterprise Technical Design Document"),
         ("Scope", "DISHA repository architecture + JARVIS-X target platform"),
-        ("Primary Themes", "AI reasoning, secure execution, memory, monitoring, deception, deployment"),
+        (
+            "Primary Themes",
+            "AI reasoning, secure execution, memory, monitoring, deception, deployment",
+        ),
         ("Audience", "Architects, engineers, security leads, operators"),
         ("Status", "Design baseline grounded in current repository state"),
     ]
@@ -110,7 +117,9 @@ def add_numbered(doc: Document, items: list[str]) -> None:
         doc.add_paragraph(item, style="List Number")
 
 
-def add_kv_table(doc: Document, rows: list[tuple[str, str]], title: str | None = None) -> None:
+def add_kv_table(
+    doc: Document, rows: list[tuple[str, str]], title: str | None = None
+) -> None:
     if title:
         doc.add_paragraph(title).runs[0].bold = True
     table = doc.add_table(rows=1, cols=2)
@@ -174,7 +183,7 @@ def build() -> None:
         doc,
         "1. Executive Summary",
         "This document unifies the architecture of the DISHA repository and the JARVIS-X platform into a single "
-        "technical design reference. DISHA is treated as a monorepo under consolidation. JARVIS-X is treated as "
+        "technical design reference. DISHA is treated as a single platform under consolidation. JARVIS-X is treated as "
         "the target orchestration architecture that brings reasoning, execution, memory, security, monitoring, "
         "and deception-aware telemetry into one coherent system.",
     )
@@ -182,7 +191,7 @@ def build() -> None:
         doc,
         [
             "DISHA contributes the current web hardening path, CLI runtime, AI core, and legacy service modules.",
-            "JARVIS-X contributes the bounded multi-brain architecture and the additive product workspace under `jarvis-x/`.",
+            "JARVIS-X contributes the bounded multi-brain architecture and the additive product workspace under `disha/`.",
             "The combined design is privacy-first, zero-trust, event-driven, and realistic for local or cloud deployment.",
         ],
     )
@@ -196,12 +205,30 @@ def build() -> None:
     add_kv_table(
         doc,
         [
-            ("web/", "Next.js control plane with auth, RBAC, CSRF, rate limiting, file workflows, audit, and shares"),
-            ("src/", "TypeScript CLI and MCP execution gateway with secure storage policy and audit hooks"),
-            ("backend/", "Legacy FastAPI backend with agents, multimodal flows, ranking, RL, and streaming"),
-            ("disha/ai/core", "Reasoning, memory, cognitive loop, citations, and decision engine substrate"),
-            ("disha-agi-brain/", "Prototype AI platform backend and model-routing support"),
-            ("jarvis-x/", "Production-minded additive workspace for backend brains, agent, mobile scaffold, and docs"),
+            (
+                "web/",
+                "Next.js control plane with auth, RBAC, CSRF, rate limiting, file workflows, audit, and shares",
+            ),
+            (
+                "src/",
+                "TypeScript CLI and MCP execution gateway with secure storage policy and audit hooks",
+            ),
+            (
+                "backend/",
+                "Legacy FastAPI backend with agents, multimodal flows, ranking, RL, and streaming",
+            ),
+            (
+                "disha/ai/core",
+                "Reasoning, memory, cognitive loop, citations, and decision engine substrate",
+            ),
+            (
+                "disha-agi-brain/",
+                "Prototype AI platform backend and model-routing support",
+            ),
+            (
+                "disha/",
+                "Production-minded additive workspace for backend brains, agent, mobile scaffold, and docs",
+            ),
         ],
         title="Primary repository surfaces",
     )
@@ -216,13 +243,34 @@ def build() -> None:
     add_kv_table(
         doc,
         [
-            ("Experience Layer", "Web console, CLI, mobile companion, voice entry, alerts"),
-            ("Orchestration Layer", "API gateway, request router, session coordinator, event workflow manager"),
-            ("Cognitive Brain Layer", "Reasoning, planning, execution, memory, intelligence, and policy-aware decisioning"),
-            ("Security and Deception Layer", "Token auth, RBAC, safe execution, anomaly detection, risk, decisions, honeypots"),
-            ("Telemetry Layer", "Host metrics, process metrics, network signals, model outputs, deception event enrichment"),
-            ("Data and Memory Layer", "SQLite or Postgres, Redis, audit events, memory, telemetry and risk logs"),
-            ("Edge and Sensor Layer", "Desktop agent, future mobile agent, honeypot collectors, health probes"),
+            (
+                "Experience Layer",
+                "Web console, CLI, mobile companion, voice entry, alerts",
+            ),
+            (
+                "Orchestration Layer",
+                "API gateway, request router, session coordinator, event workflow manager",
+            ),
+            (
+                "Cognitive Brain Layer",
+                "Reasoning, planning, execution, memory, intelligence, and policy-aware decisioning",
+            ),
+            (
+                "Security and Deception Layer",
+                "Token auth, RBAC, safe execution, anomaly detection, risk, decisions, honeypots",
+            ),
+            (
+                "Telemetry Layer",
+                "Host metrics, process metrics, network signals, model outputs, deception event enrichment",
+            ),
+            (
+                "Data and Memory Layer",
+                "SQLite or Postgres, Redis, audit events, memory, telemetry and risk logs",
+            ),
+            (
+                "Edge and Sensor Layer",
+                "Desktop agent, future mobile agent, honeypot collectors, health probes",
+            ),
         ],
     )
 
@@ -235,13 +283,31 @@ def build() -> None:
     add_kv_table(
         doc,
         [
-            ("Reasoning Brain", "Interprets intent, normalizes goals, and produces structured task meaning"),
+            (
+                "Reasoning Brain",
+                "Interprets intent, normalizes goals, and produces structured task meaning",
+            ),
             ("Planner", "Converts reasoning output into ordered executable steps"),
-            ("Execution Brain", "Runs bounded tools with confirmation and workspace controls"),
-            ("Memory Brain", "Stores short-term session context and long-term user and system memory"),
-            ("Security Brain", "Applies allow, ask, block, monitor, limit, and isolate decisions"),
-            ("Intelligence Brain", "Retrieves knowledge, selects models, validates outputs, and supports explanation"),
-            ("Deception Brain", "Sub-function of the Security Brain that handles honeypot signals and deception telemetry"),
+            (
+                "Execution Brain",
+                "Runs bounded tools with confirmation and workspace controls",
+            ),
+            (
+                "Memory Brain",
+                "Stores short-term session context and long-term user and system memory",
+            ),
+            (
+                "Security Brain",
+                "Applies allow, ask, block, monitor, limit, and isolate decisions",
+            ),
+            (
+                "Intelligence Brain",
+                "Retrieves knowledge, selects models, validates outputs, and supports explanation",
+            ),
+            (
+                "Deception Brain",
+                "Sub-function of the Security Brain that handles honeypot signals and deception telemetry",
+            ),
         ],
     )
 
@@ -253,11 +319,26 @@ def build() -> None:
     add_kv_table(
         doc,
         [
-            ("Reasoning + Memory Kernel", "`disha/ai/core/cognitive_loop.py`, `disha/ai/core/memory/*`, `disha/ai/core/intelligence/*`"),
-            ("Secure Web Control Plane", "`web/lib/server/*`, `web/services/*`, `web/app/api/*`"),
-            ("Execution Gateway", "`src/entrypoints/mcp.ts`, `src/security/*`, `src/observability/*`"),
-            ("Legacy Specialist Services", "`backend/app/*` and `disha-agi-brain/backend/*` for staged selective reuse"),
-            ("JARVIS-X Product Workspace", "`jarvis-x/backend/*`, `jarvis-x/agent/*`, `jarvis-x/mobile/*`"),
+            (
+                "Reasoning + Memory Kernel",
+                "`disha/ai/core/cognitive_loop.py`, `disha/ai/core/memory/*`, `disha/ai/core/intelligence/*`",
+            ),
+            (
+                "Secure Web Control Plane",
+                "`web/lib/server/*`, `web/services/*`, `web/app/api/*`",
+            ),
+            (
+                "Execution Gateway",
+                "`src/entrypoints/mcp.ts`, `src/security/*`, `src/observability/*`",
+            ),
+            (
+                "Legacy Specialist Services",
+                "`backend/app/*` and `disha-agi-brain/backend/*` for staged selective reuse",
+            ),
+            (
+                "JARVIS-X Product Workspace",
+                "`disha/brain/*`, `disha/edge_agent/*`, `disha/mobile/*`",
+            ),
         ],
     )
 
@@ -287,10 +368,16 @@ def build() -> None:
         doc,
         [
             ("Short-Term Memory", "In-request context and Redis-backed session state"),
-            ("Long-Term Memory", "Postgres in DISHA web path and SQLite in JARVIS-X workspace baseline"),
+            (
+                "Long-Term Memory",
+                "Postgres in DISHA web path and SQLite in JARVIS-X workspace baseline",
+            ),
             ("Event Log", "Command, telemetry, and system events"),
             ("Risk Log", "Risk level, score, action, reasons, correlation ids"),
-            ("Telemetry Store", "CPU, memory, process count, send/receive volumes, active app"),
+            (
+                "Telemetry Store",
+                "CPU, memory, process count, send/receive volumes, active app",
+            ),
         ],
     )
     add_code_block(
@@ -328,11 +415,26 @@ create table telemetry (...);
     add_kv_table(
         doc,
         [
-            ("Local Baseline", "SQLite, in-process event bus, one backend instance, one or more edge agents"),
-            ("Team Scale", "Postgres, Redis, centralized websocket fan-out, per-device session inventory"),
-            ("Cloud Scale", "Managed Postgres, Redis or message bus, stateless API layer, separate telemetry ingestion workers"),
-            ("ML Scale", "External model inference service, batched anomaly training, feature store, retraining pipeline"),
-            ("Honeypot Scale", "Dedicated deception collectors, isolated network segments, normalized threat telemetry bus"),
+            (
+                "Local Baseline",
+                "SQLite, in-process event bus, one backend instance, one or more edge agents",
+            ),
+            (
+                "Team Scale",
+                "Postgres, Redis, centralized websocket fan-out, per-device session inventory",
+            ),
+            (
+                "Cloud Scale",
+                "Managed Postgres, Redis or message bus, stateless API layer, separate telemetry ingestion workers",
+            ),
+            (
+                "ML Scale",
+                "External model inference service, batched anomaly training, feature store, retraining pipeline",
+            ),
+            (
+                "Honeypot Scale",
+                "Dedicated deception collectors, isolated network segments, normalized threat telemetry bus",
+            ),
         ],
     )
 
@@ -370,7 +472,7 @@ create table telemetry (...);
         doc,
         [
             "Local run: `uvicorn` backend plus desktop agent plus web control plane as needed",
-            "Container run: backend and agent through `jarvis-x/docker-compose.yml`",
+            "Container run: backend and agent through `disha/docker-compose.yml`",
             "Cloud-ready shape: API gateway, auth layer, message bus, data services, telemetry ingestion, alert channel",
             "Transport requirements: TLS, token auth, refresh rotation, secure sync keys, explicit device trust inventory",
         ],
@@ -384,10 +486,19 @@ create table telemetry (...);
     add_kv_table(
         doc,
         [
-            ("Web Console", "Primary operational control plane with policy-aware workflows and audit visibility"),
+            (
+                "Web Console",
+                "Primary operational control plane with policy-aware workflows and audit visibility",
+            ),
             ("CLI", "Trusted execution path for development and automation tasks"),
-            ("Mobile", "Companion interface for chat, alerts, dashboard metrics, and settings"),
-            ("Voice", "Optional intent input layer routed through the same policy and planning system"),
+            (
+                "Mobile",
+                "Companion interface for chat, alerts, dashboard metrics, and settings",
+            ),
+            (
+                "Voice",
+                "Optional intent input layer routed through the same policy and planning system",
+            ),
         ],
     )
 

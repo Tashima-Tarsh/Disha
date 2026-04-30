@@ -78,5 +78,10 @@ logs/sentinel/
 venv/
 .venv/
 .virtualenv/
+
+# DISHA Brain local runtime data
+data/
+*.db
+
 # IDE files
 .vscode/
