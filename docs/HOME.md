@@ -23,3 +23,4 @@ This wiki documents the repository as it exists today and defines the target pro
 - [Technical Design Document](TDD.md)
 - [Design System](design-system.md)
 - [JARVIS-X Architecture](jarvis-x-architecture.md)
+- [JARVIS-X Enterprise Architecture](jarvis-x-enterprise-architecture.md)

@@ -185,6 +185,7 @@ Recommended capture set:
 - [Architecture Diagrams](docs/architecture-diagrams.md)
 - [Design System](docs/design-system.md)
 - [JARVIS-X Architecture](docs/jarvis-x-architecture.md)
+- [JARVIS-X Enterprise Architecture](docs/jarvis-x-enterprise-architecture.md)
 - [Wiki Home](docs/HOME.md)
 
 ## Current State
