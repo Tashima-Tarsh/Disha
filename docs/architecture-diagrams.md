@@ -12,6 +12,10 @@ For image export, paste the diagram into Mermaid Live Editor, choose `PNG` or `S
 
 ## System Architecture
 
+Premium poster (SVG):
+
+- `docs/images/disha-brain-platform-premium.svg`
+
 ```mermaid
 flowchart LR
     User[Operator or Browser User]

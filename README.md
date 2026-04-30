@@ -42,6 +42,10 @@ Search keywords:
 
 ## Architecture Summary
 
+Premium platform diagram:
+
+![DISHA Brain Platform Architecture](docs/images/disha-brain-platform-premium.svg)
+
 ```mermaid
 flowchart LR
     U[User] --> W[Next.js Web]
