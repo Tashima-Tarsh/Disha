@@ -25,9 +25,9 @@ Primary runtime surfaces:
 |-- web/                 Next.js app and secure API surface
 |-- src/                 TypeScript CLI/runtime hardening modules
 |-- disha/               Brain backend, AI core modules, agents, and services
-|-- disha-agi-brain/     AI platform backend prototype (legacy surface)
 |-- docker/              Compose and observability assets
 |-- docs/                Architecture, wiki, design, TDD, analysis
+|-- legacy/              retired prototypes and legacy stacks
 `-- .github/workflows/   CI, CodeQL, security, and module pipelines
 ```
 
@@ -37,6 +37,7 @@ Primary runtime surfaces:
 flowchart LR
     U[User] --> W[Next.js Web]
     U --> C[TypeScript CLI]
+    W --> B[DISHA Brain API]
     W --> WS[Web Services Layer]
     WS --> SEC[Auth RBAC CSRF Rate Limit Audit]
     WS --> DB[(Postgres)]
@@ -44,8 +45,7 @@ flowchart LR
     WS --> EXT[Model or Backend Services]
     C --> MCP[MCP Entrypoint]
     MCP --> CSEC[Secure Storage Policy and Audit]
-    LEG[Legacy FastAPI Backend] --> EXT
-    CORE[AI Core Modules] --> LEG
+    CORE[AI Core Modules] --> B
 ```
 
 The production-ready platform path is `web/` + `src/` + `disha/brain/`. Other folders remain in the repo as legacy or experimental surfaces and are progressively converged or retired behind stable interfaces.
@@ -109,6 +109,18 @@ docker compose up postgres redis -d
 cd web
 npm run dev
 ```
+
+## Run With Docker Compose (Recommended)
+
+This runs the complete DISHA Brain platform:
+
+```bash
+docker compose up --build
+```
+
+Services:
+- Web UI: `http://localhost:3000`
+- Brain API: `http://localhost:8080/api/v1/health`
 
 ### 6. Run validation
 

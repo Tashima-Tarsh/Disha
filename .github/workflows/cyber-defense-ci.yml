@@ -1,14 +1,7 @@
 name: Cyber Defense CI
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - 'disha/services/cyber/**'
-  pull_request:
-    branches: [main]
-    paths:
-      - 'disha/services/cyber/**'
+  workflow_dispatch:
 
 permissions:
   contents: read

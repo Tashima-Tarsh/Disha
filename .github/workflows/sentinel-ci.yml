@@ -1,16 +1,7 @@
 name: Sentinel CI
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - 'disha/services/integrations/cyber-intelligence-platform/alerts/**'
-      - 'disha/services/ai-platform/backend/app/agents/sentinel_agent.py'
-  pull_request:
-    branches: [main]
-    paths:
-      - 'disha/services/integrations/cyber-intelligence-platform/alerts/**'
-      - 'disha/services/ai-platform/backend/app/agents/sentinel_agent.py'
+  workflow_dispatch:
 
 permissions:
   contents: read

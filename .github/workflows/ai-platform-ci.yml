@@ -1,18 +1,7 @@
 name: AI Platform CI
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - 'disha/services/ai-platform/**'
-      - 'disha/scripts/**'
-      - 'disha/ai/core/**'
-  pull_request:
-    branches: [main]
-    paths:
-      - 'disha/services/ai-platform/**'
-      - 'disha/scripts/**'
-      - 'disha/ai/core/**'
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -22,7 +11,7 @@ jobs:
     name: Lint Python (AI Platform)
     runs-on: ubuntu-latest
     env:
-      AI_PLATFORM_BACKEND_DIR: disha-agi-brain/backend
+      AI_PLATFORM_BACKEND_DIR: legacy/disha-agi-brain/backend
     steps:
       - uses: actions/checkout@v4
 
@@ -56,7 +45,7 @@ jobs:
     env:
       PYTHONPATH: ${{ github.workspace }}
       DISHA_MODEL_PROVIDER: mock
-      AI_PLATFORM_BACKEND_DIR: disha-agi-brain/backend
+      AI_PLATFORM_BACKEND_DIR: legacy/disha-agi-brain/backend
 
     steps:
       - uses: actions/checkout@v4

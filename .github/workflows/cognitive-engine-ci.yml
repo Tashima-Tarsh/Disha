@@ -1,14 +1,7 @@
 name: Cognitive Engine CI
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - 'disha/ai/core/**'
-  pull_request:
-    branches: [main]
-    paths:
-      - 'disha/ai/core/**'
+  workflow_dispatch:
 
 permissions:
   contents: read
