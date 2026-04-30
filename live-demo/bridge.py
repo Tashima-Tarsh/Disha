@@ -2,6 +2,11 @@ from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
 import json
 import random
+import sys
+import os
+
+# Add backend to path
+sys.path.append(os.path.join(os.path.dirname(__file__), "..", "backend"))
 
 app = FastAPI()
 
@@ -38,12 +43,10 @@ KNOWLEDGE = {
 }
 
 
-OSINT_SAMPLES = [
-    "[OSINT] New threat actor signature detected in sector 7. IP: 103.45.2.19 (Hangzhou, CN).",
-    "[OSINT] Deep-web mention of 'DISHA' in forum 'CyberSec-Elite'. Risk: LOW.",
-    "[OSINT] Anomaly in power-grid telemetry for New Delhi. Correlation with solar flare data: 89%.",
-    "[OSINT] Blockchain transaction spike detected on Ethereum L2. Volume: 4.2k ETH. Wallet linked to 'Sovereign-Alpha'."
-]
+from app.services.intelligence import IntelligenceService
+
+service = IntelligenceService()
+OSINT_SAMPLES = service.osint_samples
 
 
 @app.get("/ask")
