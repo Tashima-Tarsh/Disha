@@ -1,8 +1,10 @@
 # DISHA OS
 
-![DISHA OS](docs/images/disha-os-banner.svg)
+![DISHA OS](docs/images/disha-os-hero.png)
 
 DISHA OS is an AI Cyber Evidence Operating System built around DISHA Brain: a local-first, audit-first intelligence core for secure automation, cyber monitoring, evidence-grade logging, and operator control surfaces.
+
+Docs live in `docs/` (including a Wiki-ready structure under `docs/wiki/`).
 
 Primary runtime surfaces:
 
