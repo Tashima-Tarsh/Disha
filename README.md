@@ -6,6 +6,15 @@ DISHA OS is an AI Cyber Evidence Operating System built around DISHA Brain: a lo
 
 Docs live in `docs/` (including a Wiki-ready structure under `docs/wiki/`).
 
+## Deploy (Docker)
+
+- Local/dev: `docker-compose.yml`
+- Production-style: `docker-compose.prod.yml` (pulls images from GHCR)
+
+## OS Artifact
+
+CI can build a bootable ISO (`disha-os-amd64.iso`) via the `Release (Images + OS ISO)` workflow.
+
 Primary runtime surfaces:
 
 - `web/`: hardened Next.js application with authenticated API routes, RBAC, CSRF protection, audit logging, and export/share workflows.

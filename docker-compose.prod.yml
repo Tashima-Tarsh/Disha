@@ -1,0 +1,50 @@
+version: "3.9"
+
+# Production-oriented compose file.
+# - Uses built images (CI can publish to GHCR)
+# - Runs as non-root inside containers
+# - Includes health checks
+
+services:
+  disha-brain:
+    image: ghcr.io/${GITHUB_REPOSITORY_OWNER:-tashima-tarsh}/disha-brain:latest
+    environment:
+      DISHA_BRAIN_API_HOST: 0.0.0.0
+      DISHA_BRAIN_API_PORT: 8080
+      DISHA_BRAIN_API_TOKEN: ${DISHA_BRAIN_API_TOKEN:?set-me}
+      DISHA_BRAIN_DB_PATH: /data/disha_brain.db
+      DISHA_ALLOWED_ORIGINS: ${DISHA_ALLOWED_ORIGINS:-http://localhost:3000}
+    volumes:
+      - disha_data:/data
+    ports:
+      - "8080:8080"
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://127.0.0.1:8080/api/v1/health').read(); print('ok')\""]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+
+  web:
+    image: ghcr.io/${GITHUB_REPOSITORY_OWNER:-tashima-tarsh}/disha-web:latest
+    environment:
+      NODE_ENV: production
+      DISHA_AUTH_MODE: ${DISHA_AUTH_MODE:-dev-jwt}
+      DISHA_JWT_SECRET: ${DISHA_JWT_SECRET:?set-me}
+      DISHA_DEV_PASSWORD: ${DISHA_DEV_PASSWORD:?set-me}
+      DISHA_ALLOWED_ORIGINS: ${DISHA_ALLOWED_ORIGINS:-http://localhost:3000}
+      DISHA_BRAIN_URL: http://disha-brain:8080
+      DISHA_BRAIN_API_TOKEN: ${DISHA_BRAIN_API_TOKEN:?set-me}
+
+      # Cloud model (optional)
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      OPENAI_MODEL: ${OPENAI_MODEL:-gpt-5.4-mini}
+      OPENAI_BASE_URL: ${OPENAI_BASE_URL:-https://api.openai.com/v1}
+    depends_on:
+      disha-brain:
+        condition: service_healthy
+    ports:
+      - "3000:3000"
+
+volumes:
+  disha_data:
+
