@@ -1,0 +1,54 @@
+# Template for a Vyuha formation rule.
+# All actions MUST be defensive-only and comply with policies/no-first-use-policy.md
+
+id: formation.template
+name: "Template Vyuha"
+description: "Short description of the defensive mode."
+
+triggers:
+  # A rule can be activated by one or more trigger blocks.
+  # Triggers are declarative and must not encode offensive behavior.
+  - id: telemetry.anomaly
+    when:
+      any:
+        - metric: cpu_percent
+          op: ">"
+          value: 90
+          window_seconds: 120
+
+defensive_actions:
+  # Allowed defensive actions are constrained by policies/allowed-defense-actions.yaml
+  - action: traffic.rate_limit
+    params:
+      scope: local_device
+      profile: "default"
+    reason: "Reduce blast radius while preserving availability."
+
+evidence_to_collect:
+  - artifact: logs.system
+    params: { since_seconds: 600 }
+  - artifact: process.snapshot
+    params: { include_cmdline: true }
+
+dashboard_visualization:
+  # Human-facing idea: show why the formation is active and what it is doing.
+  layout: "radial"
+  highlights:
+    - "trigger_metrics"
+    - "current_controls"
+    - "evidence_queue"
+
+recovery_action:
+  # How to return to normal operations safely.
+  action: system.recover
+  params:
+    mode: "soft"
+  reason: "Return to baseline after threat is contained."
+
+failure_fallback:
+  # If primary actions fail, use a safer fallback that still preserves evidence.
+  action: device.isolate
+  params:
+    profile: "lockdown"
+  reason: "Containment-first fallback if enforcement fails."
+

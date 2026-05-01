@@ -1,0 +1,33 @@
+id: formation.matsya
+name: "Matsya Vyuha"
+description: "Fish school: blend monitoring with subtle rate limits to avoid disruption while investigating."
+triggers:
+  - id: low_grade_anomaly
+    when:
+      any:
+        - metric: anomaly_score
+          op: ">"
+          value: 0.65
+          window_seconds: 600
+defensive_actions:
+  - action: traffic.rate_limit
+    params: { scope: local_device, profile: "gentle" }
+    reason: "Reduce risk while keeping system usable."
+  - action: evidence.preserve
+    params: { scope: local_device }
+    reason: "Collect evidence under low-grade anomalies."
+evidence_to_collect:
+  - artifact: telemetry.snapshot
+    params: { include_network: true, include_process: true }
+dashboard_visualization:
+  layout: "schooling"
+  highlights: ["anomaly_trend", "gentle_controls", "evidence"]
+recovery_action:
+  action: system.recover
+  params: { mode: "soft" }
+  reason: "Relax controls after stable period."
+failure_fallback:
+  action: device.isolate
+  params: { profile: "limited-egress" }
+  reason: "Escalate if anomaly worsens."
+

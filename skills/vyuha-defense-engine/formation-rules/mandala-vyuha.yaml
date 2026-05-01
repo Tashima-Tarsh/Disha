@@ -1,0 +1,35 @@
+id: formation.mandala
+name: "Mandala Vyuha"
+description: "Governance rings: enforce strict policy gates and controlled privilege boundaries."
+triggers:
+  - id: privilege_risk
+    when:
+      any:
+        - metric: privilege_escalation_attempts
+          op: ">"
+          value: 1
+          window_seconds: 900
+defensive_actions:
+  - action: session.revoke_local
+    params: { scope: local_device }
+    reason: "Force re-authentication after privilege escalation attempts."
+  - action: keys.rotate
+    params: { scope: local_device }
+    reason: "Rotate keys to reduce exposure window."
+evidence_to_collect:
+  - artifact: logs.auth
+    params: { since_seconds: 1800 }
+  - artifact: system.audit_trail
+    params: { since_seconds: 1800 }
+dashboard_visualization:
+  layout: "rings_governance"
+  highlights: ["auth_anomalies", "key_rotation", "policy_gates"]
+recovery_action:
+  action: system.recover
+  params: { mode: "soft" }
+  reason: "Restore steady-state after privileges normalize."
+failure_fallback:
+  action: device.isolate
+  params: { profile: "limited-egress" }
+  reason: "If escalation continues, reduce network exposure."
+

@@ -1,0 +1,33 @@
+id: formation.danda
+name: "Danda Vyuha"
+description: "Staff formation: strict linear controls and clear escalation ladder."
+triggers:
+  - id: repeated_policy_violations
+    when:
+      any:
+        - metric: policy_denies
+          op: ">"
+          value: 10
+          window_seconds: 600
+defensive_actions:
+  - action: session.revoke_local
+    params: { scope: local_device }
+    reason: "Stop repeated denied actions by forcing re-authentication."
+  - action: traffic.rate_limit
+    params: { scope: local_device, profile: "strict" }
+    reason: "Slow repeated suspicious attempts."
+evidence_to_collect:
+  - artifact: policy.decision_log
+    params: { since_seconds: 1800 }
+dashboard_visualization:
+  layout: "escalation_ladder"
+  highlights: ["denies_over_time", "revocations", "rate_limits"]
+recovery_action:
+  action: system.recover
+  params: { mode: "soft" }
+  reason: "Return to normal after behavior stabilizes."
+failure_fallback:
+  action: device.isolate
+  params: { profile: "limited-egress" }
+  reason: "Contain if repeated violations continue."
+

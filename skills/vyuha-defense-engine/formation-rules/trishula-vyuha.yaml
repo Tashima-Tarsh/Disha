@@ -1,0 +1,48 @@
+id: formation.trishula
+name: "Trishula Vyuha"
+description: "Three-pronged defense: protect identity, network, and file system simultaneously."
+triggers:
+  - id: triad_risk
+    when:
+      any:
+        - metric: auth_fail_rate
+          op: ">"
+          value: 25
+          window_seconds: 300
+        - metric: suspicious_file_writes
+          op: ">"
+          value: 15
+          window_seconds: 300
+        - metric: outbound_connections
+          op: ">"
+          value: 700
+          window_seconds: 120
+defensive_actions:
+  - action: session.revoke_local
+    params: { scope: local_device }
+    reason: "Identity prong: revoke sessions under auth abuse."
+  - action: traffic.block
+    params: { scope: local_device, target: "unknown_egress" }
+    reason: "Network prong: cut unknown outbound."
+  - action: file.quarantine
+    params: { selector: "high_risk_recent_writes" }
+    reason: "File prong: prevent execution of suspicious writes."
+evidence_to_collect:
+  - artifact: logs.auth
+    params: { since_seconds: 1200 }
+  - artifact: file.write_journal
+    params: { since_seconds: 1200 }
+  - artifact: network.connections_snapshot
+    params: { include_process: true }
+dashboard_visualization:
+  layout: "trident"
+  highlights: ["identity_controls", "network_controls", "file_controls"]
+recovery_action:
+  action: system.recover
+  params: { mode: "soft" }
+  reason: "Roll back triad controls after stabilization."
+failure_fallback:
+  action: device.isolate
+  params: { profile: "lockdown" }
+  reason: "If triad controls fail, isolate fully."
+

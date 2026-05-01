@@ -1,0 +1,35 @@
+id: formation.shyena
+name: "Shyena Vyuha"
+description: "Targeted containment: narrow controls applied to the highest-risk vector."
+triggers:
+  - id: targeted_egress
+    when:
+      any:
+        - metric: anomalous_dns_queries
+          op: ">"
+          value: 200
+          window_seconds: 180
+defensive_actions:
+  - action: traffic.block
+    params: { scope: local_device, target: "suspicious_dns" }
+    reason: "Block suspicious DNS resolution behavior."
+  - action: evidence.preserve
+    params: { scope: local_device }
+    reason: "Preserve evidence before remediation."
+evidence_to_collect:
+  - artifact: dns.query_log
+    params: { since_seconds: 900 }
+  - artifact: network.connections_snapshot
+    params: { include_process: true }
+dashboard_visualization:
+  layout: "vector_focus"
+  highlights: ["dns_anomaly", "blocked_targets", "evidence_queue"]
+recovery_action:
+  action: system.recover
+  params: { mode: "soft" }
+  reason: "Restore normal DNS behavior after confirmation."
+failure_fallback:
+  action: device.isolate
+  params: { profile: "limited-egress" }
+  reason: "If anomalies persist, reduce egress further."
+

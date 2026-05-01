@@ -1,0 +1,35 @@
+id: formation.padma
+name: "Padma Vyuha"
+description: "Petal-segmentation: isolate high-risk zones while keeping safe petals operating."
+triggers:
+  - id: zone_integrity
+    when:
+      any:
+        - metric: file_integrity_violations
+          op: ">"
+          value: 3
+          window_seconds: 600
+defensive_actions:
+  - action: device.isolate
+    params: { profile: "limited-egress" }
+    reason: "Segment network access to contain suspicious zones."
+  - action: session.revoke_local
+    params: { scope: local_device }
+    reason: "Force re-authentication if integrity signals suggest compromise."
+evidence_to_collect:
+  - artifact: file.hash_manifest
+    params: { scope: "system_paths" }
+  - artifact: logs.system
+    params: { since_seconds: 1200 }
+dashboard_visualization:
+  layout: "petals"
+  highlights: ["zone_status", "integrity_deltas", "recovery_path"]
+recovery_action:
+  action: system.recover
+  params: { mode: "soft" }
+  reason: "Return petals to baseline after integrity is restored."
+failure_fallback:
+  action: device.isolate
+  params: { profile: "lockdown" }
+  reason: "Escalate to full isolation if integrity violations continue."
+

@@ -1,0 +1,33 @@
+id: formation.garbha
+name: "Garbha Vyuha"
+description: "Womb defense: protect a secure inner enclave (vault/evidence DB) with strict isolation."
+triggers:
+  - id: evidence_store_risk
+    when:
+      any:
+        - metric: evidence_store_access_anomaly
+          op: ">"
+          value: 1
+          window_seconds: 600
+defensive_actions:
+  - action: device.isolate
+    params: { profile: "trusted-triangle" }
+    reason: "Restrict connectivity to protect evidence/vault core."
+  - action: evidence.preserve
+    params: { scope: local_device }
+    reason: "Ensure evidence remains intact and captured."
+evidence_to_collect:
+  - artifact: evidence.store_access_log
+    params: { since_seconds: 3600 }
+dashboard_visualization:
+  layout: "inner_enclave"
+  highlights: ["core_integrity", "allowed_services", "evidence_access"]
+recovery_action:
+  action: system.recover
+  params: { mode: "soft" }
+  reason: "Return to baseline after access normalizes."
+failure_fallback:
+  action: device.isolate
+  params: { profile: "lockdown" }
+  reason: "Lock down if evidence store is threatened."
+

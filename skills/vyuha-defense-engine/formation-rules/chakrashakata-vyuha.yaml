@@ -1,0 +1,33 @@
+id: formation.chakrashakata
+name: "Chakrashakata Vyuha"
+description: "Wheel-wagon: maintain essential services while rotating keys and tightening ingress."
+triggers:
+  - id: sustained_abuse
+    when:
+      any:
+        - metric: inbound_request_rate
+          op: ">"
+          value: 1200
+          window_seconds: 300
+defensive_actions:
+  - action: traffic.rate_limit
+    params: { scope: local_device, profile: "sustained" }
+    reason: "Maintain service under sustained abuse."
+  - action: keys.rotate
+    params: { scope: local_device }
+    reason: "Reduce risk window during sustained hostile activity."
+evidence_to_collect:
+  - artifact: logs.web
+    params: { since_seconds: 1800 }
+dashboard_visualization:
+  layout: "wheel_and_supply"
+  highlights: ["rate_limits", "key_rotation_status", "service_health"]
+recovery_action:
+  action: system.recover
+  params: { mode: "soft" }
+  reason: "Normalize after abuse ends."
+failure_fallback:
+  action: device.isolate
+  params: { profile: "limited-egress" }
+  reason: "If rotation fails or abuse persists, restrict connectivity."
+

@@ -1,0 +1,33 @@
+id: formation.sarvatomukha
+name: "Sarvatomukha Vyuha"
+description: "Omni-facing monitoring: maximize visibility, then apply minimal containment."
+triggers:
+  - id: suspicious_behavior
+    when:
+      any:
+        - metric: anomaly_score
+          op: ">"
+          value: 0.85
+          window_seconds: 300
+defensive_actions:
+  - action: evidence.preserve
+    params: { scope: local_device }
+    reason: "Increase evidence capture when anomaly score is high."
+  - action: traffic.rate_limit
+    params: { scope: local_device, profile: "observe" }
+    reason: "Reduce risk while continuing observation."
+evidence_to_collect:
+  - artifact: telemetry.snapshot
+    params: { include_network: true, include_process: true }
+dashboard_visualization:
+  layout: "omni_radar"
+  highlights: ["anomaly_score", "telemetry", "controls_applied"]
+recovery_action:
+  action: system.recover
+  params: { mode: "soft" }
+  reason: "Return to baseline after anomaly score falls."
+failure_fallback:
+  action: device.isolate
+  params: { profile: "limited-egress" }
+  reason: "Escalate if anomaly remains high."
+

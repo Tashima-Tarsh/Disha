@@ -1,0 +1,39 @@
+id: formation.vajra
+name: "Vajra Vyuha"
+description: "Diamond defense: strong spine controls mirrored across critical subsystems."
+triggers:
+  - id: multi_domain_anomaly
+    when:
+      any:
+        - metric: cpu_percent
+          op: ">"
+          value: 95
+          window_seconds: 120
+        - metric: suspicious_file_writes
+          op: ">"
+          value: 10
+          window_seconds: 300
+defensive_actions:
+  - action: file.quarantine
+    params: { selector: "high_risk_recent_writes" }
+    reason: "Prevent execution of suspicious recent writes and preserve evidence."
+  - action: traffic.block
+    params: { scope: local_device, target: "unknown_egress" }
+    reason: "Cut off unknown outbound channels from untrusted processes."
+evidence_to_collect:
+  - artifact: file.write_journal
+    params: { since_seconds: 1800 }
+  - artifact: process.snapshot
+    params: { include_cmdline: true }
+dashboard_visualization:
+  layout: "diamond_spine"
+  highlights: ["file_writes", "egress_blocks", "quarantine_queue"]
+recovery_action:
+  action: system.recover
+  params: { mode: "soft" }
+  reason: "Remove blocks cautiously once threat is cleared."
+failure_fallback:
+  action: device.isolate
+  params: { profile: "lockdown" }
+  reason: "If file tampering continues, isolate completely."
+

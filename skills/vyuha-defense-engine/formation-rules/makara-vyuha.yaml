@@ -1,0 +1,33 @@
+id: formation.makara
+name: "Makara Vyuha"
+description: "Gateway hardening: prioritize edge blocking and session control."
+triggers:
+  - id: ingress_abuse
+    when:
+      any:
+        - metric: inbound_request_rate
+          op: ">"
+          value: 2000
+          window_seconds: 60
+defensive_actions:
+  - action: traffic.rate_limit
+    params: { scope: local_device, profile: "ingress-shield" }
+    reason: "Shed abusive load while keeping core responsive."
+  - action: session.revoke_local
+    params: { scope: local_device }
+    reason: "Invalidate suspicious sessions during ingress abuse."
+evidence_to_collect:
+  - artifact: logs.web
+    params: { since_seconds: 600 }
+dashboard_visualization:
+  layout: "gateway_shield"
+  highlights: ["ingress_rate", "sessions_revoked", "rate_limit_profile"]
+recovery_action:
+  action: system.recover
+  params: { mode: "soft" }
+  reason: "Step down rate limits safely after abuse subsides."
+failure_fallback:
+  action: device.isolate
+  params: { profile: "limited-egress" }
+  reason: "If abuse persists and threatens integrity, isolate."
+

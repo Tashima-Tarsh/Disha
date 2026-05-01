@@ -1,0 +1,35 @@
+id: formation.agni
+name: "Agni Vyuha"
+description: "Firebreak: aggressively stop local spread (kill/quarantine) and preserve evidence."
+triggers:
+  - id: rapid_file_drop
+    when:
+      any:
+        - metric: new_executables_created
+          op: ">"
+          value: 5
+          window_seconds: 120
+defensive_actions:
+  - action: file.quarantine
+    params: { selector: "new_executables" }
+    reason: "Quarantine new executables to prevent spread."
+  - action: process.kill_local
+    params: { selector: "suspicious" }
+    reason: "Terminate suspicious processes to halt propagation."
+evidence_to_collect:
+  - artifact: file.hash_manifest
+    params: { scope: "recent_executables" }
+  - artifact: process.snapshot
+    params: { include_cmdline: true }
+dashboard_visualization:
+  layout: "firebreak"
+  highlights: ["quarantine_count", "terminated_processes", "evidence"]
+recovery_action:
+  action: system.recover
+  params: { mode: "hard" }
+  reason: "Use hard recovery if propagation indicators were severe."
+failure_fallback:
+  action: device.isolate
+  params: { profile: "lockdown" }
+  reason: "If quarantine/kill fails, isolate."
+

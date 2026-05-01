@@ -1,0 +1,33 @@
+id: formation.ardha_chandra
+name: "Ardha-Chandra Vyuha"
+description: "Half-moon defense: protect critical core while allowing limited external interaction."
+triggers:
+  - id: suspicious_outbound
+    when:
+      any:
+        - metric: outbound_bytes
+          op: ">"
+          value: 50000000
+          window_seconds: 300
+defensive_actions:
+  - action: device.isolate
+    params: { profile: "limited-egress" }
+    reason: "Allow only essential outbound traffic while investigating."
+  - action: evidence.preserve
+    params: { scope: local_device }
+    reason: "Preserve logs during suspected data exfiltration indicators."
+evidence_to_collect:
+  - artifact: network.transfer_summary
+    params: { since_seconds: 1800 }
+dashboard_visualization:
+  layout: "half_moon"
+  highlights: ["egress_profile", "transfer_summary", "investigation_queue"]
+recovery_action:
+  action: system.recover
+  params: { mode: "soft" }
+  reason: "Restore normal egress after verification."
+failure_fallback:
+  action: device.isolate
+  params: { profile: "lockdown" }
+  reason: "If exfil indicators persist, lock down."
+

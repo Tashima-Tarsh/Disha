@@ -1,0 +1,35 @@
+id: formation.garuda
+name: "Garuda Vyuha"
+description: "High-velocity interception: fast isolate + revoke for rapid threat containment."
+triggers:
+  - id: rapid_spike
+    when:
+      any:
+        - metric: suspicious_process_spawn_rate
+          op: ">"
+          value: 50
+          window_seconds: 60
+defensive_actions:
+  - action: process.kill_local
+    params: { selector: "suspicious" }
+    reason: "Terminate high-confidence malicious processes quickly."
+  - action: session.revoke_local
+    params: { scope: local_device }
+    reason: "Invalidate sessions to cut off attacker control channels."
+evidence_to_collect:
+  - artifact: process.tree_snapshot
+    params: { depth: 4 }
+  - artifact: logs.system
+    params: { since_seconds: 600 }
+dashboard_visualization:
+  layout: "wing_sweep"
+  highlights: ["process_spikes", "revocations", "evidence_captured"]
+recovery_action:
+  action: system.recover
+  params: { mode: "soft" }
+  reason: "Stabilize system after rapid containment."
+failure_fallback:
+  action: device.isolate
+  params: { profile: "lockdown" }
+  reason: "If kill/revoke is insufficient, isolate device."
+

@@ -1,0 +1,37 @@
+id: formation.asura
+name: "Asura Vyuha"
+description: "Hostile-pattern defense: assume adversarial intent and apply stronger containment."
+triggers:
+  - id: high_risk
+    when:
+      any:
+        - metric: confirmed_malicious_processes
+          op: ">"
+          value: 0
+          window_seconds: 300
+        - metric: integrity_breach_events
+          op: ">"
+          value: 0
+          window_seconds: 900
+defensive_actions:
+  - action: device.isolate
+    params: { profile: "lockdown" }
+    reason: "Contain aggressively when confirmed malicious + integrity signals exist."
+  - action: evidence.preserve
+    params: { scope: local_device }
+    reason: "Preserve evidence for incident response."
+evidence_to_collect:
+  - artifact: file.integrity_report
+    params: { scope: "system_paths" }
+dashboard_visualization:
+  layout: "threat_stance"
+  highlights: ["lockdown", "confirmed_findings", "evidence_bundle"]
+recovery_action:
+  action: system.recover
+  params: { mode: "hard" }
+  reason: "Recover to known-good state after containment."
+failure_fallback:
+  action: system.recover
+  params: { mode: "hard" }
+  reason: "Hard recovery is the safest fallback in hostile patterns."
+

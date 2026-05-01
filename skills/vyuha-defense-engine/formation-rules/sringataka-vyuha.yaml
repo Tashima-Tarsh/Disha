@@ -1,0 +1,30 @@
+id: formation.sringataka
+name: "Sringataka Vyuha"
+description: "Triangle choke: constrain traffic to a minimal trusted triangle (UI, brain, update)."
+triggers:
+  - id: unknown_egress_detected
+    when:
+      any:
+        - metric: unknown_domain_contacts
+          op: ">"
+          value: 10
+          window_seconds: 300
+defensive_actions:
+  - action: device.isolate
+    params: { profile: "trusted-triangle" }
+    reason: "Allow only essential services while investigating unknown egress."
+evidence_to_collect:
+  - artifact: dns.query_log
+    params: { since_seconds: 1800 }
+dashboard_visualization:
+  layout: "triangle"
+  highlights: ["allowed_services", "blocked_domains", "evidence_capture"]
+recovery_action:
+  action: system.recover
+  params: { mode: "soft" }
+  reason: "Restore normal connectivity after confirmation."
+failure_fallback:
+  action: device.isolate
+  params: { profile: "limited-egress" }
+  reason: "Fallback to limited egress if triangle profile is unavailable."
+

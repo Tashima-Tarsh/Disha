@@ -1,0 +1,33 @@
+id: formation.varaha
+name: "Varaha Vyuha"
+description: "Boar defense: dig out persistence by isolating and preserving artifacts for cleanup."
+triggers:
+  - id: persistence_detected
+    when:
+      any:
+        - metric: persistence_events
+          op: ">"
+          value: 0
+          window_seconds: 900
+defensive_actions:
+  - action: device.isolate
+    params: { profile: "limited-egress" }
+    reason: "Reduce external interaction while persistence is investigated."
+  - action: evidence.preserve
+    params: { scope: local_device }
+    reason: "Preserve persistence artifacts for evidence."
+evidence_to_collect:
+  - artifact: startup.entries_snapshot
+    params: { include_services: true }
+dashboard_visualization:
+  layout: "persistence_map"
+  highlights: ["startup_entries", "isolation_profile", "evidence"]
+recovery_action:
+  action: system.recover
+  params: { mode: "hard" }
+  reason: "Hard recovery if persistence is confirmed."
+failure_fallback:
+  action: device.isolate
+  params: { profile: "lockdown" }
+  reason: "If persistence keeps changing, lock down."
+

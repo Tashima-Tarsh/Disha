@@ -1,0 +1,41 @@
+id: formation.chakra
+name: "Chakra Vyuha"
+description: "Concentric defense rings: tighten perimeter controls while protecting a hardened core."
+triggers:
+  - id: multi_signal.anomaly
+    when:
+      any:
+        - metric: auth_fail_rate
+          op: ">"
+          value: 20
+          window_seconds: 300
+        - metric: outbound_connections
+          op: ">"
+          value: 500
+          window_seconds: 120
+defensive_actions:
+  - action: traffic.rate_limit
+    params: { scope: local_device, profile: "perimeter-tight" }
+    reason: "Reduce abuse amplification while keeping core services available."
+  - action: traffic.block
+    params: { scope: local_device, target: "suspicious_egress" }
+    reason: "Block suspicious outbound channels from untrusted processes."
+evidence_to_collect:
+  - artifact: logs.auth
+    params: { since_seconds: 900 }
+  - artifact: network.connections_snapshot
+    params: { include_process: true }
+  - artifact: process.snapshot
+    params: { include_cmdline: true }
+dashboard_visualization:
+  layout: "concentric_rings"
+  highlights: ["outer_perimeter_controls", "core_service_health", "evidence_pipeline"]
+recovery_action:
+  action: system.recover
+  params: { mode: "soft" }
+  reason: "Relax controls gradually after signals return to baseline."
+failure_fallback:
+  action: device.isolate
+  params: { profile: "lockdown" }
+  reason: "If containment fails, isolate device to stop propagation and preserve evidence."
+

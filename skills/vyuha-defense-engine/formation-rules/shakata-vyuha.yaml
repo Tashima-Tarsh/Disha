@@ -1,0 +1,33 @@
+id: formation.shakata
+name: "Shakata Vyuha"
+description: "Wagon defense: protect supply lines (credentials/keys) and preserve availability."
+triggers:
+  - id: secrets_exposure_risk
+    when:
+      any:
+        - metric: secret_access_anomaly
+          op: ">"
+          value: 1
+          window_seconds: 600
+defensive_actions:
+  - action: keys.rotate
+    params: { scope: local_device }
+    reason: "Rotate keys when secret access anomalies are detected."
+  - action: session.revoke_local
+    params: { scope: local_device }
+    reason: "Revoke sessions to reduce misuse of stolen tokens."
+evidence_to_collect:
+  - artifact: vault.access_log
+    params: { since_seconds: 1800 }
+dashboard_visualization:
+  layout: "supply_lines"
+  highlights: ["key_rotation", "session_revocation", "vault_access"]
+recovery_action:
+  action: system.recover
+  params: { mode: "soft" }
+  reason: "Restore normal operations after rotation completes."
+failure_fallback:
+  action: device.isolate
+  params: { profile: "limited-egress" }
+  reason: "If secret anomaly persists, reduce connectivity."
+

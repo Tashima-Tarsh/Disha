@@ -1,0 +1,33 @@
+id: formation.mahisha
+name: "Mahisha Vyuha"
+description: "Bull defense: endure pressure with strong rate limiting and controlled recovery."
+triggers:
+  - id: sustained_pressure
+    when:
+      any:
+        - metric: inbound_request_rate
+          op: ">"
+          value: 1800
+          window_seconds: 600
+defensive_actions:
+  - action: traffic.rate_limit
+    params: { scope: local_device, profile: "heavy" }
+    reason: "Endure sustained pressure without collapsing."
+  - action: report.generate
+    params: { scope: local_device }
+    reason: "Generate incident report for sustained pressure event."
+evidence_to_collect:
+  - artifact: logs.web
+    params: { since_seconds: 3600 }
+dashboard_visualization:
+  layout: "pressure_gauge"
+  highlights: ["pressure_duration", "rate_limit_profile", "service_health"]
+recovery_action:
+  action: system.recover
+  params: { mode: "soft" }
+  reason: "Gradual recovery after sustained event."
+failure_fallback:
+  action: device.isolate
+  params: { profile: "limited-egress" }
+  reason: "If pressure threatens integrity, restrict more."
+

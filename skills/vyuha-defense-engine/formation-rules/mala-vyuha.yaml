@@ -1,0 +1,33 @@
+id: formation.mala
+name: "Mala Vyuha"
+description: "Garland defense: chain small controls and evidence tasks into a consistent posture."
+triggers:
+  - id: repeated_minor_alerts
+    when:
+      any:
+        - metric: alert_count_medium
+          op: ">"
+          value: 5
+          window_seconds: 3600
+defensive_actions:
+  - action: evidence.preserve
+    params: { scope: local_device }
+    reason: "Aggregate evidence across repeated alerts."
+  - action: traffic.rate_limit
+    params: { scope: local_device, profile: "steady" }
+    reason: "Apply steady controls to reduce repeated alert frequency."
+evidence_to_collect:
+  - artifact: alerts.timeline
+    params: { since_seconds: 21600 }
+dashboard_visualization:
+  layout: "garland_timeline"
+  highlights: ["alert_chain", "controls", "evidence_exports"]
+recovery_action:
+  action: system.recover
+  params: { mode: "soft" }
+  reason: "Clear garland posture after repeated alerts cease."
+failure_fallback:
+  action: device.isolate
+  params: { profile: "limited-egress" }
+  reason: "If alerts escalate, reduce connectivity."
+

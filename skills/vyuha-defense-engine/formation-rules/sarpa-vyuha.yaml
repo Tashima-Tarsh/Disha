@@ -1,0 +1,33 @@
+id: formation.sarpa
+name: "Sarpa Vyuha"
+description: "Serpentine containment: track and constrict suspicious process chains."
+triggers:
+  - id: process_chain_risk
+    when:
+      any:
+        - metric: suspicious_process_tree_depth
+          op: ">"
+          value: 6
+          window_seconds: 300
+defensive_actions:
+  - action: process.kill_local
+    params: { selector: "suspicious_tree" }
+    reason: "Terminate suspicious chained processes to stop spread."
+  - action: evidence.preserve
+    params: { scope: local_device }
+    reason: "Preserve chain evidence for later analysis."
+evidence_to_collect:
+  - artifact: process.tree_snapshot
+    params: { depth: 8 }
+dashboard_visualization:
+  layout: "serpentine_chain"
+  highlights: ["process_tree", "terminated_nodes", "evidence_links"]
+recovery_action:
+  action: system.recover
+  params: { mode: "soft" }
+  reason: "Return to baseline after chain ends."
+failure_fallback:
+  action: device.isolate
+  params: { profile: "lockdown" }
+  reason: "If process kill fails, isolate."
+

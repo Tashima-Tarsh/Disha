@@ -1,0 +1,35 @@
+id: formation.kurma
+name: "Kurma Vyuha"
+description: "Turtle defense: retract to minimal trusted services and preserve evidence."
+triggers:
+  - id: integrity_breach
+    when:
+      any:
+        - metric: integrity_breach_events
+          op: ">"
+          value: 0
+          window_seconds: 900
+defensive_actions:
+  - action: device.isolate
+    params: { profile: "lockdown" }
+    reason: "Contain aggressively during integrity breach signals."
+  - action: evidence.preserve
+    params: { scope: local_device }
+    reason: "Preserve artifacts before any remediation."
+evidence_to_collect:
+  - artifact: file.integrity_report
+    params: { scope: "system_paths" }
+  - artifact: logs.system
+    params: { since_seconds: 3600 }
+dashboard_visualization:
+  layout: "retraction"
+  highlights: ["lockdown_state", "integrity_events", "evidence_bundle"]
+recovery_action:
+  action: system.recover
+  params: { mode: "hard" }
+  reason: "Restore to known-good state after verification."
+failure_fallback:
+  action: system.recover
+  params: { mode: "hard" }
+  reason: "If isolation fails, proceed with hard recovery."
+

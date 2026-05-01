@@ -1,0 +1,33 @@
+id: formation.krauncha
+name: "Krauncha Vyuha"
+description: "Layered migration defense: protect critical services while shifting traffic to safe paths."
+triggers:
+  - id: service_instability
+    when:
+      any:
+        - metric: service_error_rate
+          op: ">"
+          value: 0.05
+          window_seconds: 300
+defensive_actions:
+  - action: traffic.rate_limit
+    params: { scope: local_device, profile: "stability" }
+    reason: "Prevent cascading failure under elevated error conditions."
+  - action: evidence.preserve
+    params: { scope: local_device }
+    reason: "Capture evidence for post-incident analysis."
+evidence_to_collect:
+  - artifact: logs.service
+    params: { since_seconds: 1800 }
+dashboard_visualization:
+  layout: "layered_flow"
+  highlights: ["error_rate", "rate_limits", "service_health"]
+recovery_action:
+  action: system.recover
+  params: { mode: "soft" }
+  reason: "Return to baseline once service stabilizes."
+failure_fallback:
+  action: device.isolate
+  params: { profile: "limited-egress" }
+  reason: "Escalate containment if instability appears adversarial."
+

@@ -1,0 +1,33 @@
+id: formation.pipilika
+name: "Pipilika Vyuha"
+description: "Ant defense: many small controls applied consistently (rate limits, session hygiene)."
+triggers:
+  - id: slow_abuse
+    when:
+      any:
+        - metric: auth_fail_rate
+          op: ">"
+          value: 10
+          window_seconds: 1800
+defensive_actions:
+  - action: traffic.rate_limit
+    params: { scope: local_device, profile: "steady" }
+    reason: "Apply steady rate limiting under slow abuse."
+  - action: session.revoke_local
+    params: { scope: local_device }
+    reason: "Refresh sessions to reduce token abuse."
+evidence_to_collect:
+  - artifact: logs.auth
+    params: { since_seconds: 7200 }
+dashboard_visualization:
+  layout: "micro_controls"
+  highlights: ["steady_rate_limits", "session_hygiene", "auth_trends"]
+recovery_action:
+  action: system.recover
+  params: { mode: "soft" }
+  reason: "Return to baseline after abuse ends."
+failure_fallback:
+  action: device.isolate
+  params: { profile: "limited-egress" }
+  reason: "If slow abuse escalates, restrict egress."
+

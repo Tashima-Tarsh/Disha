@@ -1,0 +1,33 @@
+id: formation.surya
+name: "Surya Vyuha"
+description: "Sunburst defense: illuminate and harden; prioritize visibility and identity hygiene."
+triggers:
+  - id: widespread_suspicion
+    when:
+      any:
+        - metric: anomaly_score
+          op: ">"
+          value: 0.9
+          window_seconds: 300
+defensive_actions:
+  - action: session.revoke_local
+    params: { scope: local_device }
+    reason: "Force session renewal under widespread suspicion."
+  - action: evidence.preserve
+    params: { scope: local_device }
+    reason: "Maximize evidence capture at peak anomaly."
+evidence_to_collect:
+  - artifact: logs.system
+    params: { since_seconds: 1800 }
+dashboard_visualization:
+  layout: "sunburst"
+  highlights: ["peak_anomaly", "revocations", "evidence"]
+recovery_action:
+  action: system.recover
+  params: { mode: "soft" }
+  reason: "Return to baseline after peak passes."
+failure_fallback:
+  action: device.isolate
+  params: { profile: "lockdown" }
+  reason: "If anomaly remains extreme, lock down."
+

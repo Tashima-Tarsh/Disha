@@ -1,0 +1,37 @@
+id: formation.nakshatra_mandala
+name: "Nakshatra Mandala Vyuha"
+description: "Star-ring monitoring: correlate multiple weak signals before containment."
+triggers:
+  - id: correlated_low_signals
+    when:
+      any:
+        - metric: anomaly_score
+          op: ">"
+          value: 0.7
+          window_seconds: 900
+        - metric: auth_fail_rate
+          op: ">"
+          value: 12
+          window_seconds: 900
+defensive_actions:
+  - action: evidence.preserve
+    params: { scope: local_device }
+    reason: "Collect correlated evidence across subsystems."
+  - action: traffic.rate_limit
+    params: { scope: local_device, profile: "observe" }
+    reason: "Reduce risk while correlation completes."
+evidence_to_collect:
+  - artifact: telemetry.snapshot
+    params: { include_network: true, include_process: true }
+dashboard_visualization:
+  layout: "constellation"
+  highlights: ["signal_correlation", "evidence_links", "controls"]
+recovery_action:
+  action: system.recover
+  params: { mode: "soft" }
+  reason: "Normalize after signals decline."
+failure_fallback:
+  action: device.isolate
+  params: { profile: "limited-egress" }
+  reason: "If correlation indicates escalation, restrict egress."
+

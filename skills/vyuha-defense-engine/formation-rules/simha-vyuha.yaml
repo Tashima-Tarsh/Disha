@@ -1,0 +1,33 @@
+id: formation.simha
+name: "Simha Vyuha"
+description: "Lion guard: protect crown jewels (vault/keys) with strict revocation and monitoring."
+triggers:
+  - id: vault_anomaly
+    when:
+      any:
+        - metric: vault_access_anomaly
+          op: ">"
+          value: 1
+          window_seconds: 600
+defensive_actions:
+  - action: session.revoke_local
+    params: { scope: local_device }
+    reason: "Stop suspicious vault access by revoking sessions."
+  - action: keys.rotate
+    params: { scope: local_device }
+    reason: "Rotate keys when vault access becomes suspicious."
+evidence_to_collect:
+  - artifact: vault.access_log
+    params: { since_seconds: 3600 }
+dashboard_visualization:
+  layout: "crown_jewel_guard"
+  highlights: ["vault_access", "revocations", "rotation_status"]
+recovery_action:
+  action: system.recover
+  params: { mode: "soft" }
+  reason: "Restore normal access after verification."
+failure_fallback:
+  action: device.isolate
+  params: { profile: "lockdown" }
+  reason: "If vault compromise is suspected, lock down."
+

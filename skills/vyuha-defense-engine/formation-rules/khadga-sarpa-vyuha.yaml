@@ -1,0 +1,35 @@
+id: formation.khadga_sarpa
+name: "Khadga-Sarpa Vyuha"
+description: "Sword-serpent: aggressive local containment plus surgical egress blocks."
+triggers:
+  - id: confirmed_malicious_process
+    when:
+      any:
+        - metric: confirmed_malicious_processes
+          op: ">"
+          value: 0
+          window_seconds: 300
+defensive_actions:
+  - action: process.kill_local
+    params: { selector: "confirmed_malicious" }
+    reason: "Stop confirmed malicious processes immediately."
+  - action: traffic.block
+    params: { scope: local_device, target: "process_egress_confirmed_malicious" }
+    reason: "Prevent confirmed malicious processes from exfiltrating data."
+evidence_to_collect:
+  - artifact: process.snapshot
+    params: { include_cmdline: true }
+  - artifact: network.connections_snapshot
+    params: { include_process: true }
+dashboard_visualization:
+  layout: "blade_and_chain"
+  highlights: ["confirmed_findings", "blocks_applied", "evidence_bundle"]
+recovery_action:
+  action: system.recover
+  params: { mode: "soft" }
+  reason: "Restore after containment."
+failure_fallback:
+  action: device.isolate
+  params: { profile: "lockdown" }
+  reason: "If confirmed containment fails, lock down."
+

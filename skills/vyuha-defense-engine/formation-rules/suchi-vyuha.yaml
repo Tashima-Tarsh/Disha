@@ -1,0 +1,30 @@
+id: formation.suchi
+name: "Suchi Vyuha"
+description: "Needle defense: precise blocking of a narrow threat channel."
+triggers:
+  - id: suspicious_port_activity
+    when:
+      any:
+        - metric: outbound_to_rare_ports
+          op: ">"
+          value: 50
+          window_seconds: 120
+defensive_actions:
+  - action: traffic.block
+    params: { scope: local_device, target: "rare_ports" }
+    reason: "Block rare-port outbound connections often associated with malware C2."
+evidence_to_collect:
+  - artifact: network.connections_snapshot
+    params: { include_process: true }
+dashboard_visualization:
+  layout: "needle_channel"
+  highlights: ["rare_ports", "blocked_flows", "top_processes"]
+recovery_action:
+  action: system.recover
+  params: { mode: "soft" }
+  reason: "Re-enable normal egress after confirming clean state."
+failure_fallback:
+  action: device.isolate
+  params: { profile: "limited-egress" }
+  reason: "Reduce egress further if needle block is insufficient."
+

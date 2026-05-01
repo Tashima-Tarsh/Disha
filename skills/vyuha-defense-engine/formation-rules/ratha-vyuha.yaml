@@ -1,0 +1,33 @@
+id: formation.ratha
+name: "Ratha Vyuha"
+description: "Chariot mobility: rapid switch between defensive profiles based on signals."
+triggers:
+  - id: shifting_conditions
+    when:
+      any:
+        - metric: anomaly_score
+          op: ">"
+          value: 0.8
+          window_seconds: 180
+defensive_actions:
+  - action: traffic.rate_limit
+    params: { scope: local_device, profile: "adaptive" }
+    reason: "Adapt defensively to changing conditions without over-blocking."
+  - action: evidence.preserve
+    params: { scope: local_device }
+    reason: "Capture evidence for adaptive decisions."
+evidence_to_collect:
+  - artifact: telemetry.snapshot
+    params: { include_network: true, include_process: true }
+dashboard_visualization:
+  layout: "adaptive_track"
+  highlights: ["signal_timeline", "profile_changes", "evidence"]
+recovery_action:
+  action: system.recover
+  params: { mode: "soft" }
+  reason: "Settle to baseline after adaptive period."
+failure_fallback:
+  action: device.isolate
+  params: { profile: "limited-egress" }
+  reason: "If adaptation fails, constrain connectivity."
+

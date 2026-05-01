@@ -1,0 +1,39 @@
+id: formation.sarvatobhadra
+name: "Sarvatobhadra Vyuha"
+description: "All-direction defense: broad perimeter hardening and evidence-first posture."
+triggers:
+  - id: multi_vector_attack
+    when:
+      any:
+        - metric: inbound_request_rate
+          op: ">"
+          value: 1500
+          window_seconds: 120
+        - metric: auth_fail_rate
+          op: ">"
+          value: 30
+          window_seconds: 300
+defensive_actions:
+  - action: traffic.rate_limit
+    params: { scope: local_device, profile: "global" }
+    reason: "Reduce load and abuse across all entry points."
+  - action: evidence.preserve
+    params: { scope: local_device }
+    reason: "Capture evidence during multi-vector pressure."
+evidence_to_collect:
+  - artifact: logs.web
+    params: { since_seconds: 1200 }
+  - artifact: logs.auth
+    params: { since_seconds: 1200 }
+dashboard_visualization:
+  layout: "all_sides"
+  highlights: ["global_rate_limit", "multi_signal", "evidence_status"]
+recovery_action:
+  action: system.recover
+  params: { mode: "soft" }
+  reason: "Step down controls after threat subsides."
+failure_fallback:
+  action: device.isolate
+  params: { profile: "lockdown" }
+  reason: "If pressure continues, isolate to protect integrity."
+

@@ -1,0 +1,33 @@
+id: formation.sura
+name: "Sura Vyuha"
+description: "Balanced defense: minimize disruption while enforcing hygiene controls."
+triggers:
+  - id: moderate_risk
+    when:
+      any:
+        - metric: anomaly_score
+          op: ">"
+          value: 0.75
+          window_seconds: 600
+defensive_actions:
+  - action: traffic.rate_limit
+    params: { scope: local_device, profile: "balanced" }
+    reason: "Reduce risk with minimal disruption."
+  - action: evidence.preserve
+    params: { scope: local_device }
+    reason: "Collect evidence for investigation."
+evidence_to_collect:
+  - artifact: telemetry.snapshot
+    params: { include_network: true, include_process: true }
+dashboard_visualization:
+  layout: "balanced_shield"
+  highlights: ["risk_level", "controls", "evidence"]
+recovery_action:
+  action: system.recover
+  params: { mode: "soft" }
+  reason: "Return to baseline after stability."
+failure_fallback:
+  action: device.isolate
+  params: { profile: "limited-egress" }
+  reason: "Escalate to limited egress if risk increases."
+

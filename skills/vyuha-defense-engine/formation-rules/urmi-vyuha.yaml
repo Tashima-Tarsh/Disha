@@ -1,0 +1,30 @@
+id: formation.urmi
+name: "Urmi Vyuha"
+description: "Wave defense: throttle surges and absorb spikes without system collapse."
+triggers:
+  - id: surge
+    when:
+      any:
+        - metric: inbound_request_rate
+          op: ">"
+          value: 2500
+          window_seconds: 60
+defensive_actions:
+  - action: traffic.rate_limit
+    params: { scope: local_device, profile: "surge" }
+    reason: "Absorb request surges safely."
+evidence_to_collect:
+  - artifact: logs.web
+    params: { since_seconds: 900 }
+dashboard_visualization:
+  layout: "waveform"
+  highlights: ["surge_level", "rate_limit_profile", "service_health"]
+recovery_action:
+  action: system.recover
+  params: { mode: "soft" }
+  reason: "Scale down surge controls after stabilization."
+failure_fallback:
+  action: device.isolate
+  params: { profile: "limited-egress" }
+  reason: "If surge appears malicious and persistent, restrict further."
+
