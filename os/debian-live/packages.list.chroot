@@ -20,8 +20,11 @@ chromium
 # Office suite (offline Word/Excel/PPT equivalents)
 libreoffice
 
+# systemd tooling
+systemd
+systemd-sysv
+
 # Convenience / diagnostics
 htop
 jq
 sqlite3
-

@@ -1,0 +1,12 @@
+[Unit]
+Description=DISHA OS Update Check Timer
+
+[Timer]
+OnBootSec=2min
+OnUnitActiveSec=30min
+RandomizedDelaySec=5min
+Unit=disha-update.service
+
+[Install]
+WantedBy=timers.target
+

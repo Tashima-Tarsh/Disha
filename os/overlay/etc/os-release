@@ -1,0 +1,10 @@
+NAME="DISHA OS"
+PRETTY_NAME="DISHA OS"
+ID=disha
+ID_LIKE=debian
+VERSION_ID="0.1"
+VERSION="0.1 (Appliance Preview)"
+HOME_URL="https://github.com/Tashima-Tarsh/Disha"
+SUPPORT_URL="https://github.com/Tashima-Tarsh/Disha/issues"
+BUG_REPORT_URL="https://github.com/Tashima-Tarsh/Disha/issues"
+

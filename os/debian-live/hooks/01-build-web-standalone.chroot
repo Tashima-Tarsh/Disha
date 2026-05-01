@@ -1,0 +1,27 @@
+#!/bin/sh
+set -eu
+
+# Build DISHA Web as Next "standalone" output so the OS boots without `npm install`.
+
+cd /opt/disha/web
+
+if [ -f package-lock.json ]; then
+  npm ci
+else
+  npm install
+fi
+
+npm run build
+
+rm -rf /opt/disha/web-standalone
+mkdir -p /opt/disha/web-standalone
+
+# Next standalone output includes server.js and a minimal node_modules subset.
+cp -a .next/standalone/* /opt/disha/web-standalone/
+mkdir -p /opt/disha/web-standalone/.next
+cp -a .next/static /opt/disha/web-standalone/.next/
+cp -a public /opt/disha/web-standalone/public
+
+# Reduce image size: remove build caches.
+rm -rf /opt/disha/web/node_modules/.cache || true
+

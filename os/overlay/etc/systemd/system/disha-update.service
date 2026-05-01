@@ -1,0 +1,10 @@
+[Unit]
+Description=DISHA OS Update Check (signed manifest)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+EnvironmentFile=/etc/disha/env
+ExecStart=/usr/local/bin/disha-update-check.sh
+

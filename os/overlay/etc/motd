@@ -1,0 +1,11 @@
+DISHA OS
+
+Local services:
+- DISHA Web:   http://127.0.0.1:3000/
+- DISHA Brain: http://127.0.0.1:8080/api/v1/health
+
+This is an appliance preview build. Production hardening uses:
+- Secure Boot + TPM measured boot
+- Immutable A/B updates
+- Signed update manifests
+

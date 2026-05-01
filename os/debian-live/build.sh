@@ -30,6 +30,10 @@ cp -f "${ROOT_DIR}/os/debian-live/packages.list.chroot" config/package-lists/dis
 mkdir -p config/includes.chroot
 rsync -a "${ROOT_DIR}/os/overlay/" config/includes.chroot/
 
+# Hooks (run inside the image build chroot)
+mkdir -p config/hooks/normal
+rsync -a "${ROOT_DIR}/os/debian-live/hooks/" config/hooks/normal/
+
 # Copy the repo code into /opt/disha so the OS can run DISHA services offline.
 mkdir -p config/includes.chroot/opt/disha
 rsync -a --delete \
