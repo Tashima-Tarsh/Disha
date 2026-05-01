@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="640" viewBox="0 0 1920 640">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#4F46E5"/>
+      <stop offset="1" stop-color="#38BDF8"/>
+    </linearGradient>
+    <filter id="paper" x="-10%" y="-10%" width="120%" height="120%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" stitchTiles="stitch" />
+      <feColorMatrix type="matrix" values="
+        1 0 0 0 0
+        0 1 0 0 0
+        0 0 1 0 0
+        0 0 0 0.06 0" />
+      <feComposite operator="in" in2="SourceGraphic"/>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1920" height="640" fill="#F7F4EE"/>
+  <rect width="1920" height="640" filter="url(#paper)" fill="#000000" opacity="0.06"/>
+
+  <!-- Top rule -->
+  <rect x="64" y="40" width="1792" height="4" rx="2" fill="url(#g)"/>
+
+  <!-- Watermark pattern (very light) -->
+  <g opacity="0.06" fill="none" stroke="#0F172A" stroke-width="2">
+    <path d="M160 150 h140 v140 h-140 z"/>
+    <path d="M1650 150 h140 v140 h-140 z"/>
+    <circle cx="260" cy="430" r="90"/>
+    <circle cx="1700" cy="440" r="90"/>
+    <path d="M1350 420 c40-60 140-60 180 0 c-40 60-140 60-180 0z"/>
+  </g>
+
+  <!-- Emblem -->
+  <g transform="translate(260,160)">
+    <path d="M200 0 L360 72 L360 250 C360 340 295 410 200 450 C105 410 40 340 40 250 L40 72 Z"
+          fill="none" stroke="url(#g)" stroke-width="18" stroke-linejoin="round"/>
+    <path d="M200 18 L340 82 L340 246 C340 325 282 385 200 418 C118 385 60 325 60 246 L60 82 Z"
+          fill="none" stroke="#0F172A" stroke-opacity="0.08" stroke-width="10" stroke-linejoin="round"/>
+
+    <!-- Neural graph -->
+    <g stroke="url(#g)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="132" cy="170" r="10" fill="url(#g)"/>
+      <circle cx="198" cy="128" r="10" fill="url(#g)"/>
+      <circle cx="252" cy="196" r="10" fill="url(#g)"/>
+      <circle cx="168" cy="244" r="10" fill="url(#g)"/>
+      <circle cx="114" cy="226" r="10" fill="url(#g)"/>
+      <path d="M132 170 L198 128 L252 196 L168 244 L114 226 Z"/>
+      <path d="M132 170 L168 244"/>
+    </g>
+
+    <!-- Circuit lines -->
+    <g stroke="url(#g)" stroke-width="8" stroke-linecap="round" fill="none" opacity="0.95">
+      <path d="M240 120 C270 120 285 140 285 168 L285 312"/>
+      <path d="M260 150 C295 150 312 172 312 200 L312 330"/>
+      <path d="M236 220 L312 220"/>
+      <circle cx="312" cy="220" r="6" fill="url(#g)"/>
+    </g>
+  </g>
+
+  <!-- Wordmark -->
+  <g transform="translate(780,250)">
+    <text x="0" y="0" font-family="Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial" font-size="112" letter-spacing="2" fill="#0F172A">
+      DISHA <tspan fill="url(#g)">OS</tspan>
+    </text>
+    <text x="6" y="90" font-family="Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial" font-size="28" letter-spacing="6" fill="#0F172A" opacity="0.75">
+      AI CYBER EVIDENCE OPERATING SYSTEM
+    </text>
+  </g>
+</svg>
+

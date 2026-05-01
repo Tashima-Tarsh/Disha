@@ -1,8 +1,8 @@
-# DISHA Brain
+# DISHA OS
 
-![DISHA Brain](docs/images/disha-brain-platform-premium.png)
+![DISHA OS](docs/images/disha-os-banner.svg)
 
-DISHA Brain is a single platform repository for secure AI execution and operator-grade control surfaces. It combines a hardened web app, a secure CLI/runtime, and a unified Brain backend with an edge telemetry agent.
+DISHA OS is an AI Cyber Evidence Operating System built around DISHA Brain: a local-first, audit-first intelligence core for secure automation, cyber monitoring, evidence-grade logging, and operator control surfaces.
 
 Primary runtime surfaces:
 
