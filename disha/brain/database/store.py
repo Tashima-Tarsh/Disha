@@ -67,6 +67,96 @@ class SQLiteStore:
             )
             return int(cursor.lastrowid)
 
+    def add_web_audit_event(self, event: dict[str, Any]) -> int:
+        with self.connection() as conn:
+            cursor = conn.execute(
+                """
+                insert into web_audit_events (request_id, user_id, action, resource, outcome, metadata_json)
+                values (?, ?, ?, ?, ?, ?)
+                """,
+                (
+                    str(event.get("requestId", "")),
+                    event.get("userId"),
+                    str(event.get("action", "")),
+                    event.get("resource"),
+                    str(event.get("outcome", "")),
+                    json.dumps(event.get("metadata") or {}),
+                ),
+            )
+            return int(cursor.lastrowid)
+
+    def get_ai_cache(self, cache_key: str) -> dict[str, Any] | None:
+        with self.connection() as conn:
+            row = conn.execute(
+                "select cache_key, content_type, body_text, created_at from ai_cache where cache_key = ?",
+                (cache_key,),
+            ).fetchone()
+        return dict(row) if row else None
+
+    def set_ai_cache(self, cache_key: str, content_type: str, body_text: str, created_at: int) -> None:
+        with self.connection() as conn:
+            conn.execute(
+                """
+                insert into ai_cache (cache_key, content_type, body_text, created_at)
+                values (?, ?, ?, ?)
+                on conflict(cache_key) do update set
+                  content_type=excluded.content_type,
+                  body_text=excluded.body_text,
+                  created_at=excluded.created_at
+                """,
+                (cache_key, content_type, body_text, created_at),
+            )
+
+    def upsert_graph(self, user_id: str, nodes: list[dict[str, Any]], edges: list[dict[str, Any]]) -> None:
+        with self.connection() as conn:
+            for n in nodes:
+                conn.execute(
+                    """
+                    insert into memory_graph_nodes (user_id, node_id, label, kind, weight)
+                    values (?, ?, ?, ?, ?)
+                    on conflict(user_id, node_id) do update set
+                      label=excluded.label,
+                      kind=excluded.kind,
+                      weight=memory_graph_nodes.weight + excluded.weight
+                    """,
+                    (user_id, n["id"], n["label"], n["kind"], float(n["weight"])),
+                )
+            for e in edges:
+                edge_id = f"{e['from']}=>{e['to']}:{e['kind']}"
+                conn.execute(
+                    """
+                    insert into memory_graph_edges (user_id, edge_id, from_id, to_id, kind, weight)
+                    values (?, ?, ?, ?, ?, ?)
+                    on conflict(user_id, edge_id) do update set
+                      weight=memory_graph_edges.weight + excluded.weight
+                    """,
+                    (user_id, edge_id, e["from"], e["to"], e["kind"], float(e["weight"])),
+                )
+
+    def get_graph(self, user_id: str, limit: int = 200) -> dict[str, Any]:
+        with self.connection() as conn:
+            nodes = conn.execute(
+                """
+                select node_id as id, label, kind, weight
+                from memory_graph_nodes
+                where user_id = ?
+                order by weight desc
+                limit ?
+                """,
+                (user_id, limit),
+            ).fetchall()
+            edges = conn.execute(
+                """
+                select from_id as "from", to_id as "to", kind, weight
+                from memory_graph_edges
+                where user_id = ?
+                order by weight desc
+                limit ?
+                """,
+                (user_id, limit),
+            ).fetchall()
+        return {"nodes": [dict(r) for r in nodes], "edges": [dict(r) for r in edges]}
+
     def add_risk_log(
         self,
         user_id: str,

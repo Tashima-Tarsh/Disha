@@ -41,4 +41,41 @@ create table if not exists telemetry (
   active_app text,
   created_at text not null default current_timestamp
 );
+
+create table if not exists web_audit_events (
+  id integer primary key autoincrement,
+  request_id text not null,
+  user_id text,
+  action text not null,
+  resource text,
+  outcome text not null,
+  metadata_json text not null default '{}',
+  created_at text not null default current_timestamp
+);
+
+create table if not exists ai_cache (
+  cache_key text primary key,
+  content_type text not null,
+  body_text text not null,
+  created_at integer not null
+);
+
+create table if not exists memory_graph_nodes (
+  user_id text not null,
+  node_id text not null,
+  label text not null,
+  kind text not null,
+  weight real not null,
+  primary key (user_id, node_id)
+);
+
+create table if not exists memory_graph_edges (
+  user_id text not null,
+  edge_id text not null,
+  from_id text not null,
+  to_id text not null,
+  kind text not null,
+  weight real not null,
+  primary key (user_id, edge_id)
+);
 """

@@ -1,4 +1,5 @@
 import { getRedisClient } from "../redis";
+import { brainFetch } from "../brain-client";
 
 export interface GraphNode {
   id: string;
@@ -48,7 +49,19 @@ function bump<K extends string>(map: Map<K, number>, key: K, delta: number): voi
 
 export async function upsertGraphFromText(userId: string, text: string): Promise<void> {
   const redis = await getRedisClient();
-  if (!redis) return;
+  if (!redis) {
+    try {
+      await brainFetch("/api/v1/internal/memory-graph/upsert", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId, text }),
+        timeoutMs: 5_000,
+      });
+    } catch {
+      // Best-effort.
+    }
+    return;
+  }
 
   const entities = extractEntities(text);
   if (entities.length === 0) return;
@@ -67,7 +80,18 @@ export async function upsertGraphFromText(userId: string, text: string): Promise
 
 export async function getMemoryGraph(userId: string, limit: number = 200): Promise<MemoryGraph> {
   const redis = await getRedisClient();
-  if (!redis) return { nodes: [], edges: [] };
+  if (!redis) {
+    try {
+      const res = await brainFetch(`/api/v1/internal/memory-graph?userId=${encodeURIComponent(userId)}&limit=${encodeURIComponent(String(limit))}`, {
+        method: "GET",
+        timeoutMs: 5_000,
+      });
+      if (!res.ok) return { nodes: [], edges: [] };
+      return (await res.json()) as MemoryGraph;
+    } catch {
+      return { nodes: [], edges: [] };
+    }
+  }
 
   const rawNodes = await redis.hGetAll(`graph:nodes:${userId}`);
   const rawEdges = await redis.hGetAll(`graph:edges:${userId}`);
@@ -133,4 +157,3 @@ export function buildGraphDelta(userId: string, text: string): MemoryGraph {
 
   return { nodes, edges };
 }
-

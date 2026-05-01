@@ -32,6 +32,9 @@ const envSchema = z.object({
   OPENAI_BASE_URL: z.string().url().default("https://api.openai.com/v1"),
   OPENAI_PROJECT: z.string().optional(),
   OPENAI_ORGANIZATION: z.string().optional(),
+
+  // Optional: Web can persist audit/cache/graph to DISHA Brain (SQLite) when Postgres/Redis are absent.
+  DISHA_BRAIN_API_TOKEN: z.string().optional(),
   NODE_ENV: z.string().default("development"),
 });
 

@@ -3,6 +3,7 @@ from __future__ import annotations
 import uuid
 
 from fastapi import APIRouter, Depends, HTTPException, status
+from pydantic import BaseModel, Field
 
 from ..brain.anomaly import AnomalyDetector
 from ..brain.decision import DecisionEngine
@@ -75,6 +76,26 @@ def get_context() -> AppContext:
     return context
 
 
+class WebAuditEventIn(BaseModel):
+    requestId: str
+    userId: str | None = None
+    action: str
+    resource: str | None = None
+    outcome: str
+    metadata: dict = Field(default_factory=dict)
+
+
+class CacheValueOut(BaseModel):
+    contentType: str
+    bodyText: str
+    createdAt: int
+
+
+class GraphUpsertIn(BaseModel):
+    userId: str
+    text: str
+
+
 @router.get("/health", response_model=HealthResponse)
 async def health() -> HealthResponse:
     modules = context.module_health()
@@ -85,6 +106,94 @@ async def health() -> HealthResponse:
         websocket_path="/ws/alerts",
         modules=modules,
     )
+
+
+@router.post(
+    "/internal/audit",
+    dependencies=[Depends(require_api_token)],
+)
+async def internal_audit(
+    event: WebAuditEventIn, app: AppContext = Depends(get_context)
+) -> dict[str, str]:
+    app.store.add_web_audit_event(event.model_dump())
+    return {"status": "stored"}
+
+
+@router.get(
+    "/internal/cache/{cache_key}",
+    dependencies=[Depends(require_api_token)],
+)
+async def internal_cache_get(
+    cache_key: str, app: AppContext = Depends(get_context)
+) -> CacheValueOut:
+    row = app.store.get_ai_cache(cache_key)
+    if not row:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="not_found")
+    return CacheValueOut(
+        contentType=str(row["content_type"]),
+        bodyText=str(row["body_text"]),
+        createdAt=int(row["created_at"]),
+    )
+
+
+@router.put(
+    "/internal/cache/{cache_key}",
+    dependencies=[Depends(require_api_token)],
+)
+async def internal_cache_put(
+    cache_key: str, value: CacheValueOut, app: AppContext = Depends(get_context)
+) -> dict[str, str]:
+    app.store.set_ai_cache(
+        cache_key=cache_key,
+        content_type=value.contentType,
+        body_text=value.bodyText,
+        created_at=value.createdAt,
+    )
+    return {"status": "stored"}
+
+
+@router.post(
+    "/internal/memory-graph/upsert",
+    dependencies=[Depends(require_api_token)],
+)
+async def internal_graph_upsert(
+    payload: GraphUpsertIn, app: AppContext = Depends(get_context)
+) -> dict[str, str]:
+    # Use same extraction logic as web (keep it simple and privacy-first).
+    # Minimal extraction: treat input as a user message delta and extract a few "entities".
+    entities = []
+    for token in payload.text.replace("\n", " ").split(" "):
+        t = token.strip()
+        if len(t) < 3:
+            continue
+        if t.startswith("http://") or t.startswith("https://"):
+            entities.append(t[:120])
+        if any(t.endswith(ext) for ext in (".ts", ".tsx", ".js", ".py", ".md", ".json", ".yml", ".yaml")):
+            entities.append(t[:120])
+        if t[:1].isupper() and t[1:].isalnum():
+            entities.append(t[:64])
+        if len(entities) >= 40:
+            break
+
+    user_node = {"id": f"user:{payload.userId}", "label": payload.userId, "kind": "user", "weight": 1.0}
+    nodes = [user_node]
+    edges = []
+    for e in entities:
+        nodes.append({"id": f"entity:{e}", "label": e, "kind": "entity", "weight": 1.0})
+        edges.append({"from": user_node["id"], "to": f"entity:{e}", "kind": "mentions", "weight": 1.0})
+
+    app.store.upsert_graph(payload.userId, nodes=nodes, edges=edges)
+    return {"status": "stored"}
+
+
+@router.get(
+    "/internal/memory-graph",
+    dependencies=[Depends(require_api_token)],
+)
+async def internal_graph_get(
+    userId: str, limit: int = 200, app: AppContext = Depends(get_context)
+) -> dict:
+    return app.store.get_graph(userId, limit=limit)
 
 
 @router.get(

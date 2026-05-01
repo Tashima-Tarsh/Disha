@@ -1,5 +1,6 @@
 import crypto from "node:crypto";
 import { getEnv } from "../env";
+import { brainFetch } from "../brain-client";
 import { getRedisClient } from "../redis";
 
 export type AgentMode = "eco" | "balanced" | "deep";
@@ -165,11 +166,21 @@ type CachedValue = { contentType: string; bodyText: string; createdAt: number };
 
 export async function getCachedResponse(cacheKey: string): Promise<CachedValue | null> {
   const redis = await getRedisClient();
-  if (!redis) return null;
-  const raw = await redis.get(`ai:cache:${cacheKey}`);
-  if (!raw) return null;
+  if (redis) {
+    const raw = await redis.get(`ai:cache:${cacheKey}`);
+    if (!raw) return null;
+    try {
+      return JSON.parse(raw) as CachedValue;
+    } catch {
+      return null;
+    }
+  }
+
+  // OS-local persistence: fall back to Brain (SQLite).
   try {
-    return JSON.parse(raw) as CachedValue;
+    const res = await brainFetch(`/api/v1/internal/cache/${encodeURIComponent(cacheKey)}`, { method: "GET", timeoutMs: 5_000 });
+    if (!res.ok) return null;
+    return (await res.json()) as CachedValue;
   } catch {
     return null;
   }
@@ -178,8 +189,21 @@ export async function getCachedResponse(cacheKey: string): Promise<CachedValue |
 export async function setCachedResponse(cacheKey: string, value: CachedValue): Promise<void> {
   const env = getEnv();
   const redis = await getRedisClient();
-  if (!redis) return;
   const serialized = JSON.stringify(value);
   if (Buffer.byteLength(serialized, "utf8") > env.DISHA_AGENT_MAX_CACHE_BYTES) return;
-  await redis.setEx(`ai:cache:${cacheKey}`, env.DISHA_AGENT_CACHE_TTL_SECONDS, serialized);
+  if (redis) {
+    await redis.setEx(`ai:cache:${cacheKey}`, env.DISHA_AGENT_CACHE_TTL_SECONDS, serialized);
+    return;
+  }
+
+  try {
+    await brainFetch(`/api/v1/internal/cache/${encodeURIComponent(cacheKey)}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: serialized,
+      timeoutMs: 5_000,
+    });
+  } catch {
+    // Best-effort cache only.
+  }
 }
