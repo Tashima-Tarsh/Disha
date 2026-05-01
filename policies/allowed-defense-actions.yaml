@@ -44,6 +44,10 @@ policy:
       description: "Generate incident reports and evidence bundles."
       scope: ["local_device", "owned_infrastructure"]
       admin_approval_required: false
+    - id: alert.emit
+      description: "Notify administrators/operators through approved channels."
+      scope: ["local_device", "owned_infrastructure"]
+      admin_approval_required: false
     - id: system.recover
       description: "Recover system to a known-good state using safe mode/rollback."
       scope: ["local_device"]
@@ -56,4 +60,3 @@ policy:
       description: "Run bounded, non-destructive simulations in local/owned test environments."
       scope: ["local_device", "owned_infrastructure"]
       admin_approval_required: true
-

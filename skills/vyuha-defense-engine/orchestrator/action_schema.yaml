@@ -1,0 +1,80 @@
+# Vyuha Defense Engine Orchestrator - Action Schema (defensive-only)
+#
+# This is a lightweight, human-readable schema reference.
+# Enforcement is implemented in orchestrator.py with deny-by-default.
+#
+# All actions MUST comply with:
+# - policies/no-first-use-policy.md
+# - policies/allowed-defense-actions.yaml
+
+version: "1.0"
+
+allowed_actions:
+  - id: block_ip
+    policy_action: traffic.block
+    params:
+      ip: "string"
+  - id: block_domain
+    policy_action: traffic.block
+    params:
+      domain: "string"
+  - id: rate_limit_source
+    policy_action: traffic.rate_limit
+    params:
+      source: "string"
+      profile: "string"
+  - id: quarantine_file
+    policy_action: file.quarantine
+    params:
+      path: "string"
+  - id: kill_local_process
+    policy_action: process.kill_local
+    params:
+      pid: "int (optional)"
+      name: "string (optional)"
+  - id: isolate_network
+    policy_action: device.isolate
+    params:
+      profile: "string"
+  - id: lock_sensitive_folder
+    policy_action: file.quarantine
+    params:
+      path: "string"
+  - id: revoke_session
+    policy_action: session.revoke_local
+    params:
+      session_id: "string (optional)"
+  - id: rotate_keys
+    policy_action: keys.rotate
+    params:
+      scope: "string (default: local_device)"
+  - id: start_honeypot
+    policy_action: honeypot.deploy_owned
+    params:
+      template: "string"
+  - id: capture_logs
+    policy_action: evidence.preserve
+    params:
+      since_seconds: "int"
+  - id: capture_process_tree
+    policy_action: evidence.preserve
+    params:
+      depth: "int"
+  - id: capture_network_flows
+    policy_action: evidence.preserve
+    params:
+      since_seconds: "int"
+  - id: generate_evidence_report
+    policy_action: report.generate
+    params:
+      format: "string (markdown|json|pdf)"
+  - id: notify_admin
+    policy_action: alert.emit
+    params:
+      channel: "string (log|email|webhook)"
+      message: "string"
+  - id: start_recovery
+    policy_action: system.recover
+    params:
+      mode: "string (soft|hard)"
+
