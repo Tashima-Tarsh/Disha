@@ -168,19 +168,34 @@ async def internal_graph_upsert(
             continue
         if t.startswith("http://") or t.startswith("https://"):
             entities.append(t[:120])
-        if any(t.endswith(ext) for ext in (".ts", ".tsx", ".js", ".py", ".md", ".json", ".yml", ".yaml")):
+        if any(
+            t.endswith(ext)
+            for ext in (".ts", ".tsx", ".js", ".py", ".md", ".json", ".yml", ".yaml")
+        ):
             entities.append(t[:120])
         if t[:1].isupper() and t[1:].isalnum():
             entities.append(t[:64])
         if len(entities) >= 40:
             break
 
-    user_node = {"id": f"user:{payload.userId}", "label": payload.userId, "kind": "user", "weight": 1.0}
+    user_node = {
+        "id": f"user:{payload.userId}",
+        "label": payload.userId,
+        "kind": "user",
+        "weight": 1.0,
+    }
     nodes = [user_node]
     edges = []
     for e in entities:
         nodes.append({"id": f"entity:{e}", "label": e, "kind": "entity", "weight": 1.0})
-        edges.append({"from": user_node["id"], "to": f"entity:{e}", "kind": "mentions", "weight": 1.0})
+        edges.append(
+            {
+                "from": user_node["id"],
+                "to": f"entity:{e}",
+                "kind": "mentions",
+                "weight": 1.0,
+            }
+        )
 
     app.store.upsert_graph(payload.userId, nodes=nodes, edges=edges)
     return {"status": "stored"}

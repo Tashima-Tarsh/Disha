@@ -93,7 +93,9 @@ class SQLiteStore:
             ).fetchone()
         return dict(row) if row else None
 
-    def set_ai_cache(self, cache_key: str, content_type: str, body_text: str, created_at: int) -> None:
+    def set_ai_cache(
+        self, cache_key: str, content_type: str, body_text: str, created_at: int
+    ) -> None:
         with self.connection() as conn:
             conn.execute(
                 """
@@ -107,7 +109,9 @@ class SQLiteStore:
                 (cache_key, content_type, body_text, created_at),
             )
 
-    def upsert_graph(self, user_id: str, nodes: list[dict[str, Any]], edges: list[dict[str, Any]]) -> None:
+    def upsert_graph(
+        self, user_id: str, nodes: list[dict[str, Any]], edges: list[dict[str, Any]]
+    ) -> None:
         with self.connection() as conn:
             for n in nodes:
                 conn.execute(
@@ -130,7 +134,14 @@ class SQLiteStore:
                     on conflict(user_id, edge_id) do update set
                       weight=memory_graph_edges.weight + excluded.weight
                     """,
-                    (user_id, edge_id, e["from"], e["to"], e["kind"], float(e["weight"])),
+                    (
+                        user_id,
+                        edge_id,
+                        e["from"],
+                        e["to"],
+                        e["kind"],
+                        float(e["weight"]),
+                    ),
                 )
 
     def get_graph(self, user_id: str, limit: int = 200) -> dict[str, Any]:
