@@ -1,0 +1,59 @@
+policy:
+  name: "VyuhaOS Allowed Defensive Actions"
+  version: "1.0"
+  scope: "all"
+  defaults:
+    require_audit: true
+    require_reason: true
+    require_timeouts: true
+    require_principal: true
+  allowed_actions:
+    - id: traffic.block
+      description: "Block inbound or outbound traffic to protect local/owned systems."
+      scope: ["local_device", "owned_infrastructure"]
+      admin_approval_required: false
+    - id: traffic.rate_limit
+      description: "Rate-limit requests/flows to reduce abuse impact."
+      scope: ["local_device", "owned_infrastructure"]
+      admin_approval_required: false
+    - id: device.isolate
+      description: "Isolate device networking according to an isolation profile."
+      scope: ["local_device"]
+      admin_approval_required: true
+    - id: file.quarantine
+      description: "Quarantine a local file to prevent execution and preserve evidence."
+      scope: ["local_device"]
+      admin_approval_required: true
+    - id: process.kill_local
+      description: "Terminate a malicious local process."
+      scope: ["local_device"]
+      admin_approval_required: true
+    - id: session.revoke_local
+      description: "Revoke local sessions/tokens and force re-authentication."
+      scope: ["local_device"]
+      admin_approval_required: true
+    - id: keys.rotate
+      description: "Rotate cryptographic keys used by VyuhaOS services."
+      scope: ["local_device", "owned_infrastructure"]
+      admin_approval_required: true
+    - id: evidence.preserve
+      description: "Preserve logs and artifacts in a tamper-evident store."
+      scope: ["local_device", "owned_infrastructure"]
+      admin_approval_required: false
+    - id: report.generate
+      description: "Generate incident reports and evidence bundles."
+      scope: ["local_device", "owned_infrastructure"]
+      admin_approval_required: false
+    - id: system.recover
+      description: "Recover system to a known-good state using safe mode/rollback."
+      scope: ["local_device"]
+      admin_approval_required: true
+    - id: honeypot.deploy_owned
+      description: "Deploy honeypots in owned/authorized lab environments only."
+      scope: ["owned_infrastructure"]
+      admin_approval_required: true
+    - id: simulation.run_internal
+      description: "Run bounded, non-destructive simulations in local/owned test environments."
+      scope: ["local_device", "owned_infrastructure"]
+      admin_approval_required: true
+

@@ -1,0 +1,34 @@
+policy:
+  name: "VyuhaOS Forbidden Actions"
+  version: "1.0"
+  scope: "all"
+  deny_by_default: true
+  forbidden_actions:
+    - id: hacking_back
+      description: "Any retaliatory hacking or counter-attack against external systems."
+      examples:
+        - "Exploit attacker infrastructure"
+        - "DDoS or disrupt external services"
+    - id: exploit_development
+      description: "Creation or execution of exploits targeting external systems."
+    - id: credential_theft
+      description: "Any attempt to obtain credentials unlawfully (phishing, keylogging, dumping)."
+    - id: malware_deployment
+      description: "Any creation, distribution, or deployment of malware."
+    - id: unauthorized_scanning
+      description: "Scanning of networks/systems not explicitly owned/authorized."
+      examples:
+        - "Internet-wide scanning"
+        - "Port scanning third-party IP ranges"
+    - id: destructive_retaliation
+      description: "Destructive actions against external systems or data."
+      examples:
+        - "Wipe attacker disks"
+        - "Encrypt attacker systems"
+    - id: third_party_attack
+      description: "Any action that attacks or compromises third-party infrastructure."
+    - id: unauthorized_access
+      description: "Attempting access without explicit authorization."
+    - id: persistence_or_propagation
+      description: "Worm-like propagation, self-spreading behavior, or covert persistence on external systems."
+
