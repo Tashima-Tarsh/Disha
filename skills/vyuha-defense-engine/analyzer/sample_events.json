@@ -1,0 +1,138 @@
+[
+  {
+    "event_id": "e_ransom_1",
+    "event_type": "ransomware_behavior",
+    "ts_ms": 1767210000000,
+    "device_id": "desktop-1",
+    "user_id": "local-user",
+    "source": "edr",
+    "signals": { "high_entropy_writes": 120, "shadow_copy_tamper": true }
+  },
+  {
+    "event_id": "e_bf_1",
+    "event_type": "brute_force_login",
+    "ts_ms": 1767210001000,
+    "device_id": "desktop-1",
+    "user_id": "local-user",
+    "source": "auth",
+    "signals": { "auth_fail_rate": 55 }
+  },
+  {
+    "event_id": "e_proc_1",
+    "event_type": "suspicious_process_behavior",
+    "ts_ms": 1767210002000,
+    "device_id": "desktop-1",
+    "user_id": "local-user",
+    "source": "edr",
+    "signals": { "spawn_depth": 9, "cpu_spike": true }
+  },
+  {
+    "event_id": "e_priv_1",
+    "event_type": "privilege_escalation_attempt",
+    "ts_ms": 1767210003000,
+    "device_id": "desktop-1",
+    "user_id": "local-user",
+    "source": "os_audit",
+    "signals": { "sudo_denies": 3 }
+  },
+  {
+    "event_id": "e_file_1",
+    "event_type": "unauthorized_file_access",
+    "ts_ms": 1767210004000,
+    "device_id": "desktop-1",
+    "user_id": "local-user",
+    "source": "fs",
+    "signals": { "path": "/etc/shadow", "process": "unknown" }
+  },
+  {
+    "event_id": "e_exfil_1",
+    "event_type": "data_exfiltration_pattern",
+    "ts_ms": 1767210005000,
+    "device_id": "desktop-1",
+    "user_id": "local-user",
+    "source": "net",
+    "signals": { "outbound_bytes": 120000000, "unique_domains": 40 }
+  },
+  {
+    "event_id": "e_persist_1",
+    "event_type": "malware_persistence",
+    "ts_ms": 1767210006000,
+    "device_id": "desktop-1",
+    "user_id": "local-user",
+    "source": "os_audit",
+    "signals": { "new_service": "weirdsvc", "unsigned": true }
+  },
+  {
+    "event_id": "e_rootkit_1",
+    "event_type": "rootkit_suspicion",
+    "ts_ms": 1767210007000,
+    "device_id": "desktop-1",
+    "user_id": "local-user",
+    "source": "integrity",
+    "signals": { "integrity_failures": 2 }
+  },
+  {
+    "event_id": "e_lat_1",
+    "event_type": "lateral_movement",
+    "ts_ms": 1767210008000,
+    "device_id": "desktop-1",
+    "user_id": "local-user",
+    "source": "net",
+    "signals": { "internal_conn_attempts": 120 }
+  },
+  {
+    "event_id": "e_phish_1",
+    "event_type": "phishing_download",
+    "ts_ms": 1767210009000,
+    "device_id": "desktop-1",
+    "user_id": "local-user",
+    "source": "browser",
+    "signals": { "downloaded": "invoice.exe", "origin": "unknown" }
+  },
+  {
+    "event_id": "e_out_1",
+    "event_type": "abnormal_outbound_traffic",
+    "ts_ms": 1767210010000,
+    "device_id": "desktop-1",
+    "user_id": "local-user",
+    "source": "net",
+    "signals": { "rare_ports": 80 }
+  },
+  {
+    "event_id": "e_dns_1",
+    "event_type": "suspicious_dns",
+    "ts_ms": 1767210011000,
+    "device_id": "desktop-1",
+    "user_id": "local-user",
+    "source": "dns",
+    "signals": { "nxdomain_rate": 0.6, "unique_domains": 300 }
+  },
+  {
+    "event_id": "e_storm_1",
+    "event_type": "failed_login_storm",
+    "ts_ms": 1767210012000,
+    "device_id": "desktop-1",
+    "user_id": "local-user",
+    "source": "auth",
+    "signals": { "failures": 500 }
+  },
+  {
+    "event_id": "e_usb_1",
+    "event_type": "usb_attack_risk",
+    "ts_ms": 1767210013000,
+    "device_id": "desktop-1",
+    "user_id": "local-user",
+    "source": "usb",
+    "signals": { "device_class": "HID+Storage", "new_device": true }
+  },
+  {
+    "event_id": "e_supply_1",
+    "event_type": "supply_chain_package_risk",
+    "ts_ms": 1767210014000,
+    "device_id": "desktop-1",
+    "user_id": "local-user",
+    "source": "sbom",
+    "signals": { "typosquat_suspected": true }
+  }
+]
+
