@@ -1,0 +1,25 @@
+# DISHA OS environment (systemd EnvironmentFile)
+
+# Web UI
+DISHA_AUTH_MODE=dev-jwt
+DISHA_JWT_SECRET=replace-with-at-least-32-random-characters
+DISHA_DEV_PASSWORD=replace-with-local-password
+DISHA_ALLOWED_ORIGINS=http://127.0.0.1:3000
+
+# Use OpenAI when internet is available. Key is injected by the OS setup flow.
+OPENAI_MODEL=gpt-5.4-mini
+OPENAI_BASE_URL=https://api.openai.com/v1
+
+# Prefer local-first (no external DB). These can be enabled later if desired.
+DATABASE_URL=
+REDIS_URL=
+
+# Agent runtime
+DISHA_AGENT_MODE=balanced
+DISHA_AGENT_INPUT_BUDGET_TOKENS=8000
+DISHA_AGENT_CACHE_TTL_SECONDS=3600
+DISHA_AGENT_MAX_CACHE_BYTES=250000
+DISHA_WORKFLOW_NODE_TIMEOUT_MS=15000
+DISHA_WORKFLOW_TOTAL_TIMEOUT_MS=60000
+DISHA_WORKFLOW_ALLOWED_HOSTS=127.0.0.1:3000,127.0.0.1:8080
+

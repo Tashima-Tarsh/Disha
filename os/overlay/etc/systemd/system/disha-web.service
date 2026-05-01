@@ -1,0 +1,16 @@
+[Unit]
+Description=DISHA Web UI (local)
+After=network-online.target disha-brain.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+EnvironmentFile=/etc/disha/env
+WorkingDirectory=/opt/disha/web
+ExecStart=/usr/bin/npm run start --silent
+Restart=always
+RestartSec=2
+
+[Install]
+WantedBy=multi-user.target
+

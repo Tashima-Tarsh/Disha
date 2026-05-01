@@ -1,0 +1,15 @@
+[Unit]
+Description=DISHA Kiosk UI (Chromium)
+After=graphical.target disha-web.service
+Wants=graphical.target
+
+[Service]
+Type=simple
+EnvironmentFile=/etc/disha/env
+ExecStart=/usr/local/bin/disha-kiosk.sh
+Restart=always
+RestartSec=2
+
+[Install]
+WantedBy=graphical.target
+

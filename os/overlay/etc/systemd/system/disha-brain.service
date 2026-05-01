@@ -1,0 +1,19 @@
+[Unit]
+Description=DISHA Brain (local)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+EnvironmentFile=/etc/disha/env
+WorkingDirectory=/opt/disha
+ExecStart=/usr/bin/python3 -m disha.brain
+Restart=always
+RestartSec=2
+
+# No-failure rules: every async flow must have a timeout (Brain has internal timeouts for probes).
+# Health check is provided by /api/v1/health
+
+[Install]
+WantedBy=multi-user.target
+

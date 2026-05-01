@@ -1,0 +1,27 @@
+# DISHA OS packages (installed into the live filesystem)
+
+# Base + network + certs
+ca-certificates
+curl
+wget
+openssh-server
+ufw
+
+# Runtime for DISHA services
+python3
+python3-venv
+python3-pip
+nodejs
+npm
+
+# UI shell
+chromium
+
+# Office suite (offline Word/Excel/PPT equivalents)
+libreoffice
+
+# Convenience / diagnostics
+htop
+jq
+sqlite3
+
