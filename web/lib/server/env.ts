@@ -25,6 +25,13 @@ const envSchema = z.object({
   DISHA_WORKFLOW_TOTAL_TIMEOUT_MS: z.coerce.number().int().positive().default(60_000),
   // Comma-separated allowlist of hosts for workflow HTTP nodes. Empty => deny all.
   DISHA_WORKFLOW_ALLOWED_HOSTS: z.string().optional(),
+
+  // Model provider (OpenAI) - server-side only.
+  OPENAI_API_KEY: z.string().optional(),
+  OPENAI_MODEL: z.string().default("gpt-5.4-mini"),
+  OPENAI_BASE_URL: z.string().url().default("https://api.openai.com/v1"),
+  OPENAI_PROJECT: z.string().optional(),
+  OPENAI_ORGANIZATION: z.string().optional(),
   NODE_ENV: z.string().default("development"),
 });
 

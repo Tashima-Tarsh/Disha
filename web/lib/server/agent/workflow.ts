@@ -1,6 +1,7 @@
 import { getEnv } from "../env";
 import type { RequestContext } from "../types";
 import { applyTokenEconomy, getCachedResponse, setCachedResponse } from "./tokenEconomy";
+import { callOpenAiResponses } from "../openai";
 
 export type WorkflowNodeType = "chat" | "http" | "sleep" | "set";
 
@@ -71,19 +72,22 @@ async function chatNode(ctx: RequestContext, input: AnyRecord, timeoutMs: number
   const cacheHit = await getCachedResponse(decision.cacheKey);
   if (cacheHit) return { cached: true, contentType: cacheHit.contentType, body: cacheHit.bodyText };
 
-  const response = await fetch(`${env.DISHA_BACKEND_URL}/api/chat`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    signal: AbortSignal.timeout(timeoutMs),
-    body: JSON.stringify({
-      ...optimizedBody,
-      metadata: {
-        ...(typeof optimizedBody.metadata === "object" && optimizedBody.metadata !== null ? optimizedBody.metadata : {}),
-        requestId: ctx.requestId,
-        userId: ctx.principal.userId,
-      },
-    }),
-  });
+  const response = env.OPENAI_API_KEY
+    ? await callOpenAiResponses(optimizedBody, { timeoutMs, requestId: ctx.requestId })
+    : await fetch(`${env.DISHA_BACKEND_URL}/api/chat`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        signal: AbortSignal.timeout(timeoutMs),
+        body: JSON.stringify({
+          ...optimizedBody,
+          metadata: {
+            ...(typeof optimizedBody.metadata === "object" && optimizedBody.metadata !== null ? optimizedBody.metadata : {}),
+            requestId: ctx.requestId,
+            userId: ctx.principal.userId,
+          },
+        }),
+      });
+
   const contentType = response.headers.get("Content-Type") ?? "application/json";
   const text = await response.text();
   if (!response.ok) throw Object.assign(new Error("chat backend failed"), { status: response.status });

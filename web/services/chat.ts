@@ -2,6 +2,7 @@ import { audit } from "@/lib/server/audit";
 import { getEnv } from "@/lib/server/env";
 import { upsertGraphFromText } from "@/lib/server/agent/memoryGraph";
 import { applyTokenEconomy, getCachedResponse, setCachedResponse } from "@/lib/server/agent/tokenEconomy";
+import { callOpenAiResponses } from "@/lib/server/openai";
 import type { RequestContext } from "@/lib/server/types";
 
 function validateAiOutput(contentType: string | null): boolean {
@@ -44,16 +45,21 @@ export async function proxyChat(ctx: RequestContext, body: Record<string, unknow
     },
   });
 
-  const response = await fetch(`${env.DISHA_BACKEND_URL}/api/chat`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      ...(process.env.ANTHROPIC_API_KEY ? { Authorization: `Bearer ${process.env.ANTHROPIC_API_KEY}` } : {}),
-    },
-    // Hard timeout so async flows never hang indefinitely.
-    signal: AbortSignal.timeout(env.DISHA_WORKFLOW_NODE_TIMEOUT_MS),
-    body: serialized,
-  });
+  const response = env.OPENAI_API_KEY
+    ? await callOpenAiResponses(optimizedBody, {
+        timeoutMs: env.DISHA_WORKFLOW_NODE_TIMEOUT_MS,
+        requestId: ctx.requestId,
+      })
+    : await fetch(`${env.DISHA_BACKEND_URL}/api/chat`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(process.env.ANTHROPIC_API_KEY ? { Authorization: `Bearer ${process.env.ANTHROPIC_API_KEY}` } : {}),
+        },
+        // Hard timeout so async flows never hang indefinitely.
+        signal: AbortSignal.timeout(env.DISHA_WORKFLOW_NODE_TIMEOUT_MS),
+        body: serialized,
+      });
 
   const contentType = response.headers.get("Content-Type");
   const validOutput = validateAiOutput(contentType);
@@ -94,6 +100,7 @@ export async function proxyChat(ctx: RequestContext, body: Record<string, unknow
       status: response.status,
       contentType,
       validOutput,
+      backend: env.OPENAI_API_KEY ? "openai.responses" : "proxy.backend",
       tokenEconomy: {
         mode: decision.mode,
         applied: decision.applied,
