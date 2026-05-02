@@ -1,0 +1,113 @@
+name: Deploy to Azure
+
+on:
+  workflow_run:
+    workflows: ["Release (Images + OS ISO)"]
+    types: [completed]
+  workflow_dispatch:
+    inputs:
+      image_tag:
+        description: 'Image tag to deploy (default: latest)'
+        required: false
+        default: 'latest'
+      environment:
+        description: 'Target environment'
+        required: false
+        default: 'production'
+        type: choice
+        options: [production, staging]
+
+concurrency:
+  group: azure-deploy-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  id-token: write   # OIDC — no stored secret needed
+  contents: read
+
+env:
+  RESOURCE_GROUP: disha-rg
+  LOCATION: eastus
+  IMAGE_TAG: ${{ github.event.inputs.image_tag || 'latest' }}
+
+jobs:
+  # Only run on successful release, or on manual trigger
+  guard:
+    name: Gate
+    runs-on: ubuntu-latest
+    outputs:
+      should_run: ${{ steps.check.outputs.should_run }}
+    steps:
+      - id: check
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            echo "should_run=true" >> "$GITHUB_OUTPUT"
+          elif [[ "${{ github.event.workflow_run.conclusion }}" == "success" ]]; then
+            echo "should_run=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "should_run=false" >> "$GITHUB_OUTPUT"
+          fi
+
+  deploy-container-apps:
+    name: Container Apps (web + brain)
+    needs: guard
+    if: needs.guard.outputs.should_run == 'true'
+    runs-on: ubuntu-latest
+    environment: ${{ github.event.inputs.environment || 'production' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Azure login (OIDC)
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Ensure resource group
+        uses: azure/cli@v2
+        with:
+          azcliversion: latest
+          inlineScript: |
+            az group create -n ${{ env.RESOURCE_GROUP }} -l ${{ env.LOCATION }} --query name -o tsv
+
+      - name: Deploy bicep
+        uses: azure/arm-deploy@v2
+        id: deploy
+        with:
+          resourceGroupName: ${{ env.RESOURCE_GROUP }}
+          template: infra/azure/containerapps/main.bicep
+          parameters: >
+            prefix=disha
+            ghcrOwner=${{ github.repository_owner }}
+            imageTag=${{ env.IMAGE_TAG }}
+            ghcrToken=${{ secrets.GHCR_READ_TOKEN }}
+            anthropicApiKey=${{ secrets.ANTHROPIC_API_KEY }}
+            foundryEndpoint=${{ secrets.ANTHROPIC_FOUNDRY_ENDPOINT }}
+
+      - name: Print URLs
+        run: |
+          echo "Web  : ${{ steps.deploy.outputs.webUrl }}"
+          echo "Brain: ${{ steps.deploy.outputs.brainUrl }}"
+
+      - name: Smoke test brain
+        run: |
+          url="${{ steps.deploy.outputs.brainUrl }}"
+          for i in 1 2 3 4 5; do
+            code=$(curl -s -o /dev/null -w "%{http_code}" "$url/api/v1/health" || true)
+            [[ "$code" == "200" ]] && echo "Brain healthy" && exit 0
+            echo "Attempt $i: got $code, retrying in 15s..."
+            sleep 15
+          done
+          echo "Brain health check failed" && exit 1
+
+      - name: Smoke test web
+        run: |
+          url="${{ steps.deploy.outputs.webUrl }}"
+          for i in 1 2 3 4 5; do
+            code=$(curl -s -o /dev/null -w "%{http_code}" "$url" || true)
+            [[ "$code" == "200" ]] && echo "Web healthy" && exit 0
+            echo "Attempt $i: got $code, retrying in 15s..."
+            sleep 15
+          done
+          echo "Web health check failed" && exit 1
