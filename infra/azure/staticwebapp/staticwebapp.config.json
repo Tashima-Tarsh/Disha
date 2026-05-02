@@ -1,0 +1,23 @@
+{
+  "platform": { "apiRuntime": "node:20" },
+  "navigationFallback": {
+    "rewrite": "/index.html",
+    "exclude": ["/api/*", "/_next/*", "/static/*", "*.{png,jpg,svg,ico,css,js}"]
+  },
+  "routes": [
+    {
+      "route": "/api/brain/*",
+      "rewrite": "https://REPLACE_BRAIN_FQDN/api/v1/{*}",
+      "allowedRoles": ["authenticated"]
+    },
+    { "route": "/admin/*", "allowedRoles": ["authenticated"] }
+  ],
+  "responseOverrides": {
+    "401": { "redirect": "/.auth/login/aad", "statusCode": 302 }
+  },
+  "globalHeaders": {
+    "X-Frame-Options": "DENY",
+    "X-Content-Type-Options": "nosniff",
+    "Referrer-Policy": "no-referrer"
+  }
+}

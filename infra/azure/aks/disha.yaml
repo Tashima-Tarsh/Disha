@@ -1,0 +1,76 @@
+# AKS deploy — same GHCR images. Apply after `az aks get-credentials`.
+# Create the GHCR pull secret first:
+#   kubectl create secret docker-registry ghcr \
+#     --docker-server=ghcr.io \
+#     --docker-username=<owner> --docker-password=<PAT>
+# And the app secrets:
+#   kubectl create secret generic disha-secrets \
+#     --from-literal=anthropic-api-key=<KEY>
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: disha-brain
+spec:
+  replicas: 1
+  selector: { matchLabels: { app: disha-brain } }
+  template:
+    metadata: { labels: { app: disha-brain } }
+    spec:
+      imagePullSecrets: [{ name: ghcr }]
+      containers:
+        - name: brain
+          image: ghcr.io/REPLACE_OWNER/disha-brain:latest
+          ports: [{ containerPort: 8080 }]
+          env:
+            - name: ANTHROPIC_API_KEY
+              valueFrom: { secretKeyRef: { name: disha-secrets, key: anthropic-api-key } }
+            - name: API_HOST
+              value: "0.0.0.0"
+            - name: API_PORT
+              value: "8080"
+          readinessProbe:
+            httpGet: { path: /api/v1/health, port: 8080 }
+            initialDelaySeconds: 10
+          resources:
+            requests: { cpu: "250m", memory: "512Mi" }
+            limits:   { cpu: "1",    memory: "1Gi" }
+---
+apiVersion: v1
+kind: Service
+metadata: { name: disha-brain }
+spec:
+  selector: { app: disha-brain }
+  ports: [{ port: 80, targetPort: 8080 }]
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: disha-web
+spec:
+  replicas: 1
+  selector: { matchLabels: { app: disha-web } }
+  template:
+    metadata: { labels: { app: disha-web } }
+    spec:
+      imagePullSecrets: [{ name: ghcr }]
+      containers:
+        - name: web
+          image: ghcr.io/REPLACE_OWNER/disha-web:latest
+          ports: [{ containerPort: 3000 }]
+          env:
+            - name: DISHA_BRAIN_URL
+              value: "http://disha-brain"
+            - name: ANTHROPIC_API_KEY
+              valueFrom: { secretKeyRef: { name: disha-secrets, key: anthropic-api-key } }
+          resources:
+            requests: { cpu: "250m", memory: "512Mi" }
+            limits:   { cpu: "1",    memory: "1Gi" }
+---
+apiVersion: v1
+kind: Service
+metadata: { name: disha-web }
+spec:
+  type: LoadBalancer
+  selector: { app: disha-web }
+  ports: [{ port: 80, targetPort: 3000 }]

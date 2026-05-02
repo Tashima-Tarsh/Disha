@@ -1,0 +1,12 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "prefix":           { "value": "disha" },
+    "ghcrOwner":        { "value": "tashima-tarsh" },
+    "imageTag":         { "value": "latest" },
+    "ghcrToken":        { "value": "" },
+    "anthropicApiKey":  { "value": "REPLACE_WITH_KEY" },
+    "foundryEndpoint":  { "value": "" }
+  }
+}
