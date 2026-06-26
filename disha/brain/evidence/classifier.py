@@ -21,23 +21,45 @@ CLASS_PRIORITY: dict[EvidenceClass, int] = {
 
 def classify_evidence_text(text: str, source_type: str = "operator") -> EvidenceClass:
     normalized = f"{source_type} {text}".lower()
-    if any(token in normalized for token in ("gazette", "official order", "government notification", ".gov", "gov.in")):
+    if any(
+        token in normalized
+        for token in (
+            "gazette",
+            "official order",
+            "government notification",
+            ".gov",
+            "gov.in",
+        )
+    ):
         return EvidenceClass.official_record
     if "rti" in normalized or "right to information" in normalized:
         return EvidenceClass.rti_record
-    if any(token in normalized for token in ("open data", "data.gov", "csv", "dataset")):
+    if any(
+        token in normalized for token in ("open data", "data.gov", "csv", "dataset")
+    ):
         return EvidenceClass.open_data
-    if any(token in normalized for token in ("sensor", "telemetry", "iot", "gps", "coordinate")):
+    if any(
+        token in normalized
+        for token in ("sensor", "telemetry", "iot", "gps", "coordinate")
+    ):
         return EvidenceClass.sensor_signal
     if any(token in normalized for token in ("audit", "cag", "inspection report")):
         return EvidenceClass.audit_record
     if any(token in normalized for token in ("constitution", "article ", "schedule ")):
         return EvidenceClass.constitutional_reference
-    if any(token in normalized for token in ("contradicts", "conflicts with", "mismatch")):
+    if any(
+        token in normalized for token in ("contradicts", "conflicts with", "mismatch")
+    ):
         return EvidenceClass.contradiction
-    if any(token in normalized for token in ("alleges", "allegation", "claimed", "unverified")):
+    if any(
+        token in normalized
+        for token in ("alleges", "allegation", "claimed", "unverified")
+    ):
         return EvidenceClass.allegation
-    if any(token in normalized for token in ("infer", "likely", "may indicate", "pattern suggests")):
+    if any(
+        token in normalized
+        for token in ("infer", "likely", "may indicate", "pattern suggests")
+    ):
         return EvidenceClass.inference
     return EvidenceClass.unresolved
 
@@ -80,4 +102,3 @@ def build_evidence_bundle(
         source_links=[link for link in links if link],
         confidence=confidence_for(dominant),
     )
-

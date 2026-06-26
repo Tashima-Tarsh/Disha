@@ -11,6 +11,8 @@ def run(input_text: str) -> VersionOutput:
         title="Sustainable Development Geospatial Intelligence",
         signals=["development", "resilience", *signals],
         recommendation="Prioritize public assets by verifiable infrastructure, climate, and resource signals.",
-        notes=[f"resilience_score={resilience_score(signals):.2f}", verification_note()],
+        notes=[
+            f"resilience_score={resilience_score(signals):.2f}",
+            verification_note(),
+        ],
     )
-

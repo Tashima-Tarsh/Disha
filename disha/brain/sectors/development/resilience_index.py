@@ -8,4 +8,3 @@ def resilience_score(signals: list[str]) -> float:
     if "water_climate_resilience_signal" in signals:
         base += 0.2
     return min(base, 1.0)
-

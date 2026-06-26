@@ -140,4 +140,3 @@ FORMATIONS: list[VyuhaFormation] = [
         human_approval_required=True,
     ),
 ]
-

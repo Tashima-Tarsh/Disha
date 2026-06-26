@@ -51,7 +51,9 @@ class NFUResult(BaseModel):
     reason: str
 
 
-def evaluate_actions(actions: list[str], authorized_environment: bool = False) -> NFUResult:
+def evaluate_actions(
+    actions: list[str], authorized_environment: bool = False
+) -> NFUResult:
     normalized = {action.strip().lower().replace(" ", "_") for action in actions}
     forbidden = sorted(normalized & FORBIDDEN_ACTIONS)
     unknown = sorted(normalized - ALLOWED_ACTIONS - FORBIDDEN_ACTIONS)
@@ -86,4 +88,3 @@ def evaluate_actions(actions: list[str], authorized_environment: bool = False) -
         allowed_actions=allowed,
         reason="All requested actions are defensive and evidence-preserving.",
     )
-

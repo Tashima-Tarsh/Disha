@@ -11,4 +11,3 @@ __all__ = [
     "nyaya_summary",
     "parse_rti_signal",
 ]
-

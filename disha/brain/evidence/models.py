@@ -41,4 +41,3 @@ class EvidenceBundle(BaseModel):
     dominant_class: EvidenceClass = EvidenceClass.unresolved
     source_links: list[str] = Field(default_factory=list)
     confidence: ConfidenceLevel = ConfidenceLevel.low
-

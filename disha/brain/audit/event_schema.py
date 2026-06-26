@@ -14,4 +14,3 @@ class AuditEvent(BaseModel):
     outcome: str
     metadata: dict[str, Any] = Field(default_factory=dict)
     created_at: str = Field(default_factory=lambda: datetime.now(UTC).isoformat())
-

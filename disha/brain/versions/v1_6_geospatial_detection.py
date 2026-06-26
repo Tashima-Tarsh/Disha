@@ -8,7 +8,11 @@ def run(input_text: str, coordinates: Coordinates | None = None) -> VersionOutpu
     tracker = TrackedObject(object_id="observed-signal")
     if coordinates:
         tracker.add(coordinates)
-    risk = public_safety_risk(coordinates, len(tracker.observations)) if coordinates else 0.2
+    risk = (
+        public_safety_risk(coordinates, len(tracker.observations))
+        if coordinates
+        else 0.2
+    )
     return VersionOutput(
         version="1.6",
         title="Geospatial Detection Intelligence",
@@ -19,4 +23,3 @@ def run(input_text: str, coordinates: Coordinates | None = None) -> VersionOutpu
         ),
         notes=[f"public_safety_risk={risk:.2f}", verification_note()],
     )
-

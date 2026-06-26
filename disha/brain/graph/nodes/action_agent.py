@@ -25,4 +25,3 @@ def run(state: DishaGraphState) -> DishaGraphState:
     state.final_answer = output.recommendation
     state.metadata["version_notes"] = output.notes
     return state
-

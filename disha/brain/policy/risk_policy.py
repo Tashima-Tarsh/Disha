@@ -11,4 +11,3 @@ def risk_level(score: float) -> str:
 
 def requires_approval(score: float, nfu_status: str) -> bool:
     return score >= 0.4 or nfu_status != "nfu_compliant"
-

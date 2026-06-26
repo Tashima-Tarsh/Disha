@@ -14,4 +14,3 @@ def identify_gaps(text: str) -> list[str]:
         if token in normalized:
             gaps.append(label)
     return gaps or ["insufficient verified evidence"]
-

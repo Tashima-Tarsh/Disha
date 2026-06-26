@@ -16,7 +16,9 @@ from disha.brain.vyuha import select_vyuha
 
 def test_evidence_classification_official_record() -> None:
     bundle = build_evidence_bundle(
-        ["Government notification hosted on gov.in"], "government_open_data", ["https://example.gov.in/order"]
+        ["Government notification hosted on gov.in"],
+        "government_open_data",
+        ["https://example.gov.in/order"],
     )
     assert bundle.dominant_class == EvidenceClass.official_record
     assert bundle.confidence.value == "high"
@@ -52,7 +54,10 @@ def test_nfu_forbidden_actions() -> None:
 def test_human_approval_escalates_ambiguous_action() -> None:
     graph = DishaAgenticGraph()
     result = graph.invoke(
-        GraphInput(input_text="Investigate public authority audit gap", requested_actions=["custom_action"])
+        GraphInput(
+            input_text="Investigate public authority audit gap",
+            requested_actions=["custom_action"],
+        )
     )
     assert result.human_approval_required is True
     assert result.nfu_policy_status == "ambiguous_action_requires_approval"
@@ -109,7 +114,9 @@ def test_hse_service_gap_output() -> None:
         ("gap mitigation needs Vyuha and Yudh", "audit_report", "6.6"),
     ],
 )
-def test_end_to_end_graph_invocation(text: str, source_type: str, expected_version: str) -> None:
+def test_end_to_end_graph_invocation(
+    text: str, source_type: str, expected_version: str
+) -> None:
     graph = DishaAgenticGraph()
     result = graph.invoke(
         GraphInput(

@@ -12,4 +12,3 @@ class SpatialIndex:
 
     def all_points(self) -> list[Coordinates]:
         return list(self._points)
-

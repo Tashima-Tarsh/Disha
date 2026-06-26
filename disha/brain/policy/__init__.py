@@ -15,4 +15,3 @@ __all__ = [
     "requires_approval",
     "risk_level",
 ]
-

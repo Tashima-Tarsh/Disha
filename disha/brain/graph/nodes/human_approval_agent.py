@@ -13,4 +13,3 @@ def run(state: DishaGraphState) -> DishaGraphState:
     )
     state.metadata["human_approval"] = approval.model_dump()
     return state
-

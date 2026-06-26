@@ -13,4 +13,3 @@ class VersionOutput(BaseModel):
 
 def verification_note() -> str:
     return "Operational claims require source review; unsupported facts remain [VERIFY REQUIRED]."
-

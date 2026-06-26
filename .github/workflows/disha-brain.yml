@@ -8,6 +8,8 @@ on:
 jobs:
   brain-tests:
     runs-on: ubuntu-latest
+    env:
+      PYTHONPATH: ${{ github.workspace }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -19,6 +21,8 @@ jobs:
           python -m pip install pydantic pytest ruff bandit
       - name: Lint production brain spine
         run: ruff check disha/brain tests
+      - name: Check production brain formatting
+        run: ruff format disha/brain tests --check
       - name: Security scan production brain spine
         run: bandit -q -r disha/brain
       - name: Run graph tests

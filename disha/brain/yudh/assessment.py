@@ -22,4 +22,3 @@ def assess_yudh(risk_score: float, evidence_class: str) -> YudhAssessment:
         lawful_frame="No-First-Use; owned or authorized environments only.",
         summary=f"{posture}; evidence class is {evidence_class}.",
     )
-

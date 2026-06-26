@@ -11,4 +11,3 @@ class HumanApproval(BaseModel):
 
 def approval_gate(required: bool, reason: str) -> HumanApproval:
     return HumanApproval(required=required, reason=reason)
-

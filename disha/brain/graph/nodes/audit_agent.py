@@ -8,7 +8,9 @@ from ..state import DishaGraphState
 
 def run(state: DishaGraphState, ledger: AuditLedger) -> DishaGraphState:
     event = AuditEvent(
-        event_id=sha256(f"{state.input_text}:{state.version}".encode()).hexdigest()[:16],
+        event_id=sha256(f"{state.input_text}:{state.version}".encode()).hexdigest()[
+            :16
+        ],
         action="disha_graph_run",
         version=state.version,
         outcome=state.nfu_status,
@@ -22,4 +24,3 @@ def run(state: DishaGraphState, ledger: AuditLedger) -> DishaGraphState:
     state.audit_record = ledger.append(event)
     state.metadata["audit_hash"] = ledger.latest_hash
     return state
-

@@ -4,4 +4,3 @@ from .event_schema import AuditEvent
 from .ledger import AuditLedger
 
 __all__ = ["AuditEvent", "AuditLedger"]
-

@@ -11,7 +11,9 @@ class MemoryStore:
         self.episodic = EpisodicMemory()
         self.semantic = SemanticMemory()
 
-    def update_from_result(self, input_text: str, version: str, final_answer: str) -> None:
+    def update_from_result(
+        self, input_text: str, version: str, final_answer: str
+    ) -> None:
         self.working.update({"last_version": version, "last_answer": final_answer})
         self.episodic.add(
             EpisodicMemoryItem(
@@ -19,4 +21,3 @@ class MemoryStore:
             )
         )
         self.semantic.observe([version, *input_text.split()[:8]])
-

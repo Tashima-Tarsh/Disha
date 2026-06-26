@@ -6,4 +6,3 @@ def parse_rti_signal(text: str) -> dict[str, str | bool]:
         "mentions_rti": "rti" in text.lower() or "right to information" in text.lower(),
         "status": "source-linked review required",
     }
-

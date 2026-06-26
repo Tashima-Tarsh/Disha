@@ -22,4 +22,3 @@ class SourceRegistry:
 
     def list_sources(self) -> list[SourceProvenance]:
         return list(self._sources.values())
-

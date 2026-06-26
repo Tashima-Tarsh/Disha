@@ -13,4 +13,3 @@ def run(input_text: str) -> VersionOutput:
         recommendation="Create a lawful corrective action plan gated by NFU, risk policy, and human approval where needed.",
         notes=[verification_note()],
     )
-

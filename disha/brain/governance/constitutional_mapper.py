@@ -9,6 +9,7 @@ def map_constitutional_context(text: str) -> list[str]:
     if "article 21" in normalized:
         references.append("Article 21: life and personal liberty [VERIFY REQUIRED]")
     if "constitution" in normalized and not references:
-        references.append("Constitutional reference present; exact provision [VERIFY REQUIRED]")
+        references.append(
+            "Constitutional reference present; exact provision [VERIFY REQUIRED]"
+        )
     return references
-

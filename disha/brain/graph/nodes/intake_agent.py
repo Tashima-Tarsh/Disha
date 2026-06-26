@@ -12,4 +12,3 @@ def run(payload: GraphInput) -> DishaGraphState:
         authorized_environment=payload.authorized_environment,
         metadata=payload.metadata,
     )
-

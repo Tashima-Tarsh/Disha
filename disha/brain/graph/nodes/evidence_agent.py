@@ -12,4 +12,3 @@ def run(state: DishaGraphState) -> DishaGraphState:
     state.evidence_class = bundle.dominant_class
     state.confidence_level = bundle.confidence
     return state
-

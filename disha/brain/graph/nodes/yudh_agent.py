@@ -9,4 +9,3 @@ def run(state: DishaGraphState) -> DishaGraphState:
         state.risk_score, state.evidence_class.value
     ).model_dump()
     return state
-

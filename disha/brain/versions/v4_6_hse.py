@@ -5,7 +5,11 @@ from .common import VersionOutput, verification_note
 
 
 def run(input_text: str) -> VersionOutput:
-    signals = [health_signal(input_text), welfare_signal(input_text), education_signal(input_text)]
+    signals = [
+        health_signal(input_text),
+        welfare_signal(input_text),
+        education_signal(input_text),
+    ]
     active = [signal for signal in signals if signal != "not_applicable"]
     return VersionOutput(
         version="4.6",
@@ -14,4 +18,3 @@ def run(input_text: str) -> VersionOutput:
         recommendation="Produce a district-level service gap report with privacy protection and source-linked evidence.",
         notes=[verification_note()],
     )
-

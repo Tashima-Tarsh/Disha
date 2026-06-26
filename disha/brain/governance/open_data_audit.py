@@ -7,4 +7,3 @@ def audit_open_data(text: str, source_links: list[str]) -> dict[str, object]:
         "source_count": len(source_links),
         "verification": "Every dataset must be checked against publisher metadata.",
     }
-

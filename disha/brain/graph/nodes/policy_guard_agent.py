@@ -11,4 +11,3 @@ def run(state: DishaGraphState) -> DishaGraphState:
     if result.decision.value == "forbidden":
         state.human_approval_required = True
     return state
-

@@ -23,7 +23,9 @@ class GraphInput(BaseModel):
     input_text: str
     source_type: SourceType = "operator"
     source_links: list[str] = Field(default_factory=list)
-    requested_actions: list[str] = Field(default_factory=lambda: ["report", "preserve_evidence"])
+    requested_actions: list[str] = Field(
+        default_factory=lambda: ["report", "preserve_evidence"]
+    )
     authorized_environment: bool = False
     metadata: dict[str, Any] = Field(default_factory=dict)
 
@@ -67,4 +69,3 @@ class DishaGraphResult(BaseModel):
     human_approval_required: bool
     final_recommendation: str
     audit_event: AuditEvent
-

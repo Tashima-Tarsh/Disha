@@ -15,4 +15,3 @@ def select_vyuha(signals: list[str], risk_score: float = 0.0) -> VyuhaFormation:
             best = formation
             best_score = score
     return best
-

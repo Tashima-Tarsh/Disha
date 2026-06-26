@@ -19,4 +19,3 @@ def build_recommendation(formation: VyuhaFormation) -> VyuhaRecommendation:
         human_approval_required=formation.human_approval_required,
         recommendation=f"Use {formation.name}; fallback: {formation.fallback_behavior}.",
     )
-

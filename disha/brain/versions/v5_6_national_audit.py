@@ -17,8 +17,16 @@ def run(input_text: str, source_links: list[str] | None = None) -> VersionOutput
     return VersionOutput(
         version="5.6",
         title="National Audit Intelligence",
-        signals=["national_audit", "constitutional_reference", "rti_record" if rti["mentions_rti"] else "open_data"],
+        signals=[
+            "national_audit",
+            "constitutional_reference",
+            "rti_record" if rti["mentions_rti"] else "open_data",
+        ],
         recommendation="Prepare a governance accountability report with contradiction detection and source provenance.",
-        notes=[*constitutional, nyaya_summary("constitutional_reference", 0), str(data_audit), verification_note()],
+        notes=[
+            *constitutional,
+            nyaya_summary("constitutional_reference", 0),
+            str(data_audit),
+            verification_note(),
+        ],
     )
-

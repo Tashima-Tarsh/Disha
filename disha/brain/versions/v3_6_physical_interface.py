@@ -11,4 +11,3 @@ def run(input_text: str) -> VersionOutput:
         recommendation="Accept edge telemetry only from trusted devices, preserve local operator control, and keep sensor-to-brain flow auditable.",
         notes=[verification_note()],
     )
-

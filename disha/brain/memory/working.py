@@ -9,4 +9,3 @@ class WorkingMemory:
 
     def update(self, values: dict[str, Any]) -> None:
         self.context.update(values)
-

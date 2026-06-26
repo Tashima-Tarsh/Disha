@@ -16,4 +16,3 @@ def verification_note(link: str | None, source_type: str) -> str:
     if link and source_type in {"official_record", "rti_record", "open_data"}:
         return "Source-linked; verify against the issuing authority before action."
     return "[VERIFY REQUIRED]"
-

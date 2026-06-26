@@ -59,4 +59,3 @@ class DishaAgenticGraph:
 
 def run_disha_graph(payload: GraphInput) -> DishaGraphResult:
     return DishaAgenticGraph().invoke(payload)
-

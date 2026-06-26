@@ -18,4 +18,3 @@ class TrackedObject(BaseModel):
         if self.observations:
             return "single_or_sparse_signal"
         return "no_signal"
-

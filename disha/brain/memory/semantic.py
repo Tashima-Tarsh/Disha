@@ -10,4 +10,3 @@ class SemanticMemory:
             normalized = term.strip().lower()
             if normalized:
                 self.entities[normalized] = self.entities.get(normalized, 0) + 1
-

@@ -12,4 +12,3 @@ class PermissionContext(BaseModel):
 
 def can_execute(context: PermissionContext) -> bool:
     return context.authorized_environment and context.can_execute_actions
-

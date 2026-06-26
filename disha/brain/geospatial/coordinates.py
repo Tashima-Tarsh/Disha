@@ -14,4 +14,3 @@ class Coordinates(BaseModel):
         if value != value:
             raise ValueError("coordinate must be finite")
         return value
-
