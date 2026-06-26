@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import sys
+
 import pytest
 
 from disha.brain.audit import AuditEvent, AuditLedger
@@ -12,6 +14,11 @@ from disha.brain.policy import evaluate_actions
 from disha.brain.policy.no_first_use import NFUDecision
 from disha.brain.versions import v4_6_hse, v5_6_national_audit
 from disha.brain.vyuha import select_vyuha
+
+
+def test_brain_package_import_is_lazy() -> None:
+    assert "disha.brain.app" not in sys.modules
+    assert "fastapi" not in sys.modules
 
 
 def test_evidence_classification_official_record() -> None:

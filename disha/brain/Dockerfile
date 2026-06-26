@@ -14,6 +14,9 @@ RUN mkdir -p /data && chown -R appuser:appuser /data
 
 USER appuser
 
+ENV DISHA_BRAIN_API_HOST=0.0.0.0 \
+    DISHA_BRAIN_DB_PATH=/data/disha_brain.db
+
 EXPOSE 8080
 HEALTHCHECK --interval=30s --timeout=5s --retries=3 CMD python -c "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8080/api/v1/health').read(); print('ok')" || exit 1
-CMD ["uvicorn", "disha.brain:app", "--host", "0.0.0.0", "--port", "8080"]
+CMD ["python", "-m", "disha.brain"]

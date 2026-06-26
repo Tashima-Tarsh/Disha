@@ -18,12 +18,15 @@ jobs:
       - name: Install test dependencies
         run: |
           python -m pip install --upgrade pip
-          python -m pip install pydantic pytest ruff bandit
+          python -m pip install -r disha/brain/requirements.txt
+          python -m pip install pytest ruff bandit
       - name: Lint production brain spine
         run: ruff check disha/brain tests
       - name: Check production brain formatting
         run: ruff format disha/brain tests --check
       - name: Security scan production brain spine
         run: bandit -q -r disha/brain
+      - name: Smoke import Brain API app
+        run: python -c "from disha.brain.app import app; assert app.title"
       - name: Run graph tests
         run: pytest tests/test_disha_brain_graph.py
