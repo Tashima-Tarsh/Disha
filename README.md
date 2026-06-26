@@ -1,164 +1,74 @@
-# DISHA OS
+# DISHA
 
-![DISHA OS](docs/images/disha-os-hero.png)
+DISHA is an evidence-first agentic intelligence architecture for national-scale reasoning, geospatial awareness, governance audit, cyber defence, public-sector accountability, and human-governed action.
 
-DISHA OS is an AI Cyber Evidence Operating System built around DISHA Brain: a local-first, audit-first intelligence core for secure automation, cyber monitoring, evidence-grade logging, and operator control surfaces.
+It is not a generic chatbot. The production direction is a defensive, audit-first system that classifies evidence, links sources, applies No-First-Use boundaries, routes work through versioned intelligence modules, and requires human approval when risk or ambiguity crosses policy thresholds.
 
-Docs live in `docs/` (including a Wiki-ready structure under `docs/wiki/`).
+## What Is Production-Oriented Now
 
-## Deploy (Docker)
+- `disha/brain/`: central reasoning spine, FastAPI backend, graph orchestration, policy gates, evidence model, memory, audit, Yudh/Vyuha logic, and six version modules.
+- `web/`: hardened Next.js API surface with auth, audit, export/share, file, and agent endpoints.
+- `src/`: TypeScript CLI/runtime hardening modules and MCP entrypoint.
+- `demos/`: runnable JSON payloads for the six DISHA versions.
+- `tests/test_disha_brain_graph.py`: focused tests for evidence classification, version routing, NFU, Vyuha, audit, memory, geospatial validation, HSE, national audit, and end-to-end graph invocation.
 
-- Local/dev: `docker-compose.yml`
-- Production-style: `docker-compose.prod.yml` (pulls images from GHCR)
+Legacy and experimental surfaces remain under `legacy/`, `disha/services/`, `disha/ai/`, and integrations. They should be reused only after source review.
 
-## OS Artifact
+## Six DISHA Versions
 
-CI can build a bootable ISO (`disha-os-amd64.iso`) via the `Release (Images + OS ISO)` workflow.
+| Version | Module | Purpose |
+| --- | --- | --- |
+| 1.6 | Geospatial Detection Intelligence | Coordinates, sensor evidence, object tracking, public-safety evidence bundles. |
+| 2.6 | Sustainable Development Geospatial Intelligence | Infrastructure monitoring, climate/resource signals, SETU/VARUNA resilience scoring. |
+| 3.6 | Physical Interface Architecture | Edge telemetry, trusted device state, sensor-to-brain routing, operator control. |
+| 4.6 | HSE Intelligence | Health, social welfare, education access, district-level service gap reports. |
+| 5.6 | National Audit Intelligence | RTI, open data, constitutional references, public accountability, contradiction detection. |
+| 6.6 | Gap Closure Intelligence | Gap identification, risk mitigation, Yudh assessment, Vyuha selection, lawful corrective action. |
 
-Primary runtime surfaces:
-
-- `web/`: hardened Next.js application with authenticated API routes, RBAC, CSRF protection, audit logging, and export/share workflows.
-- `src/`: TypeScript CLI/runtime surface focused on secure execution, MCP entrypoints, storage policy, and observability adapters.
-- `disha/brain/`: unified FastAPI brain backend (reasoning/planning/execution, anomaly detection, risk scoring, decisioning, events, WebSocket alerts).
-- `disha/edge_agent/`: desktop telemetry agent sending signed telemetry to the brain backend.
-
-Core use cases:
-- Secure “AI ops” command center (audit-first, policy-gated actions)
-- Cross-device assistant runtime (web + agent + brain)
-- Telemetry-driven anomaly detection and explainable alerts
-- Modular subsystem integration (MCP, cyber defense, strategy, quantum physics)
-
-Search keywords:
-`secure ai agent`, `jarvis-like assistant`, `zero trust`, `audit logging`, `policy engine`, `anomaly detection`, `fastapi`, `nextjs`, `mcp`
-
-## Why DISHA
-
-- Secure by default web and CLI foundations.
-- Explicit AI workflow boundaries instead of opaque prompt pipelines.
-- Support for interactive web, CLI, and Python service surfaces in one repository.
-- Operational focus on auditability, local development, and staged hardening.
-
-## Repository Map
-
-```text
-.
-|-- web/                 Next.js app and secure API surface
-|-- src/                 TypeScript CLI/runtime hardening modules
-|-- disha/               Brain backend, AI core modules, agents, and services
-|-- docker/              Compose and observability assets
-|-- docs/                Architecture, wiki, design, TDD, analysis
-|-- legacy/              retired prototypes and legacy stacks
-`-- .github/workflows/   CI, CodeQL, security, and module pipelines
-```
-
-## Architecture Summary
-
-![DISHA Brain Platform Architecture](docs/images/disha-brain-platform-premium.png)
+## Agentic Flow
 
 ```mermaid
-flowchart LR
-    U[User] --> W[Next.js Web]
-    U --> C[TypeScript CLI]
-    W --> B[DISHA Brain API]
-    W --> WS[Web Services Layer]
-    WS --> SEC[Auth RBAC CSRF Rate Limit Audit]
-    WS --> DB[(Postgres)]
-    WS --> REDIS[(Redis)]
-    WS --> EXT[Model or Backend Services]
-    C --> MCP[MCP Entrypoint]
-    MCP --> CSEC[Secure Storage Policy and Audit]
-    CORE[AI Core Modules] --> B
+flowchart TD
+    A[Input sources] --> B[Intake Agent]
+    B --> C[Evidence Agent]
+    C --> D[Context Agent]
+    D --> E[DISHA Brain Reasoning Agent]
+    E --> F[Version Router]
+    F --> G[Version Module]
+    G --> H[Yudh Intelligence Agent]
+    H --> I[Vyuha Selector Agent]
+    I --> J[Policy Guard and NFU Gate]
+    J --> K{Human approval required?}
+    K -->|Yes| L[Human Approval Gate]
+    K -->|No| M[Action or Report Agent]
+    L --> M
+    M --> N[Audit Agent]
+    N --> O[Memory Update Agent]
 ```
 
-## Agent Runtime (Token-Efficient)
+Each result includes version, evidence class, source list, confidence level, risk score, reasoning summary, Yudh assessment, Vyuha recommendation, NFU policy status, human approval requirement, final recommendation, and audit event.
 
-DISHA Web includes a small “agent runtime” focused on reducing LLM token spend while keeping behavior auditable and deterministic for critical flows.
-
-- Token economy: automatic context compaction + Redis-backed response cache (`DISHA_AGENT_MODE`, `DISHA_AGENT_INPUT_BUDGET_TOKENS`)
-- Memory graph: privacy-first entity graph updated from user messages (`GET /api/agent/memory-graph`)
-- Workflow runner: n8n-like node pipeline with per-node + total timeouts (`POST /api/agent/workflows/run`)
-
-The production-ready platform path is `web/` + `src/` + `disha/brain/`. Other folders remain in the repo as legacy or experimental surfaces and are progressively converged or retired behind stable interfaces.
-
-## Tech Stack
-
-| Area | Stack |
-| --- | --- |
-| Web | Next.js, React, TypeScript, Zod |
-| CLI | TypeScript, MCP, OpenTelemetry APIs |
-| Data | Postgres, Redis |
-| Python Services | FastAPI, Pydantic, PyTorch-adjacent research modules |
-| Tooling | npm, Bun, Docker Compose, GitHub Actions, Ruff, mypy, Bandit, CodeQL |
-
-## Local Setup
-
-### Prerequisites
-
-- Node.js 20+
-- npm 10+
-- Python 3.11+
-- Docker and Docker Compose
-
-### 1. Clone
+## Quickstart
 
 ```bash
-git clone https://github.com/Tashima-Tarsh/Disha.git
-cd Disha
+python -m pytest tests/test_disha_brain_graph.py
 ```
 
-### 2. Install web dependencies
+Run a demo payload:
 
 ```bash
-cd web
-npm install
+python - <<'PY'
+import json
+from pathlib import Path
+from disha.brain.graph import DishaAgenticGraph, GraphInput
+
+payload = json.loads(Path("demos/demo_5_6_national_audit.json").read_text())
+result = DishaAgenticGraph().invoke(GraphInput(**payload))
+print(result.model_dump_json(indent=2))
+PY
 ```
 
-### 3. Configure environment
-
-Use [web/.env.example](web/.env.example) as the baseline. The minimum local values are:
-
-```bash
-DISHA_AUTH_MODE=dev-jwt
-DISHA_JWT_SECRET=<32+ random characters>
-DISHA_DEV_PASSWORD=<local dev password>
-DATABASE_URL=postgresql://disha:postgres@localhost:5432/disha
-REDIS_URL=redis://localhost:6379
-DISHA_WORKSPACE_ROOT=..
-```
-
-### 4. Start infrastructure
-
-```bash
-cd docker
-docker compose up postgres redis -d
-```
-
-### 5. Run the web app
-
-```bash
-cd web
-npm run dev
-```
-
-## Run With Docker Compose (Recommended)
-
-This runs the complete DISHA Brain platform:
-
-```bash
-docker compose up --build
-```
-
-Services:
-- Web UI: `http://localhost:3000`
-- Brain API: `http://localhost:8080/api/v1/health`
-
-Optional modules (AI Platform, MCP Server, Quantum Physics, OpenCanary):
-
-```bash
-docker compose --profile full up --build
-```
-
-### 6. Run validation
+Run the existing web checks:
 
 ```bash
 cd web
@@ -167,89 +77,30 @@ npm run type-check
 npm run build
 ```
 
-## Deployment
+## Trust Boundaries
 
-### Docker Compose baseline
+DISHA never treats all text as truth. Inputs are classified as verified, official record, RTI record, open data, sensor signal, audit record, constitutional reference, inference, allegation, contradiction, or unresolved. Unsupported facts stay marked as requiring verification.
 
-The repository includes [docker/docker-compose.yml](docker/docker-compose.yml) for:
-
-- `disha-web`
-- `postgres`
-- `redis`
-- `otel-collector`
-
-Production deployment expects environment-managed secrets for:
-
-- `DISHA_JWT_SECRET`
-- `POSTGRES_PASSWORD`
-- `ANTHROPIC_API_KEY`
-- OIDC variables when using federated authentication
-
-### CI
-
-GitHub Actions covers:
-
-- quality gate linting and typing
-- module-specific CI
-- security scanning
-- CodeQL analysis
-
-## Environment Variables
-
-Primary web variables are documented in [web/.env.example](web/.env.example). The most important ones are:
-
-| Variable | Purpose |
-| --- | --- |
-| `DISHA_AUTH_MODE` | `dev-jwt` or `oidc` |
-| `DISHA_JWT_SECRET` | JWT signing key for dev JWT mode |
-| `DISHA_DEV_PASSWORD` | bootstrap password for local login |
-| `DISHA_OIDC_ISSUER` | OIDC issuer URL |
-| `DISHA_OIDC_CLIENT_ID` | OIDC client id |
-| `DISHA_OIDC_CLIENT_SECRET` | OIDC client secret |
-| `DATABASE_URL` | Postgres connection string |
-| `REDIS_URL` | Redis connection string |
-| `DISHA_WORKSPACE_ROOT` | allowed filesystem root for web file operations |
-| `DISHA_ALLOWED_ORIGINS` | allowed browser origins |
-
-## Screenshots
-
-Add screenshots to `docs/images/` and wire them here:
-
-- `docs/images/dashboard-overview.png`
-- `docs/images/auth-flow.png`
-- `docs/images/share-export.png`
-
-Recommended capture set:
-
-1. Dashboard or command center overview
-2. Auth and policy-protected API interactions
-3. File, export, and sharing workflows
+No-First-Use is enforced in code under `disha/brain/policy/no_first_use.py`. Offensive, retaliatory, unauthorized, or destructive actions are blocked. Ambiguous actions require human approval.
 
 ## Documentation
 
-- [Repository Analysis](docs/repository-analysis.md)
-- [Technical Design Document](docs/TDD.md)
-- [Architecture Diagrams](docs/architecture-diagrams.md)
-- [Design System](docs/design-system.md)
-- [DISHA Brain Architecture](docs/disha-brain-architecture.md)
-- [DISHA Brain Enterprise Architecture](docs/disha-brain-enterprise-architecture.md)
-- [Wiki Home](docs/HOME.md)
+- [Architecture](docs/ARCHITECTURE.md)
+- [Product Thesis](docs/PRODUCT_THESIS.md)
+- [Version Ladder](docs/VERSION_LADDER.md)
+- [DISHA Brain](docs/DISHA_BRAIN.md)
+- [Agentic Flow](docs/LANGGRAPH_AGENTIC_FLOW.md)
+- [Yudh/Vyuha Doctrine](docs/YUDH_VYUHA_DOCTRINE.md)
+- [No-First-Use](docs/NO_FIRST_USE.md)
+- [Evidence Model](docs/EVIDENCE_MODEL.md)
+- [Trust Model](docs/TRUST_MODEL.md)
+- [Demos](docs/DEMOS.md)
+- [Roadmap](docs/ROADMAP.md)
 
-## Current State
+## Remaining Gaps
 
-What is production-oriented now:
-
-- `web/` hardening path
-- `src/` CLI security and observability adapters
-- `disha/brain/` unified brain backend and alerts pipeline
-- Compose-based local infrastructure
-- CI hardening across Python and TypeScript surfaces
-
-What remains in transition:
-
-- legacy surfaces under `backend/` and `disha-agi-brain/`
-- uneven documentation quality outside the new docs set
-
-## License
-
-See [LICENSE](LICENSE).
+- External source verification connectors need production credentials, publisher allowlists, and retrieval audits.
+- Domain models for HSE, geospatial, governance, and resilience need expert-reviewed datasets.
+- Persistent graph memory and audit export need deployment-specific storage guarantees.
+- Existing legacy integrations need security review before being promoted into the production spine.
+- thenitishkr.in and the two DISHA Intelligence books are referenced by the product brief, but repository-verifiable source material is not present here. Their exact relationship is [VERIFY REQUIRED].
