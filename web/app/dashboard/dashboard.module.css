@@ -1,0 +1,373 @@
+.page {
+  min-height: 100vh;
+  background:
+    linear-gradient(180deg, rgba(247, 213, 111, 0.16), transparent 260px),
+    #fbf7ed;
+  color: #1d1b16;
+  font-family:
+    Arial,
+    Helvetica,
+    sans-serif;
+}
+
+.shell {
+  width: min(1440px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 28px 0 44px;
+}
+
+.header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 280px;
+  gap: 24px;
+  align-items: stretch;
+  border: 2px solid #1d1b16;
+  background: #fffdf8;
+  padding: 28px;
+}
+
+.eyebrow,
+.kicker {
+  margin: 0 0 10px;
+  color: #6b614c;
+  font-size: 0.77rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.header h1 {
+  max-width: 920px;
+  margin: 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(2.25rem, 5vw, 5.4rem);
+  line-height: 0.95;
+  letter-spacing: 0;
+}
+
+.lede {
+  max-width: 870px;
+  margin: 22px 0 0;
+  color: #373229;
+  font-size: 1.06rem;
+  line-height: 1.65;
+}
+
+.clearanceBox {
+  display: flex;
+  min-height: 100%;
+  flex-direction: column;
+  justify-content: space-between;
+  border-left: 2px solid #1d1b16;
+  background: #f7d56f;
+  padding: 20px;
+}
+
+.clearanceBox span,
+.clearanceBox small {
+  font-size: 0.82rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.clearanceBox strong {
+  margin: 34px 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 2.1rem;
+  line-height: 1;
+}
+
+.statusGrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin: 16px 0;
+}
+
+.statusCard,
+.capabilityCard,
+.mainPanel,
+.sidePanel,
+.versionSection,
+.checkPanel,
+.dossierPanel {
+  border: 1.5px solid #1d1b16;
+  background: #fffdf8;
+}
+
+.statusCard {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 10px 12px;
+  align-items: center;
+  min-height: 112px;
+  padding: 18px;
+}
+
+.statusCard svg,
+.capabilityCard svg,
+.panelHeader svg {
+  width: 24px;
+  height: 24px;
+  stroke-width: 1.8;
+}
+
+.statusCard span {
+  color: #6b614c;
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.statusCard strong {
+  grid-column: 1 / -1;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.55rem;
+}
+
+.commandLayout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 360px;
+  gap: 16px;
+}
+
+.mainPanel,
+.sidePanel,
+.versionSection,
+.checkPanel,
+.dossierPanel {
+  padding: 22px;
+}
+
+.panelHeader {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  align-items: flex-start;
+  margin-bottom: 18px;
+}
+
+.panelHeader h2,
+.sidePanel h2,
+.versionCard h3,
+.capabilityCard h3 {
+  margin: 0;
+  font-family: Georgia, "Times New Roman", serif;
+  line-height: 1.08;
+  letter-spacing: 0;
+}
+
+.panelHeader h2,
+.sidePanel h2 {
+  font-size: clamp(1.55rem, 3vw, 2.4rem);
+}
+
+.graph {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.graphStep {
+  position: relative;
+  min-height: 86px;
+  border: 1.5px solid #1d1b16;
+  background: #f6eddb;
+  padding: 14px;
+}
+
+.graphStep:nth-child(1),
+.graphStep:nth-child(5),
+.graphStep:nth-child(9),
+.graphStep:nth-child(13) {
+  background: #f7d56f;
+}
+
+.graphStep span {
+  display: block;
+  color: #6b614c;
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+
+.graphStep strong {
+  display: block;
+  margin-top: 18px;
+  font-size: 1rem;
+}
+
+.sidePanel {
+  background: #f6eddb;
+}
+
+.truthList {
+  display: grid;
+  gap: 14px;
+  margin: 22px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.truthList li {
+  border-top: 1px solid rgba(29, 27, 22, 0.34);
+  padding-top: 13px;
+  line-height: 1.5;
+}
+
+.capabilityGrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+  margin: 16px 0;
+}
+
+.capabilityCard {
+  min-height: 214px;
+  padding: 20px;
+}
+
+.capabilityCard h3 {
+  margin-top: 32px;
+  font-size: 1.35rem;
+}
+
+.capabilityCard p,
+.versionCard p {
+  color: #4a4234;
+  line-height: 1.55;
+}
+
+.versionGrid {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.versionCard {
+  display: flex;
+  min-height: 196px;
+  flex-direction: column;
+  border: 1.5px solid #1d1b16;
+  background: #fffdf8;
+  padding: 16px;
+}
+
+.versionCard span {
+  width: max-content;
+  border: 1px solid #1d1b16;
+  background: #f7d56f;
+  padding: 4px 8px;
+  font-weight: 900;
+}
+
+.versionCard h3 {
+  margin-top: 18px;
+  font-size: 1.2rem;
+}
+
+.versionCard strong {
+  margin-top: auto;
+  color: #254229;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+}
+
+.bottomGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(320px, 0.76fr);
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.checkList {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.checkList div {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  border-top: 1px solid rgba(29, 27, 22, 0.35);
+  padding-top: 12px;
+}
+
+.checkList span {
+  width: 10px;
+  height: 10px;
+  flex: 0 0 auto;
+  border: 1px solid #1d1b16;
+  background: #f7d56f;
+}
+
+.checkList p {
+  margin: 0;
+  line-height: 1.35;
+}
+
+.dossierList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.dossierList span {
+  border: 1px solid #1d1b16;
+  background: #f6eddb;
+  padding: 10px 12px;
+  font-size: 0.92rem;
+}
+
+@media (max-width: 1120px) {
+  .header,
+  .commandLayout,
+  .bottomGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .clearanceBox {
+    border-top: 2px solid #1d1b16;
+    border-left: 0;
+  }
+
+  .statusGrid,
+  .capabilityGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .graph,
+  .versionGrid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 680px) {
+  .shell {
+    width: min(100% - 20px, 1440px);
+    padding-top: 10px;
+  }
+
+  .header,
+  .mainPanel,
+  .sidePanel,
+  .versionSection,
+  .checkPanel,
+  .dossierPanel {
+    padding: 16px;
+  }
+
+  .statusGrid,
+  .capabilityGrid,
+  .graph,
+  .versionGrid,
+  .checkList {
+    grid-template-columns: 1fr;
+  }
+
+  .statusCard,
+  .capabilityCard,
+  .versionCard {
+    min-height: auto;
+  }
+}
