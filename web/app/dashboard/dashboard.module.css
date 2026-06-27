@@ -16,6 +16,83 @@
   padding: 28px 0 44px;
 }
 
+.departmentFrame {
+  display: grid;
+  grid-template-columns: 188px minmax(0, 1fr);
+  gap: 16px;
+}
+
+.directorateRail {
+  position: sticky;
+  top: 20px;
+  align-self: start;
+  min-height: calc(100vh - 56px);
+  border: 2px solid #1d1b16;
+  background: #1d1b16;
+  color: #fffdf8;
+  padding: 16px;
+}
+
+.sealMark {
+  display: grid;
+  gap: 10px;
+  justify-items: start;
+  border-bottom: 1px solid rgba(255, 253, 248, 0.32);
+  padding-bottom: 18px;
+}
+
+.sealMark svg {
+  width: 34px;
+  height: 34px;
+}
+
+.sealMark span {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.5rem;
+  font-weight: 800;
+}
+
+.directorateRail nav {
+  display: grid;
+  gap: 8px;
+  margin: 28px 0;
+}
+
+.directorateRail a {
+  border: 1px solid rgba(255, 253, 248, 0.32);
+  color: #fffdf8;
+  padding: 10px;
+  font-size: 0.8rem;
+  font-weight: 800;
+  text-decoration: none;
+  text-transform: uppercase;
+}
+
+.railNote {
+  margin-top: auto;
+  border-top: 1px solid rgba(255, 253, 248, 0.32);
+  padding-top: 18px;
+}
+
+.railNote span {
+  display: block;
+  color: #f7d56f;
+  font-size: 0.76rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.railNote strong {
+  display: block;
+  margin-top: 8px;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.45rem;
+}
+
+.board {
+  min-width: 0;
+}
+
 .header {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 280px;
@@ -87,7 +164,9 @@
 .statusCard,
 .capabilityCard,
 .mainPanel,
-.sidePanel,
+.watchPanel,
+.sourcePanel,
+.situationPanel,
 .versionSection,
 .checkPanel,
 .dossierPanel {
@@ -125,14 +204,18 @@
   font-size: 1.55rem;
 }
 
+.situationGrid,
 .commandLayout {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 360px;
   gap: 16px;
+  margin-bottom: 16px;
 }
 
 .mainPanel,
-.sidePanel,
+.watchPanel,
+.sourcePanel,
+.situationPanel,
 .versionSection,
 .checkPanel,
 .dossierPanel {
@@ -148,7 +231,7 @@
 }
 
 .panelHeader h2,
-.sidePanel h2,
+.watchPanel h2,
 .versionCard h3,
 .capabilityCard h3 {
   margin: 0;
@@ -158,8 +241,83 @@
 }
 
 .panelHeader h2,
-.sidePanel h2 {
+.watchPanel h2 {
   font-size: clamp(1.55rem, 3vw, 2.4rem);
+}
+
+.situationPanel {
+  background: #fffdf8;
+}
+
+.mapBoard {
+  min-height: 340px;
+  border: 1.5px solid #1d1b16;
+  background:
+    linear-gradient(rgba(29, 27, 22, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(29, 27, 22, 0.08) 1px, transparent 1px),
+    #f6eddb;
+  background-size: 32px 32px;
+  padding: 18px;
+}
+
+.mapGrid {
+  position: relative;
+  min-height: 302px;
+  border: 1px solid rgba(29, 27, 22, 0.55);
+}
+
+.mapGrid::before,
+.mapGrid::after {
+  position: absolute;
+  content: "";
+  inset: 50% 8%;
+  border-top: 1.5px solid rgba(29, 27, 22, 0.55);
+}
+
+.mapGrid::after {
+  inset: 8% 50%;
+  border-top: 0;
+  border-left: 1.5px solid rgba(29, 27, 22, 0.55);
+}
+
+.mapGrid span {
+  position: absolute;
+  border: 1.5px solid #1d1b16;
+  background: #fffdf8;
+  padding: 10px 12px;
+  font-size: 0.85rem;
+  font-weight: 800;
+}
+
+.zoneNorth {
+  top: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.zoneWest {
+  top: 48%;
+  left: 18px;
+  transform: translateY(-50%);
+}
+
+.zoneCenter {
+  top: 50%;
+  left: 50%;
+  background: #f7d56f !important;
+  transform: translate(-50%, -50%);
+}
+
+.zoneEast {
+  top: 48%;
+  right: 18px;
+  transform: translateY(-50%);
+}
+
+.zoneSouth {
+  bottom: 18px;
+  left: 50%;
+  transform: translateX(-50%);
 }
 
 .graph {
@@ -196,7 +354,7 @@
   font-size: 1rem;
 }
 
-.sidePanel {
+.watchPanel {
   background: #f6eddb;
 }
 
@@ -219,6 +377,44 @@
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 16px;
   margin: 16px 0;
+}
+
+.sourcePanel {
+  background: #f6eddb;
+}
+
+.sourceTable {
+  display: grid;
+  gap: 10px;
+}
+
+.sourceTable div {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 6px 12px;
+  border-top: 1px solid rgba(29, 27, 22, 0.35);
+  padding-top: 12px;
+}
+
+.sourceTable strong {
+  font-family: Georgia, "Times New Roman", serif;
+}
+
+.sourceTable span {
+  border: 1px solid #1d1b16;
+  background: #f7d56f;
+  padding: 4px 8px;
+  font-size: 0.76rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.sourceTable p {
+  grid-column: 1 / -1;
+  margin: 0;
+  color: #4a4234;
+  font-size: 0.92rem;
+  line-height: 1.45;
 }
 
 .capabilityCard {
@@ -307,20 +503,52 @@
 }
 
 .dossierList {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 10px;
 }
 
-.dossierList span {
+.dossierList article {
   border: 1px solid #1d1b16;
   background: #f6eddb;
-  padding: 10px 12px;
+  padding: 12px;
+}
+
+.dossierList span {
+  color: #6b614c;
+  font-size: 0.72rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.dossierList strong {
+  display: block;
+  margin-top: 8px;
+  font-family: Georgia, "Times New Roman", serif;
+}
+
+.dossierList p {
+  margin: 8px 0 0;
+  color: #4a4234;
   font-size: 0.92rem;
 }
 
 @media (max-width: 1120px) {
+  .departmentFrame {
+    grid-template-columns: 1fr;
+  }
+
+  .directorateRail {
+    position: static;
+    min-height: auto;
+  }
+
+  .directorateRail nav {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
   .header,
+  .situationGrid,
   .commandLayout,
   .bottomGrid {
     grid-template-columns: 1fr;
@@ -350,7 +578,9 @@
 
   .header,
   .mainPanel,
-  .sidePanel,
+  .watchPanel,
+  .sourcePanel,
+  .situationPanel,
   .versionSection,
   .checkPanel,
   .dossierPanel {
@@ -361,8 +591,14 @@
   .capabilityGrid,
   .graph,
   .versionGrid,
-  .checkList {
+  .checkList,
+  .dossierList,
+  .directorateRail nav {
     grid-template-columns: 1fr;
+  }
+
+  .mapBoard {
+    min-height: 300px;
   }
 
   .statusCard,
