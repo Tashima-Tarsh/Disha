@@ -94,6 +94,7 @@ No-First-Use is enforced in code under `disha/brain/policy/no_first_use.py`. Off
 - [No-First-Use](docs/NO_FIRST_USE.md)
 - [Evidence Model](docs/EVIDENCE_MODEL.md)
 - [Trust Model](docs/TRUST_MODEL.md)
+- [Production Readiness](docs/PRODUCTION_READINESS.md)
 - [Demos](docs/DEMOS.md)
 - [Roadmap](docs/ROADMAP.md)
 
