@@ -14,7 +14,7 @@ from disha.brain.memory import MemoryStore
 from disha.brain.policy import evaluate_actions
 from disha.brain.policy.no_first_use import NFUDecision
 from disha.brain.versions import v4_6_hse, v5_6_national_audit
-from disha.brain.vyuha import select_vyuha
+from disha.brain.vyuha import build_dharma_yudh_vyuha_plan, select_vyuha
 
 
 def test_brain_package_import_is_lazy() -> None:
@@ -76,6 +76,28 @@ def test_vyuha_selection() -> None:
     assert formation.name == "NYAYA Audit Vyuha"
 
 
+def test_dharma_yudh_vyuha_plan_prefers_nyaya_for_public_authority() -> None:
+    audit = build_constitutional_audit(
+        text="RTI public authority contradiction in welfare record",
+        evidence_class="rti_record",
+        confidence_level="medium",
+        source_links=["https://example.gov.in/rti-response"],
+    )
+    plan = build_dharma_yudh_vyuha_plan(
+        ["RTI public authority contradiction", "rti_record"],
+        0.35,
+        evidence_class="rti_record",
+        confidence_level="medium",
+        source_links=["https://example.gov.in/rti-response"],
+        requested_actions=["report", "preserve_evidence"],
+        constitutional_audit=audit.model_dump(),
+    )
+    assert plan.formation == "NYAYA Audit Vyuha"
+    assert plan.pramana["verification_status"] == "source_linked_review"
+    assert plan.dharma["public_authority_signal"] is True
+    assert "unauthorized_access" in plan.karma["blocked_actions"]
+
+
 def test_constitutional_audit_requires_sources_for_public_authority_claim() -> None:
     audit = build_constitutional_audit(
         text="RTI public authority contradiction about district health access",
@@ -130,6 +152,24 @@ def test_graph_audit_contains_constitutional_action_ledger() -> None:
     assert ledger["public_authority_signal"] is True
     assert ledger["verification_status"] == "verification_required"
     assert "unverified_public_claim" in ledger["blocked_actions"]
+
+
+def test_graph_vyuha_contains_dharma_pramana_karma_decision_spine() -> None:
+    graph = DishaAgenticGraph()
+    result = graph.invoke(
+        GraphInput(
+            input_text="RTI Article 12 public authority contradiction",
+            source_type="rti_record",
+            source_links=["https://example.gov.in/rti-response"],
+            requested_actions=["report", "preserve_evidence"],
+        )
+    )
+    recommendation = result.vyuha_recommendation
+    assert recommendation["formation"] == "NYAYA Audit Vyuha"
+    assert recommendation["pramana"]["verification_status"] == "source_linked_review"
+    assert recommendation["dharma"]["public_authority_signal"] is True
+    assert "unverified_public_claim" in recommendation["karma"]["blocked_actions"]
+    assert recommendation["formation_scores"]
 
 
 def test_hse_service_gap_output() -> None:

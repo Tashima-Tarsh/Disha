@@ -59,6 +59,17 @@ For each graph run it records:
 
 The graph stores this ledger in audit metadata, so constitutional reasoning is attached to the evidence trail instead of living only in docs.
 
+The repo also has a Dharma-Yudh-Vyuha planner in `disha/brain/vyuha/dynamic.py`.
+
+This planner turns each run into a governed decision:
+
+- Pramana: evidence class, confidence, source count, verification status, and gaps
+- Dharma: public-authority signal and constitutional/public-interest principles
+- Yudh: risk posture and formation reason
+- Karma: permitted actions, blocked actions, and action discipline
+
+The planner does not reward aggressive action. It prefers the formation that is best supported by proof, lawful duty, and defensive constraints. A public-authority RTI contradiction should move toward NYAYA Audit Vyuha; a high-risk defensive incident should still remain NFU-governed and approval-gated.
+
 ## Product Rule
 
 DISHA must not become a surveillance platform. It should become a public-interest audit and cyber-protection system:
