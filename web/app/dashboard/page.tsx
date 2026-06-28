@@ -3,7 +3,6 @@
 import { useEffect, useMemo, useState } from "react";
 import {
   AlertTriangle,
-  CheckCircle2,
   ChevronDown,
   ClipboardList,
   FileSearch,
@@ -286,13 +285,13 @@ export default function DashboardPage() {
     () => new Set(filtered.map((territory) => normalizeName(territory.name))),
     [filtered],
   );
-  const totalCases = filtered.reduce((sum, territory) => sum + territory.cases, 0);
   const approvalQueue = filtered.reduce((sum, territory) => sum + territory.approval, 0);
   const averageEvidence = Math.round(filtered.reduce((sum, territory) => sum + territory.evidence, 0) / Math.max(filtered.length, 1));
   const averageClosure = Math.round(filtered.reduce((sum, territory) => sum + territory.closure, 0) / Math.max(filtered.length, 1));
   const criticalCount = filtered.filter((territory) => territory.priority === "Critical").length;
   const regionRows = summarizeByRegion(filtered);
   const domainRows = summarizeByDomain(filtered);
+  const priorityRows = summarizeByPriority(filtered);
   const lastUpdated = new Date(payload.generatedAt).toLocaleTimeString("en-IN", {
     hour: "2-digit",
     minute: "2-digit",
@@ -304,12 +303,12 @@ export default function DashboardPage() {
       <section className={styles.shell} aria-labelledby="dashboard-title">
         <header className={styles.commandHeader}>
           <div>
-            <p className={styles.eyebrow}>DISHA Bharat Live Scan</p>
-            <h1 id="dashboard-title">Agentic India scan dashboard</h1>
+            <p className={styles.eyebrow}>DISHA National Intelligence Report</p>
+            <h1 id="dashboard-title">India public accountability dashboard</h1>
           </div>
           <div className={styles.scanStatus}>
             <Radar aria-hidden="true" />
-            <span>{payload.scanId}</span>
+            <span>Dataset refresh</span>
             <strong>{lastUpdated}</strong>
             <button type="button" onClick={() => setRefreshNonce((value) => value + 1)}>
               {isRefreshing ? "Scanning" : "Refresh"}
@@ -320,7 +319,7 @@ export default function DashboardPage() {
         <section className={styles.filterBar} aria-label="Dashboard slicers">
           <div className={styles.filterTitle}>
             <Filter aria-hidden="true" />
-            <span>Slicers</span>
+            <span>Report slicers</span>
           </div>
           <SelectControl label="Region" value={selectedRegion} values={regions} onChange={setSelectedRegion} />
           <SelectControl label="Domain" value={selectedDomain} values={domains} onChange={setSelectedDomain} />
@@ -332,31 +331,51 @@ export default function DashboardPage() {
           </label>
         </section>
 
-        <section className={styles.kpiGrid} aria-label="All India KPIs">
-          <Kpi label="Territories scanned" value={String(filtered.length)} detail="state and UT units" icon={MapPinned} />
-          <Kpi label="Public-interest cases" value={String(totalCases)} detail="live demo workload" icon={ClipboardList} />
-          <Kpi label="Evidence readiness" value={`${averageEvidence}%`} detail="source confidence" icon={CheckCircle2} />
-          <Kpi label="Human approval queue" value={String(approvalQueue)} detail="policy-gated action" icon={Gavel} />
-          <Kpi label="Closure readiness" value={`${averageClosure}%`} detail="audit to action" icon={ShieldCheck} />
-          <Kpi label="Critical territories" value={String(criticalCount)} detail="senior review lane" icon={AlertTriangle} />
+        <section className={styles.measureGrid} aria-label="Live BI visuals">
+          <article className={styles.measureVisual}>
+            <PanelHeader icon={AlertTriangle} eyebrow="Heat matrix" title="Priority by active units" />
+            <div className={styles.heatMatrix}>
+              {priorityRows.map((row) => (
+                <div key={row.label} data-priority={row.label}>
+                  <span>{row.label}</span>
+                  <i style={{ width: `${Math.max((row.value / Math.max(filtered.length, 1)) * 100, 8)}%` }} />
+                  <strong>{row.value}</strong>
+                </div>
+              ))}
+            </div>
+          </article>
+          <article className={styles.measureVisual}>
+            <PanelHeader icon={Gavel} eyebrow="Approval lane" title="Actions waiting for human review" />
+            <div className={styles.flowVisual}>
+              <span style={{ width: `${Math.min(approvalQueue * 3, 100)}%` }} />
+              <p>{approvalQueue} approval-gated actions across the current filter.</p>
+            </div>
+          </article>
+          <article className={styles.measureVisual}>
+            <PanelHeader icon={ShieldCheck} eyebrow="Evidence lane" title="Verification and closure state" />
+            <div className={styles.dualGauge}>
+              <div><span style={{ height: `${averageEvidence}%` }} /><p>Evidence</p></div>
+              <div><span style={{ height: `${averageClosure}%` }} /><p>Closure</p></div>
+              <div><span style={{ height: `${Math.min(criticalCount * 18, 100)}%` }} /><p>Critical</p></div>
+            </div>
+          </article>
+          <article className={styles.measureVisual}>
+            <PanelHeader icon={ClipboardList} eyebrow="Live queue" title="Top changing territories" />
+            <div className={styles.eventRail}>
+              {filtered.slice(0, 5).map((territory) => (
+                <button type="button" key={territory.name} onClick={() => setSelectedTerritory(territory.name)}>
+                  <span>{territory.name}</span>
+                  <i>{territory.agenticScan.nextAction}</i>
+                </button>
+              ))}
+            </div>
+          </article>
         </section>
 
         <section className={styles.operationsGrid}>
           <article className={styles.mapPanel}>
-            <PanelHeader icon={MapPinned} eyebrow="India map" title="State and UT scan surface" />
+            <PanelHeader icon={MapPinned} eyebrow="Map visual" title="State and UT heat map" />
             <div className={styles.scanCanvas}>
-              <div className={styles.floatingMetrics} aria-hidden="true">
-                <div>
-                  <span>Evidence</span>
-                  <strong>{averageEvidence}%</strong>
-                  <i />
-                </div>
-                <div>
-                  <span>Cases</span>
-                  <strong>{totalCases.toLocaleString("en-IN")}</strong>
-                  <b />
-                </div>
-              </div>
               <IndiaMap
                 activeSet={activeSet}
                 features={mapFeatures}
@@ -364,32 +383,11 @@ export default function DashboardPage() {
                 selectedName={selected.name}
                 onSelect={setSelectedTerritory}
               />
-              <div className={styles.scanLens} aria-hidden="true">
-                <span />
-                <strong />
-                <i />
-              </div>
-              <div className={styles.scanRings} aria-hidden="true">
-                <span />
-                <span />
-                <span />
-                <span />
-              </div>
-              <div className={styles.signalReadout} aria-hidden="true">
-                <strong>{selected.cases.toLocaleString("en-IN")}</strong>
-                <span>{selected.name}</span>
-                <p>{selected.agenticScan.posture}</p>
-              </div>
-              <div className={styles.chartOverlay} aria-hidden="true">
-                {regionRows.slice(0, 6).map((row) => (
-                  <span key={row.label} style={{ height: `${Math.max(row.value, 14)}px` }} />
-                ))}
-              </div>
             </div>
           </article>
 
           <aside className={styles.drillPanel}>
-            <PanelHeader icon={FileSearch} eyebrow="Agentic drill-through" title={selected.name} />
+            <PanelHeader icon={FileSearch} eyebrow="Drill-through visual" title={selected.name} />
             <div className={styles.scoreRing} style={{ "--score": `${selected.evidence * 3.6}deg` } as CSSProperties}>
               <strong>{selected.evidence}%</strong>
               <span>evidence</span>
@@ -431,12 +429,6 @@ export default function DashboardPage() {
         <section className={styles.sourceGrid} aria-label="National data source coverage">
           <article className={styles.panel}>
             <PanelHeader icon={ShieldCheck} eyebrow="National source registry" title="President to panchayat data coverage" />
-            <div className={styles.sourceKpis}>
-              <Detail label="Registered layers" value={String(nationalPayload.coverage.total)} />
-              <Detail label="Live verified" value={String(nationalPayload.coverage.verifiedLiveSources)} />
-              <Detail label="Need verification" value={String(nationalPayload.coverage.verificationGaps)} />
-              <Detail label="Bulk imports" value={String(nationalPayload.coverage.counts.requires_bulk_import)} />
-            </div>
             <div className={styles.sourceList}>
               {nationalPayload.sources.slice(0, 10).map((source) => (
                 <div key={source.id}>
@@ -531,17 +523,6 @@ function SelectControl<T extends string>({ label, value, values, onChange }: { l
       </select>
       <ChevronDown aria-hidden="true" />
     </label>
-  );
-}
-
-function Kpi({ label, value, detail, icon: Icon }: { label: string; value: string; detail: string; icon: LucideIcon }) {
-  return (
-    <article className={styles.kpiCard}>
-      <Icon aria-hidden="true" />
-      <span>{label}</span>
-      <strong>{value}</strong>
-      <p>{detail}</p>
-    </article>
   );
 }
 
@@ -655,6 +636,15 @@ function summarizeByDomain(items: ScanTerritory[]) {
     .map((domain) => ({
       domain,
       value: items.filter((item) => item.domain === domain).reduce((sum, item) => sum + item.cases, 0),
+    }))
+    .filter((row) => row.value > 0);
+}
+
+function summarizeByPriority(items: ScanTerritory[]) {
+  return (["Critical", "High", "Watch", "Stable"] as Priority[])
+    .map((priority) => ({
+      label: priority,
+      value: items.filter((item) => item.priority === priority).length,
     }))
     .filter((row) => row.value > 0);
 }
