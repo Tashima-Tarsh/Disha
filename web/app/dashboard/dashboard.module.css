@@ -1,82 +1,121 @@
 .page {
   min-height: 100vh;
-  background: #f4f1e8;
-  color: #1f1c16;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.7), rgba(246, 239, 221, 0.82)),
+    #f6efe0;
+  color: #211d16;
   font-family: Arial, Helvetica, sans-serif;
 }
 
 .shell {
-  width: min(1500px, calc(100% - 28px));
+  width: min(1760px, calc(100% - 28px));
   margin: 0 auto;
   padding: 18px 0 34px;
 }
 
 .hero,
 .filterBar,
-.kpiCard,
 .panel,
-.problemCard {
-  border: 1px solid #242016;
-  background: #fffdf8;
+.atlasPanel,
+.contextPanel,
+.kpiCard,
+.heroPanel {
+  border: 1px solid rgba(36, 31, 22, 0.28);
+  background: rgba(255, 253, 247, 0.94);
+  box-shadow: 0 18px 42px rgba(85, 65, 28, 0.08);
 }
 
 .hero {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 360px;
+  grid-template-columns: minmax(0, 1fr) 390px;
   gap: 14px;
-  padding: 22px;
+  min-height: 330px;
+  padding: 24px;
+  background:
+    linear-gradient(115deg, rgba(255, 253, 247, 0.96) 0%, rgba(255, 253, 247, 0.9) 58%, rgba(244, 178, 64, 0.22) 100%),
+    #fffdf7;
+}
+
+.heroCopy {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
 }
 
 .eyebrow,
-.panelHeader p,
 .filterTitle,
+.selectControl span,
 .kpiCard span,
-.problemCard span {
+.panelHeader p,
+.heroPanel span,
+.leadBox span,
+.territoryCard span,
+.protection span {
   margin: 0;
-  color: #6d6046;
-  font-size: 0.76rem;
-  font-weight: 800;
-  letter-spacing: 0.07em;
+  color: #756445;
+  font-size: 0.73rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 
 .hero h1 {
-  max-width: 980px;
+  max-width: 1120px;
   margin: 8px 0 0;
   font-family: Georgia, "Times New Roman", serif;
-  font-size: clamp(2rem, 4.6vw, 4.8rem);
-  line-height: 0.98;
+  font-size: clamp(2.45rem, 5.6vw, 6.25rem);
+  font-weight: 700;
+  line-height: 0.96;
   letter-spacing: 0;
 }
 
-.hero p,
-.problemCard p {
-  max-width: 900px;
-  margin: 14px 0 0;
-  color: #3f382b;
-  font-size: 1rem;
-  line-height: 1.55;
+.hero p {
+  max-width: 860px;
+  margin: 18px 0 0;
+  color: #463a29;
+  font-size: clamp(1rem, 1.3vw, 1.2rem);
+  line-height: 1.56;
 }
 
-.problemCard {
+.heroPanel {
   display: flex;
-  min-height: 100%;
   flex-direction: column;
   justify-content: space-between;
-  background: #f7d56f;
+  min-height: 100%;
   padding: 18px;
+  background:
+    linear-gradient(180deg, rgba(255, 214, 116, 0.92), rgba(255, 244, 211, 0.92)),
+    #f8ca62;
 }
 
-.problemCard strong {
-  margin-top: 24px;
+.heroPanel div:first-child {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.heroPanel svg {
+  width: 21px;
+  height: 21px;
+}
+
+.heroPanel strong {
+  display: block;
+  margin: 34px 0 0;
   font-family: Georgia, "Times New Roman", serif;
-  font-size: 1.8rem;
-  line-height: 1.05;
+  font-size: clamp(2rem, 4vw, 3.4rem);
+  line-height: 0.98;
+}
+
+.heroPanel p {
+  margin-top: 18px;
+  color: #352715;
+  font-size: 0.98rem;
 }
 
 .filterBar {
   display: grid;
-  grid-template-columns: 130px repeat(4, minmax(0, 1fr));
+  grid-template-columns: 150px repeat(3, minmax(0, 1fr));
   gap: 10px;
   margin: 12px 0;
   padding: 12px;
@@ -90,36 +129,43 @@
 
 .filterTitle svg,
 .panelHeader svg,
-.barRow svg {
+.kpiCard svg,
+.domainList svg,
+.territoryCard svg {
   width: 20px;
   height: 20px;
-  stroke-width: 1.8;
+  stroke-width: 1.9;
 }
 
-.filterBar button {
-  min-height: 58px;
-  border: 1px solid #242016;
-  background: #f8f1dc;
-  color: #1f1c16;
-  text-align: left;
+.selectControl {
+  position: relative;
+  display: grid;
+  gap: 5px;
+  min-height: 68px;
+  border: 1px solid rgba(36, 31, 22, 0.32);
+  background: #fff7df;
+  padding: 9px 12px;
 }
 
-.filterBar button span,
-.filterBar button strong {
-  display: block;
-  padding: 0 12px;
-}
-
-.filterBar button span {
-  color: #6d6046;
-  font-size: 0.72rem;
+.selectControl select {
+  width: 100%;
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: #211d16;
+  font: inherit;
+  font-size: 1rem;
   font-weight: 800;
-  text-transform: uppercase;
+  outline: none;
 }
 
-.filterBar button strong {
-  margin-top: 7px;
-  font-size: 0.95rem;
+.selectControl svg {
+  position: absolute;
+  right: 10px;
+  bottom: 13px;
+  width: 18px;
+  height: 18px;
+  pointer-events: none;
 }
 
 .kpiGrid {
@@ -130,31 +176,40 @@
 }
 
 .kpiCard {
-  min-height: 132px;
-  padding: 16px;
+  min-height: 146px;
+  padding: 15px;
+  background: #fffdf7;
+}
+
+.kpiCard svg {
+  margin-bottom: 14px;
+  color: #8e6025;
 }
 
 .kpiCard strong {
   display: block;
-  margin-top: 18px;
+  margin-top: 10px;
   font-family: Georgia, "Times New Roman", serif;
-  font-size: 2.25rem;
+  font-size: clamp(2.05rem, 3vw, 3rem);
+  line-height: 1;
 }
 
 .kpiCard p {
   margin: 8px 0 0;
-  color: #4b4232;
+  color: #514634;
   font-size: 0.9rem;
+  line-height: 1.35;
 }
 
-.analyticsGrid,
-.midGrid {
+.mapGrid {
   display: grid;
-  grid-template-columns: minmax(0, 1.25fr) minmax(360px, 0.75fr);
+  grid-template-columns: minmax(0, 1fr) 360px;
   gap: 12px;
   margin-bottom: 12px;
 }
 
+.atlasPanel,
+.contextPanel,
 .panel {
   padding: 18px;
 }
@@ -170,217 +225,199 @@
 .panelHeader h2 {
   margin: 6px 0 0;
   font-family: Georgia, "Times New Roman", serif;
-  font-size: 1.45rem;
-  line-height: 1.12;
+  font-size: clamp(1.4rem, 2vw, 2rem);
+  line-height: 1.08;
+}
+
+.panelHeader svg {
+  color: #8e6025;
+}
+
+.territoryGrid {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 9px;
+}
+
+.territoryCard {
+  display: flex;
+  flex-direction: column;
+  min-height: 166px;
+  border: 1px solid rgba(36, 31, 22, 0.34);
+  color: #211d16;
+  padding: 10px;
+  text-align: left;
+  transition:
+    transform 160ms ease,
+    border-color 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.territoryCard:hover,
+.territoryCard:focus-visible {
+  border-color: #211d16;
+  box-shadow: 0 14px 26px rgba(64, 45, 18, 0.16);
+  outline: none;
+  transform: translateY(-2px);
+}
+
+.territoryCard div {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: center;
+}
+
+.territoryCard strong {
+  display: block;
+  margin-top: 15px;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.17rem;
+  line-height: 1.08;
+}
+
+.territoryCard p {
+  margin: 8px 0 0;
+  color: #3f3425;
+  font-size: 0.86rem;
+  line-height: 1.3;
+}
+
+.territoryCard small {
+  display: block;
+  margin-top: auto;
+  color: #544632;
+  font-size: 0.76rem;
+  font-weight: 800;
+}
+
+.critical {
+  background: #f4a58d;
+}
+
+.high {
+  background: #f3ca64;
+}
+
+.watch {
+  background: #b9dc9b;
+}
+
+.stable {
+  background: #a9d8d0;
+}
+
+.contextPanel {
+  background: #fffdf7;
+}
+
+.protectionStack {
+  display: grid;
+  gap: 10px;
+}
+
+.protection {
+  border-top: 1px solid rgba(36, 31, 22, 0.22);
+  padding-top: 12px;
+}
+
+.protection p,
+.leadBox p {
+  margin: 7px 0 0;
+  color: #443829;
+  line-height: 1.45;
+}
+
+.leadBox {
+  margin-top: 18px;
+  border: 1px solid rgba(36, 31, 22, 0.3);
+  background: #f8f0d9;
+  padding: 14px;
+}
+
+.leadBox strong {
+  display: block;
+  margin-top: 12px;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.75rem;
+  line-height: 1.05;
+}
+
+.analyticsGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(360px, 0.65fr);
+  gap: 12px;
 }
 
 .barList {
   display: grid;
-  gap: 13px;
+  gap: 11px;
 }
 
 .barRow {
   display: grid;
-  grid-template-columns: minmax(190px, 1fr) 44px minmax(0, 1.6fr);
+  grid-template-columns: 130px 56px minmax(0, 1fr);
   gap: 12px;
   align-items: center;
 }
 
-.barRow div:first-child {
-  display: flex;
-  gap: 8px;
-  align-items: center;
+.barRow span {
+  font-weight: 900;
 }
 
 .barRow strong {
   text-align: right;
 }
 
-.barTrack {
+.barRow div {
   overflow: hidden;
-  height: 18px;
-  border: 1px solid #242016;
-  background: #f4f1e8;
+  height: 20px;
+  border: 1px solid rgba(36, 31, 22, 0.35);
+  background: #f7efd7;
 }
 
-.barTrack span {
+.barRow i {
   display: block;
   height: 100%;
+  max-width: 100%;
+  background: linear-gradient(90deg, #8abf88, #f0c456, #e99878);
 }
 
-.strong {
-  background: #1f1c16;
-}
-
-.warm {
-  background: #caa23e;
-}
-
-.soft {
-  background: #e7c967;
-}
-
-.pale {
-  background: #efe2b2;
-}
-
-.donutWrap {
+.domainList {
   display: grid;
-  grid-template-columns: 170px minmax(0, 1fr);
-  gap: 20px;
+  gap: 10px;
+}
+
+.domainList div {
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr) 52px;
+  gap: 10px;
   align-items: center;
-}
-
-.donut {
-  width: 168px;
-  height: 168px;
-  border: 1px solid #242016;
-  border-radius: 50%;
-  background: conic-gradient(
-    #1f1c16 0deg 154deg,
-    #caa23e 154deg 266deg,
-    #e7c967 266deg 327deg,
-    #efe2b2 327deg 360deg
-  );
-  box-shadow: inset 0 0 0 42px #fffdf8;
-}
-
-.legend {
-  display: grid;
-  gap: 10px;
-}
-
-.legend div {
-  display: grid;
-  grid-template-columns: 44px minmax(0, 1fr);
-  gap: 10px;
-  border-top: 1px solid rgba(36, 32, 22, 0.25);
-  padding-top: 10px;
-}
-
-.legend span {
-  font-weight: 900;
-}
-
-.legend p {
-  margin: 0;
-  color: #4b4232;
-  line-height: 1.35;
-}
-
-.regionGrid {
-  display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: 10px;
-}
-
-.regionCard {
-  min-height: 146px;
-  border: 1px solid #242016;
-  background: #f8f1dc;
-  padding: 12px;
-}
-
-.regionCard span {
-  font-size: 0.75rem;
-  font-weight: 900;
-  text-transform: uppercase;
-}
-
-.regionCard strong {
-  display: block;
-  margin-top: 16px;
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: 1.45rem;
-}
-
-.regionCard p,
-.regionCard small {
-  display: block;
-  margin: 8px 0 0;
-  color: #4b4232;
-  line-height: 1.35;
-}
-
-.decisionList {
-  display: grid;
-  gap: 10px;
-}
-
-.decisionList div {
-  display: flex;
-  gap: 10px;
-  align-items: flex-start;
-  border-top: 1px solid rgba(36, 32, 22, 0.25);
+  border-top: 1px solid rgba(36, 31, 22, 0.22);
   padding-top: 11px;
 }
 
-.decisionList span {
-  width: 11px;
-  height: 11px;
-  flex: 0 0 auto;
-  margin-top: 3px;
-  border: 1px solid #242016;
-  background: #f7d56f;
+.domainList span {
+  color: #352d21;
+  font-weight: 800;
 }
 
-.decisionList p {
-  margin: 0;
-  line-height: 1.45;
+.domainList strong {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.3rem;
+  text-align: right;
 }
 
-.tableWrap {
-  overflow-x: auto;
+@media (max-width: 1480px) {
+  .territoryGrid {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
 }
 
-.tableWrap table {
-  width: 100%;
-  border-collapse: collapse;
-  min-width: 880px;
-}
-
-.tableWrap th,
-.tableWrap td {
-  border-top: 1px solid rgba(36, 32, 22, 0.28);
-  padding: 12px 10px;
-  text-align: left;
-  vertical-align: top;
-}
-
-.tableWrap th {
-  color: #6d6046;
-  font-size: 0.72rem;
-  font-weight: 900;
-  text-transform: uppercase;
-}
-
-.tableWrap td {
-  color: #29241b;
-  line-height: 1.35;
-}
-
-.highRisk,
-.mediumRisk {
-  display: inline-block;
-  border: 1px solid #242016;
-  padding: 4px 8px;
-  font-size: 0.78rem;
-  font-weight: 900;
-  text-transform: uppercase;
-}
-
-.highRisk {
-  background: #f7d56f;
-}
-
-.mediumRisk {
-  background: #f8f1dc;
-}
-
-@media (max-width: 1180px) {
+@media (max-width: 1220px) {
   .hero,
-  .analyticsGrid,
-  .midGrid {
+  .mapGrid,
+  .analyticsGrid {
     grid-template-columns: 1fr;
   }
 
@@ -388,36 +425,43 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .kpiGrid,
-  .regionGrid {
+  .kpiGrid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .territoryGrid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 }
 
-@media (max-width: 720px) {
+@media (max-width: 820px) {
   .shell {
-    width: min(100% - 18px, 1500px);
+    width: min(100% - 18px, 1760px);
     padding-top: 10px;
   }
 
   .hero,
-  .panel,
-  .problemCard {
+  .atlasPanel,
+  .contextPanel,
+  .panel {
     padding: 14px;
   }
 
   .filterBar,
   .kpiGrid,
-  .regionGrid,
-  .donutWrap {
+  .territoryGrid {
     grid-template-columns: 1fr;
   }
 
-  .barRow {
-    grid-template-columns: 1fr 40px;
+  .territoryCard {
+    min-height: 132px;
   }
 
-  .barTrack {
+  .barRow {
+    grid-template-columns: 1fr 44px;
+  }
+
+  .barRow div {
     grid-column: 1 / -1;
   }
 }
