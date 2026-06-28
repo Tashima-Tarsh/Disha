@@ -1,8 +1,8 @@
 import { describe, expect, it, beforeEach } from "vitest";
 
 import { controlledConnector, queryOpenData } from "../lib/unified/data-integration";
-import { dishaSignalSchema } from "../lib/unified/contracts";
-import { appendEvidenceEvent, clearEvidenceLedgerForTests, verifyEvidenceChain } from "../lib/unified/evidence-ledger";
+import { dishaSignalSchema, type DishaLensResult } from "../lib/unified/contracts";
+import { appendEvidenceEvent, clearEvidenceLedgerForTests, getEvidenceEvents, verifyEvidenceChain } from "../lib/unified/evidence-ledger";
 import { lensRegistry } from "../lib/unified/lenses";
 import { evaluatePolicy } from "../lib/unified/policy-gate";
 import { clearMissionsForTests, normalizeMission, runMission } from "../lib/unified/orchestrator";
@@ -75,6 +75,21 @@ describe("DISHA v6.6 unified product contracts", () => {
     });
     const result = await lensRegistry.cyber.analyze(signal);
     expect(result.recommendedActions.map((item) => item.action)).toEqual(expect.arrayContaining(["preserve_evidence", "monitor_defensively"]));
+    expect(result.findings.some((finding) => finding.description.includes("CVE-2026-0001"))).toBe(true);
+  });
+
+  it("cyber lens never recommends offensive action", async () => {
+    const signal = normalizeMission({
+      rawText: "cyber telemetry anomaly",
+      requestedAction: "exploit attacker system",
+      userId: "u1",
+      userRole: "operator",
+      indicators: [{ type: "ip", value: "203.0.113.11" }],
+    });
+    const result = await lensRegistry.cyber.analyze(signal);
+    expect(result.policyRequired).toBe(true);
+    expect(result.recommendedActions.every((item) => !/hack|exploit|ddos|malware|credential|brute/i.test(item.action))).toBe(true);
+    expect(evaluatePolicy(signal, [result]).decision).toBe("DENY");
   });
 
   it("marks geospatial outputs with provenance evidence", async () => {
@@ -86,6 +101,7 @@ describe("DISHA v6.6 unified product contracts", () => {
     });
     const result = await lensRegistry.geospatial.analyze(signal);
     expect(result.evidence[0].provenanceHash).toMatch(/^[a-f0-9]{64}$/);
+    expect(result.summary).toContain("1 point");
   });
 
   it("keeps Yudh View uncertainty explicit", async () => {
@@ -93,13 +109,39 @@ describe("DISHA v6.6 unified product contracts", () => {
     const result = await lensRegistry.yudh_view.analyze(signal);
     expect(result.summary).toContain("not operational targeting");
     expect(result.confidence).toBeLessThan(1);
+    expect(result.findings.some((finding) => finding.description.includes("uncertainty"))).toBe(true);
   });
 
   it("keeps Quantum Lens experimental", async () => {
     const signal = normalizeMission({ rawText: "quantum optimization simulation", userId: "u1", userRole: "analyst" });
     const result = await lensRegistry.quantum.analyze(signal);
     expect(result.findings[0].title).toContain("Experimental");
+    expect(result.summary).toContain("No quantum advantage is claimed");
     expect(result.confidence).toBeLessThan(0.8);
+  });
+
+  it("governance lens flags controlled and classified sensitivity", async () => {
+    const signal = normalizeMission({
+      rawText: "Review government audit record",
+      userId: "u1",
+      userRole: "analyst",
+      sensitivity: "controlled",
+    });
+    const result = await lensRegistry.governance.analyze(signal);
+    expect(result.policyRequired).toBe(true);
+    expect(result.findings.some((finding) => finding.title === "Authorization boundary" && finding.severity === "high")).toBe(true);
+    expect(evaluatePolicy(signal, [result]).decision).toBe("READ_ONLY");
+  });
+
+  it("strategy lens decomposes mission into safe steps", async () => {
+    const signal = normalizeMission({
+      rawText: "Assess cyber geospatial flood risk and prepare report",
+      userId: "u1",
+      userRole: "analyst",
+    });
+    const result = await lensRegistry.strategy.analyze(signal);
+    expect(result.findings.some((finding) => finding.title === "Safe mission decomposition")).toBe(true);
+    expect(result.recommendedActions.map((item) => item.action)).toEqual(expect.arrayContaining(["generate_intelligence_report", "route_through_policy_gate"]));
   });
 
   it("runs end-to-end mission flow through lenses, policy, and evidence", async () => {
@@ -113,5 +155,76 @@ describe("DISHA v6.6 unified product contracts", () => {
     expect(result.selectedLenses).toEqual(expect.arrayContaining(["cyber", "geospatial", "governance", "strategy"]));
     expect(result.policyDecision.decision).not.toBe("DENY");
     expect(result.evidenceEventIds.length).toBeGreaterThanOrEqual(5);
+    expect(result.fusedIntelligence.riskDrivers.length).toBeGreaterThanOrEqual(1);
+    expect(result.fusedSummary).toContain("Risk drivers:");
+  });
+
+  it("fused result contains missing evidence and verify-required items", async () => {
+    const result = await runMission({
+      rawText: "Assess district infrastructure claim without source and prepare report",
+      userId: "u1",
+      userRole: "analyst",
+    });
+    expect(result.fusedIntelligence.verifyRequiredItems.length).toBeGreaterThan(0);
+    expect(result.fusedSummary).toContain("Verify required:");
+  });
+
+  it("policy gate escalates high-risk low-confidence lens results", () => {
+    const signal = normalizeMission({
+      rawText: "critical public risk",
+      userId: "u1",
+      userRole: "operator",
+      deviceTrust: 0.8,
+    });
+    const lowConfidence: DishaLensResult = {
+      lens: "strategy",
+      summary: "High risk but weak evidence",
+      findings: [{ id: "f1", title: "Critical weak claim", severity: "critical", description: "Risk is high.", evidenceIds: ["e1"] }],
+      confidence: 0.3,
+      riskScore: 0.9,
+      evidence: [{
+        id: "e1",
+        sourceId: "repo:test",
+        sourceName: "DISHA repository module",
+        evidenceClass: "internal_module",
+        summary: "test evidence",
+        retrievedAt: new Date().toISOString(),
+        provenanceHash: "a".repeat(64),
+      }],
+      recommendedActions: [],
+      policyRequired: true,
+    };
+    expect(evaluatePolicy(signal, [lowConfidence]).decision).toBe("ESCALATE");
+  });
+
+  it("evidence ledger includes lens output event hashes", async () => {
+    const mission = await runMission({
+      rawText: "Assess cyber telemetry report",
+      userId: "u1",
+      userRole: "analyst",
+      indicators: [{ type: "domain", value: "example.gov" }],
+    });
+    const chainOk = verifyEvidenceChain(getEvidenceEvents(mission.missionId));
+    expect(chainOk.ok).toBe(true);
+    expect(mission.evidenceEventIds.length).toBeGreaterThanOrEqual(6);
+  });
+
+  it("every lens result contains at least one evidence item", async () => {
+    const signal = normalizeMission({ rawText: "cyber geospatial yudh quantum governance", userId: "u1", userRole: "analyst" });
+    for (const lens of Object.values(lensRegistry)) {
+      const result = await lens.analyze(signal);
+      expect(result.evidence.length).toBeGreaterThan(0);
+      expect(result.evidence.every((item) => item.provenanceHash.match(/^[a-f0-9]{64}$/))).toBe(true);
+    }
+  });
+
+  it("unsupported factual claims are marked verify required", async () => {
+    const signal = normalizeMission({
+      rawText: "Article 12 ministry district claim without source",
+      userId: "u1",
+      userRole: "analyst",
+    });
+    const result = await lensRegistry.governance.analyze(signal);
+    expect(JSON.stringify(result)).toContain("[VERIFY REQUIRED]");
   });
 });

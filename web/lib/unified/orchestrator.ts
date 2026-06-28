@@ -32,12 +32,24 @@ export type MissionResult = {
   signal: DishaSignal;
   selectedLenses: LensName[];
   lensResults: DishaLensResult[];
+  fusedIntelligence: FusionResult;
   fusedSummary: string;
   riskScore: number;
   policyDecision: PolicyDecision;
   approvalRequired: boolean;
   safeExecution: "report_generated" | "waiting_for_confirmation" | "sandbox_only" | "read_only" | "denied" | "escalated";
   evidenceEventIds: string[];
+};
+
+export type FusionResult = {
+  executiveSummary: string;
+  topFindings: string[];
+  riskDrivers: string[];
+  confidence: number;
+  uncertainty: string[];
+  requiredApprovals: string[];
+  recommendedSafeActions: string[];
+  verifyRequiredItems: string[];
 };
 
 export async function runMission(input: MissionInput): Promise<MissionResult> {
@@ -89,18 +101,20 @@ export async function runMission(input: MissionInput): Promise<MissionResult> {
     lensResults: lensResults.map((result) => result.lens),
   });
   eventIds.push(policyEvent.eventId);
-  policyDecision.evidenceEventId = policyEvent.eventId;
+  const responsePolicyDecision = { ...policyDecision, evidenceEventId: policyEvent.eventId };
 
+  const fusedIntelligence = fuseLensResults(lensResults);
   const result: MissionResult = {
     missionId: signal.missionId ?? signal.id,
     signal,
     selectedLenses: selected.map((lens) => lens.name),
     lensResults,
-    fusedSummary: fuseLensResults(lensResults),
+    fusedIntelligence,
+    fusedSummary: renderFusionSummary(fusedIntelligence),
     riskScore: Math.max(signal.riskContext.actionRisk, ...lensResults.map((item) => item.riskScore)),
-    policyDecision,
-    approvalRequired: ["ASK_CONFIRMATION", "ESCALATE"].includes(policyDecision.decision),
-    safeExecution: executionState(policyDecision),
+    policyDecision: responsePolicyDecision,
+    approvalRequired: ["ASK_CONFIRMATION", "ESCALATE"].includes(responsePolicyDecision.decision),
+    safeExecution: executionState(responsePolicyDecision),
     evidenceEventIds: eventIds,
   };
 
@@ -110,7 +124,7 @@ export async function runMission(input: MissionInput): Promise<MissionResult> {
     action: "report_generated",
     input: { missionId: result.missionId },
     output: result,
-    policyDecision,
+    policyDecision: responsePolicyDecision,
   }).eventId);
   result.evidenceEventIds = eventIds;
   missions.set(result.missionId, result);
@@ -176,8 +190,60 @@ function sensitivityRisk(sensitivity: DishaSignal["context"]["sensitivity"]): nu
   return 0.1;
 }
 
-function fuseLensResults(results: DishaLensResult[]): string {
-  return results.map((result) => `${result.lens}: ${result.summary}`).join(" ");
+function fuseLensResults(results: DishaLensResult[]): FusionResult {
+  const sortedFindings = results
+    .flatMap((result) => result.findings.map((finding) => ({ ...finding, lens: result.lens, riskScore: result.riskScore })))
+    .sort((a, b) => severityRank(b.severity) - severityRank(a.severity) || b.riskScore - a.riskScore);
+  const riskDrivers = sortedFindings
+    .filter((finding) => ["critical", "high", "medium"].includes(finding.severity))
+    .map((finding) => `${finding.lens}: ${finding.title}`)
+    .slice(0, 6);
+  const verifyRequiredItems = sortedFindings
+    .filter((finding) => finding.description.includes("[VERIFY REQUIRED]"))
+    .map((finding) => `${finding.lens}: ${finding.title}`);
+  const uncertainty = [
+    ...results.filter((result) => result.confidence < 0.6).map((result) => `${result.lens}: low confidence ${result.confidence.toFixed(2)}`),
+    ...verifyRequiredItems,
+  ];
+  const confidence = results.length
+    ? Number((results.reduce((sum, result) => sum + result.confidence, 0) / results.length).toFixed(2))
+    : 0;
+  const requiredApprovals = results
+    .filter((result) => result.policyRequired || result.riskScore >= 0.55)
+    .map((result) => result.lens);
+  const recommendedSafeActions = Array.from(new Set(results.flatMap((result) =>
+    result.recommendedActions
+      .filter((item) => !/hack|exploit|ddos|malware|credential|brute/i.test(item.action))
+      .map((item) => item.label),
+  ))).slice(0, 8);
+
+  return {
+    executiveSummary: results.map((result) => `${result.lens}: ${result.summary}`).join(" "),
+    topFindings: sortedFindings.map((finding) => `${finding.lens}: ${finding.title}`).slice(0, 6),
+    riskDrivers,
+    confidence,
+    uncertainty,
+    requiredApprovals: Array.from(new Set(requiredApprovals)),
+    recommendedSafeActions,
+    verifyRequiredItems,
+  };
+}
+
+function renderFusionSummary(fusion: FusionResult): string {
+  return [
+    `Executive summary: ${fusion.executiveSummary}`,
+    `Top findings: ${fusion.topFindings.join("; ") || "none"}`,
+    `Risk drivers: ${fusion.riskDrivers.join("; ") || "none"}`,
+    `Confidence: ${fusion.confidence}`,
+    `Uncertainty: ${fusion.uncertainty.join("; ") || "none"}`,
+    `Required approvals: ${fusion.requiredApprovals.join(", ") || "none"}`,
+    `Recommended safe actions: ${fusion.recommendedSafeActions.join(", ") || "none"}`,
+    `Verify required: ${fusion.verifyRequiredItems.join("; ") || "none"}`,
+  ].join("\n");
+}
+
+function severityRank(severity: DishaLensResult["findings"][number]["severity"]): number {
+  return { info: 0, low: 1, medium: 2, high: 3, critical: 4 }[severity];
 }
 
 function executionState(policy: PolicyDecision): MissionResult["safeExecution"] {
