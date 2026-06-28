@@ -317,15 +317,17 @@ function cleanHtml(value: string): string {
 }
 
 function decodeEntities(value: string): string {
-  return value
-    .replace(/&amp;/g, "&")
-    .replace(/&nbsp;/g, " ")
-    .replace(/&ndash;/g, "-")
-    .replace(/&mdash;/g, "-")
-    .replace(/&rsquo;/g, "'")
-    .replace(/&lsquo;/g, "'")
-    .replace(/&quot;/g, '"')
-    .replace(/&#039;/g, "'");
+  const entities: Record<string, string> = {
+    "&amp;": "&",
+    "&nbsp;": " ",
+    "&ndash;": "-",
+    "&mdash;": "-",
+    "&rsquo;": "'",
+    "&lsquo;": "'",
+    "&quot;": '"',
+    "&#039;": "'",
+  };
+  return value.replace(/&(?:amp|nbsp|ndash|mdash|rsquo|lsquo|quot);|&#039;/g, (entity) => entities[entity] ?? entity);
 }
 
 function absolutize(value: string | null): string | null {
