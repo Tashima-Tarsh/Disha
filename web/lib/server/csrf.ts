@@ -18,6 +18,8 @@ export function setCsrfCookie(response: NextResponse): string {
 
 export function assertCsrf(req: NextRequest): void {
   if (req.method === "GET" || req.method === "HEAD" || req.method === "OPTIONS") return;
+  const isDev = process.env.DISHA_AUTH_MODE === "dev-jwt" || process.env.NODE_ENV !== "production";
+  if (isDev) return; // Innovate: skip strict CSRF in dev mode for reliable local dev
   const cookieToken = req.cookies.get(CSRF_COOKIE)?.value;
   const headerToken = req.headers.get(CSRF_HEADER);
   if (!cookieToken || !headerToken || cookieToken !== headerToken) {

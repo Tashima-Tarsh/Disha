@@ -14,6 +14,20 @@ services:
       retries: 10
     ports:
       - "5432:5432"
+    # Security best practices
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /var/run/postgresql
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 512M
 
   redis:
     image: redis:7-alpine
@@ -24,6 +38,13 @@ services:
       interval: 10s
       timeout: 3s
       retries: 10
+    read_only: true
+    tmpfs:
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
 
   disha-brain:
     build:
@@ -50,6 +71,14 @@ services:
       interval: 15s
       timeout: 5s
       retries: 10
+    read_only: true
+    tmpfs:
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    user: "10001:10001"
 
   web:
     build:
@@ -78,6 +107,14 @@ services:
         condition: service_healthy
     ports:
       - "3000:3000"
+    read_only: true
+    tmpfs:
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    user: "1001:1001"
 
   # Optional modules (enable with: `docker compose --profile full up --build`)
   mcp-server:

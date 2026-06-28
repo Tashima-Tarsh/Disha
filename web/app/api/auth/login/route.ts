@@ -21,6 +21,7 @@ export async function POST(req: NextRequest) {
     });
     return response;
   } catch (error) {
+    console.error("LOGIN ERROR", error);
     return errorResponse(error, req);
   }
 }
