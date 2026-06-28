@@ -59,3 +59,25 @@ The India scan feed lives in:
 - `web/app/api/dashboard/india/route.ts`
 
 The dashboard must read these sources and show missing layers as missing, not as finished.
+
+## Connector Contract
+
+The connector manifest lives in:
+
+- `web/lib/national-connectors.ts`
+- `web/app/api/dashboard/connectors/route.ts`
+
+Each connector records:
+
+- official authority
+- official endpoint
+- connector kind
+- refresh cadence
+- API-key requirement
+- bulk-import requirement
+- provenance keys
+- update detection method
+- safety boundary
+
+DISHA should treat connector health as source reachability, not data completeness.
+Completion requires ingestion, normalization, provenance checks, and dashboard coverage tests.

@@ -86,6 +86,19 @@ type NationalPayload = {
   sources: NationalSource[];
 };
 
+type ConnectorPayload = {
+  connectors: Array<{
+    id: string;
+    label: string;
+    layer: string;
+    authority: string;
+    cadence: string;
+    needsApiKey: boolean;
+    needsBulkImport: boolean;
+    updateDetection: string;
+  }>;
+};
+
 type Geometry = {
   type: "Polygon" | "MultiPolygon";
   coordinates: number[][][] | number[][][][];
@@ -157,6 +170,10 @@ const fallbackNationalPayload: NationalPayload = {
   sources: [],
 };
 
+const fallbackConnectorPayload: ConnectorPayload = {
+  connectors: [],
+};
+
 export default function DashboardPage() {
   const [selectedRegion, setSelectedRegion] = useState<(typeof regions)[number]>("All India");
   const [selectedDomain, setSelectedDomain] = useState<(typeof domains)[number]>("All domains");
@@ -166,6 +183,7 @@ export default function DashboardPage() {
   const [selectedTerritory, setSelectedTerritory] = useState("Uttar Pradesh");
   const [payload, setPayload] = useState<ScanPayload>(fallbackPayload);
   const [nationalPayload, setNationalPayload] = useState<NationalPayload>(fallbackNationalPayload);
+  const [connectorPayload, setConnectorPayload] = useState<ConnectorPayload>(fallbackConnectorPayload);
   const [mapFeatures, setMapFeatures] = useState<MapFeature[]>([]);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [refreshNonce, setRefreshNonce] = useState(0);
@@ -205,6 +223,21 @@ export default function DashboardPage() {
     return () => {
       alive = false;
       window.clearInterval(interval);
+    };
+  }, [refreshNonce]);
+
+  useEffect(() => {
+    let alive = true;
+
+    async function loadConnectors() {
+      const response = await fetch("/api/dashboard/connectors", { cache: "no-store" });
+      const connectorManifest = (await response.json()) as ConnectorPayload;
+      if (alive) setConnectorPayload(connectorManifest);
+    }
+
+    loadConnectors().catch(() => setConnectorPayload(fallbackConnectorPayload));
+    return () => {
+      alive = false;
     };
   }, [refreshNonce]);
 
@@ -411,6 +444,24 @@ export default function DashboardPage() {
                   <strong>{source.authority}</strong>
                   <small>{source.status.replaceAll("_", " ")}</small>
                   <p>{source.dashboardUse}</p>
+                </div>
+              ))}
+            </div>
+          </article>
+          <article className={styles.panel}>
+            <PanelHeader icon={RefreshCw} eyebrow="Connector mesh" title="Auto-update source connectors" />
+            <div className={styles.connectorList}>
+              {connectorPayload.connectors.slice(0, 12).map((connector) => (
+                <div key={connector.id}>
+                  <span>{connector.layer}</span>
+                  <strong>{connector.label}</strong>
+                  <small>{connector.cadence}</small>
+                  <p>{connector.updateDetection}</p>
+                  <em>
+                    {connector.needsApiKey ? "API key required" : "No API key"}
+                    {" · "}
+                    {connector.needsBulkImport ? "Bulk import" : "Index/probe"}
+                  </em>
                 </div>
               ))}
             </div>

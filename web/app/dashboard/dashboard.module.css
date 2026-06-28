@@ -525,6 +525,8 @@
 
 .sourceGrid {
   display: grid;
+  grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
+  gap: 10px;
   margin-top: 10px;
 }
 
@@ -561,6 +563,53 @@
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 8px;
+}
+
+.connectorList {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.connectorList div {
+  min-height: 164px;
+  border: 1px solid rgba(157, 247, 242, 0.18);
+  background: rgba(3, 38, 58, 0.42);
+  padding: 10px;
+}
+
+.connectorList span {
+  color: #a8e8e5;
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.connectorList strong {
+  display: block;
+  margin-top: 9px;
+  line-height: 1.2;
+}
+
+.connectorList small,
+.connectorList em {
+  display: inline-block;
+  margin-top: 8px;
+  border: 1px solid rgba(157, 247, 242, 0.2);
+  padding: 3px 6px;
+  color: #efffff;
+  font-size: 0.7rem;
+  font-style: normal;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.connectorList p {
+  margin: 8px 0 0;
+  color: #a8d7d4;
+  font-size: 0.82rem;
+  line-height: 1.35;
 }
 
 .sourceList div {
@@ -718,7 +767,8 @@
 @media (max-width: 1280px) {
   .commandHeader,
   .operationsGrid,
-  .analyticsGrid {
+  .analyticsGrid,
+  .sourceGrid {
     grid-template-columns: 1fr;
   }
 
@@ -731,7 +781,8 @@
   }
 
   .sourceKpis,
-  .sourceList {
+  .sourceList,
+  .connectorList {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
@@ -744,7 +795,8 @@
   .filterBar,
   .kpiGrid,
   .sourceKpis,
-  .sourceList {
+  .sourceList,
+  .connectorList {
     grid-template-columns: 1fr;
   }
 
