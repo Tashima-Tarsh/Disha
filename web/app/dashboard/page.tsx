@@ -7,10 +7,12 @@ import {
   Eye,
   FileText,
   GitBranch,
+  Globe2,
   Landmark,
   Layers,
   Lock,
   Map,
+  Network,
   Radar,
   Scale,
   Shield,
@@ -148,6 +150,51 @@ const sources = [
   { label: "Operator note", level: "Low", note: "Human claim only" },
 ];
 
+const nationalZones = [
+  {
+    region: "North",
+    focus: "Border-state resilience and public infrastructure continuity",
+    lane: "Geospatial + audit",
+  },
+  {
+    region: "East",
+    focus: "Flood, bridge, health, and school-access stress signals",
+    lane: "Development + HSE",
+  },
+  {
+    region: "West",
+    focus: "Urban services, port-adjacent infrastructure, and open-data review",
+    lane: "Audit + resilience",
+  },
+  {
+    region: "South",
+    focus: "Water, climate, edge telemetry, and district service continuity",
+    lane: "SETU/VARUNA + edge",
+  },
+  {
+    region: "Central",
+    focus: "Gap closure routing across public service and resource evidence",
+    lane: "Yudh/Vyuha",
+  },
+];
+
+const liveSignals = [
+  "Open-data evidence stream",
+  "RTI contradiction queue",
+  "District service-gap watch",
+  "Infrastructure resilience lane",
+  "Human approval queue",
+  "Audit hash-chain continuity",
+];
+
+const privacyGuardrails = [
+  "No individual-level tracking",
+  "No biometric or face surveillance",
+  "No hidden collection",
+  "Only aggregate, open, consented, or authorized signals",
+  "Every claim carries evidence status",
+];
+
 export default function DashboardPage() {
   return (
     <main className={styles.page}>
@@ -196,6 +243,45 @@ export default function DashboardPage() {
               <StatusCard icon={Lock} label="Policy posture" value="NFU enforced" />
               <StatusCard icon={GitBranch} label="CI coverage" value="13 green checks" />
               <StatusCard icon={Eye} label="Claim handling" value="[VERIFY REQUIRED]" />
+            </section>
+
+            <section className={styles.nationalGrid} aria-label="India observatory">
+              <div className={styles.nationalPanel}>
+                <div className={styles.panelHeader}>
+                  <div>
+                    <p className={styles.kicker}>India resilience observatory</p>
+                    <h2>National-scale awareness without citizen surveillance</h2>
+                  </div>
+                  <Globe2 aria-hidden="true" />
+                </div>
+                <div className={styles.zoneLedger}>
+                  {nationalZones.map((zone) => (
+                    <article key={zone.region}>
+                      <span>{zone.region}</span>
+                      <strong>{zone.focus}</strong>
+                      <p>{zone.lane}</p>
+                    </article>
+                  ))}
+                </div>
+              </div>
+
+              <aside className={styles.livePanel} aria-label="Live signal posture">
+                <div className={styles.panelHeader}>
+                  <div>
+                    <p className={styles.kicker}>Live posture</p>
+                    <h2>Signals under review</h2>
+                  </div>
+                  <Network aria-hidden="true" />
+                </div>
+                <div className={styles.liveSignals}>
+                  {liveSignals.map((signal) => (
+                    <div key={signal}>
+                      <span />
+                      <p>{signal}</p>
+                    </div>
+                  ))}
+                </div>
+              </aside>
             </section>
 
             <section className={styles.situationGrid} id="situation">
@@ -277,6 +363,21 @@ export default function DashboardPage() {
                   <p>{item.body}</p>
                 </article>
               ))}
+            </section>
+
+            <section className={styles.guardrailPanel} aria-label="Privacy guardrails">
+              <div className={styles.panelHeader}>
+                <div>
+                  <p className={styles.kicker}>Constitutional guardrails</p>
+                  <h2>What this system will not do</h2>
+                </div>
+                <Shield aria-hidden="true" />
+              </div>
+              <div className={styles.guardrailList}>
+                {privacyGuardrails.map((guardrail) => (
+                  <span key={guardrail}>{guardrail}</span>
+                ))}
+              </div>
             </section>
 
             <section className={styles.versionSection}>
