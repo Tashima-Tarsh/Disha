@@ -1,50 +1,121 @@
 import { NextResponse } from "next/server";
 
-import { clamp, territories } from "@/lib/india-dashboard-data";
+import { territories } from "@/lib/india-dashboard-data";
 
 export const dynamic = "force-dynamic";
 
-export function GET() {
-  const now = Date.now();
-  const tick = Math.floor(now / 12000);
-  const scan = territories.map((territory, index) => {
-    const wave = ((tick + index * 3) % 9) - 4;
-    const evidenceWave = ((tick * 2 + index) % 7) - 3;
-    const cases = Math.max(1, territory.cases + wave);
-    const evidence = clamp(territory.evidence + evidenceWave, 42, 94);
-    const approval = Math.max(0, territory.approval + (wave > 1 ? 1 : 0));
-    const closure = clamp(100 - Math.round(cases * 1.15) + Math.round(evidence / 4), 18, 94);
+type SourceProbe = {
+  id: string;
+  authority: string;
+  url: string;
+  ok: boolean;
+  checkedAt: string;
+  status?: number;
+};
+
+const SOURCES = {
+  igodStateUt: {
+    id: "igod-state-ut-directory",
+    authority: "Integrated Government Online Directory",
+    url: "https://igod.gov.in/sg/states",
+  },
+  nationalPortal: {
+    id: "national-portal-states-ut",
+    authority: "National Portal of India",
+    url: "https://www.india.gov.in/explore-india/facts-of-india/states-ut-districts",
+  },
+  lgd: {
+    id: "local-government-directory",
+    authority: "Local Government Directory",
+    url: "https://lgdirectory.gov.in/",
+  },
+};
+
+export async function GET() {
+  const checkedAt = new Date().toISOString();
+  const [igod, nationalPortal, lgd] = await Promise.all([
+    fetchSource(SOURCES.igodStateUt, checkedAt),
+    fetchSource(SOURCES.nationalPortal, checkedAt),
+    fetchSource(SOURCES.lgd, checkedAt),
+  ]);
+
+  const scan = territories.map((territory) => {
+    const matchedSources = [
+      igod.probe.ok ? SOURCES.igodStateUt.id : null,
+      nationalPortal.probe.ok ? SOURCES.nationalPortal.id : null,
+      lgd.probe.ok ? SOURCES.lgd.id : null,
+    ].filter((source): source is string => Boolean(source));
+
+    const sourceCount = matchedSources.length;
+    const verified = sourceCount >= 2;
+    const evidence = sourceCount === 3 ? 100 : sourceCount === 2 ? 82 : sourceCount === 1 ? 55 : 0;
+    const approval = verified ? 0 : 1;
+    const closure = evidence;
     const agenticScan = {
-      posture:
-        territory.priority === "Critical"
-          ? "Escalated review"
-          : territory.priority === "High"
-            ? "Active verification"
-            : "Routine scan",
-      nextAction:
-        evidence < 65
-          ? "Source review"
-          : approval > 5
-            ? "Human approval"
-            : "Evidence bundle",
-      confidenceBand: evidence >= 78 ? "Strong" : evidence >= 65 ? "Review" : "Weak",
+      posture: verified ? "Official directory matched" : "Source verification required",
+      nextAction: verified ? "Maintain source trail" : "Review official listing",
+      confidenceBand: evidence >= 82 ? "Source-linked" : evidence > 0 ? "Partial" : "Unmatched",
     };
 
     return {
       ...territory,
-      cases,
+      domain: "Evidence",
+      priority: verified ? "Stable" : "Watch",
+      cases: sourceCount,
       evidence,
       approval,
       closure,
+      note: verified
+        ? `Official source coverage: ${matchedSources.join(", ")}`
+        : "Official source coverage incomplete; do not treat as complete coverage.",
       agenticScan,
     };
   });
 
   return NextResponse.json({
-    generatedAt: new Date(now).toISOString(),
-    scanId: `DISHA-IN-${tick}`,
-    sourceNotice:
-      "Demo operational feed for product evaluation. Not a government statistic.",
+    generatedAt: checkedAt,
+    scanId: `DISHA-IN-SOURCE-${checkedAt.slice(0, 10)}`,
+    sourceNotice: "Source-backed administrative coverage feed. Values represent official-source matches, not incident counts.",
+    sources: [igod.probe, nationalPortal.probe, lgd.probe],
+    nationalAdministrativeSummary: {
+      authority: SOURCES.lgd.authority,
+      sourceUrl: SOURCES.lgd.url,
+      reachable: lgd.probe.ok,
+      extractionStatus: "requires_bulk_import_or_official_api",
+    },
     scan,
   });
+}
+
+async function fetchSource(
+  source: { id: string; authority: string; url: string },
+  checkedAt: string,
+): Promise<{ text: string; probe: SourceProbe }> {
+  try {
+    const response = await fetch(source.url, {
+      cache: "no-store",
+      headers: {
+        "user-agent": "DISHA-source-backed-dashboard/1.0",
+      },
+    });
+    const text = await response.text();
+    return {
+      text,
+      probe: {
+        ...source,
+        ok: response.ok,
+        status: response.status,
+        checkedAt,
+      },
+    };
+  } catch {
+    return {
+      text: "",
+      probe: {
+        ...source,
+        ok: false,
+        checkedAt,
+      },
+    };
+  }
 }

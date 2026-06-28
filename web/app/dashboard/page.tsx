@@ -102,13 +102,20 @@ const domainMeta: Record<Domain, { icon: LucideIcon; label: string; color: strin
 const fallbackPayload: ScanPayload = {
   generatedAt: new Date().toISOString(),
   scanId: "DISHA-IN-LOCAL",
+  sourceNotice: "Live official-source feed unavailable. Values are withheld until source refresh succeeds.",
   scan: territories.map((territory) => ({
     ...territory,
-    closure: 62,
+    domain: "Evidence",
+    priority: "Watch",
+    cases: 0,
+    evidence: 0,
+    approval: 1,
+    closure: 0,
+    note: "Official source refresh unavailable.",
     agenticScan: {
-      posture: "Routine scan",
-      nextAction: "Evidence bundle",
-      confidenceBand: "Review",
+      posture: "Source unavailable",
+      nextAction: "Refresh official source",
+      confidenceBand: "Unavailable",
     },
   })),
 };
@@ -314,22 +321,22 @@ export default function DashboardPage() {
               <Detail label="Next action" value={selected.agenticScan.nextAction} />
               <Detail label="Confidence" value={selected.agenticScan.confidenceBand} />
               <Detail label="Domain" value={domainMeta[selected.domain].label} />
-              <Detail label="Cases" value={String(selected.cases)} />
-              <Detail label="Approval" value={String(selected.approval)} />
-              <Detail label="Closure" value={`${selected.closure}%`} />
+              <Detail label="Official sources" value={String(selected.cases)} />
+              <Detail label="Review queue" value={String(selected.approval)} />
+              <Detail label="Source score" value={`${selected.closure}%`} />
             </div>
           </aside>
         </section>
 
         <section className={styles.analyticsGrid}>
-          <ChartPanel icon={Landmark} eyebrow="Region" title="Case distribution" rows={regionRows} />
+          <ChartPanel icon={Landmark} eyebrow="Region" title="Official source matches" rows={regionRows} />
           <DomainPanel rows={domainRows} />
           <article className={styles.panel}>
             <PanelHeader icon={ClipboardList} eyebrow="Matrix" title="Territory queue" />
             <div className={styles.sortRow}>
-              <button type="button" className={sortKey === "cases" ? styles.activeTool : ""} onClick={() => setSortKey("cases")}>Cases</button>
-              <button type="button" className={sortKey === "evidence" ? styles.activeTool : ""} onClick={() => setSortKey("evidence")}>Evidence</button>
-              <button type="button" className={sortKey === "approval" ? styles.activeTool : ""} onClick={() => setSortKey("approval")}>Approval</button>
+              <button type="button" className={sortKey === "cases" ? styles.activeTool : ""} onClick={() => setSortKey("cases")}>Sources</button>
+              <button type="button" className={sortKey === "evidence" ? styles.activeTool : ""} onClick={() => setSortKey("evidence")}>Score</button>
+              <button type="button" className={sortKey === "approval" ? styles.activeTool : ""} onClick={() => setSortKey("approval")}>Review</button>
             </div>
             <div className={styles.scanTable}>
               {filtered.slice(0, 12).map((territory) => (
