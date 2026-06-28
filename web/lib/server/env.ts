@@ -4,18 +4,18 @@ const envSchema = z.object({
   DISHA_AUTH_MODE: z.enum(["dev-jwt", "oidc"]).default("dev-jwt"),
   DISHA_JWT_SECRET: z.string().min(32).optional(),
   DISHA_DEV_PASSWORD: z.string().min(12).optional(),
-  DISHA_OIDC_ISSUER: z.preprocess((v) => (typeof v === "string" && v.trim() === "" ? undefined : v), z.string().url().optional()),
+  DISHA_OIDC_ISSUER: z.string().url().optional(),
   DISHA_OIDC_CLIENT_ID: z.string().optional(),
   DISHA_OIDC_CLIENT_SECRET: z.string().optional(),
   DATABASE_URL: z.string().optional(),
   REDIS_URL: z.string().optional(),
   DISHA_WORKSPACE_ROOT: z.string().optional(),
   DISHA_ALLOWED_ORIGINS: z.string().optional(),
-  DISHA_BACKEND_URL: z.preprocess((v) => (typeof v === "string" && v.trim() === "" ? undefined : v), z.string().url().default("http://localhost:3001")),
-  DISHA_BRAIN_URL: z.preprocess((v) => (typeof v === "string" && v.trim() === "" ? undefined : v), z.string().url().optional()),
+  DISHA_BACKEND_URL: z.string().url().default("http://localhost:3001"),
+  DISHA_BRAIN_URL: z.string().url().optional(),
   // Public base URL for generating stable production share links, callbacks, etc.
   // Set this in production (e.g. https://app.example.com). Falls back to request origin in dev.
-  NEXT_PUBLIC_APP_URL: z.preprocess((v) => (typeof v === "string" && v.trim() === "" ? undefined : v), z.string().url().optional()),
+  NEXT_PUBLIC_APP_URL: z.string().url().optional(),
   DISHA_WEB_RATE_LIMIT: z.coerce.number().int().positive().default(120),
   DISHA_WEB_API_TOKEN: z.string().optional(),
 
@@ -32,7 +32,7 @@ const envSchema = z.object({
   // Model provider (OpenAI) - server-side only.
   OPENAI_API_KEY: z.string().optional(),
   OPENAI_MODEL: z.string().default("gpt-5.4-mini"),
-  OPENAI_BASE_URL: z.preprocess((v) => (typeof v === "string" && v.trim() === "" ? undefined : v), z.string().url().default("https://api.openai.com/v1")),
+  OPENAI_BASE_URL: z.string().url().default("https://api.openai.com/v1"),
   OPENAI_PROJECT: z.string().optional(),
   OPENAI_ORGANIZATION: z.string().optional(),
 

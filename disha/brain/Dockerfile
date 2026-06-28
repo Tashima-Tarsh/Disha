@@ -19,6 +19,9 @@ RUN mkdir -p /data && chown -R appuser:appuser /data
 # Make data dir writable only for app, read-only fs where possible
 USER appuser
 
+ENV DISHA_BRAIN_API_HOST=0.0.0.0 \
+    DISHA_BRAIN_DB_PATH=/data/disha_brain.db
+
 # Runtime security notes: run container with --read-only --tmpfs /tmp --security-opt no-new-privileges
 
 EXPOSE 8080

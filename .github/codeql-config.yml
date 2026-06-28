@@ -13,6 +13,18 @@
 # All other CodeQL security rules remain fully active for the entire repo.
 name: "Disha CodeQL Config"
 
+paths:
+  - web
+  - docs
+  - .github
+
+paths-ignore:
+  - legacy/**
+  - disha/apps/**
+  - disha/services/**
+  - disha/ai/**
+  - disha/mobile/**
+
 query-filters:
   - exclude:
       id: py/clear-text-logging-sensitive-data

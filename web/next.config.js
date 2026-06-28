@@ -4,6 +4,10 @@ const nextConfig = {
   output: "standalone",
   // Keep behavior deterministic in production images.
   poweredByHeader: false,
+  // This app lives inside the monorepo; keep Turbopack rooted at web/.
+  turbopack: {
+    root: __dirname,
+  },
 };
 
 module.exports = nextConfig;

@@ -14,6 +14,7 @@ from ..brain.planner import Planner
 from ..brain.reasoning import ReasoningBrain
 from ..brain.risk_engine import RiskEngine
 from ..database.store import SQLiteStore
+from ..graph import DishaAgenticGraph, DishaGraphResult, GraphInput
 from ..models.schemas import (
     CommandResponse,
     DecisionAction,
@@ -49,6 +50,7 @@ class AppContext:
         self.anomaly = AnomalyDetector()
         self.risk_engine = RiskEngine()
         self.decision_engine = DecisionEngine()
+        self.graph = DishaAgenticGraph()
         self.monitoring: MonitoringService | None = None
 
     def module_health(self) -> dict[str, str]:
@@ -63,6 +65,7 @@ class AppContext:
             "anomaly_detector": "ok" if self.anomaly else "degraded",
             "risk_engine": "ok" if self.risk_engine else "degraded",
             "decision_engine": "ok" if self.decision_engine else "degraded",
+            "agentic_graph": "ok" if self.graph else "degraded",
             "monitoring": "ok" if self.monitoring else "degraded",
         }
         return modules
@@ -106,6 +109,17 @@ async def health() -> HealthResponse:
         websocket_path="/ws/alerts",
         modules=modules,
     )
+
+
+@router.post(
+    "/graph/invoke",
+    response_model=DishaGraphResult,
+    dependencies=[Depends(require_api_token)],
+)
+async def invoke_graph(
+    payload: GraphInput, app: AppContext = Depends(get_context)
+) -> DishaGraphResult:
+    return app.graph.invoke(payload)
 
 
 @router.post(

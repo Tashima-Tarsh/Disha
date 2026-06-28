@@ -1,0 +1,21 @@
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /web
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    groups:
+      web-runtime:
+        patterns:
+          - next
+          - react
+          - react-dom
+          - "@next/*"
+      web-tooling:
+        patterns:
+          - typescript
+          - vitest
+          - eslint
+          - eslint-config-next
+          - "@types/*"

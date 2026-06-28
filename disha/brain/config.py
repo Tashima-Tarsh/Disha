@@ -12,7 +12,7 @@ class Settings:
         "DISHA_BRAIN_APP_NAME", os.getenv("JARVIS_X_APP_NAME", "DISHA Brain")
     )
     api_host: str = os.getenv(
-        "DISHA_BRAIN_API_HOST", os.getenv("JARVIS_X_API_HOST", "0.0.0.0")
+        "DISHA_BRAIN_API_HOST", os.getenv("JARVIS_X_API_HOST", "127.0.0.1")
     )
     api_port: int = int(
         os.getenv("DISHA_BRAIN_API_PORT", os.getenv("JARVIS_X_API_PORT", "8080"))

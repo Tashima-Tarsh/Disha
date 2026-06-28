@@ -1,5 +1,5 @@
 {
-  "name": "claude-code-web",
+  "name": "disha-web",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -29,7 +29,7 @@
     "framer-motion": "^12.38.0",
     "lucide-react": "^1.8.0",
     "nanoid": "^5.1.7",
-    "next": "^16.2.3",
+    "next": "^16.3.0-canary.69",
     "pg": "^8.20.0",
     "react": "^19.2.5",
     "react-dom": "^19.2.5",
@@ -43,7 +43,7 @@
     "zustand": "^5.0.12"
   },
   "devDependencies": {
-    "@next/bundle-analyzer": "^16.2.3",
+    "@next/bundle-analyzer": "^16.3.0-canary.69",
     "@tailwindcss/postcss": "^4.2.2",
     "@types/node": "^25.6.0",
     "@types/pg": "^8.20.0",
@@ -51,7 +51,7 @@
     "@types/react-dom": "^19.2.3",
     "autoprefixer": "^10.4.27",
     "eslint": "^10.2.0",
-    "eslint-config-next": "^16.2.3",
+    "eslint-config-next": "^16.3.0-canary.69",
     "postcss": "^8.5.10",
     "tailwindcss": "^4.2.2",
     "typescript": "^6.0.2",

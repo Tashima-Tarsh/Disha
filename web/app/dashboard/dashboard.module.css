@@ -1,0 +1,717 @@
+.page {
+  min-height: 100vh;
+  background: #eef1f5;
+  color: #1f2933;
+  font-family: "Segoe UI", Arial, Helvetica, sans-serif;
+}
+
+.shell {
+  width: min(1880px, calc(100% - 20px));
+  margin: 0 auto;
+  padding: 10px 0 22px;
+}
+
+.reportTabs {
+  display: flex;
+  gap: 0;
+  align-items: flex-end;
+  border: 1px solid #d7dde6;
+  border-bottom: 0;
+  background: #ffffff;
+}
+
+.reportTabs button {
+  min-height: 38px;
+  border: 0;
+  border-right: 1px solid #e5e7eb;
+  background: #f8fafc;
+  color: #475569;
+  padding: 0 18px;
+  font-weight: 750;
+  cursor: pointer;
+}
+
+.reportTabs .activeTab {
+  border-bottom: 3px solid #f2c811;
+  background: #ffffff;
+  color: #111827;
+}
+
+.commandHeader {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  gap: 10px;
+  align-items: stretch;
+  margin-bottom: 10px;
+}
+
+.commandHeader,
+.filterBar,
+.measureVisual,
+.mapPanel,
+.drillPanel,
+.panel {
+  border: 1px solid #d7dde6;
+  background: #ffffff;
+  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.08);
+}
+
+.commandHeader > div:first-child {
+  padding: 14px 16px;
+}
+
+.eyebrow,
+.filterTitle,
+.selectControl span,
+.searchControl span,
+.panelHeader p,
+.scanStatus span,
+.detailList span,
+.notice {
+  margin: 0;
+  color: #5d6b7c;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.commandHeader h1 {
+  margin: 4px 0 0;
+  color: #111827;
+  font-size: clamp(1.7rem, 2.4vw, 2.7rem);
+  font-weight: 650;
+  line-height: 1.05;
+  letter-spacing: 0;
+}
+
+.scanStatus {
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr);
+  gap: 6px 9px;
+  align-items: center;
+  border-left: 4px solid #f2c811;
+  padding: 12px;
+}
+
+.scanStatus svg {
+  grid-row: span 2;
+  width: 20px;
+  height: 20px;
+  color: #2563eb;
+}
+
+.scanStatus strong {
+  color: #111827;
+  font-size: 1.35rem;
+  font-weight: 750;
+}
+
+.scanStatus button {
+  grid-column: 1 / -1;
+  min-height: 34px;
+  border: 1px solid #cbd5e1;
+  background: #f8fafc;
+  color: #111827;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.filterBar {
+  display: grid;
+  grid-template-columns: 110px repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  margin-bottom: 10px;
+  padding: 10px;
+}
+
+.filterTitle {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.filterTitle svg,
+.selectControl svg,
+.searchControl svg,
+.panelHeader svg {
+  width: 18px;
+  height: 18px;
+  stroke-width: 1.9;
+}
+
+.selectControl,
+.searchControl {
+  position: relative;
+  display: grid;
+  gap: 4px;
+  min-height: 58px;
+  border: 1px solid #d7dde6;
+  background: #f8fafc;
+  padding: 8px 10px;
+}
+
+.selectControl select,
+.searchControl input {
+  width: 100%;
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: #111827;
+  font: inherit;
+  font-weight: 650;
+  outline: none;
+}
+
+.selectControl svg,
+.searchControl svg {
+  position: absolute;
+  right: 10px;
+  bottom: 11px;
+  color: #64748b;
+  pointer-events: none;
+}
+
+.searchControl input {
+  padding-right: 28px;
+}
+
+.measureGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr) minmax(0, 0.8fr) minmax(0, 1.2fr);
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.measureVisual {
+  min-height: 154px;
+  padding: 12px;
+}
+
+.heatMatrix {
+  display: grid;
+  gap: 8px;
+}
+
+.heatMatrix div {
+  display: grid;
+  grid-template-columns: 82px minmax(0, 1fr) 34px;
+  gap: 8px;
+  align-items: center;
+}
+
+.heatMatrix span,
+.eventRail span,
+.dualGauge p {
+  color: #64748b;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.heatMatrix i {
+  display: block;
+  height: 18px;
+  border: 1px solid #d7dde6;
+}
+
+.heatMatrix strong {
+  color: #111827;
+  text-align: right;
+}
+
+.heatMatrix div[data-priority="Critical"] i {
+  background: #d64545;
+}
+
+.heatMatrix div[data-priority="High"] i {
+  background: #f59e0b;
+}
+
+.heatMatrix div[data-priority="Watch"] i {
+  background: #38a169;
+}
+
+.heatMatrix div[data-priority="Stable"] i {
+  background: #3b82f6;
+}
+
+.flowVisual {
+  display: grid;
+  align-content: end;
+  min-height: 86px;
+  gap: 10px;
+}
+
+.flowVisual span {
+  display: block;
+  height: 30px;
+  border: 1px solid #d7dde6;
+  background: repeating-linear-gradient(90deg, #f2c811 0 12px, #fde68a 12px 18px);
+}
+
+.flowVisual p {
+  margin: 0;
+  color: #64748b;
+  line-height: 1.35;
+}
+
+.dualGauge {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  min-height: 92px;
+  align-items: end;
+}
+
+.dualGauge div {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  height: 100%;
+}
+
+.dualGauge span {
+  display: block;
+  width: 28px;
+  align-self: end;
+  border: 1px solid #d7dde6;
+  background: #2563eb;
+}
+
+.eventRail {
+  display: grid;
+  gap: 6px;
+}
+
+.eventRail button {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(100px, 0.8fr);
+  gap: 8px;
+  align-items: center;
+  border: 1px solid #e5e7eb;
+  background: #ffffff;
+  color: #111827;
+  padding: 7px 8px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.eventRail i {
+  color: #475569;
+  font-size: 0.78rem;
+  font-style: normal;
+  font-weight: 650;
+  text-align: right;
+}
+
+.operationsGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 380px;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.mapPanel,
+.drillPanel,
+.panel {
+  padding: 12px;
+}
+
+.panelHeader {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: flex-start;
+  border-bottom: 1px solid #e5e7eb;
+  margin-bottom: 10px;
+  padding-bottom: 8px;
+}
+
+.panelHeader h2 {
+  margin: 3px 0 0;
+  color: #111827;
+  font-size: clamp(1.05rem, 1.35vw, 1.35rem);
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.panelHeader svg {
+  color: #2563eb;
+}
+
+.scanCanvas {
+  position: relative;
+  overflow: hidden;
+  min-height: min(66vh, 720px);
+  border: 1px solid #d7dde6;
+  background: #f8fafc;
+}
+
+.scanCanvas::before,
+.scanCanvas::after,
+.scanLens,
+.scanRings {
+  display: none;
+}
+
+.indiaMap {
+  display: block;
+  width: 100%;
+  height: min(66vh, 720px);
+  min-height: 520px;
+  background: #f8fafc;
+}
+
+.mapDistrict {
+  cursor: pointer;
+  stroke: #ffffff;
+  stroke-width: 0.45;
+  transition:
+    opacity 120ms ease,
+    stroke-width 120ms ease;
+}
+
+.mapDistrict[data-priority="Critical"] {
+  fill: #d64545;
+}
+
+.mapDistrict[data-priority="High"] {
+  fill: #f59e0b;
+}
+
+.mapDistrict[data-priority="Watch"] {
+  fill: #38a169;
+}
+
+.mapDistrict[data-priority="Stable"] {
+  fill: #3b82f6;
+}
+
+.mapMuted {
+  opacity: 0.14;
+}
+
+.mapActive {
+  opacity: 0.88;
+}
+
+.mapDistrict:hover,
+.mapDistrict:focus-visible,
+.mapSelected {
+  opacity: 1;
+  stroke: #111827;
+  stroke-width: 1.4;
+  outline: none;
+}
+
+.mapLoading {
+  display: grid;
+  place-items: center;
+  min-height: 520px;
+  background: #f8fafc;
+  color: #5d6b7c;
+  font-weight: 750;
+  text-transform: uppercase;
+}
+
+.scoreRing {
+  display: grid;
+  place-items: center;
+  width: 170px;
+  height: 170px;
+  margin: 2px auto 14px;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at center, #ffffff 0 50%, transparent 51%),
+    conic-gradient(#2563eb 0 var(--score), #e5e7eb var(--score) 360deg);
+}
+
+.scoreRing strong {
+  color: #111827;
+  font-size: 2.25rem;
+  font-weight: 760;
+  line-height: 1;
+}
+
+.scoreRing span {
+  margin-top: -46px;
+  color: #5d6b7c;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.detailList {
+  display: grid;
+  gap: 7px;
+}
+
+.detailList div {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  border-top: 1px solid #e5e7eb;
+  padding-top: 9px;
+}
+
+.detailList strong {
+  max-width: 58%;
+  color: #111827;
+  text-align: right;
+}
+
+.analyticsGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 0.95fr) minmax(330px, 0.7fr) minmax(360px, 0.85fr);
+  gap: 10px;
+}
+
+.barList {
+  display: grid;
+  gap: 9px;
+}
+
+.barRow {
+  display: grid;
+  grid-template-columns: 120px 52px minmax(0, 1fr);
+  gap: 9px;
+  align-items: center;
+}
+
+.barRow span {
+  color: #111827;
+  font-weight: 700;
+}
+
+.barRow strong {
+  color: #111827;
+  text-align: right;
+}
+
+.barRow div {
+  overflow: hidden;
+  height: 18px;
+  border: 1px solid #d7dde6;
+  background: #eef1f5;
+}
+
+.barRow i {
+  display: block;
+  height: 100%;
+  background: #2563eb;
+}
+
+.domainList,
+.scanTable,
+.sourceList,
+.connectorList {
+  display: grid;
+  gap: 7px;
+}
+
+.domainList div {
+  display: grid;
+  grid-template-columns: 22px minmax(0, 1fr) 50px;
+  gap: 9px;
+  align-items: center;
+  border-top: 1px solid #e5e7eb;
+  padding-top: 9px;
+}
+
+.domainList span {
+  color: #111827;
+  font-weight: 700;
+}
+
+.domainList strong {
+  color: #111827;
+  font-size: 1.15rem;
+  text-align: right;
+}
+
+.sortRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-bottom: 9px;
+}
+
+.sortRow button,
+.activeTool {
+  min-height: 32px;
+  border: 1px solid #cbd5e1;
+  background: #f8fafc;
+  color: #111827;
+  padding: 0 10px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.sortRow .activeTool {
+  border-color: #f2c811;
+  background: #fff7cc;
+}
+
+.scanTable {
+  max-height: 320px;
+  overflow: auto;
+}
+
+.scanTable button {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 44px;
+  gap: 5px 9px;
+  align-items: center;
+  border: 1px solid #e5e7eb;
+  background: #ffffff;
+  color: #111827;
+  padding: 8px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.scanTable span {
+  font-weight: 700;
+}
+
+.scanTable strong {
+  font-size: 1.1rem;
+  text-align: right;
+}
+
+.scanTable small {
+  grid-column: 1 / -1;
+  color: #64748b;
+  font-weight: 650;
+}
+
+.sourceGrid {
+  display: none;
+}
+
+.notice {
+  display: none;
+}
+
+/*
+ * Source registry styles remain for the non-visible connector workbench.
+ * The product report canvas above is intentionally free of provenance copy.
+ */
+.sourceGridLegacy {
+  display: grid;
+  grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.sourceList div,
+.connectorList div {
+  border: 1px solid #e5e7eb;
+  background: #ffffff;
+  padding: 9px;
+}
+
+.sourceList span,
+.connectorList span {
+  color: #5d6b7c;
+  font-size: 0.72rem;
+  font-weight: 750;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.sourceList strong,
+.connectorList strong {
+  display: block;
+  margin-top: 7px;
+  color: #111827;
+  line-height: 1.2;
+}
+
+.sourceList {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+.connectorList {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.sourceList small,
+.connectorList small,
+.connectorList em {
+  display: inline-block;
+  margin-top: 7px;
+  border: 1px solid #d7dde6;
+  background: #f8fafc;
+  padding: 3px 6px;
+  color: #475569;
+  font-size: 0.68rem;
+  font-style: normal;
+  font-weight: 750;
+  text-transform: uppercase;
+}
+
+.sourceList p,
+.connectorList p {
+  margin: 7px 0 0;
+  color: #64748b;
+  font-size: 0.8rem;
+  line-height: 1.34;
+}
+
+@media (max-width: 1280px) {
+  .commandHeader,
+  .operationsGrid,
+  .analyticsGrid,
+  .sourceGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .filterBar {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .measureGrid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .sourceList,
+  .connectorList {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .shell {
+    width: min(100% - 14px, 1880px);
+  }
+
+  .filterBar,
+  .measureGrid,
+  .sourceList,
+  .connectorList {
+    grid-template-columns: 1fr;
+  }
+
+  .mapPanel,
+  .drillPanel,
+  .panel,
+  .commandHeader > div:first-child {
+    padding: 10px;
+  }
+
+  .indiaMap,
+  .scanCanvas {
+    height: 58vh;
+    min-height: 420px;
+  }
+
+  .barRow {
+    grid-template-columns: 1fr 44px;
+  }
+
+  .barRow div {
+    grid-column: 1 / -1;
+  }
+}
