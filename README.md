@@ -1,108 +1,60 @@
 # DISHA
 
-DISHA is an evidence-first agentic intelligence architecture for national-scale reasoning, geospatial awareness, governance audit, cyber defence, public-sector accountability, and human-governed action.
+DISHA v6.6 is a unified, evidence-first intelligence product. The active production surface is the Next.js application in `web/`.
 
-It is not a generic chatbot. The production direction is a defensive, audit-first system that classifies evidence, links sources, applies No-First-Use boundaries, routes work through versioned intelligence modules, and requires human approval when risk or ambiguity crosses policy thresholds.
+The product contract is simple: receive a mission, normalize it into a typed signal, analyze it through governed lenses, evaluate policy, and write an evidence chain before returning the result.
 
-## What Is Production-Oriented Now
+## Active Product
 
-- `disha/brain/`: central reasoning spine, FastAPI backend, graph orchestration, policy gates, evidence model, memory, audit, Yudh/Vyuha logic, and six version modules.
-- `web/`: hardened Next.js API surface with auth, audit, export/share, file, and agent endpoints.
-- `src/`: TypeScript CLI/runtime hardening modules and MCP entrypoint.
-- `demos/`: runnable JSON payloads for the six DISHA versions.
-- `tests/test_disha_brain_graph.py`: focused tests for evidence classification, version routing, NFU, Vyuha, audit, memory, geospatial validation, HSE, national audit, and end-to-end graph invocation.
+- `web/app/`: product UI and API routes.
+- `web/app/api/v1/`: mission, lens, policy, evidence, data, and health APIs.
+- `web/lib/unified/`: contracts, orchestrator, lenses, policy gate, evidence ledger, and data connectors.
+- `web/tests/unified-os.test.ts`: product-spine tests.
+- `docs/product/DISHA_V6_6_PRODUCT_SPEC.md`: product specification.
+- `docs/architecture/UNIFIED_INTELLIGENCE_OS.md`: architecture.
+- `docs/security/POLICY_GATE.md`: policy and safety boundary.
+- `docs/data_governance/OPEN_AND_CONTROLLED_DATA.md`: source and controlled-data rules.
+- `docs/api/API_REFERENCE.md`: API v1 reference.
+- `docs/release/V6_6_RELEASE_CHECKLIST.md`: production checklist.
 
-Legacy and experimental surfaces remain under `legacy/`, `disha/services/`, `disha/ai/`, and integrations. They should be reused only after source review.
+## Product Verification
 
-## Six DISHA Versions
-
-| Version | Module | Purpose |
-| --- | --- | --- |
-| 1.6 | Geospatial Detection Intelligence | Coordinates, sensor evidence, object tracking, public-safety evidence bundles. |
-| 2.6 | Sustainable Development Geospatial Intelligence | Infrastructure monitoring, climate/resource signals, SETU/VARUNA resilience scoring. |
-| 3.6 | Physical Interface Architecture | Edge telemetry, trusted device state, sensor-to-brain routing, operator control. |
-| 4.6 | HSE Intelligence | Health, social welfare, education access, district-level service gap reports. |
-| 5.6 | National Audit Intelligence | RTI, open data, constitutional references, public accountability, contradiction detection. |
-| 6.6 | Gap Closure Intelligence | Gap identification, risk mitigation, Yudh assessment, Vyuha selection, lawful corrective action. |
-
-## Agentic Flow
-
-```mermaid
-flowchart TD
-    A[Input sources] --> B[Intake Agent]
-    B --> C[Evidence Agent]
-    C --> D[Context Agent]
-    D --> E[DISHA Brain Reasoning Agent]
-    E --> F[Version Router]
-    F --> G[Version Module]
-    G --> H[Yudh Intelligence Agent]
-    H --> I[Vyuha Selector Agent]
-    I --> J[Policy Guard and NFU Gate]
-    J --> K{Human approval required?}
-    K -->|Yes| L[Human Approval Gate]
-    K -->|No| M[Action or Report Agent]
-    L --> M
-    M --> N[Audit Agent]
-    N --> O[Memory Update Agent]
-```
-
-Each result includes version, evidence class, source list, confidence level, risk score, reasoning summary, Yudh assessment, Vyuha recommendation, NFU policy status, human approval requirement, final recommendation, and audit event.
-
-## Quickstart
+Run all active checks from the repository root:
 
 ```bash
-python -m pytest tests/test_disha_brain_graph.py
+npm run verify
 ```
 
-Run a demo payload:
+Or run them inside `web/`:
 
 ```bash
-python - <<'PY'
-import json
-from pathlib import Path
-from disha.brain.graph import DishaAgenticGraph, GraphInput
-
-payload = json.loads(Path("demos/demo_5_6_national_audit.json").read_text())
-result = DishaAgenticGraph().invoke(GraphInput(**payload))
-print(result.model_dump_json(indent=2))
-PY
-```
-
-Run the existing web checks:
-
-```bash
-cd web
-npm run test
 npm run type-check
+npm test
 npm run build
 ```
 
-## Trust Boundaries
+## Local Development
 
-DISHA never treats all text as truth. Inputs are classified as verified, official record, RTI record, open data, sensor signal, audit record, constitutional reference, inference, allegation, contradiction, or unresolved. Unsupported facts stay marked as requiring verification.
+```bash
+npm install --prefix web
+npm run dev
+```
 
-No-First-Use is enforced in code under `disha/brain/policy/no_first_use.py`. Offensive, retaliatory, unauthorized, or destructive actions are blocked. Ambiguous actions require human approval.
+The app runs on `http://127.0.0.1:3000` by default.
 
-## Documentation
+## Production Boundary
 
-- [Architecture](docs/ARCHITECTURE.md)
-- [Product Thesis](docs/PRODUCT_THESIS.md)
-- [Version Ladder](docs/VERSION_LADDER.md)
-- [DISHA Brain](docs/DISHA_BRAIN.md)
-- [Agentic Flow](docs/LANGGRAPH_AGENTIC_FLOW.md)
-- [Yudh/Vyuha Doctrine](docs/YUDH_VYUHA_DOCTRINE.md)
-- [No-First-Use](docs/NO_FIRST_USE.md)
-- [Evidence Model](docs/EVIDENCE_MODEL.md)
-- [Trust Model](docs/TRUST_MODEL.md)
-- [Production Readiness](docs/PRODUCTION_READINESS.md)
-- [Repository Audit](docs/REPOSITORY_AUDIT.md)
-- [Demos](docs/DEMOS.md)
-- [Roadmap](docs/ROADMAP.md)
+Only `web/package.json` and `web/package-lock.json` are active dependency manifests. Older experiments under `legacy/`, `disha/apps/`, `disha/services/`, `disha/ai/`, and `disha/mobile/` are retained as source archive material, not installable production packages.
 
-## Remaining Gaps
+Archived code must be promoted through the v6.6 contracts before it becomes product code:
 
-- External source verification connectors need production credentials, publisher allowlists, and retrieval audits.
-- Domain models for HSE, geospatial, governance, and resilience need expert-reviewed datasets.
-- Persistent graph memory and audit export need deployment-specific storage guarantees.
-- Existing legacy integrations need security review before being promoted into the production spine.
-- thenitishkr.in and the two DISHA Intelligence books are referenced by the product brief, but repository-verifiable source material is not present here. Their exact relationship is [VERIFY REQUIRED].
+- cyber work through the defensive cyber lens,
+- strategic/Yudh work through Yudh View,
+- geospatial work through the geospatial lens,
+- governance work through the policy gate,
+- evidence work through the evidence ledger,
+- data work through open or controlled connector contracts.
+
+## Accuracy Rule
+
+DISHA must not invent facts, statistics, legal claims, government references, incidents, or dates. If a claim is not verified from repository material or a source connector, it must be shown as `[VERIFY REQUIRED]`.
