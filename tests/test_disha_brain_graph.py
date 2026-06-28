@@ -7,6 +7,7 @@ import pytest
 from disha.brain.audit import AuditEvent, AuditLedger
 from disha.brain.evidence import EvidenceClass, build_evidence_bundle
 from disha.brain.geospatial import Coordinates, TrackedObject
+from disha.brain.governance import build_constitutional_audit
 from disha.brain.graph import DishaAgenticGraph, GraphInput
 from disha.brain.graph.router import route_version
 from disha.brain.memory import MemoryStore
@@ -75,6 +76,19 @@ def test_vyuha_selection() -> None:
     assert formation.name == "NYAYA Audit Vyuha"
 
 
+def test_constitutional_audit_requires_sources_for_public_authority_claim() -> None:
+    audit = build_constitutional_audit(
+        text="RTI public authority contradiction about district health access",
+        evidence_class="rti_record",
+        confidence_level="medium",
+        source_links=[],
+    )
+    assert audit.public_authority_signal is True
+    assert audit.human_review_required is True
+    assert "source links absent" in audit.evidence_gaps
+    assert "unverified_public_claim" in audit.blocked_actions
+
+
 def test_audit_ledger_creation() -> None:
     ledger = AuditLedger()
     event = ledger.append(AuditEvent(event_id="e1", action="test", outcome="ok"))
@@ -101,6 +115,21 @@ def test_national_audit_evidence_classification() -> None:
     output = v5_6_national_audit.run("RTI and Article 12 record mismatch")
     assert output.version == "5.6"
     assert "national_audit" in output.signals
+
+
+def test_graph_audit_contains_constitutional_action_ledger() -> None:
+    graph = DishaAgenticGraph()
+    result = graph.invoke(
+        GraphInput(
+            input_text="RTI public authority contradiction in district welfare record",
+            source_type="rti_record",
+            requested_actions=["report", "preserve_evidence"],
+        )
+    )
+    ledger = result.audit_event.metadata["constitutional_audit"]
+    assert ledger["public_authority_signal"] is True
+    assert ledger["verification_status"] == "verification_required"
+    assert "unverified_public_claim" in ledger["blocked_actions"]
 
 
 def test_hse_service_gap_output() -> None:

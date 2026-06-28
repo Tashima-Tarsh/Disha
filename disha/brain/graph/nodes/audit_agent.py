@@ -19,6 +19,7 @@ def run(state: DishaGraphState, ledger: AuditLedger) -> DishaGraphState:
             "risk_score": state.risk_score,
             "human_approval_required": state.human_approval_required,
             "source_count": len(state.source_links),
+            "constitutional_audit": state.metadata.get("constitutional_audit", {}),
         },
     )
     state.audit_record = ledger.append(event)
