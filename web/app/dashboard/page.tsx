@@ -55,47 +55,8 @@ type ScanTerritory = {
 type ScanPayload = {
   generatedAt: string;
   scanId: string;
-  sourceNotice: string;
+  sourceNotice?: string;
   scan: ScanTerritory[];
-};
-
-type NationalSourceStatus =
-  | "connected"
-  | "registry_ready"
-  | "requires_api_key"
-  | "requires_bulk_import"
-  | "verify_required";
-
-type NationalSource = {
-  id: string;
-  layer: string;
-  scope: string;
-  authority: string;
-  status: NationalSourceStatus;
-  dashboardUse: string;
-};
-
-type NationalPayload = {
-  coverage: {
-    total: number;
-    verifiedLiveSources: number;
-    verificationGaps: number;
-    counts: Record<NationalSourceStatus, number>;
-  };
-  sources: NationalSource[];
-};
-
-type ConnectorPayload = {
-  connectors: Array<{
-    id: string;
-    label: string;
-    layer: string;
-    authority: string;
-    cadence: string;
-    needsApiKey: boolean;
-    needsBulkImport: boolean;
-    updateDetection: string;
-  }>;
 };
 
 type Geometry = {
@@ -141,7 +102,6 @@ const domainMeta: Record<Domain, { icon: LucideIcon; label: string; color: strin
 const fallbackPayload: ScanPayload = {
   generatedAt: new Date().toISOString(),
   scanId: "DISHA-IN-LOCAL",
-  sourceNotice: "Demo operational feed for product evaluation. Not a government statistic.",
   scan: territories.map((territory) => ({
     ...territory,
     closure: 62,
@@ -153,26 +113,6 @@ const fallbackPayload: ScanPayload = {
   })),
 };
 
-const fallbackNationalPayload: NationalPayload = {
-  coverage: {
-    total: 0,
-    verifiedLiveSources: 0,
-    verificationGaps: 0,
-    counts: {
-      connected: 0,
-      registry_ready: 0,
-      requires_api_key: 0,
-      requires_bulk_import: 0,
-      verify_required: 0,
-    },
-  },
-  sources: [],
-};
-
-const fallbackConnectorPayload: ConnectorPayload = {
-  connectors: [],
-};
-
 export default function DashboardPage() {
   const [selectedRegion, setSelectedRegion] = useState<(typeof regions)[number]>("All India");
   const [selectedDomain, setSelectedDomain] = useState<(typeof domains)[number]>("All domains");
@@ -181,8 +121,8 @@ export default function DashboardPage() {
   const [sortKey, setSortKey] = useState<SortKey>("cases");
   const [selectedTerritory, setSelectedTerritory] = useState("Uttar Pradesh");
   const [payload, setPayload] = useState<ScanPayload>(fallbackPayload);
-  const [nationalPayload, setNationalPayload] = useState<NationalPayload>(fallbackNationalPayload);
-  const [connectorPayload, setConnectorPayload] = useState<ConnectorPayload>(fallbackConnectorPayload);
+  const nationalPayload = { sources: [] as Array<{ id: string; layer: string; authority: string; status: string; dashboardUse: string }> };
+  const connectorPayload = { connectors: [] as Array<{ id: string; label: string; layer: string; cadence: string; needsApiKey: boolean; needsBulkImport: boolean; updateDetection: string }> };
   const [mapFeatures, setMapFeatures] = useState<MapFeature[]>([]);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [refreshNonce, setRefreshNonce] = useState(0);
@@ -222,36 +162,6 @@ export default function DashboardPage() {
     return () => {
       alive = false;
       window.clearInterval(interval);
-    };
-  }, [refreshNonce]);
-
-  useEffect(() => {
-    let alive = true;
-
-    async function loadConnectors() {
-      const response = await fetch("/api/dashboard/connectors", { cache: "no-store" });
-      const connectorManifest = (await response.json()) as ConnectorPayload;
-      if (alive) setConnectorPayload(connectorManifest);
-    }
-
-    loadConnectors().catch(() => setConnectorPayload(fallbackConnectorPayload));
-    return () => {
-      alive = false;
-    };
-  }, [refreshNonce]);
-
-  useEffect(() => {
-    let alive = true;
-
-    async function loadNationalRegistry() {
-      const response = await fetch("/api/dashboard/national", { cache: "no-store" });
-      const registry = (await response.json()) as NationalPayload;
-      if (alive) setNationalPayload(registry);
-    }
-
-    loadNationalRegistry().catch(() => setNationalPayload(fallbackNationalPayload));
-    return () => {
-      alive = false;
     };
   }, [refreshNonce]);
 
@@ -301,25 +211,32 @@ export default function DashboardPage() {
   return (
     <main className={styles.page}>
       <section className={styles.shell} aria-labelledby="dashboard-title">
+        <nav className={styles.reportTabs} aria-label="Report pages">
+          <button type="button" className={styles.activeTab}>Executive</button>
+          <button type="button">Geography</button>
+          <button type="button">Evidence</button>
+          <button type="button">Actions</button>
+        </nav>
+
         <header className={styles.commandHeader}>
           <div>
-            <p className={styles.eyebrow}>DISHA National Intelligence Report</p>
-            <h1 id="dashboard-title">India public accountability dashboard</h1>
+            <p className={styles.eyebrow}>DISHA Report View</p>
+            <h1 id="dashboard-title">India constitutional action monitor</h1>
           </div>
           <div className={styles.scanStatus}>
             <Radar aria-hidden="true" />
-            <span>Dataset refresh</span>
+            <span>Refresh state</span>
             <strong>{lastUpdated}</strong>
             <button type="button" onClick={() => setRefreshNonce((value) => value + 1)}>
-              {isRefreshing ? "Scanning" : "Refresh"}
+              {isRefreshing ? "Updating" : "Refresh"}
             </button>
           </div>
         </header>
 
-        <section className={styles.filterBar} aria-label="Dashboard slicers">
+        <section className={styles.filterBar} aria-label="Report filters">
           <div className={styles.filterTitle}>
             <Filter aria-hidden="true" />
-            <span>Report slicers</span>
+            <span>Filters</span>
           </div>
           <SelectControl label="Region" value={selectedRegion} values={regions} onChange={setSelectedRegion} />
           <SelectControl label="Domain" value={selectedDomain} values={domains} onChange={setSelectedDomain} />
@@ -331,9 +248,9 @@ export default function DashboardPage() {
           </label>
         </section>
 
-        <section className={styles.measureGrid} aria-label="Live BI visuals">
+        <section className={styles.measureGrid} aria-label="Report measures">
           <article className={styles.measureVisual}>
-            <PanelHeader icon={AlertTriangle} eyebrow="Heat matrix" title="Priority by active units" />
+            <PanelHeader icon={AlertTriangle} eyebrow="Priority" title="Active units" />
             <div className={styles.heatMatrix}>
               {priorityRows.map((row) => (
                 <div key={row.label} data-priority={row.label}>
@@ -345,14 +262,14 @@ export default function DashboardPage() {
             </div>
           </article>
           <article className={styles.measureVisual}>
-            <PanelHeader icon={Gavel} eyebrow="Approval lane" title="Actions waiting for human review" />
+            <PanelHeader icon={Gavel} eyebrow="Action gate" title="Human review" />
             <div className={styles.flowVisual}>
               <span style={{ width: `${Math.min(approvalQueue * 3, 100)}%` }} />
-              <p>{approvalQueue} approval-gated actions across the current filter.</p>
+              <p>{approvalQueue} items in the selected filter context.</p>
             </div>
           </article>
           <article className={styles.measureVisual}>
-            <PanelHeader icon={ShieldCheck} eyebrow="Evidence lane" title="Verification and closure state" />
+            <PanelHeader icon={ShieldCheck} eyebrow="Evidence" title="Verification state" />
             <div className={styles.dualGauge}>
               <div><span style={{ height: `${averageEvidence}%` }} /><p>Evidence</p></div>
               <div><span style={{ height: `${averageClosure}%` }} /><p>Closure</p></div>
@@ -360,7 +277,7 @@ export default function DashboardPage() {
             </div>
           </article>
           <article className={styles.measureVisual}>
-            <PanelHeader icon={ClipboardList} eyebrow="Live queue" title="Top changing territories" />
+            <PanelHeader icon={ClipboardList} eyebrow="Queue" title="Territory movement" />
             <div className={styles.eventRail}>
               {filtered.slice(0, 5).map((territory) => (
                 <button type="button" key={territory.name} onClick={() => setSelectedTerritory(territory.name)}>
@@ -374,7 +291,7 @@ export default function DashboardPage() {
 
         <section className={styles.operationsGrid}>
           <article className={styles.mapPanel}>
-            <PanelHeader icon={MapPinned} eyebrow="Map visual" title="State and UT heat map" />
+            <PanelHeader icon={MapPinned} eyebrow="India map" title="State and union territory layer" />
             <div className={styles.scanCanvas}>
               <IndiaMap
                 activeSet={activeSet}
@@ -387,7 +304,7 @@ export default function DashboardPage() {
           </article>
 
           <aside className={styles.drillPanel}>
-            <PanelHeader icon={FileSearch} eyebrow="Drill-through visual" title={selected.name} />
+            <PanelHeader icon={FileSearch} eyebrow="Drill through" title={selected.name} />
             <div className={styles.scoreRing} style={{ "--score": `${selected.evidence * 3.6}deg` } as CSSProperties}>
               <strong>{selected.evidence}%</strong>
               <span>evidence</span>
@@ -405,10 +322,10 @@ export default function DashboardPage() {
         </section>
 
         <section className={styles.analyticsGrid}>
-          <ChartPanel icon={Landmark} eyebrow="Zone workload" title="Cases by region" rows={regionRows} />
+          <ChartPanel icon={Landmark} eyebrow="Region" title="Case distribution" rows={regionRows} />
           <DomainPanel rows={domainRows} />
           <article className={styles.panel}>
-            <PanelHeader icon={ClipboardList} eyebrow="Scan table" title="Territory queue" />
+            <PanelHeader icon={ClipboardList} eyebrow="Matrix" title="Territory queue" />
             <div className={styles.sortRow}>
               <button type="button" className={sortKey === "cases" ? styles.activeTool : ""} onClick={() => setSortKey("cases")}>Cases</button>
               <button type="button" className={sortKey === "evidence" ? styles.activeTool : ""} onClick={() => setSortKey("evidence")}>Evidence</button>
@@ -428,7 +345,7 @@ export default function DashboardPage() {
 
         <section className={styles.sourceGrid} aria-label="National data source coverage">
           <article className={styles.panel}>
-            <PanelHeader icon={ShieldCheck} eyebrow="National source registry" title="President to panchayat data coverage" />
+            <PanelHeader icon={ShieldCheck} eyebrow="Registry" title="Coverage" />
             <div className={styles.sourceList}>
               {nationalPayload.sources.slice(0, 10).map((source) => (
                 <div key={source.id}>
@@ -441,7 +358,7 @@ export default function DashboardPage() {
             </div>
           </article>
           <article className={styles.panel}>
-            <PanelHeader icon={RefreshCw} eyebrow="Connector mesh" title="Auto-update source connectors" />
+            <PanelHeader icon={RefreshCw} eyebrow="Sources" title="Updates" />
             <div className={styles.connectorList}>
               {connectorPayload.connectors.slice(0, 12).map((connector) => (
                 <div key={connector.id}>
@@ -460,7 +377,6 @@ export default function DashboardPage() {
           </article>
         </section>
 
-        <p className={styles.notice}>{payload.sourceNotice} Map geometry is a public GeoJSON asset rendered locally for product demonstration.</p>
       </section>
     </main>
   );

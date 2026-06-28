@@ -11,6 +11,32 @@
   padding: 10px 0 22px;
 }
 
+.reportTabs {
+  display: flex;
+  gap: 0;
+  align-items: flex-end;
+  border: 1px solid #d7dde6;
+  border-bottom: 0;
+  background: #ffffff;
+}
+
+.reportTabs button {
+  min-height: 38px;
+  border: 0;
+  border-right: 1px solid #e5e7eb;
+  background: #f8fafc;
+  color: #475569;
+  padding: 0 18px;
+  font-weight: 750;
+  cursor: pointer;
+}
+
+.reportTabs .activeTab {
+  border-bottom: 3px solid #f2c811;
+  background: #ffffff;
+  color: #111827;
+}
+
 .commandHeader {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 320px;
@@ -561,6 +587,18 @@
 }
 
 .sourceGrid {
+  display: none;
+}
+
+.notice {
+  display: none;
+}
+
+/*
+ * Source registry styles remain for the non-visible connector workbench.
+ * The product report canvas above is intentionally free of provenance copy.
+ */
+.sourceGridLegacy {
   display: grid;
   grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
   gap: 10px;
@@ -620,12 +658,6 @@
   color: #64748b;
   font-size: 0.8rem;
   line-height: 1.34;
-}
-
-.notice {
-  margin-top: 10px;
-  color: #64748b;
-  line-height: 1.4;
 }
 
 @media (max-width: 1280px) {
