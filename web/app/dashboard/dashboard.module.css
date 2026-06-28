@@ -523,6 +523,77 @@
   gap: 10px;
 }
 
+.sourceGrid {
+  display: grid;
+  margin-top: 10px;
+}
+
+.sourceKpis {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.sourceKpis div {
+  border: 1px solid rgba(157, 247, 242, 0.18);
+  background: rgba(3, 38, 58, 0.42);
+  padding: 10px;
+}
+
+.sourceKpis span,
+.sourceList span {
+  color: #a8e8e5;
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.sourceKpis strong {
+  display: block;
+  margin-top: 7px;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.4rem;
+}
+
+.sourceList {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.sourceList div {
+  min-height: 142px;
+  border: 1px solid rgba(157, 247, 242, 0.18);
+  background: rgba(3, 38, 58, 0.42);
+  padding: 10px;
+}
+
+.sourceList strong {
+  display: block;
+  margin-top: 9px;
+  line-height: 1.2;
+}
+
+.sourceList small {
+  display: inline-block;
+  margin-top: 8px;
+  border: 1px solid rgba(157, 247, 242, 0.2);
+  padding: 3px 6px;
+  color: #efffff;
+  font-size: 0.7rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.sourceList p {
+  margin: 8px 0 0;
+  color: #a8d7d4;
+  font-size: 0.82rem;
+  line-height: 1.35;
+}
+
 .barList {
   display: grid;
   gap: 10px;
@@ -658,6 +729,11 @@
   .kpiGrid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
+
+  .sourceKpis,
+  .sourceList {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 @media (max-width: 760px) {
@@ -666,7 +742,9 @@
   }
 
   .filterBar,
-  .kpiGrid {
+  .kpiGrid,
+  .sourceKpis,
+  .sourceList {
     grid-template-columns: 1fr;
   }
 

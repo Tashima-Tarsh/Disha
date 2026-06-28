@@ -60,6 +60,32 @@ type ScanPayload = {
   scan: ScanTerritory[];
 };
 
+type NationalSourceStatus =
+  | "connected"
+  | "registry_ready"
+  | "requires_api_key"
+  | "requires_bulk_import"
+  | "verify_required";
+
+type NationalSource = {
+  id: string;
+  layer: string;
+  scope: string;
+  authority: string;
+  status: NationalSourceStatus;
+  dashboardUse: string;
+};
+
+type NationalPayload = {
+  coverage: {
+    total: number;
+    verifiedLiveSources: number;
+    verificationGaps: number;
+    counts: Record<NationalSourceStatus, number>;
+  };
+  sources: NationalSource[];
+};
+
 type Geometry = {
   type: "Polygon" | "MultiPolygon";
   coordinates: number[][][] | number[][][][];
@@ -115,6 +141,22 @@ const fallbackPayload: ScanPayload = {
   })),
 };
 
+const fallbackNationalPayload: NationalPayload = {
+  coverage: {
+    total: 0,
+    verifiedLiveSources: 0,
+    verificationGaps: 0,
+    counts: {
+      connected: 0,
+      registry_ready: 0,
+      requires_api_key: 0,
+      requires_bulk_import: 0,
+      verify_required: 0,
+    },
+  },
+  sources: [],
+};
+
 export default function DashboardPage() {
   const [selectedRegion, setSelectedRegion] = useState<(typeof regions)[number]>("All India");
   const [selectedDomain, setSelectedDomain] = useState<(typeof domains)[number]>("All domains");
@@ -123,6 +165,7 @@ export default function DashboardPage() {
   const [sortKey, setSortKey] = useState<SortKey>("cases");
   const [selectedTerritory, setSelectedTerritory] = useState("Uttar Pradesh");
   const [payload, setPayload] = useState<ScanPayload>(fallbackPayload);
+  const [nationalPayload, setNationalPayload] = useState<NationalPayload>(fallbackNationalPayload);
   const [mapFeatures, setMapFeatures] = useState<MapFeature[]>([]);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [refreshNonce, setRefreshNonce] = useState(0);
@@ -162,6 +205,21 @@ export default function DashboardPage() {
     return () => {
       alive = false;
       window.clearInterval(interval);
+    };
+  }, [refreshNonce]);
+
+  useEffect(() => {
+    let alive = true;
+
+    async function loadNationalRegistry() {
+      const response = await fetch("/api/dashboard/national", { cache: "no-store" });
+      const registry = (await response.json()) as NationalPayload;
+      if (alive) setNationalPayload(registry);
+    }
+
+    loadNationalRegistry().catch(() => setNationalPayload(fallbackNationalPayload));
+    return () => {
+      alive = false;
     };
   }, [refreshNonce]);
 
@@ -332,6 +390,28 @@ export default function DashboardPage() {
                   <strong>{territory.cases}</strong>
                   <small>{territory.agenticScan.nextAction}</small>
                 </button>
+              ))}
+            </div>
+          </article>
+        </section>
+
+        <section className={styles.sourceGrid} aria-label="National data source coverage">
+          <article className={styles.panel}>
+            <PanelHeader icon={ShieldCheck} eyebrow="National source registry" title="President to panchayat data coverage" />
+            <div className={styles.sourceKpis}>
+              <Detail label="Registered layers" value={String(nationalPayload.coverage.total)} />
+              <Detail label="Live verified" value={String(nationalPayload.coverage.verifiedLiveSources)} />
+              <Detail label="Need verification" value={String(nationalPayload.coverage.verificationGaps)} />
+              <Detail label="Bulk imports" value={String(nationalPayload.coverage.counts.requires_bulk_import)} />
+            </div>
+            <div className={styles.sourceList}>
+              {nationalPayload.sources.slice(0, 10).map((source) => (
+                <div key={source.id}>
+                  <span>{source.layer}</span>
+                  <strong>{source.authority}</strong>
+                  <small>{source.status.replaceAll("_", " ")}</small>
+                  <p>{source.dashboardUse}</p>
+                </div>
               ))}
             </div>
           </article>
