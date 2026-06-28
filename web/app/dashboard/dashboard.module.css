@@ -1,7 +1,9 @@
 .page {
   min-height: 100vh;
-  background: #f3ecd9;
-  color: #211d16;
+  background:
+    radial-gradient(circle at 72% 12%, rgba(58, 226, 216, 0.34), transparent 34%),
+    linear-gradient(135deg, #0c5562 0%, #0d344d 52%, #19204e 100%);
+  color: #efffff;
   font-family: Arial, Helvetica, sans-serif;
 }
 
@@ -17,9 +19,10 @@
 .mapPanel,
 .drillPanel,
 .panel {
-  border: 1px solid rgba(34, 28, 18, 0.28);
-  background: rgba(255, 253, 247, 0.96);
-  box-shadow: 0 16px 38px rgba(68, 51, 22, 0.08);
+  border: 1px solid rgba(157, 247, 242, 0.25);
+  background: rgba(8, 57, 78, 0.56);
+  box-shadow: 0 18px 44px rgba(0, 14, 30, 0.28);
+  backdrop-filter: blur(8px);
 }
 
 .commandHeader {
@@ -41,6 +44,7 @@
 .notice {
   margin: 0;
   color: #756445;
+  color: #a8e8e5;
   font-size: 0.72rem;
   font-weight: 900;
   letter-spacing: 0.08em;
@@ -61,8 +65,8 @@
   grid-template-columns: 28px minmax(0, 1fr);
   gap: 8px 10px;
   align-items: center;
-  border: 1px solid rgba(34, 28, 18, 0.26);
-  background: #f7cf72;
+  border: 1px solid rgba(157, 247, 242, 0.28);
+  background: rgba(18, 134, 141, 0.46);
   padding: 14px;
 }
 
@@ -80,9 +84,9 @@
 .scanStatus button {
   grid-column: 1 / -1;
   min-height: 40px;
-  border: 1px solid rgba(34, 28, 18, 0.44);
-  background: #fffdf7;
-  color: #211d16;
+  border: 1px solid rgba(157, 247, 242, 0.35);
+  background: rgba(234, 255, 250, 0.12);
+  color: #efffff;
   font-weight: 900;
   cursor: pointer;
 }
@@ -117,8 +121,8 @@
   display: grid;
   gap: 4px;
   min-height: 62px;
-  border: 1px solid rgba(34, 28, 18, 0.26);
-  background: #fff7df;
+  border: 1px solid rgba(157, 247, 242, 0.24);
+  background: rgba(3, 35, 56, 0.42);
   padding: 8px 11px;
 }
 
@@ -128,7 +132,7 @@
   appearance: none;
   border: 0;
   background: transparent;
-  color: #211d16;
+  color: #efffff;
   font: inherit;
   font-weight: 850;
   outline: none;
@@ -159,7 +163,7 @@
 }
 
 .kpiCard svg {
-  color: #8e6025;
+  color: #8ce8e4;
 }
 
 .kpiCard strong {
@@ -172,7 +176,7 @@
 
 .kpiCard p {
   margin: 7px 0 0;
-  color: #514634;
+  color: #a8d7d4;
   font-size: 0.88rem;
 }
 
@@ -205,22 +209,59 @@
 }
 
 .panelHeader svg {
-  color: #8e6025;
+  color: #8ce8e4;
+}
+
+.scanCanvas {
+  position: relative;
+  overflow: hidden;
+  min-height: min(72vh, 790px);
+  border: 1px solid rgba(157, 247, 242, 0.18);
+  background:
+    radial-gradient(circle at 52% 46%, rgba(33, 231, 228, 0.22), transparent 23%),
+    radial-gradient(circle at 18% 74%, rgba(120, 71, 174, 0.28), transparent 34%),
+    linear-gradient(135deg, rgba(11, 108, 126, 0.82), rgba(10, 42, 72, 0.92));
+}
+
+.scanCanvas::before {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background-image:
+    radial-gradient(circle, rgba(205, 255, 249, 0.16) 1px, transparent 1.8px),
+    linear-gradient(30deg, transparent 0 48%, rgba(142, 240, 236, 0.09) 49% 51%, transparent 52%);
+  background-size: 18px 18px, 120px 120px;
+  content: "";
+  opacity: 0.65;
+  pointer-events: none;
+}
+
+.scanCanvas::after {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  background:
+    linear-gradient(90deg, rgba(255, 255, 255, 0.08), transparent 17% 83%, rgba(255, 255, 255, 0.08)),
+    radial-gradient(circle at 50% 50%, transparent 0 22%, rgba(8, 18, 40, 0.18) 42%, rgba(8, 18, 40, 0.42) 100%);
+  content: "";
+  pointer-events: none;
 }
 
 .indiaMap {
+  position: relative;
+  z-index: 3;
   display: block;
   width: 100%;
   height: min(72vh, 790px);
   min-height: 560px;
-  border: 1px solid rgba(34, 28, 18, 0.22);
-  background:
-    linear-gradient(180deg, #fdf9ed, #f6edd6);
+  border: 0;
+  background: transparent;
+  filter: drop-shadow(0 12px 18px rgba(0, 0, 0, 0.22));
 }
 
 .mapDistrict {
   cursor: pointer;
-  stroke: rgba(35, 30, 20, 0.42);
+  stroke: rgba(195, 255, 251, 0.42);
   stroke-width: 0.42;
   transition:
     fill 180ms ease,
@@ -229,19 +270,19 @@
 }
 
 .mapDistrict[data-priority="Critical"] {
-  fill: #e9866b;
+  fill: rgba(252, 152, 116, 0.82);
 }
 
 .mapDistrict[data-priority="High"] {
-  fill: #efc44f;
+  fill: rgba(246, 209, 91, 0.82);
 }
 
 .mapDistrict[data-priority="Watch"] {
-  fill: #9fcf83;
+  fill: rgba(105, 210, 176, 0.8);
 }
 
 .mapDistrict[data-priority="Stable"] {
-  fill: #92d0c7;
+  fill: rgba(103, 194, 222, 0.78);
 }
 
 .mapMuted {
@@ -256,22 +297,176 @@
 .mapDistrict:focus-visible,
 .mapSelected {
   opacity: 1;
-  stroke: #211d16;
+  stroke: #ffffff;
   stroke-width: 1.4;
   outline: none;
 }
 
 .mapSelected {
-  filter: drop-shadow(0 0 4px rgba(33, 29, 22, 0.35));
+  filter: drop-shadow(0 0 7px rgba(214, 255, 250, 0.82));
+}
+
+.floatingMetrics {
+  position: absolute;
+  top: 22px;
+  left: 22px;
+  z-index: 5;
+  display: grid;
+  grid-template-columns: repeat(2, 126px);
+  gap: 10px;
+}
+
+.floatingMetrics div {
+  min-height: 92px;
+  border: 1px solid rgba(157, 247, 242, 0.24);
+  background: rgba(3, 38, 58, 0.55);
+  padding: 12px;
+}
+
+.floatingMetrics span,
+.signalReadout span {
+  color: #a8e8e5;
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.floatingMetrics strong {
+  display: block;
+  margin-top: 7px;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.55rem;
+}
+
+.floatingMetrics i,
+.floatingMetrics b {
+  display: block;
+  height: 24px;
+  margin-top: 10px;
+  background:
+    linear-gradient(90deg, transparent 0 8%, rgba(214, 255, 250, 0.9) 9% 12%, transparent 13% 21%, rgba(214, 255, 250, 0.65) 22% 25%, transparent 26%),
+    linear-gradient(180deg, transparent 45%, rgba(214, 255, 250, 0.28) 46% 54%, transparent 55%);
+}
+
+.scanLens {
+  position: absolute;
+  top: 47%;
+  left: 50%;
+  z-index: 6;
+  width: clamp(128px, 13vw, 190px);
+  aspect-ratio: 1;
+  border: 8px solid rgba(13, 10, 20, 0.82);
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 45% 48%, #ffffff 0 4%, transparent 5%),
+    radial-gradient(circle at 65% 31%, rgba(255, 255, 255, 0.38) 0 11%, transparent 12%),
+    radial-gradient(circle at 35% 60%, #5829a6 0 22%, #1d1640 23% 48%, #050713 49% 100%);
+  box-shadow:
+    0 0 0 10px rgba(0, 0, 0, 0.28),
+    0 0 36px rgba(105, 231, 228, 0.35);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.scanLens span,
+.scanLens strong,
+.scanLens i {
+  position: absolute;
+  border-radius: 50%;
+  content: "";
+}
+
+.scanLens span {
+  inset: 22%;
+  border: 1px solid rgba(215, 255, 250, 0.36);
+}
+
+.scanLens strong {
+  inset: 38%;
+  background: #0a0714;
+}
+
+.scanLens i {
+  top: 28%;
+  left: 30%;
+  width: 13%;
+  height: 13%;
+  background: #ffffff;
+}
+
+.scanRings {
+  position: absolute;
+  top: 47%;
+  left: 50%;
+  z-index: 5;
+  width: clamp(320px, 42vw, 640px);
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.scanRings span {
+  position: absolute;
+  border: 1px solid rgba(186, 255, 251, 0.34);
+  border-radius: 50%;
+}
+
+.scanRings span:nth-child(1) { inset: 4%; }
+.scanRings span:nth-child(2) { inset: 19%; }
+.scanRings span:nth-child(3) { inset: 33%; }
+.scanRings span:nth-child(4) { inset: 46%; border-style: dashed; }
+
+.signalReadout {
+  position: absolute;
+  right: 26px;
+  top: 30%;
+  z-index: 6;
+  width: min(290px, 34%);
+  border: 1px solid rgba(157, 247, 242, 0.22);
+  background: rgba(3, 38, 58, 0.48);
+  padding: 16px;
+}
+
+.signalReadout strong {
+  display: block;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 2.2rem;
+}
+
+.signalReadout p {
+  margin: 8px 0 0;
+  color: #d8fffb;
+}
+
+.chartOverlay {
+  position: absolute;
+  right: 26px;
+  bottom: 28px;
+  z-index: 6;
+  display: flex;
+  gap: 6px;
+  align-items: end;
+  height: 96px;
+  width: min(260px, 32%);
+  border-top: 1px solid rgba(214, 255, 250, 0.32);
+  border-bottom: 1px solid rgba(214, 255, 250, 0.32);
+  padding: 10px;
+}
+
+.chartOverlay span {
+  flex: 1;
+  min-height: 12px;
+  background: rgba(214, 255, 250, 0.7);
 }
 
 .mapLoading {
   display: grid;
   place-items: center;
   min-height: 560px;
-  border: 1px solid rgba(34, 28, 18, 0.22);
-  background: #fdf9ed;
-  color: #756445;
+  border: 1px solid rgba(157, 247, 242, 0.18);
+  background: rgba(3, 38, 58, 0.42);
+  color: #a8e8e5;
   font-weight: 900;
   text-transform: uppercase;
 }
@@ -282,11 +477,11 @@
   width: 190px;
   height: 190px;
   margin: 4px auto 18px;
-  border: 1px solid rgba(34, 28, 18, 0.36);
+  border: 1px solid rgba(157, 247, 242, 0.28);
   border-radius: 50%;
   background:
-    radial-gradient(circle at center, #fffdf7 0 49%, transparent 50%),
-    conic-gradient(#7aaa5d 0 var(--score), #efe4c8 var(--score) 360deg);
+    radial-gradient(circle at center, rgba(8, 57, 78, 0.96) 0 49%, transparent 50%),
+    conic-gradient(#87fff2 0 var(--score), rgba(255, 255, 255, 0.13) var(--score) 360deg);
 }
 
 .scoreRing strong {
@@ -297,7 +492,7 @@
 
 .scoreRing span {
   margin-top: -50px;
-  color: #756445;
+  color: #a8e8e5;
   font-size: 0.72rem;
   font-weight: 900;
   letter-spacing: 0.08em;
@@ -313,7 +508,7 @@
   display: flex;
   justify-content: space-between;
   gap: 14px;
-  border-top: 1px solid rgba(34, 28, 18, 0.2);
+  border-top: 1px solid rgba(157, 247, 242, 0.18);
   padding-top: 10px;
 }
 
@@ -351,14 +546,14 @@
 .barRow div {
   overflow: hidden;
   height: 20px;
-  border: 1px solid rgba(34, 28, 18, 0.26);
-  background: #f7efd7;
+  border: 1px solid rgba(157, 247, 242, 0.2);
+  background: rgba(3, 38, 58, 0.42);
 }
 
 .barRow i {
   display: block;
   height: 100%;
-  background: linear-gradient(90deg, #7aaa5d, #efc44f, #e9866b);
+  background: linear-gradient(90deg, #87fff2, #efc44f, #e9866b);
 }
 
 .domainList {
@@ -371,7 +566,7 @@
   grid-template-columns: 24px minmax(0, 1fr) 52px;
   gap: 10px;
   align-items: center;
-  border-top: 1px solid rgba(34, 28, 18, 0.2);
+  border-top: 1px solid rgba(157, 247, 242, 0.18);
   padding-top: 10px;
 }
 
@@ -395,17 +590,17 @@
 .sortRow button,
 .activeTool {
   min-height: 36px;
-  border: 1px solid rgba(34, 28, 18, 0.3);
-  background: #fff7df;
-  color: #211d16;
+  border: 1px solid rgba(157, 247, 242, 0.22);
+  background: rgba(3, 38, 58, 0.42);
+  color: #efffff;
   padding: 0 11px;
   font-weight: 900;
   cursor: pointer;
 }
 
 .sortRow .activeTool {
-  background: #211d16;
-  color: #fffdf7;
+  background: rgba(135, 255, 242, 0.22);
+  color: #efffff;
 }
 
 .scanTable {
@@ -420,9 +615,9 @@
   grid-template-columns: minmax(0, 1fr) 44px;
   gap: 6px 10px;
   align-items: center;
-  border: 1px solid rgba(34, 28, 18, 0.22);
-  background: #fffaf0;
-  color: #211d16;
+  border: 1px solid rgba(157, 247, 242, 0.18);
+  background: rgba(3, 38, 58, 0.42);
+  color: #efffff;
   padding: 9px;
   text-align: left;
   cursor: pointer;
@@ -440,7 +635,7 @@
 
 .scanTable small {
   grid-column: 1 / -1;
-  color: #5d503b;
+  color: #a8d7d4;
   font-weight: 800;
 }
 
@@ -493,5 +688,19 @@
 
   .barRow div {
     grid-column: 1 / -1;
+  }
+
+  .floatingMetrics,
+  .signalReadout,
+  .chartOverlay {
+    position: relative;
+    inset: auto;
+    width: auto;
+    margin: 10px;
+  }
+
+  .scanLens,
+  .scanRings {
+    display: none;
   }
 }

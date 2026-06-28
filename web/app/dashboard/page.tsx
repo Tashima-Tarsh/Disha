@@ -214,7 +214,7 @@ export default function DashboardPage() {
         <header className={styles.commandHeader}>
           <div>
             <p className={styles.eyebrow}>DISHA Bharat Live Scan</p>
-            <h1 id="dashboard-title">India constitutional audit operations map</h1>
+            <h1 id="dashboard-title">Agentic India scan dashboard</h1>
           </div>
           <div className={styles.scanStatus}>
             <Radar aria-hidden="true" />
@@ -253,13 +253,48 @@ export default function DashboardPage() {
         <section className={styles.operationsGrid}>
           <article className={styles.mapPanel}>
             <PanelHeader icon={MapPinned} eyebrow="India map" title="State and UT scan surface" />
-            <IndiaMap
-              activeSet={activeSet}
-              features={mapFeatures}
-              scanByName={scanByName}
-              selectedName={selected.name}
-              onSelect={setSelectedTerritory}
-            />
+            <div className={styles.scanCanvas}>
+              <div className={styles.floatingMetrics} aria-hidden="true">
+                <div>
+                  <span>Evidence</span>
+                  <strong>{averageEvidence}%</strong>
+                  <i />
+                </div>
+                <div>
+                  <span>Cases</span>
+                  <strong>{totalCases.toLocaleString("en-IN")}</strong>
+                  <b />
+                </div>
+              </div>
+              <IndiaMap
+                activeSet={activeSet}
+                features={mapFeatures}
+                scanByName={scanByName}
+                selectedName={selected.name}
+                onSelect={setSelectedTerritory}
+              />
+              <div className={styles.scanLens} aria-hidden="true">
+                <span />
+                <strong />
+                <i />
+              </div>
+              <div className={styles.scanRings} aria-hidden="true">
+                <span />
+                <span />
+                <span />
+                <span />
+              </div>
+              <div className={styles.signalReadout} aria-hidden="true">
+                <strong>{selected.cases.toLocaleString("en-IN")}</strong>
+                <span>{selected.name}</span>
+                <p>{selected.agenticScan.posture}</p>
+              </div>
+              <div className={styles.chartOverlay} aria-hidden="true">
+                {regionRows.slice(0, 6).map((row) => (
+                  <span key={row.label} style={{ height: `${Math.max(row.value, 14)}px` }} />
+                ))}
+              </div>
+            </div>
           </article>
 
           <aside className={styles.drillPanel}>
