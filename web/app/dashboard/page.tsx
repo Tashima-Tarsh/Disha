@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import {
   AlertTriangle,
+  ArrowUpDown,
   CheckCircle2,
   ChevronDown,
   ClipboardList,
@@ -11,11 +12,13 @@ import {
   Gavel,
   Landmark,
   MapPinned,
+  RefreshCw,
   Route,
+  Search,
   ShieldCheck,
-  Sparkles,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
+import type { CSSProperties } from "react";
 
 import styles from "./dashboard.module.css";
 
@@ -23,6 +26,7 @@ type Region = "North" | "South" | "East" | "West" | "Central" | "North East";
 type TerritoryKind = "State" | "Union Territory";
 type Priority = "Critical" | "High" | "Watch" | "Stable";
 type Domain = "Constitutional" | "Service" | "Resilience" | "Evidence";
+type SortKey = "cases" | "evidence" | "approval";
 
 type Territory = {
   name: string;
@@ -34,6 +38,13 @@ type Territory = {
   evidence: number;
   approval: number;
   note: string;
+};
+
+type LiveTerritory = Territory & {
+  liveCases: number;
+  liveEvidence: number;
+  liveApproval: number;
+  closure: number;
 };
 
 const territories: Territory[] = [
@@ -75,64 +86,77 @@ const territories: Territory[] = [
   { name: "Puducherry", kind: "Union Territory", region: "South", domain: "Service", priority: "Stable", cases: 6, evidence: 76, approval: 1, note: "health-service records" },
 ];
 
-const regions: Array<"All India" | Region> = [
-  "All India",
-  "North",
-  "South",
-  "East",
-  "West",
-  "Central",
-  "North East",
-];
+const regions: Array<"All India" | Region> = ["All India", "North", "South", "East", "West", "Central", "North East"];
+const domains: Array<"All domains" | Domain> = ["All domains", "Constitutional", "Service", "Resilience", "Evidence"];
+const priorities: Array<"All priorities" | Priority> = ["All priorities", "Critical", "High", "Watch", "Stable"];
 
-const domains: Array<"All domains" | Domain> = [
-  "All domains",
-  "Constitutional",
-  "Service",
-  "Resilience",
-  "Evidence",
-];
-
-const priorities: Array<"All priorities" | Priority> = [
-  "All priorities",
-  "Critical",
-  "High",
-  "Watch",
-  "Stable",
-];
-
-const domainMeta: Record<Domain, { icon: LucideIcon; label: string }> = {
-  Constitutional: { icon: Landmark, label: "Constitutional audit" },
-  Service: { icon: ClipboardList, label: "Service-gap protection" },
-  Resilience: { icon: Route, label: "Infrastructure resilience" },
-  Evidence: { icon: FileSearch, label: "Evidence verification" },
+const domainMeta: Record<Domain, { icon: LucideIcon; label: string; color: string }> = {
+  Constitutional: { icon: Landmark, label: "Constitutional audit", color: "#d8a235" },
+  Service: { icon: ClipboardList, label: "Service-gap protection", color: "#7aaa5d" },
+  Resilience: { icon: Route, label: "Infrastructure resilience", color: "#d87855" },
+  Evidence: { icon: FileSearch, label: "Evidence verification", color: "#5aa6a0" },
 };
 
 export default function DashboardPage() {
   const [selectedRegion, setSelectedRegion] = useState<(typeof regions)[number]>("All India");
   const [selectedDomain, setSelectedDomain] = useState<(typeof domains)[number]>("All domains");
   const [selectedPriority, setSelectedPriority] = useState<(typeof priorities)[number]>("All priorities");
+  const [search, setSearch] = useState("");
+  const [sortKey, setSortKey] = useState<SortKey>("cases");
+  const [refreshTick, setRefreshTick] = useState(0);
+  const [selectedTerritory, setSelectedTerritory] = useState("Uttar Pradesh");
 
-  const filtered = useMemo(
+  const liveTerritories = useMemo(
     () =>
-      territories.filter((territory) => {
+      territories.map((territory, index) => {
+        const wave = ((refreshTick + index * 3) % 7) - 3;
+        const evidenceWave = ((refreshTick * 2 + index) % 5) - 2;
+        const liveCases = Math.max(1, territory.cases + wave);
+        const liveEvidence = clamp(territory.evidence + evidenceWave, 42, 94);
+        return {
+          ...territory,
+          liveCases,
+          liveEvidence,
+          liveApproval: Math.max(0, territory.approval + (wave > 1 ? 1 : 0)),
+          closure: clamp(100 - Math.round(liveCases * 1.3) + Math.round(liveEvidence / 4), 18, 91),
+        };
+      }),
+    [refreshTick],
+  );
+
+  const filtered = useMemo(() => {
+    const query = search.trim().toLowerCase();
+    return liveTerritories
+      .filter((territory) => {
         const regionMatch = selectedRegion === "All India" || territory.region === selectedRegion;
         const domainMatch = selectedDomain === "All domains" || territory.domain === selectedDomain;
         const priorityMatch = selectedPriority === "All priorities" || territory.priority === selectedPriority;
-        return regionMatch && domainMatch && priorityMatch;
-      }),
-    [selectedDomain, selectedPriority, selectedRegion],
-  );
+        const searchMatch =
+          !query ||
+          territory.name.toLowerCase().includes(query) ||
+          territory.note.toLowerCase().includes(query) ||
+          territory.region.toLowerCase().includes(query);
+        return regionMatch && domainMatch && priorityMatch && searchMatch;
+      })
+      .sort((a, b) => getSortValue(b, sortKey) - getSortValue(a, sortKey));
+  }, [liveTerritories, search, selectedDomain, selectedPriority, selectedRegion, sortKey]);
 
-  const totalCases = filtered.reduce((sum, territory) => sum + territory.cases, 0);
-  const approvalQueue = filtered.reduce((sum, territory) => sum + territory.approval, 0);
-  const averageEvidence = Math.round(
-    filtered.reduce((sum, territory) => sum + territory.evidence, 0) / Math.max(filtered.length, 1),
-  );
+  const selected =
+    liveTerritories.find((territory) => territory.name === selectedTerritory) ??
+    filtered[0] ??
+    liveTerritories[0];
+  const totalCases = filtered.reduce((sum, territory) => sum + territory.liveCases, 0);
+  const approvalQueue = filtered.reduce((sum, territory) => sum + territory.liveApproval, 0);
+  const averageEvidence = Math.round(filtered.reduce((sum, territory) => sum + territory.liveEvidence, 0) / Math.max(filtered.length, 1));
+  const averageClosure = Math.round(filtered.reduce((sum, territory) => sum + territory.closure, 0) / Math.max(filtered.length, 1));
   const criticalCount = filtered.filter((territory) => territory.priority === "Critical").length;
-  const leadTerritory = [...filtered].sort((a, b) => b.cases - a.cases)[0];
   const regionRows = summarizeByRegion(filtered);
   const domainRows = summarizeByDomain(filtered);
+  const priorityRows = summarizeByPriority(filtered);
+  const lastUpdated = new Date(Date.now() + refreshTick * 60000).toLocaleTimeString("en-IN", {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
 
   return (
     <main className={styles.page}>
@@ -142,124 +166,113 @@ export default function DashboardPage() {
             <p className={styles.eyebrow}>DISHA Bharat Operations View</p>
             <h1 id="dashboard-title">Constitutional audit and public protection across India</h1>
             <p>
-              A civic command view for source-linked public evidence, service gaps,
-              resilience risk, and lawful action. The screen is demo operational
-              data only; it is not a government claim.
+              Interactive BI view for source-linked public evidence, service gaps,
+              resilience risk, and lawful action. Demo operational data only; not a
+              government claim.
             </p>
           </div>
           <div className={styles.heroPanel}>
             <div>
-              <Sparkles aria-hidden="true" />
-              <span>Active lens</span>
+              <RefreshCw aria-hidden="true" />
+              <span>Live demo cycle</span>
             </div>
-            <strong>{selectedRegion}</strong>
-            <p>
-              {filtered.length} states and union territories in view. Every tile
-              keeps weak evidence away from public truth until review is complete.
-            </p>
+            <strong>{lastUpdated}</strong>
+            <button type="button" onClick={() => setRefreshTick((tick) => tick + 1)}>
+              Refresh metrics
+            </button>
           </div>
         </header>
 
         <section className={styles.filterBar} aria-label="Dashboard filters">
           <div className={styles.filterTitle}>
             <Filter aria-hidden="true" />
-            <span>Filters</span>
+            <span>Slicers</span>
           </div>
           <SelectControl label="Region" value={selectedRegion} values={regions} onChange={setSelectedRegion} />
           <SelectControl label="Domain" value={selectedDomain} values={domains} onChange={setSelectedDomain} />
           <SelectControl label="Priority" value={selectedPriority} values={priorities} onChange={setSelectedPriority} />
+          <label className={styles.searchControl}>
+            <span>Search</span>
+            <Search aria-hidden="true" />
+            <input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="State, UT, note, region" />
+          </label>
         </section>
 
-        <section className={styles.kpiGrid} aria-label="All India indicators">
-          <Kpi label="Territories in view" value={String(filtered.length)} detail="states and union territories" icon={MapPinned} />
-          <Kpi label="Public-interest cases" value={String(totalCases)} detail="source-linked work items" icon={ClipboardList} />
-          <Kpi label="Evidence readiness" value={`${averageEvidence}%`} detail="demo confidence average" icon={CheckCircle2} />
+        <section className={styles.kpiGrid} aria-label="Dashboard indicators">
+          <Kpi label="Territories in view" value={String(filtered.length)} detail="after slicers and search" icon={MapPinned} />
+          <Kpi label="Public-interest cases" value={String(totalCases)} detail="current demo workload" icon={ClipboardList} />
+          <Kpi label="Evidence readiness" value={`${averageEvidence}%`} detail="source confidence average" icon={CheckCircle2} />
           <Kpi label="Human approval queue" value={String(approvalQueue)} detail="policy-gated actions" icon={Gavel} />
-          <Kpi label="Critical territories" value={String(criticalCount)} detail="needs senior review" icon={AlertTriangle} />
+          <Kpi label="Closure readiness" value={`${averageClosure}%`} detail="audit-to-action progress" icon={ShieldCheck} />
+          <Kpi label="Critical territories" value={String(criticalCount)} detail="senior review required" icon={AlertTriangle} />
         </section>
 
-        <section className={styles.mapGrid}>
+        <section className={styles.biGrid}>
           <article className={styles.atlasPanel}>
-            <PanelHeader icon={MapPinned} eyebrow="India coverage board" title="All states and union territories" />
+            <PanelHeader icon={MapPinned} eyebrow="Selectable India board" title="All states and union territories" />
+            <div className={styles.toolRow}>
+              <button type="button" className={sortKey === "cases" ? styles.activeTool : ""} onClick={() => setSortKey("cases")}>
+                <ArrowUpDown aria-hidden="true" /> Cases
+              </button>
+              <button type="button" className={sortKey === "evidence" ? styles.activeTool : ""} onClick={() => setSortKey("evidence")}>
+                <ArrowUpDown aria-hidden="true" /> Evidence
+              </button>
+              <button type="button" className={sortKey === "approval" ? styles.activeTool : ""} onClick={() => setSortKey("approval")}>
+                <ArrowUpDown aria-hidden="true" /> Approval
+              </button>
+            </div>
             <div className={styles.territoryGrid}>
               {filtered.map((territory) => {
                 const Icon = domainMeta[territory.domain].icon;
+                const isSelected = territory.name === selected.name;
                 return (
-                  <button className={`${styles.territoryCard} ${styles[territory.priority.toLowerCase()]}`} type="button" key={territory.name}>
+                  <button
+                    className={`${styles.territoryCard} ${styles[territory.priority.toLowerCase()]} ${isSelected ? styles.selectedCard : ""}`}
+                    type="button"
+                    key={territory.name}
+                    onClick={() => setSelectedTerritory(territory.name)}
+                  >
                     <div>
                       <Icon aria-hidden="true" />
                       <span>{territory.kind}</span>
                     </div>
                     <strong>{territory.name}</strong>
                     <p>{territory.note}</p>
-                    <small>{territory.cases} cases | {territory.evidence}% evidence</small>
+                    <small>{territory.liveCases} cases | {territory.liveEvidence}% evidence</small>
                   </button>
                 );
               })}
             </div>
           </article>
 
-          <aside className={styles.contextPanel}>
-            <PanelHeader icon={ShieldCheck} eyebrow="Action discipline" title="What the product protects" />
-            <div className={styles.protectionStack}>
-              <Protection label="No individual surveillance" text="Only aggregate, source-linked, consented, or authorized evidence belongs here." />
-              <Protection label="No unsupported public claim" text="Unverified findings remain review work until sources can support them." />
-              <Protection label="No retaliation" text="Defensive action stays inside lawful public-interest and authorized boundaries." />
+          <aside className={styles.drillPanel}>
+            <PanelHeader icon={FileSearch} eyebrow="Drill-through" title={selected.name} />
+            <div className={styles.scoreRing} style={{ "--score": `${selected.liveEvidence * 3.6}deg` } as CSSProperties}>
+              <strong>{selected.liveEvidence}%</strong>
+              <span>evidence</span>
             </div>
-            <div className={styles.leadBox}>
-              <span>Highest current load</span>
-              <strong>{leadTerritory?.name ?? "No territory"}</strong>
-              <p>{leadTerritory ? `${leadTerritory.cases} demo cases in ${domainMeta[leadTerritory.domain].label.toLowerCase()}.` : "Adjust filters to restore a view."}</p>
+            <div className={styles.detailList}>
+              <Detail label="Region" value={selected.region} />
+              <Detail label="Domain" value={domainMeta[selected.domain].label} />
+              <Detail label="Priority" value={selected.priority} />
+              <Detail label="Cases" value={String(selected.liveCases)} />
+              <Detail label="Approval queue" value={String(selected.liveApproval)} />
+              <Detail label="Closure readiness" value={`${selected.closure}%`} />
             </div>
           </aside>
         </section>
 
         <section className={styles.analyticsGrid}>
-          <article className={styles.panel}>
-            <PanelHeader icon={Landmark} eyebrow="Regional posture" title="Cases by zone" />
-            <div className={styles.barList}>
-              {regionRows.map((row) => (
-                <div className={styles.barRow} key={row.region}>
-                  <span>{row.region}</span>
-                  <strong>{row.cases}</strong>
-                  <div><i style={{ width: `${Math.max(row.cases, 4)}%` }} /></div>
-                </div>
-              ))}
-            </div>
-          </article>
-
-          <article className={styles.panel}>
-            <PanelHeader icon={FileSearch} eyebrow="Problem domains" title="Where attention is going" />
-            <div className={styles.domainList}>
-              {domainRows.map((row) => {
-                const Icon = domainMeta[row.domain].icon;
-                return (
-                  <div key={row.domain}>
-                    <Icon aria-hidden="true" />
-                    <span>{domainMeta[row.domain].label}</span>
-                    <strong>{row.cases}</strong>
-                  </div>
-                );
-              })}
-            </div>
-          </article>
+          <ChartPanel icon={Landmark} eyebrow="Regional posture" title="Cases by zone" rows={regionRows} />
+          <DomainPanel rows={domainRows} />
+          <PriorityPanel rows={priorityRows} />
         </section>
       </section>
     </main>
   );
 }
 
-function SelectControl<T extends string>({
-  label,
-  value,
-  values,
-  onChange,
-}: {
-  label: string;
-  value: T;
-  values: readonly T[];
-  onChange: (value: T) => void;
-}) {
+function SelectControl<T extends string>({ label, value, values, onChange }: { label: string; value: T; values: readonly T[]; onChange: (value: T) => void }) {
   return (
     <label className={styles.selectControl}>
       <span>{label}</span>
@@ -296,30 +309,105 @@ function PanelHeader({ icon: Icon, eyebrow, title }: { icon: LucideIcon; eyebrow
   );
 }
 
-function Protection({ label, text }: { label: string; text: string }) {
+function Detail({ label, value }: { label: string; value: string }) {
   return (
-    <div className={styles.protection}>
+    <div>
       <span>{label}</span>
-      <p>{text}</p>
+      <strong>{value}</strong>
     </div>
   );
 }
 
-function summarizeByRegion(items: Territory[]) {
+function ChartPanel({ icon, eyebrow, title, rows }: { icon: LucideIcon; eyebrow: string; title: string; rows: Array<{ label: string; value: number }> }) {
+  const max = Math.max(...rows.map((row) => row.value), 1);
+  return (
+    <article className={styles.panel}>
+      <PanelHeader icon={icon} eyebrow={eyebrow} title={title} />
+      <div className={styles.barList}>
+        {rows.map((row) => (
+          <div className={styles.barRow} key={row.label}>
+            <span>{row.label}</span>
+            <strong>{row.value}</strong>
+            <div><i style={{ width: `${Math.max((row.value / max) * 100, 4)}%` }} /></div>
+          </div>
+        ))}
+      </div>
+    </article>
+  );
+}
+
+function DomainPanel({ rows }: { rows: Array<{ domain: Domain; value: number }> }) {
+  return (
+    <article className={styles.panel}>
+      <PanelHeader icon={FileSearch} eyebrow="Problem domains" title="Workload split" />
+      <div className={styles.domainList}>
+        {rows.map((row) => {
+          const Icon = domainMeta[row.domain].icon;
+          return (
+            <div key={row.domain}>
+              <Icon aria-hidden="true" style={{ color: domainMeta[row.domain].color }} />
+              <span>{domainMeta[row.domain].label}</span>
+              <strong>{row.value}</strong>
+            </div>
+          );
+        })}
+      </div>
+    </article>
+  );
+}
+
+function PriorityPanel({ rows }: { rows: Array<{ label: Priority; value: number }> }) {
+  const total = rows.reduce((sum, row) => sum + row.value, 0);
+  return (
+    <article className={styles.panel}>
+      <PanelHeader icon={AlertTriangle} eyebrow="Priority mix" title="Review posture" />
+      <div className={styles.priorityStack}>
+        {rows.map((row) => (
+          <div key={row.label}>
+            <span>{row.label}</span>
+            <strong>{row.value}</strong>
+            <i style={{ width: `${Math.max((row.value / Math.max(total, 1)) * 100, 5)}%` }} />
+          </div>
+        ))}
+      </div>
+    </article>
+  );
+}
+
+function summarizeByRegion(items: LiveTerritory[]) {
   return regions
     .filter((region): region is Region => region !== "All India")
     .map((region) => ({
-      region,
-      cases: items.filter((item) => item.region === region).reduce((sum, item) => sum + item.cases, 0),
+      label: region,
+      value: items.filter((item) => item.region === region).reduce((sum, item) => sum + item.liveCases, 0),
     }))
-    .filter((row) => row.cases > 0);
+    .filter((row) => row.value > 0);
 }
 
-function summarizeByDomain(items: Territory[]) {
+function summarizeByDomain(items: LiveTerritory[]) {
   return (Object.keys(domainMeta) as Domain[])
     .map((domain) => ({
       domain,
-      cases: items.filter((item) => item.domain === domain).reduce((sum, item) => sum + item.cases, 0),
+      value: items.filter((item) => item.domain === domain).reduce((sum, item) => sum + item.liveCases, 0),
     }))
-    .filter((row) => row.cases > 0);
+    .filter((row) => row.value > 0);
+}
+
+function summarizeByPriority(items: LiveTerritory[]) {
+  return (["Critical", "High", "Watch", "Stable"] as Priority[])
+    .map((priority) => ({
+      label: priority,
+      value: items.filter((item) => item.priority === priority).length,
+    }))
+    .filter((row) => row.value > 0);
+}
+
+function getSortValue(territory: LiveTerritory, sortKey: SortKey) {
+  if (sortKey === "evidence") return territory.liveEvidence;
+  if (sortKey === "approval") return territory.liveApproval;
+  return territory.liveCases;
+}
+
+function clamp(value: number, min: number, max: number) {
+  return Math.min(Math.max(value, min), max);
 }
