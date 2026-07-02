@@ -70,8 +70,8 @@ type LegacyBuilderPayload = {
 };
 
 type Geometry = {
-  type: "Polygon" | "MultiPolygon";
-  coordinates: number[][][] | number[][][][];
+  type: "Polygon" | "MultiPolygon" | "LineString" | "MultiLineString";
+  coordinates: number[][] | number[][][] | number[][][][];
 };
 
 type GeoFeature = {
@@ -142,7 +142,7 @@ export default function DashboardClient({ initialPayload }: ClientProps) {
   useEffect(() => {
     let alive = true;
     async function loadMap() {
-      const response = await fetch("/data/india-districts.geojson");
+      const response = await fetch("/data/datameet-india-land-simplified.geojson");
       const geojson = (await response.json()) as GeoJson;
       if (alive) setMapFeatures(buildMapFeatures(geojson));
     }
@@ -291,6 +291,7 @@ export default function DashboardClient({ initialPayload }: ClientProps) {
               <strong>{selectedTerritory}</strong>
               <span>{selectedRegion === "All India" ? "All states and union territories" : `${selectedRegion} region`}</span>
               <em>No incident data is invented; geography is used as a builder layer until official datasets are imported.</em>
+              <em>Boundary layer: DataMeet India community, CC BY 4.0.</em>
             </div>
           </article>
 
@@ -459,6 +460,12 @@ function buildMapFeatures(geojson: GeoJson): MapFeature[] {
 }
 
 function geometryToPath(geometry: Geometry): string {
+  if (geometry.type === "LineString") {
+    return lineToPath(geometry.coordinates as number[][]);
+  }
+  if (geometry.type === "MultiLineString") {
+    return (geometry.coordinates as number[][][]).map(lineToPath).join(" ");
+  }
   const polygons = geometry.type === "Polygon" ? [geometry.coordinates as number[][][]] : geometry.coordinates as number[][][][];
   return polygons
     .map((polygon) =>
@@ -473,6 +480,15 @@ function geometryToPath(geometry: Geometry): string {
         )
         .join(" "),
     )
+    .join(" ");
+}
+
+function lineToPath(line: number[][]): string {
+  return line
+    .map(([lon, lat], index) => {
+      const [x, y] = projectPoint(lon, lat);
+      return `${index === 0 ? "M" : "L"}${x.toFixed(2)} ${y.toFixed(2)}`;
+    })
     .join(" ");
 }
 
