@@ -7,7 +7,7 @@ describe("DISHA agentic AI skill readiness", () => {
   it("declares a governed Claude orchestration boundary", () => {
     const report = getAgenticReadinessReport();
     expect(report.agenticMode).toBe("governed_orchestrator");
-    expect(report.claudeBridge.allowedEntryPoints).toEqual(expect.arrayContaining(["/api/v1/mission"]));
+    expect(report.claudeBridge.allowedEntryPoints).toEqual(expect.arrayContaining(["/api/v1/agentic/mission", "/api/v1/mission"]));
     expect(report.claudeBridge.deniedCapabilities).toEqual(expect.arrayContaining(["policy bypass", "direct controlled-data access"]));
   });
 
@@ -36,8 +36,10 @@ describe("DISHA agentic AI skill readiness", () => {
   it("marks unfinished capabilities as partial rather than pretending production readiness", () => {
     const report = getAgenticReadinessReport();
     const claudeBridge = report.skills.find((skill) => skill.id === "claude-orchestrator-bridge");
+    const modelBridge = report.skills.find((skill) => skill.id === "governed-model-intelligence");
     const memory = report.skills.find((skill) => skill.id === "memory-learning");
     expect(claudeBridge?.status).toBe("partial");
+    expect(modelBridge?.status).toBe("ready");
     expect(memory?.blockers.length).toBeGreaterThan(0);
     expect(report.readiness.partial).toBeGreaterThan(0);
   });
