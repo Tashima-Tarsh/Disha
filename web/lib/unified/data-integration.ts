@@ -5,39 +5,17 @@ import type {
   OpenDataRecord,
 } from "./contracts";
 import { hashValue } from "./hash";
+import { listSourceRegistry, probeSources } from "./source-registry";
 
-export const openDataSources = [
-  {
-    sourceId: "cag-audit-index",
-    sourceName: "Comptroller and Auditor General audit reports",
-    license: "Official public website terms",
-    url: "https://cag.gov.in/en/audit-report",
-  },
-  {
-    sourceId: "india-budget",
-    sourceName: "India Budget, Ministry of Finance",
-    license: "Official public website terms",
-    url: "https://www.indiabudget.gov.in/",
-  },
-  {
-    sourceId: "data-gov-in",
-    sourceName: "Open Government Data Platform India",
-    license: "Government Open Data License - India",
-    url: "https://www.data.gov.in/apis",
-  },
-  {
-    sourceId: "lgd",
-    sourceName: "Local Government Directory",
-    license: "Official public directory",
-    url: "https://lgdirectory.gov.in/",
-  },
-  {
-    sourceId: "bhuvan",
-    sourceName: "Bhuvan geospatial services",
-    license: "Official public service terms",
-    url: "https://bhuvan-app1.nrsc.gov.in/api/",
-  },
-];
+export const openDataSources = listSourceRegistry().map((source) => ({
+  sourceId: source.sourceId,
+  sourceName: source.sourceName,
+  license: source.license,
+  url: source.url,
+  owner: source.owner,
+  domain: source.domain,
+  updateMode: source.updateMode,
+}));
 
 export async function queryOpenData(sourceId?: string): Promise<OpenDataRecord[]> {
   const selected = sourceId
@@ -48,11 +26,17 @@ export async function queryOpenData(sourceId?: string): Promise<OpenDataRecord[]
     ...source,
     retrievedAt,
     data: {
-      status: "source_manifest",
-      note: "Connector preserves source identity; dataset-specific ingestion runs through provenance checks.",
+      status: "real_source_reference",
+      note: "No synthetic dataset is returned. Use the source probe and source-specific parser before promoting facts.",
+      noDemoData: true,
+      verificationRequiredBeforePublication: true,
     },
     provenanceHash: hashValue({ ...source, retrievedAt }),
   }));
+}
+
+export async function queryOpenDataLiveStatus(sourceId?: string) {
+  return probeSources(sourceId);
 }
 
 export class DenyByDefaultControlledConnector implements ControlledDataConnector {
