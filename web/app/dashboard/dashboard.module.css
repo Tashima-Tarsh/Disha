@@ -201,7 +201,16 @@
   align-items: center;
   border: 1px solid #d8dee7;
   background: #f7f9fb;
+  color: #111827;
   padding: 7px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.kpi[data-active="true"] {
+  border-color: #2563eb;
+  background: #eff6ff;
+  box-shadow: inset 0 -3px 0 #2563eb;
 }
 
 .kpi svg {

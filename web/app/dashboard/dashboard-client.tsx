@@ -32,6 +32,7 @@ type GeoFeature = { properties: { st_nm?: string; district?: string }; geometry:
 type GeoJson = { features: GeoFeature[] };
 type MapFeature = { id: string; stateName: string; district: string; path: string };
 type FlowNode = { id: string; label: string; x: number; y: number; level: "central" | "state" | "district" | "source"; value: number };
+type KpiKey = "sources" | "years" | "crime" | "typologies" | "parser" | "probe" | "review" | "policy";
 
 const INDIA_BOUNDS = { minLon: 67, maxLon: 98.5, minLat: 5.5, maxLat: 37.5 };
 const VIEWBOX = { width: 760, height: 820 };
@@ -61,6 +62,7 @@ export default function DashboardClient({ initialPayload }: ClientProps) {
   const [payload, setPayload] = useState(initialPayload);
   const [region, setRegion] = useState<(typeof regions)[number]>("All India");
   const [domain, setDomain] = useState("all");
+  const [activeKpi, setActiveKpi] = useState<KpiKey>("crime");
   const [query, setQuery] = useState("");
   const [selectedSourceId, setSelectedSourceId] = useState(initialPayload.sources[0]?.sourceId ?? "");
   const [mapFeatures, setMapFeatures] = useState<MapFeature[]>([]);
@@ -117,6 +119,7 @@ export default function DashboardClient({ initialPayload }: ClientProps) {
   const selectedPillar = payload.core.find((pillar) => selectedSource && pillar.sourceIds.includes(selectedSource.sourceId)) ?? payload.core[0];
   const crimeCyberSources = payload.sources.filter((source) => ["crime", "cybercrime", "cyber_incident", "consumer_finance_protection"].includes(source.domain));
   const officialSourceYears = 2026 - 2012 + 1;
+  const activeModel = getKpiModel(activeKpi, payload, crimeCyberSources.length);
   const activeTerritories = useMemo(() => new Set(territories.filter((item) => region === "All India" || item.region === region).map((item) => normalizeName(item.name))), [region]);
   const flowNodes = useMemo(() => makeFlowNodes(payload, tick), [payload, tick]);
   const lastUpdated = new Date(payload.generatedAt).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
@@ -154,14 +157,14 @@ export default function DashboardClient({ initialPayload }: ClientProps) {
 
         <section className={styles.mapStage}>
           <div className={styles.mapToolbar}>
-            <Kpi icon={Database} label="Official source body" value={payload.metrics.sources} />
-            <Kpi icon={FileClock} label="2012-2026 years" value={officialSourceYears} />
-            <Kpi icon={Gavel} label="Crime/cyber lanes" value={crimeCyberSources.length} />
-            <Kpi icon={AlertCircle} label="Scam typologies" value={6} />
-            <Kpi icon={Workflow} label="Parser queue" value={payload.metrics.parserBacklog} />
-            <Kpi icon={Activity} label="Probe ready" value={payload.metrics.liveProbeReady} />
-            <Kpi icon={LockKeyhole} label="Review gates" value={payload.metrics.authOrReviewRequired} />
-            <Kpi icon={ShieldCheck} label="Policy/evidence gates" value={6} />
+            <Kpi id="sources" active={activeKpi} onSelect={setActiveKpi} icon={Database} label="Official source body" value={payload.metrics.sources} />
+            <Kpi id="years" active={activeKpi} onSelect={setActiveKpi} icon={FileClock} label="2012-2026 years" value={officialSourceYears} />
+            <Kpi id="crime" active={activeKpi} onSelect={setActiveKpi} icon={Gavel} label="Crime/cyber lanes" value={crimeCyberSources.length} />
+            <Kpi id="typologies" active={activeKpi} onSelect={setActiveKpi} icon={AlertCircle} label="Scam typologies" value={6} />
+            <Kpi id="parser" active={activeKpi} onSelect={setActiveKpi} icon={Workflow} label="Parser queue" value={payload.metrics.parserBacklog} />
+            <Kpi id="probe" active={activeKpi} onSelect={setActiveKpi} icon={Activity} label="Probe ready" value={payload.metrics.liveProbeReady} />
+            <Kpi id="review" active={activeKpi} onSelect={setActiveKpi} icon={LockKeyhole} label="Review gates" value={payload.metrics.authOrReviewRequired} />
+            <Kpi id="policy" active={activeKpi} onSelect={setActiveKpi} icon={ShieldCheck} label="Policy/evidence gates" value={6} />
           </div>
           <div className={styles.mapCanvas}>
             <IndiaMap activeNames={activeTerritories} features={mapFeatures} />
@@ -171,9 +174,9 @@ export default function DashboardClient({ initialPayload }: ClientProps) {
               <path className={styles.arcC} d="M380 396 C255 482 196 575 106 744" />
               <path className={styles.arcD} d="M380 396 C488 512 565 602 664 748" />
               <path className={styles.arcE} d="M380 396 C385 300 375 212 382 82" />
-              {flowNodes.map((node) => (
+              {flowNodes.map((node, index) => (
                 <g key={node.id} className={styles.flowNode}>
-                  <circle cx={node.x} cy={node.y} r={node.value} fill={levelColor[node.level]} />
+                  <circle cx={node.x} cy={node.y} r={node.value + (activeModel.heat[index % activeModel.heat.length] / 22)} fill={levelColor[node.level]} />
                   <text x={node.x + node.value + 8} y={node.y + 4}>{node.label}</text>
                 </g>
               ))}
@@ -212,34 +215,23 @@ export default function DashboardClient({ initialPayload }: ClientProps) {
 
         <section className={styles.bottomDeck}>
           <article>
-            <h2>Selected intelligence lane</h2>
-            <strong>{selectedSource?.sourceName ?? "No source selected"}</strong>
-            <p>{selectedSource?.owner ?? "Source owner pending."}</p>
+            <h2>{activeModel.title}</h2>
+            <strong>{activeModel.question}</strong>
+            <p>{activeModel.explanation}</p>
             <div className={styles.microGrid}>
-              <span>Domain <b>{selectedSource ? labelize(selectedSource.domain) : "-"}</b></span>
-              <span>Mode <b>{selectedSource?.updateMode.replaceAll("_", " ") ?? "-"}</b></span>
-              <span>License <b>{selectedSource?.license ?? "-"}</b></span>
+              {activeModel.metrics.map((item) => <span key={item.label}>{item.label} <b>{item.value}</b></span>)}
             </div>
           </article>
           <article>
-            <h2>Central to state flow</h2>
+            <h2>Dynamic calculation path</h2>
             <div className={styles.timeline}>
-              {["Registry", "Probe", "Parser", "Evidence hash", "Lens fusion", "Policy gate", "Brief"].map((item, index) => <span key={item} data-hot={index <= tick % 7}>{item}</span>)}
+              {activeModel.steps.map((item, index) => <span key={item} data-hot={index <= tick % activeModel.steps.length}>{item}</span>)}
             </div>
           </article>
           <article>
-            <h2>Crime and cyber typology watch</h2>
+            <h2>{activeModel.heatTitle}</h2>
             <div className={styles.domainBars}>
-              {[
-                ["NCRB crime tables", 15],
-                ["CERT-In incident reports", 15],
-                ["Digital arrest", 8],
-                ["Jamtara / Telegram fraud", 7],
-                ["Loan app fraud", 7],
-                ["Worm / malware incidents", 9],
-                ["PIB / MHA advisories", 6],
-                ["RBI consumer protection", 5],
-              ].map(([label, value]) => <div key={String(label)}><span>{label}</span><i style={{ width: `${Math.max(Number(value) * 6, 18)}%` }} /><b>{value}</b></div>)}
+              {activeModel.bars.map((item) => <div key={item.label}><span>{item.label}</span><i style={{ width: `${Math.max(item.value * 6, 18)}%` }} /><b>{item.value}</b></div>)}
             </div>
           </article>
         </section>
@@ -248,8 +240,95 @@ export default function DashboardClient({ initialPayload }: ClientProps) {
   );
 }
 
-function Kpi({ icon: Icon, label, value }: { icon: LucideIcon; label: string; value: number }) {
-  return <div className={styles.kpi}><Icon aria-hidden="true" /><span>{label}</span><strong>{value}</strong></div>;
+function Kpi({ id, active, onSelect, icon: Icon, label, value }: { id: KpiKey; active: KpiKey; onSelect: (id: KpiKey) => void; icon: LucideIcon; label: string; value: number }) {
+  return <button type="button" className={styles.kpi} data-active={active === id} onClick={() => onSelect(id)}><Icon aria-hidden="true" /><span>{label}</span><strong>{value}</strong></button>;
+}
+
+function getKpiModel(active: KpiKey, payload: DashboardBuilderPayload, crimeCyberCount: number) {
+  const commonSteps = ["Registry", "Probe", "Parser", "Evidence hash", "Lens fusion", "Policy gate", "Brief"];
+  const models: Record<KpiKey, {
+    title: string;
+    question: string;
+    explanation: string;
+    heatTitle: string;
+    steps: string[];
+    metrics: Array<{ label: string; value: string | number }>;
+    bars: Array<{ label: string; value: number }>;
+    heat: number[];
+  }> = {
+    sources: {
+      title: "Official source body",
+      question: "Which official sources can DISHA prove and route?",
+      explanation: "This view counts registered official/public sources only. It is not a crime count.",
+      heatTitle: "Source body heat",
+      steps: commonSteps,
+      metrics: [{ label: "Sources", value: payload.metrics.sources }, { label: "Domains", value: payload.metrics.domains }, { label: "Review", value: payload.metrics.authOrReviewRequired }],
+      bars: payload.domains.slice(0, 8).map((item) => ({ label: labelize(item.domain), value: item.total })),
+      heat: payload.domains.map((item) => item.total * 10),
+    },
+    years: {
+      title: "2012-2026 official coverage",
+      question: "What period is the crime/cyber importer expected to cover?",
+      explanation: "The dashboard marks the complete target window. Year-wise official tables still require NCRB/CERT-In parsers.",
+      heatTitle: "Year coverage readiness",
+      steps: ["2012", "2014", "2016", "2018", "2020", "2022", "2024", "2026"],
+      metrics: [{ label: "Years", value: 15 }, { label: "Parsed", value: 0 }, { label: "Required", value: "NCRB/CERT-In" }],
+      bars: ["2012-14", "2015-17", "2018-20", "2021-23", "2024-26"].map((label, index) => ({ label, value: [3, 3, 3, 3, 3][index] })),
+      heat: [15, 18, 20, 22, 24, 26],
+    },
+    crime: {
+      title: "Crime/cyber lanes",
+      question: "Which official lanes support crime and cybercrime analysis?",
+      explanation: "NCRB, I4C, Cybercrime portal, CERT-In, PIB, and RBI lanes are registered; numeric claims wait for parsers.",
+      heatTitle: "Crime/cyber source heat",
+      steps: ["NCRB", "I4C", "Cybercrime portal", "CERT-In", "PIB", "RBI", "Evidence"],
+      metrics: [{ label: "Lanes", value: crimeCyberCount }, { label: "Verified", value: crimeCyberCount }, { label: "Parsed rows", value: 0 }],
+      bars: [
+        { label: "NCRB crime tables", value: 15 },
+        { label: "CERT-In incident reports", value: 15 },
+        { label: "I4C advisories", value: 8 },
+        { label: "Cybercrime portal", value: 8 },
+        { label: "PIB releases", value: 6 },
+        { label: "RBI protection", value: 5 },
+      ],
+      heat: [30, 40, 55, 65, 74, 82],
+    },
+    typologies: {
+      title: "Scam typology watch",
+      question: "Which cybercrime patterns should the analyst board watch?",
+      explanation: "Typologies are shown as official-source watch lanes, not as incident totals.",
+      heatTitle: "Typology readiness",
+      steps: ["Identify", "Source", "Classify", "Map state", "Verify", "Escalate"],
+      metrics: [{ label: "Typologies", value: 6 }, { label: "Source lanes", value: crimeCyberCount }, { label: "False claims", value: "blocked" }],
+      bars: [
+        { label: "Digital arrest", value: 8 },
+        { label: "Jamtara / Telegram fraud", value: 7 },
+        { label: "Chinese loan app", value: 7 },
+        { label: "Worm / malware", value: 9 },
+        { label: "Investment scam", value: 6 },
+        { label: "Phishing / mule account", value: 8 },
+      ],
+      heat: [42, 55, 63, 71, 79, 88],
+    },
+    parser: makeSimpleModel("Parser queue", "Which source families still need importers?", payload.metrics.parserBacklog, payload.domains.filter((item) => item.parserRequired > 0).slice(0, 8).map((item) => ({ label: labelize(item.domain), value: item.parserRequired }))),
+    probe: makeSimpleModel("Probe readiness", "Which sources can be checked live before parser import?", payload.metrics.liveProbeReady, payload.domains.filter((item) => item.total > 0).slice(0, 8).map((item) => ({ label: labelize(item.domain), value: item.apiPull + 1 }))),
+    review: makeSimpleModel("Review gates", "Which sources need auth/manual review before publication?", payload.metrics.authOrReviewRequired, payload.domains.slice(0, 8).map((item) => ({ label: labelize(item.domain), value: item.parserRequired }))),
+    policy: makeSimpleModel("Policy/evidence gates", "Which controls protect the dashboard from fake intelligence?", 6, ["Policy", "Evidence", "Redaction", "Source hash", "Human review", "No demo data"].map((label) => ({ label, value: 6 }))),
+  };
+  return models[active];
+}
+
+function makeSimpleModel(title: string, question: string, value: number, bars: Array<{ label: string; value: number }>) {
+  return {
+    title,
+    question,
+    explanation: "Click-driven drill-down recalculates the visible heat bars, timeline, and map node intensity from DISHA source metadata.",
+    heatTitle: `${title} heat`,
+    steps: ["Select KPI", "Filter lanes", "Calculate readiness", "Map heat", "Review", "Export"],
+    metrics: [{ label: "Selected", value }, { label: "Rows", value: bars.length }, { label: "Mode", value: "live" }],
+    bars,
+    heat: bars.map((item) => item.value * 12 + 20),
+  };
 }
 
 function IndiaMap({ activeNames, features }: { activeNames: Set<string>; features: MapFeature[] }) {
