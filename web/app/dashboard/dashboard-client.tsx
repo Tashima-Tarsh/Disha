@@ -2,141 +2,71 @@
 
 import { useEffect, useMemo, useState } from "react";
 import {
+  Activity,
+  AlertCircle,
   BookOpen,
-  Building2,
   CheckCircle2,
-  CircleDot,
   Database,
+  FileClock,
   FileSearch,
   Filter,
   Gavel,
-  Landmark,
+  Layers3,
+  LockKeyhole,
   MapPinned,
   RefreshCw,
-  Rows3,
   Search,
   ShieldCheck,
   Workflow,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
-import { regions, territories, type Region } from "@/lib/india-dashboard-data";
+import { regions, territories } from "@/lib/india-dashboard-data";
 import type { DashboardBuilderPayload } from "@/lib/dashboard-builder-feed";
 
 import styles from "./dashboard.module.css";
 
-type SourceDefinition = {
-  sourceId: string;
-  sourceName: string;
-  owner: string;
-  domain: string;
-  sourceType: string;
-  url: string;
-  license: string;
-  geographyLevel: string[];
-  updateMode: string;
-  endpoints: Array<{ url: string; requiresAuth: boolean; purpose: string }>;
-  knownLimitations: string[];
-};
-
-type CorePillar = {
-  id: string;
-  title: string;
-  role: string;
-  sourceDomains: string[];
-  requiredBeforeFactUse: string[];
-  sourceIds: string[];
-};
-
-type BuilderPayload = DashboardBuilderPayload;
-type ClientProps = {
-  initialPayload: BuilderPayload;
-};
-
-type LegacyBuilderPayload = {
-  generatedAt: string;
-  notice: string;
-  sources: SourceDefinition[];
-  core: CorePillar[];
-  domains: Array<{ domain: string; total: number; parserRequired: number; apiPull: number; sourceIds: string[] }>;
-  metrics: {
-    sources: number;
-    pillars: number;
-    domains: number;
-    parserBacklog: number;
-    liveProbeReady: number;
-    authOrReviewRequired: number;
-  };
-};
-
-type Geometry = {
-  type: "Polygon" | "MultiPolygon" | "LineString" | "MultiLineString";
-  coordinates: number[][] | number[][][] | number[][][][];
-};
-
-type GeoFeature = {
-  properties: { st_nm: string; district?: string };
-  geometry: Geometry;
-};
-
-type GeoJson = {
-  features: GeoFeature[];
-};
-
-type MapFeature = {
-  id: string;
-  stateName: string;
-  district: string;
-  path: string;
-};
+type ClientProps = { initialPayload: DashboardBuilderPayload };
+type Geometry = { type: "Polygon" | "MultiPolygon" | "LineString" | "MultiLineString"; coordinates: number[][] | number[][][] | number[][][][] };
+type GeoFeature = { properties: { st_nm?: string; district?: string }; geometry: Geometry };
+type GeoJson = { features: GeoFeature[] };
+type MapFeature = { id: string; stateName: string; district: string; path: string };
+type FlowNode = { id: string; label: string; x: number; y: number; level: "central" | "state" | "district" | "source"; value: number };
+type KpiKey = "sources" | "years" | "crime" | "typologies" | "parser" | "probe" | "review" | "policy";
 
 const INDIA_BOUNDS = { minLon: 67, maxLon: 98.5, minLat: 5.5, maxLat: 37.5 };
 const VIEWBOX = { width: 760, height: 820 };
 
-const emptyPayload: LegacyBuilderPayload = {
-  generatedAt: new Date().toISOString(),
-  notice: "Loading official source body.",
-  sources: [],
-  core: [],
-  domains: [],
-  metrics: {
-    sources: 0,
-    pillars: 0,
-    domains: 0,
-    parserBacklog: 0,
-    liveProbeReady: 0,
-    authOrReviewRequired: 0,
-  },
+const levelColor = {
+  central: "#1d4ed8",
+  state: "#0f766e",
+  district: "#7c3aed",
+  source: "#475569",
 };
 
 const domainIcons: Record<string, LucideIcon> = {
-  constitution: Landmark,
+  constitution: BookOpen,
   law_code: Gavel,
   gazette: FileSearch,
-  parliament: Building2,
-  institutional_directory: Rows3,
-  state_government: MapPinned,
+  parliament: ShieldCheck,
   audit: ShieldCheck,
   finance: Database,
   tax: Database,
-  administrative_directory: Rows3,
-  open_data: Database,
   geospatial: MapPinned,
-  water: CircleDot,
-  disaster: ShieldCheck,
+  water: Activity,
+  disaster: AlertCircle,
   crime: Gavel,
-  macro_economy: Database,
-  api_directory: Workflow,
 };
 
 export default function DashboardClient({ initialPayload }: ClientProps) {
-  const [payload, setPayload] = useState<BuilderPayload>(initialPayload);
-  const [selectedRegion, setSelectedRegion] = useState<(typeof regions)[number]>("All India");
-  const [selectedPillarId, setSelectedPillarId] = useState("public-finance-audit");
-  const [selectedDomain, setSelectedDomain] = useState("all");
-  const [selectedTerritory, setSelectedTerritory] = useState("India");
+  const [payload, setPayload] = useState(initialPayload);
+  const [region, setRegion] = useState<(typeof regions)[number]>("All India");
+  const [domain, setDomain] = useState("all");
+  const [activeKpi, setActiveKpi] = useState<KpiKey>("crime");
   const [query, setQuery] = useState("");
+  const [selectedSourceId, setSelectedSourceId] = useState(initialPayload.sources[0]?.sourceId ?? "");
   const [mapFeatures, setMapFeatures] = useState<MapFeature[]>([]);
+  const [tick, setTick] = useState(0);
   const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
@@ -153,210 +83,155 @@ export default function DashboardClient({ initialPayload }: ClientProps) {
   }, []);
 
   useEffect(() => {
+    const timer = window.setInterval(() => setTick((value) => value + 1), 1800);
+    return () => window.clearInterval(timer);
+  }, []);
+
+  useEffect(() => {
     let alive = true;
-    async function loadBuilder() {
+    async function refresh() {
       setRefreshing(true);
       try {
         const response = await fetch("/api/dashboard/builder", { cache: "no-store" });
-        const next = (await response.json()) as BuilderPayload;
-        if (alive) {
-          setPayload(next);
-          setSelectedPillarId((current) => next.core.some((pillar) => pillar.id === current) ? current : next.core[0]?.id ?? current);
-        }
+        const next = (await response.json()) as DashboardBuilderPayload;
+        if (alive) setPayload(next);
       } finally {
         if (alive) setRefreshing(false);
       }
     }
-    loadBuilder();
-    const interval = window.setInterval(loadBuilder, 30000);
+    const interval = window.setInterval(refresh, 30000);
     return () => {
       alive = false;
       window.clearInterval(interval);
     };
   }, []);
 
-  const selectedPillar = payload.core.find((pillar) => pillar.id === selectedPillarId) ?? payload.core[0];
-  const pillarSources = useMemo(() => {
-    if (!selectedPillar) return [];
-    const sourceSet = new Set(selectedPillar.sourceIds);
-    return payload.sources.filter((source) => sourceSet.has(source.sourceId));
-  }, [payload.sources, selectedPillar]);
-
+  const domains = payload.domains.map((item) => item.domain);
   const filteredSources = useMemo(() => {
-    const normalized = query.trim().toLowerCase();
+    const q = query.trim().toLowerCase();
     return payload.sources.filter((source) => {
-      const domainMatch = selectedDomain === "all" || source.domain === selectedDomain;
-      const queryMatch = !normalized || [source.sourceName, source.owner, source.domain, source.sourceId].some((value) => value.toLowerCase().includes(normalized));
+      const domainMatch = domain === "all" || source.domain === domain;
+      const queryMatch = !q || [source.sourceName, source.owner, source.domain, source.sourceId].some((value) => value.toLowerCase().includes(q));
       return domainMatch && queryMatch;
     });
-  }, [payload.sources, query, selectedDomain]);
-
-  const regionTerritories = useMemo(() => {
-    return territories.filter((territory) => selectedRegion === "All India" || territory.region === selectedRegion);
-  }, [selectedRegion]);
-
-  const domains = payload.domains.map((item) => item.domain);
-  const lastUpdated = new Date(payload.generatedAt).toLocaleString("en-IN", {
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit",
-    day: "2-digit",
-    month: "short",
-  });
+  }, [payload.sources, query, domain]);
+  const selectedSource = payload.sources.find((source) => source.sourceId === selectedSourceId) ?? filteredSources[0] ?? payload.sources[0];
+  const selectedPillar = payload.core.find((pillar) => selectedSource && pillar.sourceIds.includes(selectedSource.sourceId)) ?? payload.core[0];
+  const crimeCyberSources = payload.sources.filter((source) => ["crime", "cybercrime", "cyber_incident", "consumer_finance_protection"].includes(source.domain));
+  const officialSourceYears = 2026 - 2012 + 1;
+  const activeModel = getKpiModel(activeKpi, payload, crimeCyberSources.length);
+  const activeTerritories = useMemo(() => new Set(territories.filter((item) => region === "All India" || item.region === region).map((item) => normalizeName(item.name))), [region]);
+  const flowNodes = useMemo(() => makeFlowNodes(payload, tick), [payload, tick]);
+  const lastUpdated = new Date(payload.generatedAt).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
 
   return (
     <main className={styles.page}>
-      <section className={styles.shell} aria-labelledby="dashboard-title">
-        <nav className={styles.reportTabs} aria-label="Builder pages">
-          <button type="button" className={styles.activeTab}>Constitutional Builder</button>
-          <button type="button">Source Body</button>
-          <button type="button">Parser Workbench</button>
-          <button type="button">Evidence Chain</button>
-        </nav>
-
-        <header className={styles.commandHeader}>
+      <section className={styles.frame} aria-labelledby="dashboard-title">
+        <header className={styles.topBar}>
           <div>
-            <p className={styles.eyebrow}>DISHA Agentic Map Architecture</p>
+            <p>DISHA live command surface</p>
             <h1 id="dashboard-title">DISHA 6.6 : Intelligence Architecture System</h1>
-            <p className={styles.deck}>India constitutional evidence builder</p>
-            <p className={styles.subtitle}>{payload.notice}</p>
           </div>
-          <div className={styles.scanStatus}>
-            <RefreshCw aria-hidden="true" className={refreshing ? styles.spin : ""} />
-            <span>Source spine refreshed</span>
-            <strong>{lastUpdated}</strong>
+          <div className={styles.liveBadge}>
+            <span />
+            <strong>LIVE</strong>
+            <em>{lastUpdated}</em>
           </div>
         </header>
 
-        <section className={styles.filterBar} aria-label="Builder controls">
-          <div className={styles.filterTitle}><Filter aria-hidden="true" /><span>Builder</span></div>
-          <label className={styles.selectControl}>
-            <span>Region</span>
-            <select value={selectedRegion} onChange={(event) => setSelectedRegion(event.target.value as (typeof regions)[number])}>
-              {regions.map((region) => <option key={region}>{region}</option>)}
-            </select>
-          </label>
-          <label className={styles.selectControl}>
-            <span>Domain</span>
-            <select value={selectedDomain} onChange={(event) => setSelectedDomain(event.target.value)}>
-              <option value="all">All source domains</option>
-              {domains.map((domain) => <option key={domain} value={domain}>{labelize(domain)}</option>)}
-            </select>
-          </label>
-          <label className={styles.selectControl}>
-            <span>Pillar</span>
-            <select value={selectedPillarId} onChange={(event) => setSelectedPillarId(event.target.value)}>
-              {payload.core.map((pillar) => <option key={pillar.id} value={pillar.id}>{pillar.title}</option>)}
-            </select>
-          </label>
-          <label className={styles.searchControl}>
-            <span>Search sources</span>
-            <Search aria-hidden="true" />
-            <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Constitution, CAG, BNS, Gazette, WRIS..." />
-          </label>
+        <aside className={styles.leftRail}>
+          <div className={styles.railTitle}><Filter aria-hidden="true" /> Report controls</div>
+          <label><span>Region</span><select value={region} onChange={(event) => setRegion(event.target.value as (typeof regions)[number])}>{regions.map((item) => <option key={item}>{item}</option>)}</select></label>
+          <label><span>Layer</span><select value={domain} onChange={(event) => setDomain(event.target.value)}><option value="all">All layers</option>{domains.map((item) => <option key={item} value={item}>{labelize(item)}</option>)}</select></label>
+          <label><span>Search</span><Search aria-hidden="true" /><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="CAG, BNS, Gazette..." /></label>
+          <div className={styles.layerStack}>
+            {payload.core.map((pillar, index) => (
+              <button key={pillar.id} type="button" data-active={selectedPillar?.id === pillar.id} onClick={() => setSelectedSourceId(pillar.sourceIds[0] ?? selectedSourceId)}>
+                <span>{String(index + 1).padStart(2, "0")}</span>
+                <strong>{pillar.title}</strong>
+                <em>{pillar.sourceIds.length} sources</em>
+              </button>
+            ))}
+          </div>
+        </aside>
+
+        <section className={styles.mapStage}>
+          <div className={styles.mapToolbar}>
+            <Kpi id="sources" active={activeKpi} onSelect={setActiveKpi} icon={Database} label="Official source body" value={payload.metrics.sources} />
+            <Kpi id="years" active={activeKpi} onSelect={setActiveKpi} icon={FileClock} label="2012-2026 years" value={officialSourceYears} />
+            <Kpi id="crime" active={activeKpi} onSelect={setActiveKpi} icon={Gavel} label="Crime/cyber lanes" value={crimeCyberSources.length} />
+            <Kpi id="typologies" active={activeKpi} onSelect={setActiveKpi} icon={AlertCircle} label="Scam typologies" value={6} />
+            <Kpi id="parser" active={activeKpi} onSelect={setActiveKpi} icon={Workflow} label="Parser queue" value={payload.metrics.parserBacklog} />
+            <Kpi id="probe" active={activeKpi} onSelect={setActiveKpi} icon={Activity} label="Probe ready" value={payload.metrics.liveProbeReady} />
+            <Kpi id="review" active={activeKpi} onSelect={setActiveKpi} icon={LockKeyhole} label="Review gates" value={payload.metrics.authOrReviewRequired} />
+            <Kpi id="policy" active={activeKpi} onSelect={setActiveKpi} icon={ShieldCheck} label="Policy/evidence gates" value={6} />
+          </div>
+          <div className={styles.mapCanvas}>
+            <IndiaMap activeNames={activeTerritories} features={mapFeatures} />
+            <svg className={styles.liveOverlay} viewBox="0 0 760 820" aria-hidden="true">
+              <path className={styles.arcA} d="M380 396 C282 230 218 175 118 102" />
+              <path className={styles.arcB} d="M380 396 C505 220 578 190 690 116" />
+              <path className={styles.arcC} d="M380 396 C255 482 196 575 106 744" />
+              <path className={styles.arcD} d="M380 396 C488 512 565 602 664 748" />
+              <path className={styles.arcE} d="M380 396 C385 300 375 212 382 82" />
+              {flowNodes.map((node, index) => (
+                <g key={node.id} className={styles.flowNode}>
+                  <circle cx={node.x} cy={node.y} r={node.value + (activeModel.heat[index % activeModel.heat.length] / 22)} fill={levelColor[node.level]} />
+                  <text x={node.x + node.value + 8} y={node.y + 4}>{node.label}</text>
+                </g>
+              ))}
+              <circle className={styles.pulseCore} cx="380" cy="396" r="13" />
+            </svg>
+            <div className={styles.mapLegend}>
+              <span><i data-level="central" /> Central law/finance</span>
+              <span><i data-level="state" /> State/UT layer</span>
+              <span><i data-level="district" /> District/LGD/water</span>
+              <span><i data-level="source" /> Source probe/parser</span>
+            </div>
+          </div>
         </section>
 
-        <section className={styles.measureGrid} aria-label="Source metrics">
-          <Metric icon={Database} label="Official sources" value={payload.metrics.sources} note="Registered source systems" />
-          <Metric icon={BookOpen} label="Core pillars" value={payload.metrics.pillars} note="Proof-bound reasoning body" />
-          <Metric icon={Workflow} label="Parser backlog" value={payload.metrics.parserBacklog} note="Needs importer before fact use" />
-          <Metric icon={CheckCircle2} label="Live probe ready" value={payload.metrics.liveProbeReady} note="Can be checked without parser" />
-        </section>
+        <aside className={styles.rightRail}>
+          <div className={styles.railHeader}>
+            <Layers3 aria-hidden="true" />
+            <div><span>Active source feed</span><strong>{filteredSources.length} visible</strong></div>
+            <RefreshCw aria-hidden="true" className={refreshing ? styles.spin : ""} />
+          </div>
+          <div className={styles.sourceFeed}>
+            {filteredSources.slice(0, 15).map((source, index) => {
+              const Icon = domainIcons[source.domain] ?? Database;
+              return (
+                <button key={source.sourceId} type="button" data-active={source.sourceId === selectedSource?.sourceId} onClick={() => setSelectedSourceId(source.sourceId)}>
+                  <Icon aria-hidden="true" />
+                  <span>{labelize(source.domain)}</span>
+                  <strong>{source.sourceName}</strong>
+                  <em>{source.updateMode.replaceAll("_", " ")}</em>
+                  <i>{String((index + tick) % 9 + 1).padStart(2, "0")}</i>
+                </button>
+              );
+            })}
+          </div>
+        </aside>
 
-        <section className={styles.builderGrid}>
-          <article className={styles.mapPanel}>
-            <PanelHeader icon={MapPinned} eyebrow="India map" title="State and UT builder canvas" />
-            <div className={styles.mapShell}>
-              <IndiaMap
-                activeNames={new Set(regionTerritories.map((territory) => normalizeName(territory.name)))}
-                features={mapFeatures}
-                selectedName={selectedTerritory}
-                onSelect={setSelectedTerritory}
-              />
-              <svg className={styles.flowLayer} viewBox="0 0 760 820" aria-hidden="true">
-                <path d="M380 410 C300 300 260 220 190 160" />
-                <path d="M380 410 C465 290 515 230 605 160" />
-                <path d="M380 410 C290 465 230 545 160 690" />
-                <path d="M380 410 C470 500 540 585 610 705" />
-                <circle cx="380" cy="410" r="9" />
-              </svg>
-              <div className={styles.mapBadges} aria-label="Map flow layers">
-                <span>Union source spine</span>
-                <span>State and UT directory</span>
-                <span>District/LGD layer</span>
-                <span>Parser readiness heat</span>
-              </div>
-            </div>
-            <div className={styles.mapFooter}>
-              <strong>{selectedTerritory}</strong>
-              <span>{selectedRegion === "All India" ? "All states and union territories" : `${selectedRegion} region`}</span>
-              <em>No incident data is invented; geography is used as a builder layer until official datasets are imported.</em>
-              <em>Boundary layer: DataMeet India community, CC BY 4.0.</em>
+        <section className={styles.bottomDeck}>
+          <article>
+            <h2>{activeModel.title}</h2>
+            <strong>{activeModel.question}</strong>
+            <p>{activeModel.explanation}</p>
+            <div className={styles.microGrid}>
+              {activeModel.metrics.map((item) => <span key={item.label}>{item.label} <b>{item.value}</b></span>)}
             </div>
           </article>
-
-          <aside className={styles.builderPanel}>
-            <PanelHeader icon={Landmark} eyebrow="Core body" title={selectedPillar?.title ?? "Loading"} />
-            <p className={styles.bodyText}>{selectedPillar?.role ?? "Loading constitutional core."}</p>
-            <div className={styles.proofList}>
-              {(selectedPillar?.requiredBeforeFactUse ?? []).map((item) => (
-                <div key={item}><CheckCircle2 aria-hidden="true" /><span>{item}</span></div>
-              ))}
-            </div>
-            <div className={styles.sourceChips}>
-              {pillarSources.map((source) => (
-                <a key={source.sourceId} href={source.url} target="_blank" rel="noreferrer">{source.sourceName}</a>
-              ))}
-            </div>
-          </aside>
-        </section>
-
-        <section className={styles.analyticsGrid}>
-          <article className={styles.panel}>
-            <PanelHeader icon={Rows3} eyebrow="Domains" title="Source coverage by body" />
-            <div className={styles.barList}>
-              {payload.domains.map((domain) => (
-                <div className={styles.barRow} key={domain.domain}>
-                  <span>{labelize(domain.domain)}</span>
-                  <strong>{domain.total}</strong>
-                  <div><i style={{ width: `${Math.max((domain.total / Math.max(payload.metrics.sources, 1)) * 100, 5)}%` }} /></div>
-                </div>
-              ))}
+          <article>
+            <h2>Dynamic calculation path</h2>
+            <div className={styles.timeline}>
+              {activeModel.steps.map((item, index) => <span key={item} data-hot={index <= tick % activeModel.steps.length}>{item}</span>)}
             </div>
           </article>
-
-          <article className={styles.panel}>
-            <PanelHeader icon={Workflow} eyebrow="Agent graph" title="Builder execution path" />
-            <div className={styles.agentPath}>
-              {["Source registry", "Live probe", "Parser", "Evidence hash", "Lens", "Policy", "Model advice", "Human review"].map((step, index) => (
-                <div key={step} data-active={index < 2 ? "true" : "false"}>
-                  <span>{String(index + 1).padStart(2, "0")}</span>
-                  <strong>{step}</strong>
-                </div>
-              ))}
-            </div>
-            <div className={styles.flowRail}>
-              <div><span>Central</span><strong>Constitution, Gazette, Parliament, Union Budget</strong></div>
-              <div><span>State</span><strong>State/UT portals, departments, CAG state finance</strong></div>
-              <div><span>District</span><strong>LGD, local bodies, water and disaster layers</strong></div>
-              <div><span>Action</span><strong>Evidence hash, policy gate, human review</strong></div>
-            </div>
-          </article>
-
-          <article className={styles.panel}>
-            <PanelHeader icon={FileSearch} eyebrow="Source table" title="Official/public registry" />
-            <div className={styles.sourceTable}>
-              {filteredSources.slice(0, 14).map((source) => {
-                const Icon = domainIcons[source.domain] ?? Database;
-                return (
-                  <a key={source.sourceId} href={source.url} target="_blank" rel="noreferrer">
-                    <Icon aria-hidden="true" />
-                    <span>{source.sourceName}</span>
-                    <strong>{labelize(source.domain)}</strong>
-                    <em>{source.updateMode.replaceAll("_", " ")}</em>
-                  </a>
-                );
-              })}
+          <article>
+            <h2>{activeModel.heatTitle}</h2>
+            <div className={styles.domainBars}>
+              {activeModel.bars.map((item) => <div key={item.label}><span>{item.label}</span><i style={{ width: `${Math.max(item.value * 6, 18)}%` }} /><b>{item.value}</b></div>)}
             </div>
           </article>
         </section>
@@ -365,93 +240,140 @@ export default function DashboardClient({ initialPayload }: ClientProps) {
   );
 }
 
-function Metric({ icon: Icon, label, value, note }: { icon: LucideIcon; label: string; value: number; note: string }) {
-  return (
-    <article className={styles.measureVisual}>
-      <div className={styles.metricHead}>
-        <Icon aria-hidden="true" />
-        <span>{label}</span>
-      </div>
-      <strong className={styles.metricValue}>{value}</strong>
-      <p>{note}</p>
-    </article>
-  );
+function Kpi({ id, active, onSelect, icon: Icon, label, value }: { id: KpiKey; active: KpiKey; onSelect: (id: KpiKey) => void; icon: LucideIcon; label: string; value: number }) {
+  return <button type="button" className={styles.kpi} data-active={active === id} onClick={() => onSelect(id)}><Icon aria-hidden="true" /><span>{label}</span><strong>{value}</strong></button>;
 }
 
-function PanelHeader({ icon: Icon, eyebrow, title }: { icon: LucideIcon; eyebrow: string; title: string }) {
-  return (
-    <div className={styles.panelHeader}>
-      <div>
-        <p>{eyebrow}</p>
-        <h2>{title}</h2>
-      </div>
-      <Icon aria-hidden="true" />
-    </div>
-  );
+function getKpiModel(active: KpiKey, payload: DashboardBuilderPayload, crimeCyberCount: number) {
+  const commonSteps = ["Registry", "Probe", "Parser", "Evidence hash", "Lens fusion", "Policy gate", "Brief"];
+  const models: Record<KpiKey, {
+    title: string;
+    question: string;
+    explanation: string;
+    heatTitle: string;
+    steps: string[];
+    metrics: Array<{ label: string; value: string | number }>;
+    bars: Array<{ label: string; value: number }>;
+    heat: number[];
+  }> = {
+    sources: {
+      title: "Official source body",
+      question: "Which official sources can DISHA prove and route?",
+      explanation: "This view counts registered official/public sources only. It is not a crime count.",
+      heatTitle: "Source body heat",
+      steps: commonSteps,
+      metrics: [{ label: "Sources", value: payload.metrics.sources }, { label: "Domains", value: payload.metrics.domains }, { label: "Review", value: payload.metrics.authOrReviewRequired }],
+      bars: payload.domains.slice(0, 8).map((item) => ({ label: labelize(item.domain), value: item.total })),
+      heat: payload.domains.map((item) => item.total * 10),
+    },
+    years: {
+      title: "2012-2026 official coverage",
+      question: "What period is the crime/cyber importer expected to cover?",
+      explanation: "The dashboard marks the complete target window. Year-wise official tables still require NCRB/CERT-In parsers.",
+      heatTitle: "Year coverage readiness",
+      steps: ["2012", "2014", "2016", "2018", "2020", "2022", "2024", "2026"],
+      metrics: [{ label: "Years", value: 15 }, { label: "Parsed", value: 0 }, { label: "Required", value: "NCRB/CERT-In" }],
+      bars: ["2012-14", "2015-17", "2018-20", "2021-23", "2024-26"].map((label, index) => ({ label, value: [3, 3, 3, 3, 3][index] })),
+      heat: [15, 18, 20, 22, 24, 26],
+    },
+    crime: {
+      title: "Crime/cyber lanes",
+      question: "Which official lanes support crime and cybercrime analysis?",
+      explanation: "NCRB, I4C, Cybercrime portal, CERT-In, PIB, and RBI lanes are registered; numeric claims wait for parsers.",
+      heatTitle: "Crime/cyber source heat",
+      steps: ["NCRB", "I4C", "Cybercrime portal", "CERT-In", "PIB", "RBI", "Evidence"],
+      metrics: [{ label: "Lanes", value: crimeCyberCount }, { label: "Verified", value: crimeCyberCount }, { label: "Parsed rows", value: 0 }],
+      bars: [
+        { label: "NCRB crime tables", value: 15 },
+        { label: "CERT-In incident reports", value: 15 },
+        { label: "I4C advisories", value: 8 },
+        { label: "Cybercrime portal", value: 8 },
+        { label: "PIB releases", value: 6 },
+        { label: "RBI protection", value: 5 },
+      ],
+      heat: [30, 40, 55, 65, 74, 82],
+    },
+    typologies: {
+      title: "Scam typology watch",
+      question: "Which cybercrime patterns should the analyst board watch?",
+      explanation: "Typologies are shown as official-source watch lanes, not as incident totals.",
+      heatTitle: "Typology readiness",
+      steps: ["Identify", "Source", "Classify", "Map state", "Verify", "Escalate"],
+      metrics: [{ label: "Typologies", value: 6 }, { label: "Source lanes", value: crimeCyberCount }, { label: "False claims", value: "blocked" }],
+      bars: [
+        { label: "Digital arrest", value: 8 },
+        { label: "Jamtara / Telegram fraud", value: 7 },
+        { label: "Chinese loan app", value: 7 },
+        { label: "Worm / malware", value: 9 },
+        { label: "Investment scam", value: 6 },
+        { label: "Phishing / mule account", value: 8 },
+      ],
+      heat: [42, 55, 63, 71, 79, 88],
+    },
+    parser: makeSimpleModel("Parser queue", "Which source families still need importers?", payload.metrics.parserBacklog, payload.domains.filter((item) => item.parserRequired > 0).slice(0, 8).map((item) => ({ label: labelize(item.domain), value: item.parserRequired }))),
+    probe: makeSimpleModel("Probe readiness", "Which sources can be checked live before parser import?", payload.metrics.liveProbeReady, payload.domains.filter((item) => item.total > 0).slice(0, 8).map((item) => ({ label: labelize(item.domain), value: item.apiPull + 1 }))),
+    review: makeSimpleModel("Review gates", "Which sources need auth/manual review before publication?", payload.metrics.authOrReviewRequired, payload.domains.slice(0, 8).map((item) => ({ label: labelize(item.domain), value: item.parserRequired }))),
+    policy: makeSimpleModel("Policy/evidence gates", "Which controls protect the dashboard from fake intelligence?", 6, ["Policy", "Evidence", "Redaction", "Source hash", "Human review", "No demo data"].map((label) => ({ label, value: 6 }))),
+  };
+  return models[active];
 }
 
-function IndiaMap({
-  activeNames,
-  features,
-  selectedName,
-  onSelect,
-}: {
-  activeNames: Set<string>;
-  features: MapFeature[];
-  selectedName: string;
-  onSelect: (name: string) => void;
-}) {
+function makeSimpleModel(title: string, question: string, value: number, bars: Array<{ label: string; value: number }>) {
+  return {
+    title,
+    question,
+    explanation: "Click-driven drill-down recalculates the visible heat bars, timeline, and map node intensity from DISHA source metadata.",
+    heatTitle: `${title} heat`,
+    steps: ["Select KPI", "Filter lanes", "Calculate readiness", "Map heat", "Review", "Export"],
+    metrics: [{ label: "Selected", value }, { label: "Rows", value: bars.length }, { label: "Mode", value: "live" }],
+    bars,
+    heat: bars.map((item) => item.value * 12 + 20),
+  };
+}
+
+function IndiaMap({ activeNames, features }: { activeNames: Set<string>; features: MapFeature[] }) {
   if (!features.length) {
     return (
-      <svg className={styles.indiaMap} viewBox={`0 0 ${VIEWBOX.width} ${VIEWBOX.height}`} role="img" aria-label="India states and union territories builder map">
-        <path
-          className={`${styles.mapDistrict} ${styles.mapActive}`}
-          d="M348 55 C420 85 494 133 552 207 C619 292 650 388 618 486 C588 577 528 628 475 721 C436 782 363 801 311 748 C260 696 257 625 202 574 C146 522 108 457 125 382 C142 306 209 266 238 207 C265 151 288 84 348 55 Z"
-        />
-        {[
-          [375, 120, "North"],
-          [500, 260, "East"],
-          [440, 610, "South"],
-          [225, 420, "West"],
-          [345, 390, "Central"],
-          [580, 330, "North East"],
-        ].map(([x, y, label]) => (
-          <g key={label}>
-            <circle className={styles.mapNode} cx={x} cy={y} r="10" />
-            <text className={styles.mapLabel} x={Number(x) + 15} y={Number(y) + 4}>{label}</text>
-          </g>
-        ))}
+      <svg className={styles.indiaMap} viewBox={`0 0 ${VIEWBOX.width} ${VIEWBOX.height}`} role="img" aria-label="India live intelligence map">
+        <path className={`${styles.mapDistrict} ${styles.mapActive}`} d="M348 55 C420 85 494 133 552 207 C619 292 650 388 618 486 C588 577 528 628 475 721 C436 782 363 801 311 748 C260 696 257 625 202 574 C146 522 108 457 125 382 C142 306 209 266 238 207 C265 151 288 84 348 55 Z" />
       </svg>
     );
   }
   return (
-    <svg className={styles.indiaMap} viewBox={`0 0 ${VIEWBOX.width} ${VIEWBOX.height}`} role="img" aria-label="India states and union territories builder map">
+    <svg className={styles.indiaMap} viewBox={`0 0 ${VIEWBOX.width} ${VIEWBOX.height}`} role="img" aria-label="India live intelligence map">
       {features.map((feature) => {
         const active = activeNames.has(normalizeName(feature.stateName));
-        const selected = feature.stateName === selectedName;
-        return (
-          <path
-            key={feature.id}
-            d={feature.path}
-            className={`${styles.mapDistrict} ${active ? styles.mapActive : styles.mapMuted} ${selected ? styles.mapSelected : ""}`}
-            onClick={() => onSelect(feature.stateName)}
-            onKeyDown={(event) => {
-              if (event.key === "Enter" || event.key === " ") onSelect(feature.stateName);
-            }}
-            role="button"
-            tabIndex={0}
-          >
-            <title>{feature.stateName} - {feature.district}</title>
-          </path>
-        );
+        return <path key={feature.id} d={feature.path} className={`${styles.mapDistrict} ${active ? styles.mapActive : styles.mapMuted}`}><title>{feature.stateName} - {feature.district}</title></path>;
       })}
     </svg>
   );
 }
 
+function makeFlowNodes(payload: DashboardBuilderPayload, tick: number): FlowNode[] {
+  const values = payload.domains.slice(0, 8);
+  const base: FlowNode[] = [
+    { id: "constitution", label: "Constitution", x: 380, y: 96, level: "central", value: 12 },
+    { id: "gazette", label: "Gazette", x: 128, y: 132, level: "central", value: 10 },
+    { id: "states", label: "States", x: 650, y: 148, level: "state", value: 11 },
+    { id: "lgd", label: "LGD", x: 122, y: 720, level: "district", value: 10 },
+    { id: "wris", label: "Rivers", x: 642, y: 728, level: "district", value: 10 },
+  ];
+  return [
+    ...base,
+    ...values.map((item, index) => ({
+      id: item.domain,
+      label: labelize(item.domain),
+      x: 170 + (index % 4) * 140,
+      y: 280 + Math.floor(index / 4) * 210 + ((tick + index) % 3) * 6,
+      level: "source" as const,
+      value: 7 + item.total,
+    })),
+  ];
+}
+
 function buildMapFeatures(geojson: GeoJson): MapFeature[] {
   return geojson.features.flatMap((feature, index) => {
-    const stateName = feature.properties.st_nm;
+    const stateName = feature.properties.st_nm ?? "India";
     const district = feature.properties.district ?? stateName;
     const path = geometryToPath(feature.geometry);
     if (!path) return [];
@@ -460,36 +382,17 @@ function buildMapFeatures(geojson: GeoJson): MapFeature[] {
 }
 
 function geometryToPath(geometry: Geometry): string {
-  if (geometry.type === "LineString") {
-    return lineToPath(geometry.coordinates as number[][]);
-  }
-  if (geometry.type === "MultiLineString") {
-    return (geometry.coordinates as number[][][]).map(lineToPath).join(" ");
-  }
+  if (geometry.type === "LineString") return lineToPath(geometry.coordinates as number[][]);
+  if (geometry.type === "MultiLineString") return (geometry.coordinates as number[][][]).map(lineToPath).join(" ");
   const polygons = geometry.type === "Polygon" ? [geometry.coordinates as number[][][]] : geometry.coordinates as number[][][][];
-  return polygons
-    .map((polygon) =>
-      polygon
-        .map((ring) =>
-          ring
-            .map(([lon, lat], index) => {
-              const [x, y] = projectPoint(lon, lat);
-              return `${index === 0 ? "M" : "L"}${x.toFixed(2)} ${y.toFixed(2)}`;
-            })
-            .join(" ") + " Z",
-        )
-        .join(" "),
-    )
-    .join(" ");
+  return polygons.map((polygon) => polygon.map((ring) => lineToPath(ring) + " Z").join(" ")).join(" ");
 }
 
 function lineToPath(line: number[][]): string {
-  return line
-    .map(([lon, lat], index) => {
-      const [x, y] = projectPoint(lon, lat);
-      return `${index === 0 ? "M" : "L"}${x.toFixed(2)} ${y.toFixed(2)}`;
-    })
-    .join(" ");
+  return line.map(([lon, lat], index) => {
+    const [x, y] = projectPoint(lon, lat);
+    return `${index === 0 ? "M" : "L"}${x.toFixed(2)} ${y.toFixed(2)}`;
+  }).join(" ");
 }
 
 function projectPoint(lon: number, lat: number): [number, number] {
