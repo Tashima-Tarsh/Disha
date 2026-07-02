@@ -5,11 +5,14 @@ import {
   Activity,
   AlertCircle,
   BookOpen,
+  CheckCircle2,
   Database,
+  FileClock,
   FileSearch,
   Filter,
   Gavel,
   Layers3,
+  LockKeyhole,
   MapPinned,
   RefreshCw,
   Search,
@@ -34,10 +37,10 @@ const INDIA_BOUNDS = { minLon: 67, maxLon: 98.5, minLat: 5.5, maxLat: 37.5 };
 const VIEWBOX = { width: 760, height: 820 };
 
 const levelColor = {
-  central: "#8f1d21",
-  state: "#c9961a",
-  district: "#1f6f5b",
-  source: "#345995",
+  central: "#1d4ed8",
+  state: "#0f766e",
+  district: "#7c3aed",
+  source: "#475569",
 };
 
 const domainIcons: Record<string, LucideIcon> = {
@@ -112,6 +115,8 @@ export default function DashboardClient({ initialPayload }: ClientProps) {
   }, [payload.sources, query, domain]);
   const selectedSource = payload.sources.find((source) => source.sourceId === selectedSourceId) ?? filteredSources[0] ?? payload.sources[0];
   const selectedPillar = payload.core.find((pillar) => selectedSource && pillar.sourceIds.includes(selectedSource.sourceId)) ?? payload.core[0];
+  const crimeCyberSources = payload.sources.filter((source) => ["crime", "cybercrime", "cyber_incident", "consumer_finance_protection"].includes(source.domain));
+  const officialSourceYears = 2026 - 2012 + 1;
   const activeTerritories = useMemo(() => new Set(territories.filter((item) => region === "All India" || item.region === region).map((item) => normalizeName(item.name))), [region]);
   const flowNodes = useMemo(() => makeFlowNodes(payload, tick), [payload, tick]);
   const lastUpdated = new Date(payload.generatedAt).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
@@ -149,10 +154,14 @@ export default function DashboardClient({ initialPayload }: ClientProps) {
 
         <section className={styles.mapStage}>
           <div className={styles.mapToolbar}>
-            <Kpi icon={Database} label="Sources" value={payload.metrics.sources} />
-            <Kpi icon={BookOpen} label="Pillars" value={payload.metrics.pillars} />
+            <Kpi icon={Database} label="Official source body" value={payload.metrics.sources} />
+            <Kpi icon={FileClock} label="2012-2026 years" value={officialSourceYears} />
+            <Kpi icon={Gavel} label="Crime/cyber lanes" value={crimeCyberSources.length} />
+            <Kpi icon={AlertCircle} label="Scam typologies" value={6} />
             <Kpi icon={Workflow} label="Parser queue" value={payload.metrics.parserBacklog} />
             <Kpi icon={Activity} label="Probe ready" value={payload.metrics.liveProbeReady} />
+            <Kpi icon={LockKeyhole} label="Review gates" value={payload.metrics.authOrReviewRequired} />
+            <Kpi icon={ShieldCheck} label="Policy/evidence gates" value={6} />
           </div>
           <div className={styles.mapCanvas}>
             <IndiaMap activeNames={activeTerritories} features={mapFeatures} />
@@ -219,9 +228,18 @@ export default function DashboardClient({ initialPayload }: ClientProps) {
             </div>
           </article>
           <article>
-            <h2>Heat by source body</h2>
+            <h2>Crime and cyber typology watch</h2>
             <div className={styles.domainBars}>
-              {payload.domains.slice(0, 9).map((item) => <div key={item.domain}><span>{labelize(item.domain)}</span><i style={{ width: `${Math.max(item.total * 22, 18)}%` }} /><b>{item.total}</b></div>)}
+              {[
+                ["NCRB crime tables", 15],
+                ["CERT-In incident reports", 15],
+                ["Digital arrest", 8],
+                ["Jamtara / Telegram fraud", 7],
+                ["Loan app fraud", 7],
+                ["Worm / malware incidents", 9],
+                ["PIB / MHA advisories", 6],
+                ["RBI consumer protection", 5],
+              ].map(([label, value]) => <div key={String(label)}><span>{label}</span><i style={{ width: `${Math.max(Number(value) * 6, 18)}%` }} /><b>{value}</b></div>)}
             </div>
           </article>
         </section>

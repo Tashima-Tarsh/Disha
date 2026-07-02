@@ -1,6 +1,6 @@
 .page {
   min-height: 100vh;
-  background: #e9edf2;
+  background: #ffffff;
   color: #161616;
   font-family: "Segoe UI", Arial, Helvetica, sans-serif;
 }
@@ -32,7 +32,7 @@
   align-items: center;
   justify-content: space-between;
   padding: 10px 14px;
-  border-bottom: 4px solid #f2c811;
+  border-bottom: 4px solid #2563eb;
 }
 
 .topBar p,
@@ -71,19 +71,19 @@
   width: 10px;
   height: 10px;
   border-radius: 50%;
-  background: #cf2e2e;
-  box-shadow: 0 0 0 0 rgba(207, 46, 46, 0.7);
+  background: #16a34a;
+  box-shadow: 0 0 0 0 rgba(22, 163, 74, 0.5);
   animation: pulse 1.4s infinite;
 }
 
 .liveBadge strong {
-  color: #cf2e2e;
+  color: #166534;
   font-size: 1rem;
 }
 
 @keyframes pulse {
-  70% { box-shadow: 0 0 0 9px rgba(207, 46, 46, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(207, 46, 46, 0); }
+  70% { box-shadow: 0 0 0 9px rgba(22, 163, 74, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(22, 163, 74, 0); }
 }
 
 .leftRail,
@@ -156,8 +156,8 @@
 
 .layerStack button[data-active="true"],
 .sourceFeed button[data-active="true"] {
-  border-color: #f2c811;
-  background: #fff8d5;
+  border-color: #2563eb;
+  background: #eff6ff;
 }
 
 .layerStack span {
@@ -188,7 +188,7 @@
 
 .mapToolbar {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(8, minmax(0, 1fr));
   gap: 8px;
   border-bottom: 1px solid #d8dee7;
   padding: 8px;
@@ -223,7 +223,7 @@
   background:
     linear-gradient(90deg, rgba(148, 163, 184, 0.22) 1px, transparent 1px),
     linear-gradient(0deg, rgba(148, 163, 184, 0.22) 1px, transparent 1px),
-    #f8fafc;
+    #ffffff;
   background-size: 40px 40px;
 }
 
@@ -271,10 +271,10 @@
 }
 
 .arcA,
-.arcE { stroke: #8f1d21; }
-.arcB { stroke: #c9961a; }
-.arcC { stroke: #1f6f5b; }
-.arcD { stroke: #345995; }
+.arcE { stroke: #2563eb; }
+.arcB { stroke: #0f766e; }
+.arcC { stroke: #7c3aed; }
+.arcD { stroke: #475569; }
 
 @keyframes dash {
   to { stroke-dashoffset: -36; }
@@ -296,7 +296,7 @@
 }
 
 .pulseCore {
-  fill: #cf2e2e;
+  fill: #2563eb;
   stroke: #ffffff;
   stroke-width: 5;
   animation: corePulse 1.8s infinite;
@@ -334,10 +334,10 @@
   border-radius: 50%;
 }
 
-.mapLegend i[data-level="central"] { background: #8f1d21; }
-.mapLegend i[data-level="state"] { background: #c9961a; }
-.mapLegend i[data-level="district"] { background: #1f6f5b; }
-.mapLegend i[data-level="source"] { background: #345995; }
+.mapLegend i[data-level="central"] { background: #2563eb; }
+.mapLegend i[data-level="state"] { background: #0f766e; }
+.mapLegend i[data-level="district"] { background: #7c3aed; }
+.mapLegend i[data-level="source"] { background: #475569; }
 
 .railHeader {
   justify-content: space-between;
@@ -393,7 +393,7 @@
 .sourceFeed i {
   grid-row: 1;
   grid-column: 3;
-  color: #cf2e2e;
+  color: #2563eb;
   font-style: normal;
   font-weight: 900;
   text-align: right;
@@ -472,8 +472,8 @@
 }
 
 .timeline span[data-hot="true"] {
-  border-color: #f2c811;
-  background: linear-gradient(180deg, #fff7c2, #ffffff);
+  border-color: #2563eb;
+  background: #eff6ff;
   color: #111827;
 }
 
@@ -502,7 +502,7 @@
   display: block;
   max-width: 100%;
   height: 14px;
-  background: linear-gradient(90deg, #1f6f5b, #f2c811, #8f1d21);
+  background: linear-gradient(90deg, #2563eb, #0f766e, #7c3aed);
 }
 
 .domainBars b {
