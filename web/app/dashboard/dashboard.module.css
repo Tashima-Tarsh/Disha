@@ -254,16 +254,15 @@
 }
 
 .mapDistrict {
-  fill: none;
+  fill: var(--heat-fill, #e2e8f0);
   stroke: #475569;
-  stroke-width: 1.1;
-  opacity: 0.82;
+  stroke-width: 0.35;
+  opacity: var(--heat-opacity, 0.82);
 }
 
 .mapActive {
-  stroke: #1f6f5b;
-  stroke-width: 1.8;
-  filter: drop-shadow(0 0 4px rgba(31, 111, 91, 0.3));
+  stroke: #ffffff;
+  stroke-width: 0.55;
 }
 
 .mapMuted {
@@ -411,7 +410,7 @@
 .bottomDeck {
   grid-column: 1 / -1;
   display: grid;
-  grid-template-columns: 1fr 1fr 1.25fr;
+  grid-template-columns: 0.9fr 1fr 1.45fr;
   gap: 8px;
   min-height: 0;
 }
@@ -461,61 +460,88 @@
   font-weight: 850;
 }
 
-.timeline {
+.chartGrid {
   display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 5px;
-  align-items: stretch;
-}
-
-.timeline span {
-  min-height: 92px;
-  display: grid;
-  align-content: end;
-  border: 1px solid #d8dee7;
-  background: #f8fafc;
-  color: #475569;
-  padding: 7px;
-  font-size: 0.76rem;
-  font-weight: 850;
-}
-
-.timeline span[data-hot="true"] {
-  border-color: #2563eb;
-  background: #eff6ff;
-  color: #111827;
-}
-
-.domainBars {
-  display: grid;
-  gap: 6px;
-}
-
-.domainBars div {
-  display: grid;
-  grid-template-columns: 132px minmax(0, 1fr) 26px;
-  gap: 7px;
+  grid-template-columns: minmax(0, 1fr) 220px;
+  gap: 10px;
   align-items: center;
 }
 
-.domainBars span {
-  overflow: hidden;
-  color: #334155;
-  font-size: 0.78rem;
-  font-weight: 800;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.domainBars i {
+.barChart,
+.lineChart,
+.donutChart {
   display: block;
-  max-width: 100%;
-  height: 14px;
-  background: linear-gradient(90deg, #2563eb, #0f766e, #7c3aed);
+  width: 100%;
+  height: 100%;
+  min-height: 142px;
 }
 
-.domainBars b {
-  text-align: right;
+.barChart text,
+.lineChart text,
+.donutChart text {
+  fill: #334155;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.chartTrack {
+  fill: #eef2f7;
+}
+
+.chartBar {
+  fill: #2563eb;
+}
+
+.lineChart line {
+  stroke: #e2e8f0;
+  stroke-width: 1;
+}
+
+.lineChart polyline {
+  fill: none;
+  stroke: #2563eb;
+  stroke-width: 3;
+}
+
+.lineChart circle {
+  fill: #ffffff;
+  stroke: #2563eb;
+  stroke-width: 3;
+}
+
+.lineChart circle[data-hot="true"] {
+  fill: #0f766e;
+  stroke: #0f766e;
+}
+
+.donutBase,
+.donutChart circle {
+  fill: none;
+  stroke-width: 20;
+  transform: rotate(-90deg);
+  transform-origin: 92px 92px;
+}
+
+.donutBase {
+  stroke: #eef2f7;
+}
+
+.donutSlice0 { stroke: #2563eb; }
+.donutSlice1 { stroke: #0f766e; }
+.donutSlice2 { stroke: #7c3aed; }
+.donutSlice3 { stroke: #f59e0b; }
+.donutSlice4 { stroke: #64748b; }
+
+.donutValue {
+  fill: #111827 !important;
+  font-size: 24px !important;
+  font-weight: 850 !important;
+}
+
+.donutLabel {
+  fill: #64748b !important;
+  font-size: 10px !important;
+  text-transform: uppercase;
 }
 
 @media (max-width: 1180px) {
@@ -558,7 +584,7 @@
   }
 
   .sourceFeed button,
-  .domainBars div {
+  .chartGrid {
     grid-template-columns: 1fr;
   }
 }

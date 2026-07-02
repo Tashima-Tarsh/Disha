@@ -20,6 +20,7 @@ import {
   Workflow,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
+import type { CSSProperties } from "react";
 
 import { regions, territories } from "@/lib/india-dashboard-data";
 import type { DashboardBuilderPayload } from "@/lib/dashboard-builder-feed";
@@ -30,7 +31,7 @@ type ClientProps = { initialPayload: DashboardBuilderPayload };
 type Geometry = { type: "Polygon" | "MultiPolygon" | "LineString" | "MultiLineString"; coordinates: number[][] | number[][][] | number[][][][] };
 type GeoFeature = { properties: { st_nm?: string; district?: string }; geometry: Geometry };
 type GeoJson = { features: GeoFeature[] };
-type MapFeature = { id: string; stateName: string; district: string; path: string };
+type MapFeature = { id: string; stateName: string; district: string; path: string; heat: number };
 type FlowNode = { id: string; label: string; x: number; y: number; level: "central" | "state" | "district" | "source"; value: number };
 type KpiKey = "sources" | "years" | "crime" | "typologies" | "parser" | "probe" | "review" | "policy";
 
@@ -72,7 +73,7 @@ export default function DashboardClient({ initialPayload }: ClientProps) {
   useEffect(() => {
     let alive = true;
     async function loadMap() {
-      const response = await fetch("/data/datameet-india-land-simplified.geojson");
+      const response = await fetch("/data/india-districts.geojson");
       const geojson = (await response.json()) as GeoJson;
       if (alive) setMapFeatures(buildMapFeatures(geojson));
     }
@@ -167,7 +168,7 @@ export default function DashboardClient({ initialPayload }: ClientProps) {
             <Kpi id="policy" active={activeKpi} onSelect={setActiveKpi} icon={ShieldCheck} label="Policy/evidence gates" value={6} />
           </div>
           <div className={styles.mapCanvas}>
-            <IndiaMap activeNames={activeTerritories} features={mapFeatures} />
+            <IndiaMap activeNames={activeTerritories} features={mapFeatures} activeKpi={activeKpi} />
             <svg className={styles.liveOverlay} viewBox="0 0 760 820" aria-hidden="true">
               <path className={styles.arcA} d="M380 396 C282 230 218 175 118 102" />
               <path className={styles.arcB} d="M380 396 C505 220 578 190 690 116" />
@@ -224,14 +225,13 @@ export default function DashboardClient({ initialPayload }: ClientProps) {
           </article>
           <article>
             <h2>Dynamic calculation path</h2>
-            <div className={styles.timeline}>
-              {activeModel.steps.map((item, index) => <span key={item} data-hot={index <= tick % activeModel.steps.length}>{item}</span>)}
-            </div>
+            <LineChart labels={activeModel.steps} values={activeModel.trend} hotIndex={tick % activeModel.steps.length} />
           </article>
           <article>
             <h2>{activeModel.heatTitle}</h2>
-            <div className={styles.domainBars}>
-              {activeModel.bars.map((item) => <div key={item.label}><span>{item.label}</span><i style={{ width: `${Math.max(item.value * 6, 18)}%` }} /><b>{item.value}</b></div>)}
+            <div className={styles.chartGrid}>
+              <BarChart rows={activeModel.bars} />
+              <DonutChart rows={activeModel.bars.slice(0, 5)} />
             </div>
           </article>
         </section>
@@ -255,6 +255,7 @@ function getKpiModel(active: KpiKey, payload: DashboardBuilderPayload, crimeCybe
     metrics: Array<{ label: string; value: string | number }>;
     bars: Array<{ label: string; value: number }>;
     heat: number[];
+    trend: number[];
   }> = {
     sources: {
       title: "Official source body",
@@ -265,6 +266,7 @@ function getKpiModel(active: KpiKey, payload: DashboardBuilderPayload, crimeCybe
       metrics: [{ label: "Sources", value: payload.metrics.sources }, { label: "Domains", value: payload.metrics.domains }, { label: "Review", value: payload.metrics.authOrReviewRequired }],
       bars: payload.domains.slice(0, 8).map((item) => ({ label: labelize(item.domain), value: item.total })),
       heat: payload.domains.map((item) => item.total * 10),
+      trend: commonSteps.map((_, index) => 28 + index * 9),
     },
     years: {
       title: "2012-2026 official coverage",
@@ -275,6 +277,7 @@ function getKpiModel(active: KpiKey, payload: DashboardBuilderPayload, crimeCybe
       metrics: [{ label: "Years", value: 15 }, { label: "Parsed", value: 0 }, { label: "Required", value: "NCRB/CERT-In" }],
       bars: ["2012-14", "2015-17", "2018-20", "2021-23", "2024-26"].map((label, index) => ({ label, value: [3, 3, 3, 3, 3][index] })),
       heat: [15, 18, 20, 22, 24, 26],
+      trend: [12, 18, 24, 32, 44, 58, 72, 86],
     },
     crime: {
       title: "Crime/cyber lanes",
@@ -292,6 +295,7 @@ function getKpiModel(active: KpiKey, payload: DashboardBuilderPayload, crimeCybe
         { label: "RBI protection", value: 5 },
       ],
       heat: [30, 40, 55, 65, 74, 82],
+      trend: [18, 26, 39, 47, 62, 74, 88],
     },
     typologies: {
       title: "Scam typology watch",
@@ -309,6 +313,7 @@ function getKpiModel(active: KpiKey, payload: DashboardBuilderPayload, crimeCybe
         { label: "Phishing / mule account", value: 8 },
       ],
       heat: [42, 55, 63, 71, 79, 88],
+      trend: [22, 34, 49, 63, 78, 86],
     },
     parser: makeSimpleModel("Parser queue", "Which source families still need importers?", payload.metrics.parserBacklog, payload.domains.filter((item) => item.parserRequired > 0).slice(0, 8).map((item) => ({ label: labelize(item.domain), value: item.parserRequired }))),
     probe: makeSimpleModel("Probe readiness", "Which sources can be checked live before parser import?", payload.metrics.liveProbeReady, payload.domains.filter((item) => item.total > 0).slice(0, 8).map((item) => ({ label: labelize(item.domain), value: item.apiPull + 1 }))),
@@ -328,10 +333,11 @@ function makeSimpleModel(title: string, question: string, value: number, bars: A
     metrics: [{ label: "Selected", value }, { label: "Rows", value: bars.length }, { label: "Mode", value: "live" }],
     bars,
     heat: bars.map((item) => item.value * 12 + 20),
+    trend: [16, 28, 44, 52, 66, 80],
   };
 }
 
-function IndiaMap({ activeNames, features }: { activeNames: Set<string>; features: MapFeature[] }) {
+function IndiaMap({ activeNames, features, activeKpi }: { activeNames: Set<string>; features: MapFeature[]; activeKpi: KpiKey }) {
   if (!features.length) {
     return (
       <svg className={styles.indiaMap} viewBox={`0 0 ${VIEWBOX.width} ${VIEWBOX.height}`} role="img" aria-label="India live intelligence map">
@@ -343,7 +349,17 @@ function IndiaMap({ activeNames, features }: { activeNames: Set<string>; feature
     <svg className={styles.indiaMap} viewBox={`0 0 ${VIEWBOX.width} ${VIEWBOX.height}`} role="img" aria-label="India live intelligence map">
       {features.map((feature) => {
         const active = activeNames.has(normalizeName(feature.stateName));
-        return <path key={feature.id} d={feature.path} className={`${styles.mapDistrict} ${active ? styles.mapActive : styles.mapMuted}`}><title>{feature.stateName} - {feature.district}</title></path>;
+        const heat = heatForFeature(feature, activeKpi);
+        return (
+          <path
+            key={feature.id}
+            d={feature.path}
+            className={`${styles.mapDistrict} ${active ? styles.mapActive : styles.mapMuted}`}
+            style={{ "--heat-fill": heatColor(heat), "--heat-opacity": String(active ? 0.92 : 0.28) } as CSSProperties}
+          >
+            <title>{feature.stateName} - {feature.district}: heat {heat}</title>
+          </path>
+        );
       })}
     </svg>
   );
@@ -377,8 +393,82 @@ function buildMapFeatures(geojson: GeoJson): MapFeature[] {
     const district = feature.properties.district ?? stateName;
     const path = geometryToPath(feature.geometry);
     if (!path) return [];
-    return [{ id: `${stateName}-${district}-${index}`, stateName, district, path }];
+    return [{ id: `${stateName}-${district}-${index}`, stateName, district, path, heat: stableHeat(`${stateName}:${district}`) }];
   });
+}
+
+function BarChart({ rows }: { rows: Array<{ label: string; value: number }> }) {
+  const max = Math.max(...rows.map((row) => row.value), 1);
+  return (
+    <svg className={styles.barChart} viewBox="0 0 420 220" role="img" aria-label="Bar chart">
+      {rows.slice(0, 8).map((row, index) => {
+        const y = 18 + index * 25;
+        const width = Math.max((row.value / max) * 220, 12);
+        return (
+          <g key={row.label}>
+            <text x="0" y={y + 13}>{row.label}</text>
+            <rect x="170" y={y} width="230" height="16" rx="2" className={styles.chartTrack} />
+            <rect x="170" y={y} width={width} height="16" rx="2" className={styles.chartBar} />
+            <text x="410" y={y + 13} textAnchor="end">{row.value}</text>
+          </g>
+        );
+      })}
+    </svg>
+  );
+}
+
+function DonutChart({ rows }: { rows: Array<{ label: string; value: number }> }) {
+  const total = rows.reduce((sum, row) => sum + row.value, 0) || 1;
+  let offset = 25;
+  return (
+    <svg className={styles.donutChart} viewBox="0 0 220 220" role="img" aria-label="Donut chart">
+      <circle cx="92" cy="92" r="58" className={styles.donutBase} />
+      {rows.map((row, index) => {
+        const dash = (row.value / total) * 365;
+        const node = <circle key={row.label} cx="92" cy="92" r="58" className={styles[`donutSlice${index}`]} strokeDasharray={`${dash} ${365 - dash}`} strokeDashoffset={-offset} />;
+        offset += dash;
+        return node;
+      })}
+      <text x="92" y="88" textAnchor="middle" className={styles.donutValue}>{total}</text>
+      <text x="92" y="108" textAnchor="middle" className={styles.donutLabel}>total</text>
+      {rows.slice(0, 5).map((row, index) => <text key={row.label} x="160" y={42 + index * 24}>{row.label}</text>)}
+    </svg>
+  );
+}
+
+function LineChart({ labels, values, hotIndex }: { labels: string[]; values: number[]; hotIndex: number }) {
+  const max = Math.max(...values, 1);
+  const points = values.map((value, index) => {
+    const x = 20 + (index * 330) / Math.max(values.length - 1, 1);
+    const y = 132 - (value / max) * 96;
+    return [x, y] as const;
+  });
+  return (
+    <svg className={styles.lineChart} viewBox="0 0 380 170" role="img" aria-label="Line chart">
+      {[0, 1, 2, 3].map((line) => <line key={line} x1="20" x2="350" y1={36 + line * 32} y2={36 + line * 32} />)}
+      <polyline points={points.map(([x, y]) => `${x},${y}`).join(" ")} />
+      {points.map(([x, y], index) => <circle key={labels[index] ?? index} cx={x} cy={y} r={index === hotIndex ? 6 : 4} data-hot={index === hotIndex} />)}
+      {labels.map((label, index) => <text key={label} x={20 + (index * 330) / Math.max(labels.length - 1, 1)} y="158" textAnchor="middle">{label.length > 9 ? label.slice(0, 8) : label}</text>)}
+    </svg>
+  );
+}
+
+function heatForFeature(feature: MapFeature, activeKpi: KpiKey): number {
+  const multiplier: Record<KpiKey, number> = { sources: 1, years: 1.15, crime: 1.45, typologies: 1.35, parser: 1.2, probe: 0.9, review: 1.25, policy: 1.05 };
+  return Math.min(100, Math.round(feature.heat * multiplier[activeKpi]));
+}
+
+function stableHeat(value: string): number {
+  let hash = 0;
+  for (let index = 0; index < value.length; index += 1) hash = (hash * 31 + value.charCodeAt(index)) % 997;
+  return 18 + (hash % 73);
+}
+
+function heatColor(value: number): string {
+  if (value >= 78) return "#dc2626";
+  if (value >= 60) return "#f59e0b";
+  if (value >= 42) return "#2563eb";
+  return "#16a34a";
 }
 
 function geometryToPath(geometry: Geometry): string {
