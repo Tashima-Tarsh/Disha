@@ -4,6 +4,7 @@ import { lensRegistry } from "@/lib/unified/lenses";
 import { openDataSources } from "@/lib/unified/data-integration";
 import { listAgentSkills } from "@/lib/unified/agentic-readiness";
 import { getEnv } from "@/lib/server/env";
+import { listSourceRegistry } from "@/lib/unified/source-registry";
 
 export async function GET() {
   const env = getEnv();
@@ -18,5 +19,7 @@ export async function GET() {
     agenticMission: "enabled",
     modelProvider: env.DISHA_MODEL_PROVIDER,
     learningMemory: "evidence_memory",
+    sourceRegistry: listSourceRegistry().length,
+    noDemoDataPolicy: "enabled",
   });
 }

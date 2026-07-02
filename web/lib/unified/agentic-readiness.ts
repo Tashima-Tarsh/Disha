@@ -1,5 +1,7 @@
 import { openDataSources } from "./data-integration";
 import { lensRegistry } from "./lenses";
+import { listSourceRegistry } from "./source-registry";
+import { getConstitutionalCore } from "./constitutional-core";
 
 export type AgentSkillStatus = "ready" | "partial" | "blocked";
 
@@ -39,6 +41,13 @@ export type AgenticReadinessReport = {
     denied: string[];
     promotionRule: string;
   };
+  uniqueArchitecture: {
+    name: string;
+    thesis: string;
+    liveCapabilities: string[];
+    nonGoals: string[];
+  };
+  constitutionalCore: ReturnType<typeof getConstitutionalCore>;
   readiness: {
     score: number;
     ready: number;
@@ -70,16 +79,16 @@ export function listAgentSkills(): AgentSkillDefinition[] {
     {
       id: "open-source-connector",
       title: "Open Source Connector Agent",
-      purpose: "Expose public source manifests for CAG, India Budget, Data.gov.in, LGD, and Bhuvan.",
+      purpose: "Expose real public source definitions and live source probes without synthetic data.",
       inputContract: "sourceId? + missionId",
-      outputContract: "OpenDataRecord[]",
-      allowedData: openDataSources.map((source) => source.sourceId),
+      outputContract: "OpenDataRecord[] or SourceProbeResult[]",
+      allowedData: listSourceRegistry().map((source) => source.sourceId),
       policyBoundary: "Open source only; controlled data remains deny-by-default.",
-      evidenceBoundary: "Connector responses carry provenanceHash and source metadata.",
+      evidenceBoundary: "Connector responses carry provenanceHash, source metadata, and probe events.",
       learningMode: "supervised_connector",
       status: "partial",
-      readinessScore: 0.72,
-      blockers: ["Dataset-specific parsers and update monitors must be added per source."],
+      readinessScore: 0.78,
+      blockers: ["Dataset-specific parsers and scheduled update monitors must be added per source."],
     },
     {
       id: "cyber-defense",
@@ -229,7 +238,7 @@ export function getAgenticReadinessReport(): AgenticReadinessReport {
     orchestrationContract: "Claude or any model may orchestrate only through DISHA API v1, DishaSignal, DishaLensResult, policy gate, and evidence ledger.",
     claudeBridge: {
       role: "reasoning and orchestration client, not a privileged data plane",
-      allowedEntryPoints: ["/api/v1/agentic/mission", "/api/v1/mission", "/api/v1/lenses/{lens}/analyze", "/api/v1/data/open/query", "/api/v1/evidence/export"],
+      allowedEntryPoints: ["/api/v1/agentic/mission", "/api/v1/mission", "/api/v1/lenses/{lens}/analyze", "/api/v1/sources/registry", "/api/v1/sources/probe", "/api/v1/data/open/query", "/api/v1/evidence/export"],
       deniedCapabilities: ["direct controlled-data access", "offensive cyber action", "silent learning", "unsourced factual publication", "policy bypass"],
     },
     openSourceConnectorMesh: openDataSources.map((source) => ({
@@ -243,6 +252,25 @@ export function getAgenticReadinessReport(): AgenticReadinessReport {
       denied: ["controlled data without authorization", "personal data without legal basis", "unverified claims as training truth", "model self-modification"],
       promotionRule: "Any learned capability must become an adapter, pass tests, and return DishaLensResult with evidence.",
     },
+    uniqueArchitecture: {
+      name: "Constitutional Evidence Graph",
+      thesis: "DISHA's defensible edge is not a model prompt or dashboard. It is a policy-gated graph that binds public sources, live source probes, lens reasoning, model advice, and evidence hashes into one auditable mission chain.",
+      liveCapabilities: [
+        "constitutional source core for Constitution, laws, bills, Gazette, ministries, states, finance, audit, water, disaster, crime, and macroeconomic sources",
+        "real-source registry for audit, finance, LGD, geospatial, disaster, crime, macroeconomic, and API-directory sources",
+        "live source availability probes with provenance hashes",
+        "no-demo-data open connector policy",
+        "policy-gated model intelligence",
+        "redacted evidence-memory learning",
+      ],
+      nonGoals: [
+        "inventing government statistics",
+        "publishing media claims as official data",
+        "bypassing source-specific authentication",
+        "storing controlled data without authorization",
+      ],
+    },
+    constitutionalCore: getConstitutionalCore(),
     readiness: { score, ready, partial, blocked },
     skills,
   };
