@@ -31,9 +31,11 @@ type ClientProps = { initialPayload: DashboardBuilderPayload };
 type Geometry = { type: "Polygon" | "MultiPolygon" | "LineString" | "MultiLineString"; coordinates: number[][] | number[][][] | number[][][][] };
 type GeoFeature = { properties: { st_nm?: string; district?: string }; geometry: Geometry };
 type GeoJson = { features: GeoFeature[] };
-type MapFeature = { id: string; stateName: string; district: string; path: string; heat: number };
+type MapFeature = { id: string; stateName: string; district: string; path: string };
 type FlowNode = { id: string; label: string; x: number; y: number; level: "central" | "state" | "district" | "source"; value: number };
 type KpiKey = "sources" | "years" | "crime" | "typologies" | "parser" | "probe" | "review" | "policy";
+type DashboardSource = DashboardBuilderPayload["sources"][number];
+type DashboardDomain = DashboardBuilderPayload["domains"][number];
 
 const INDIA_BOUNDS = { minLon: 67, maxLon: 98.5, minLat: 5.5, maxLat: 37.5 };
 const VIEWBOX = { width: 760, height: 820 };
@@ -67,7 +69,6 @@ export default function DashboardClient({ initialPayload }: ClientProps) {
   const [query, setQuery] = useState("");
   const [selectedSourceId, setSelectedSourceId] = useState(initialPayload.sources[0]?.sourceId ?? "");
   const [mapFeatures, setMapFeatures] = useState<MapFeature[]>([]);
-  const [tick, setTick] = useState(0);
   const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
@@ -81,11 +82,6 @@ export default function DashboardClient({ initialPayload }: ClientProps) {
     return () => {
       alive = false;
     };
-  }, []);
-
-  useEffect(() => {
-    const timer = window.setInterval(() => setTick((value) => value + 1), 1800);
-    return () => window.clearInterval(timer);
   }, []);
 
   useEffect(() => {
@@ -116,13 +112,15 @@ export default function DashboardClient({ initialPayload }: ClientProps) {
       return domainMatch && queryMatch;
     });
   }, [payload.sources, query, domain]);
-  const selectedSource = payload.sources.find((source) => source.sourceId === selectedSourceId) ?? filteredSources[0] ?? payload.sources[0];
+  const filteredDomains = useMemo(() => groupDomains(filteredSources), [filteredSources]);
+  const selectedSource = filteredSources.find((source) => source.sourceId === selectedSourceId) ?? filteredSources[0];
   const selectedPillar = payload.core.find((pillar) => selectedSource && pillar.sourceIds.includes(selectedSource.sourceId)) ?? payload.core[0];
-  const crimeCyberSources = payload.sources.filter((source) => ["crime", "cybercrime", "cyber_incident", "consumer_finance_protection"].includes(source.domain));
+  const crimeCyberSources = filteredSources.filter((source) => ["crime", "cybercrime", "cyber_incident", "consumer_finance_protection"].includes(source.domain));
   const officialSourceYears = 2026 - 2012 + 1;
-  const activeModel = getKpiModel(activeKpi, payload, crimeCyberSources.length);
+  const activeModel = getKpiModel(activeKpi, filteredSources, filteredDomains, crimeCyberSources.length);
   const activeTerritories = useMemo(() => new Set(territories.filter((item) => region === "All India" || item.region === region).map((item) => normalizeName(item.name))), [region]);
-  const flowNodes = useMemo(() => makeFlowNodes(payload, tick), [payload, tick]);
+  const flowNodes = useMemo(() => makeFlowNodes(filteredDomains), [filteredDomains]);
+  const selectedCoverage = getSourceMapCoverage(selectedSource);
   const lastUpdated = new Date(payload.generatedAt).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
 
   return (
@@ -135,7 +133,7 @@ export default function DashboardClient({ initialPayload }: ClientProps) {
           </div>
           <div className={styles.liveBadge}>
             <span />
-            <strong>LIVE</strong>
+            <strong>REGISTRY</strong>
             <em>{lastUpdated}</em>
           </div>
         </header>
@@ -144,10 +142,18 @@ export default function DashboardClient({ initialPayload }: ClientProps) {
           <div className={styles.railTitle}><Filter aria-hidden="true" /> Report controls</div>
           <label><span>Region</span><select value={region} onChange={(event) => setRegion(event.target.value as (typeof regions)[number])}>{regions.map((item) => <option key={item}>{item}</option>)}</select></label>
           <label><span>Layer</span><select value={domain} onChange={(event) => setDomain(event.target.value)}><option value="all">All layers</option>{domains.map((item) => <option key={item} value={item}>{labelize(item)}</option>)}</select></label>
-          <label><span>Search</span><Search aria-hidden="true" /><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="CAG, BNS, Gazette..." /></label>
+          <label><span>Search</span><Search aria-hidden="true" /><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search registered source" /></label>
           <div className={styles.layerStack}>
             {payload.core.map((pillar, index) => (
-              <button key={pillar.id} type="button" data-active={selectedPillar?.id === pillar.id} onClick={() => setSelectedSourceId(pillar.sourceIds[0] ?? selectedSourceId)}>
+              <button
+                key={pillar.id}
+                type="button"
+                data-active={selectedPillar?.id === pillar.id}
+                onClick={() => {
+                  setDomain("all");
+                  setSelectedSourceId(pillar.sourceIds[0] ?? selectedSourceId);
+                }}
+              >
                 <span>{String(index + 1).padStart(2, "0")}</span>
                 <strong>{pillar.title}</strong>
                 <em>{pillar.sourceIds.length} sources</em>
@@ -158,17 +164,17 @@ export default function DashboardClient({ initialPayload }: ClientProps) {
 
         <section className={styles.mapStage}>
           <div className={styles.mapToolbar}>
-            <Kpi id="sources" active={activeKpi} onSelect={setActiveKpi} icon={Database} label="Official source body" value={payload.metrics.sources} />
+            <Kpi id="sources" active={activeKpi} onSelect={setActiveKpi} icon={Database} label="Visible sources" value={filteredSources.length} />
             <Kpi id="years" active={activeKpi} onSelect={setActiveKpi} icon={FileClock} label="2012-2026 years" value={officialSourceYears} />
             <Kpi id="crime" active={activeKpi} onSelect={setActiveKpi} icon={Gavel} label="Crime/cyber lanes" value={crimeCyberSources.length} />
             <Kpi id="typologies" active={activeKpi} onSelect={setActiveKpi} icon={AlertCircle} label="Scam typologies" value={6} />
-            <Kpi id="parser" active={activeKpi} onSelect={setActiveKpi} icon={Workflow} label="Parser queue" value={payload.metrics.parserBacklog} />
-            <Kpi id="probe" active={activeKpi} onSelect={setActiveKpi} icon={Activity} label="Probe ready" value={payload.metrics.liveProbeReady} />
-            <Kpi id="review" active={activeKpi} onSelect={setActiveKpi} icon={LockKeyhole} label="Review gates" value={payload.metrics.authOrReviewRequired} />
+            <Kpi id="parser" active={activeKpi} onSelect={setActiveKpi} icon={Workflow} label="Parser queue" value={filteredSources.filter((source) => source.updateMode !== "live_probe").length} />
+            <Kpi id="probe" active={activeKpi} onSelect={setActiveKpi} icon={Activity} label="Probe ready" value={filteredSources.filter((source) => source.updateMode === "live_probe").length} />
+            <Kpi id="review" active={activeKpi} onSelect={setActiveKpi} icon={LockKeyhole} label="Review gates" value={filteredSources.filter((source) => source.endpoints.some((endpoint) => endpoint.requiresAuth) || source.updateMode === "manual_review_required").length} />
             <Kpi id="policy" active={activeKpi} onSelect={setActiveKpi} icon={ShieldCheck} label="Policy/evidence gates" value={6} />
           </div>
           <div className={styles.mapCanvas}>
-            <IndiaMap activeNames={activeTerritories} features={mapFeatures} activeKpi={activeKpi} />
+            <IndiaMap activeNames={activeTerritories} features={mapFeatures} coverage={selectedCoverage} />
             <svg className={styles.liveOverlay} viewBox="0 0 760 820" aria-hidden="true">
               <path className={styles.arcA} d="M380 396 C282 230 218 175 118 102" />
               <path className={styles.arcB} d="M380 396 C505 220 578 190 690 116" />
@@ -177,17 +183,17 @@ export default function DashboardClient({ initialPayload }: ClientProps) {
               <path className={styles.arcE} d="M380 396 C385 300 375 212 382 82" />
               {flowNodes.map((node, index) => (
                 <g key={node.id} className={styles.flowNode}>
-                  <circle cx={node.x} cy={node.y} r={node.value + (activeModel.heat[index % activeModel.heat.length] / 22)} fill={levelColor[node.level]} />
+                  <circle cx={node.x} cy={node.y} r={node.value} fill={levelColor[node.level]} />
                   <text x={node.x + node.value + 8} y={node.y + 4}>{node.label}</text>
                 </g>
               ))}
               <circle className={styles.pulseCore} cx="380" cy="396" r="13" />
             </svg>
             <div className={styles.mapLegend}>
-              <span><i data-level="central" /> Central law/finance</span>
-              <span><i data-level="state" /> State/UT layer</span>
-              <span><i data-level="district" /> District/LGD/water</span>
-              <span><i data-level="source" /> Source probe/parser</span>
+              <span><i data-level="central" /> Selected source: {selectedSource?.sourceName ?? "none"}</span>
+              <span><i data-level="state" /> Geography: {selectedCoverage.label}</span>
+              <span><i data-level="district" /> Region filter: {region}</span>
+              <span><i data-level="source" /> No district incident counts displayed</span>
             </div>
           </div>
         </section>
@@ -199,7 +205,8 @@ export default function DashboardClient({ initialPayload }: ClientProps) {
             <RefreshCw aria-hidden="true" className={refreshing ? styles.spin : ""} />
           </div>
           <div className={styles.sourceFeed}>
-            {filteredSources.slice(0, 15).map((source, index) => {
+            {!filteredSources.length && <p className={styles.emptyState}>No registered source matches the current filters.</p>}
+            {filteredSources.slice(0, 15).map((source) => {
               const Icon = domainIcons[source.domain] ?? Database;
               return (
                 <button key={source.sourceId} type="button" data-active={source.sourceId === selectedSource?.sourceId} onClick={() => setSelectedSourceId(source.sourceId)}>
@@ -207,7 +214,7 @@ export default function DashboardClient({ initialPayload }: ClientProps) {
                   <span>{labelize(source.domain)}</span>
                   <strong>{source.sourceName}</strong>
                   <em>{source.updateMode.replaceAll("_", " ")}</em>
-                  <i>{String((index + tick) % 9 + 1).padStart(2, "0")}</i>
+                  <i>{source.sourceType.replaceAll("_", " ")}</i>
                 </button>
               );
             })}
@@ -224,8 +231,8 @@ export default function DashboardClient({ initialPayload }: ClientProps) {
             </div>
           </article>
           <article>
-            <h2>Dynamic calculation path</h2>
-            <LineChart labels={activeModel.steps} values={activeModel.trend} hotIndex={tick % activeModel.steps.length} />
+            <h2>Readiness calculation path</h2>
+            <LineChart labels={activeModel.steps} values={activeModel.trend} hotIndex={-1} />
           </article>
           <article>
             <h2>{activeModel.heatTitle}</h2>
@@ -244,8 +251,11 @@ function Kpi({ id, active, onSelect, icon: Icon, label, value }: { id: KpiKey; a
   return <button type="button" className={styles.kpi} data-active={active === id} onClick={() => onSelect(id)}><Icon aria-hidden="true" /><span>{label}</span><strong>{value}</strong></button>;
 }
 
-function getKpiModel(active: KpiKey, payload: DashboardBuilderPayload, crimeCyberCount: number) {
+function getKpiModel(active: KpiKey, sources: DashboardSource[], domains: DashboardDomain[], crimeCyberCount: number) {
   const commonSteps = ["Registry", "Probe", "Parser", "Evidence hash", "Lens fusion", "Policy gate", "Brief"];
+  const parserBacklog = sources.filter((source) => source.updateMode !== "live_probe").length;
+  const liveProbeReady = sources.filter((source) => source.updateMode === "live_probe").length;
+  const reviewRequired = sources.filter((source) => source.endpoints.some((endpoint) => endpoint.requiresAuth) || source.updateMode === "manual_review_required").length;
   const models: Record<KpiKey, {
     title: string;
     question: string;
@@ -254,90 +264,78 @@ function getKpiModel(active: KpiKey, payload: DashboardBuilderPayload, crimeCybe
     steps: string[];
     metrics: Array<{ label: string; value: string | number }>;
     bars: Array<{ label: string; value: number }>;
-    heat: number[];
     trend: number[];
   }> = {
     sources: {
       title: "Official source body",
-      question: "Which official sources can DISHA prove and route?",
-      explanation: "This view counts registered official/public sources only. It is not a crime count.",
-      heatTitle: "Source body heat",
+      question: "Which registered official sources are visible after filters?",
+      explanation: "This view counts repository-registered official/public sources only. It is not a government statistic or incident count.",
+      heatTitle: "Visible source domains",
       steps: commonSteps,
-      metrics: [{ label: "Sources", value: payload.metrics.sources }, { label: "Domains", value: payload.metrics.domains }, { label: "Review", value: payload.metrics.authOrReviewRequired }],
-      bars: payload.domains.slice(0, 8).map((item) => ({ label: labelize(item.domain), value: item.total })),
-      heat: payload.domains.map((item) => item.total * 10),
+      metrics: [{ label: "Sources", value: sources.length }, { label: "Domains", value: domains.length }, { label: "Review", value: reviewRequired }],
+      bars: domains.slice(0, 8).map((item) => ({ label: labelize(item.domain), value: item.total })),
       trend: commonSteps.map((_, index) => 28 + index * 9),
     },
     years: {
-      title: "2012-2026 official coverage",
-      question: "What period is the crime/cyber importer expected to cover?",
-      explanation: "The dashboard marks the complete target window. Year-wise official tables still require NCRB/CERT-In parsers.",
-      heatTitle: "Year coverage readiness",
+      title: "2012-2026 target window",
+      question: "What period should future crime/cyber importers cover?",
+      explanation: "This is a target ingestion window only. It does not claim parsed year-wise NCRB/CERT-In rows are present.",
+      heatTitle: "Target-year import plan",
       steps: ["2012", "2014", "2016", "2018", "2020", "2022", "2024", "2026"],
       metrics: [{ label: "Years", value: 15 }, { label: "Parsed", value: 0 }, { label: "Required", value: "NCRB/CERT-In" }],
-      bars: ["2012-14", "2015-17", "2018-20", "2021-23", "2024-26"].map((label, index) => ({ label, value: [3, 3, 3, 3, 3][index] })),
-      heat: [15, 18, 20, 22, 24, 26],
-      trend: [12, 18, 24, 32, 44, 58, 72, 86],
+      bars: ["2012-14", "2015-17", "2018-20", "2021-23", "2024-26"].map((label) => ({ label, value: 0 })),
+      trend: [0, 0, 0, 0, 0, 0, 0, 0],
     },
     crime: {
       title: "Crime/cyber lanes",
       question: "Which official lanes support crime and cybercrime analysis?",
-      explanation: "NCRB, I4C, Cybercrime portal, CERT-In, PIB, and RBI lanes are registered; numeric claims wait for parsers.",
-      heatTitle: "Crime/cyber source heat",
+      explanation: "Only registered source lanes are shown here. Numeric crime/cyber claims remain blocked until official tables are parsed.",
+      heatTitle: "Crime/cyber registered lanes",
       steps: ["NCRB", "I4C", "Cybercrime portal", "CERT-In", "PIB", "RBI", "Evidence"],
       metrics: [{ label: "Lanes", value: crimeCyberCount }, { label: "Verified", value: crimeCyberCount }, { label: "Parsed rows", value: 0 }],
-      bars: [
-        { label: "NCRB crime tables", value: 15 },
-        { label: "CERT-In incident reports", value: 15 },
-        { label: "I4C advisories", value: 8 },
-        { label: "Cybercrime portal", value: 8 },
-        { label: "PIB releases", value: 6 },
-        { label: "RBI protection", value: 5 },
-      ],
-      heat: [30, 40, 55, 65, 74, 82],
-      trend: [18, 26, 39, 47, 62, 74, 88],
+      bars: groupDomains(sources.filter((source) => ["crime", "cybercrime", "cyber_incident", "consumer_finance_protection"].includes(source.domain))).map((item) => ({ label: labelize(item.domain), value: item.total })),
+      trend: [0, 0, 0, 0, 0, 0, crimeCyberCount],
     },
     typologies: {
-      title: "Scam typology watch",
-      question: "Which cybercrime patterns should the analyst board watch?",
-      explanation: "Typologies are shown as official-source watch lanes, not as incident totals.",
-      heatTitle: "Typology readiness",
+      title: "Typology evidence gate",
+      question: "Which scam labels are allowed only as uncounted watch categories?",
+      explanation: "These labels are not incident totals. They are analyst watch categories that require official source evidence before publication.",
+      heatTitle: "Watch categories, not counts",
       steps: ["Identify", "Source", "Classify", "Map state", "Verify", "Escalate"],
       metrics: [{ label: "Typologies", value: 6 }, { label: "Source lanes", value: crimeCyberCount }, { label: "False claims", value: "blocked" }],
       bars: [
-        { label: "Digital arrest", value: 8 },
-        { label: "Jamtara / Telegram fraud", value: 7 },
-        { label: "Chinese loan app", value: 7 },
-        { label: "Worm / malware", value: 9 },
-        { label: "Investment scam", value: 6 },
-        { label: "Phishing / mule account", value: 8 },
+        { label: "Digital arrest", value: hasSource(sources, "cybercrime") ? 1 : 0 },
+        { label: "Jamtara / Telegram fraud", value: hasSource(sources, "cybercrime") ? 1 : 0 },
+        { label: "Chinese loan app", value: hasSource(sources, "consumer_finance_protection") ? 1 : 0 },
+        { label: "Worm / malware", value: hasSource(sources, "cyber_incident") ? 1 : 0 },
+        { label: "Investment scam", value: hasSource(sources, "cybercrime") ? 1 : 0 },
+        { label: "Phishing / mule account", value: hasSource(sources, "cybercrime") ? 1 : 0 },
       ],
-      heat: [42, 55, 63, 71, 79, 88],
-      trend: [22, 34, 49, 63, 78, 86],
+      trend: [0, 0, 0, 0, 0, crimeCyberCount],
     },
-    parser: makeSimpleModel("Parser queue", "Which source families still need importers?", payload.metrics.parserBacklog, payload.domains.filter((item) => item.parserRequired > 0).slice(0, 8).map((item) => ({ label: labelize(item.domain), value: item.parserRequired }))),
-    probe: makeSimpleModel("Probe readiness", "Which sources can be checked live before parser import?", payload.metrics.liveProbeReady, payload.domains.filter((item) => item.total > 0).slice(0, 8).map((item) => ({ label: labelize(item.domain), value: item.apiPull + 1 }))),
-    review: makeSimpleModel("Review gates", "Which sources need auth/manual review before publication?", payload.metrics.authOrReviewRequired, payload.domains.slice(0, 8).map((item) => ({ label: labelize(item.domain), value: item.parserRequired }))),
+    parser: makeSimpleModel("Parser queue", "Which visible source families still need importers?", parserBacklog, domains.filter((item) => item.parserRequired > 0).slice(0, 8).map((item) => ({ label: labelize(item.domain), value: item.parserRequired }))),
+    probe: makeSimpleModel("Probe readiness", "Which visible sources can be checked by live probe?", liveProbeReady, domains.filter((item) => item.total > 0).slice(0, 8).map((item) => ({ label: labelize(item.domain), value: item.total - item.parserRequired }))),
+    review: makeSimpleModel("Review gates", "Which visible sources need auth/manual review before publication?", reviewRequired, domains.slice(0, 8).map((item) => ({ label: labelize(item.domain), value: item.parserRequired }))),
     policy: makeSimpleModel("Policy/evidence gates", "Which controls protect the dashboard from fake intelligence?", 6, ["Policy", "Evidence", "Redaction", "Source hash", "Human review", "No demo data"].map((label) => ({ label, value: 6 }))),
   };
   return models[active];
 }
 
 function makeSimpleModel(title: string, question: string, value: number, bars: Array<{ label: string; value: number }>) {
+  const total = bars.reduce((sum, item) => sum + item.value, 0);
   return {
     title,
     question,
-    explanation: "Click-driven drill-down recalculates the visible heat bars, timeline, and map node intensity from DISHA source metadata.",
-    heatTitle: `${title} heat`,
-    steps: ["Select KPI", "Filter lanes", "Calculate readiness", "Map heat", "Review", "Export"],
-    metrics: [{ label: "Selected", value }, { label: "Rows", value: bars.length }, { label: "Mode", value: "live" }],
+    explanation: "Click-driven drill-down recalculates the visible bars and readiness line from DISHA source metadata only.",
+    heatTitle: `${title} by visible domain`,
+    steps: ["Select KPI", "Apply filters", "Count sources", "Check readiness", "Review", "Export"],
+    metrics: [{ label: "Selected", value }, { label: "Rows", value: bars.length }, { label: "Source total", value: total }],
     bars,
-    heat: bars.map((item) => item.value * 12 + 20),
-    trend: [16, 28, 44, 52, 66, 80],
+    trend: [0, 0, Math.max(0, total - value), value, value, value],
   };
 }
 
-function IndiaMap({ activeNames, features, activeKpi }: { activeNames: Set<string>; features: MapFeature[]; activeKpi: KpiKey }) {
+function IndiaMap({ activeNames, features, coverage }: { activeNames: Set<string>; features: MapFeature[]; coverage: ReturnType<typeof getSourceMapCoverage> }) {
   if (!features.length) {
     return (
       <svg className={styles.indiaMap} viewBox={`0 0 ${VIEWBOX.width} ${VIEWBOX.height}`} role="img" aria-label="India live intelligence map">
@@ -349,15 +347,14 @@ function IndiaMap({ activeNames, features, activeKpi }: { activeNames: Set<strin
     <svg className={styles.indiaMap} viewBox={`0 0 ${VIEWBOX.width} ${VIEWBOX.height}`} role="img" aria-label="India live intelligence map">
       {features.map((feature) => {
         const active = activeNames.has(normalizeName(feature.stateName));
-        const heat = heatForFeature(feature, activeKpi);
         return (
           <path
             key={feature.id}
             d={feature.path}
             className={`${styles.mapDistrict} ${active ? styles.mapActive : styles.mapMuted}`}
-            style={{ "--heat-fill": heatColor(heat), "--heat-opacity": String(active ? 0.92 : 0.28) } as CSSProperties}
+            style={{ "--heat-fill": active ? coverage.color : "#e2e8f0", "--heat-opacity": String(active ? coverage.opacity : 0.22) } as CSSProperties}
           >
-            <title>{feature.stateName} - {feature.district}: heat {heat}</title>
+            <title>{feature.stateName} - {feature.district}: {coverage.title}</title>
           </path>
         );
       })}
@@ -365,8 +362,8 @@ function IndiaMap({ activeNames, features, activeKpi }: { activeNames: Set<strin
   );
 }
 
-function makeFlowNodes(payload: DashboardBuilderPayload, tick: number): FlowNode[] {
-  const values = payload.domains.slice(0, 8);
+function makeFlowNodes(domains: DashboardDomain[]): FlowNode[] {
+  const values = domains.slice(0, 8);
   const base: FlowNode[] = [
     { id: "constitution", label: "Constitution", x: 380, y: 96, level: "central", value: 12 },
     { id: "gazette", label: "Gazette", x: 128, y: 132, level: "central", value: 10 },
@@ -380,7 +377,7 @@ function makeFlowNodes(payload: DashboardBuilderPayload, tick: number): FlowNode
       id: item.domain,
       label: labelize(item.domain),
       x: 170 + (index % 4) * 140,
-      y: 280 + Math.floor(index / 4) * 210 + ((tick + index) % 3) * 6,
+      y: 280 + Math.floor(index / 4) * 210,
       level: "source" as const,
       value: 7 + item.total,
     })),
@@ -393,8 +390,54 @@ function buildMapFeatures(geojson: GeoJson): MapFeature[] {
     const district = feature.properties.district ?? stateName;
     const path = geometryToPath(feature.geometry);
     if (!path) return [];
-    return [{ id: `${stateName}-${district}-${index}`, stateName, district, path, heat: stableHeat(`${stateName}:${district}`) }];
+    return [{ id: `${stateName}-${district}-${index}`, stateName, district, path }];
   });
+}
+
+function groupDomains(sources: DashboardSource[]): DashboardDomain[] {
+  return Array.from(new Set(sources.map((source) => source.domain))).map((sourceDomain) => {
+    const domainSources = sources.filter((source) => source.domain === sourceDomain);
+    return {
+      domain: sourceDomain,
+      total: domainSources.length,
+      apiPull: domainSources.filter((source) => source.updateMode === "api_pull").length,
+      parserRequired: domainSources.filter((source) => source.updateMode !== "live_probe").length,
+      sourceIds: domainSources.map((source) => source.sourceId),
+    };
+  });
+}
+
+function hasSource(sources: DashboardSource[], domain: string): boolean {
+  return sources.some((source) => source.domain === domain);
+}
+
+function getSourceMapCoverage(source?: DashboardSource) {
+  if (!source) {
+    return { label: "No source selected", color: "#e2e8f0", opacity: 0.5, title: "No source selected" };
+  }
+  const levels = new Set(source.geographyLevel);
+  if (levels.has("district") || levels.has("local_body") || levels.has("point")) {
+    return {
+      label: "district/local eligible",
+      color: "#2563eb",
+      opacity: 0.82,
+      title: `${source.sourceName}: registered for district/local geography. District incident rows are not imported.`,
+    };
+  }
+  if (levels.has("state")) {
+    return {
+      label: "state eligible",
+      color: "#0f766e",
+      opacity: 0.76,
+      title: `${source.sourceName}: registered for state geography. State-specific values are not imported.`,
+    };
+  }
+  return {
+    label: "national/union only",
+    color: "#cbd5e1",
+    opacity: 0.62,
+    title: `${source.sourceName}: national/union source. No state or district data is claimed.`,
+  };
 }
 
 function BarChart({ rows }: { rows: Array<{ label: string; value: number }> }) {
@@ -451,24 +494,6 @@ function LineChart({ labels, values, hotIndex }: { labels: string[]; values: num
       {labels.map((label, index) => <text key={label} x={20 + (index * 330) / Math.max(labels.length - 1, 1)} y="158" textAnchor="middle">{label.length > 9 ? label.slice(0, 8) : label}</text>)}
     </svg>
   );
-}
-
-function heatForFeature(feature: MapFeature, activeKpi: KpiKey): number {
-  const multiplier: Record<KpiKey, number> = { sources: 1, years: 1.15, crime: 1.45, typologies: 1.35, parser: 1.2, probe: 0.9, review: 1.25, policy: 1.05 };
-  return Math.min(100, Math.round(feature.heat * multiplier[activeKpi]));
-}
-
-function stableHeat(value: string): number {
-  let hash = 0;
-  for (let index = 0; index < value.length; index += 1) hash = (hash * 31 + value.charCodeAt(index)) % 997;
-  return 18 + (hash % 73);
-}
-
-function heatColor(value: number): string {
-  if (value >= 78) return "#dc2626";
-  if (value >= 60) return "#f59e0b";
-  if (value >= 42) return "#2563eb";
-  return "#16a34a";
 }
 
 function geometryToPath(geometry: Geometry): string {

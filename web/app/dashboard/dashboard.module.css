@@ -377,6 +377,17 @@
   overflow: auto;
 }
 
+.emptyState {
+  margin: 0;
+  border: 1px dashed #cbd5e1;
+  background: #f8fafc;
+  color: #475569;
+  padding: 12px;
+  font-size: 0.84rem;
+  font-weight: 750;
+  line-height: 1.35;
+}
+
 .sourceFeed button {
   position: relative;
   display: grid;
