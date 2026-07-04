@@ -1,5 +1,6 @@
 import { getAgenticReadinessReport } from "./agentic-readiness";
 import { getConstitutionalCore } from "./constitutional-core";
+import { getSevenProductionCapabilities, type ProductionCapability } from "./production-spine";
 import { listSourceRegistry } from "./source-registry";
 
 export type ArchitectureZoneStatus = "active" | "governed_promotion" | "archive" | "external_adapter";
@@ -31,6 +32,7 @@ export type ArchitectureControlPlane = {
     noClaimRule: string;
   };
   agenticReadiness: ReturnType<typeof getAgenticReadinessReport>["readiness"];
+  productionSpine: ProductionCapability[];
   zones: ArchitectureZone[];
   premiumUSP: string[];
   productionGaps: string[];
@@ -84,6 +86,7 @@ export function getArchitectureControlPlane(): ArchitectureControlPlane {
       noClaimRule: "The product may show registry counts, source status, parser readiness, and verified connector records. It must not show invented incident totals, district heat, legal facts, or government figures.",
     },
     agenticReadiness: readiness,
+    productionSpine: getSevenProductionCapabilities(),
     zones: [
       {
         id: "runtime-web",
