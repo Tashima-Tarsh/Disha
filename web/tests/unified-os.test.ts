@@ -8,8 +8,8 @@ import { evaluatePolicy } from "../lib/unified/policy-gate";
 import { clearMissionsForTests, normalizeMission, runMission } from "../lib/unified/orchestrator";
 
 describe("DISHA v6.6 unified product contracts", () => {
-  beforeEach(() => {
-    clearEvidenceLedgerForTests();
+  beforeEach(async () => {
+    await clearEvidenceLedgerForTests();
     clearMissionsForTests();
   });
 
@@ -45,9 +45,9 @@ describe("DISHA v6.6 unified product contracts", () => {
     expect(evaluatePolicy(signal).decision).toBe("DENY");
   });
 
-  it("verifies evidence hash chains", () => {
-    const first = appendEvidenceEvent({ missionId: "m1", actor: "u1", action: "user_command_received", input: { a: 1 } });
-    const second = appendEvidenceEvent({ missionId: "m1", actor: "policy-gate", action: "policy_decision_made", input: first, output: { ok: true } });
+  it("verifies evidence hash chains", async () => {
+    const first = await appendEvidenceEvent({ missionId: "m1", actor: "u1", action: "user_command_received", input: { a: 1 } });
+    const second = await appendEvidenceEvent({ missionId: "m1", actor: "policy-gate", action: "policy_decision_made", input: first, output: { ok: true } });
     expect(verifyEvidenceChain([first, second]).ok).toBe(true);
     expect(verifyEvidenceChain([{ ...second, previousHash: "bad" }]).ok).toBe(false);
   });
@@ -204,7 +204,7 @@ describe("DISHA v6.6 unified product contracts", () => {
       userRole: "analyst",
       indicators: [{ type: "domain", value: "example.gov" }],
     });
-    const chainOk = verifyEvidenceChain(getEvidenceEvents(mission.missionId));
+    const chainOk = verifyEvidenceChain(await getEvidenceEvents(mission.missionId));
     expect(chainOk.ok).toBe(true);
     expect(mission.evidenceEventIds.length).toBeGreaterThanOrEqual(6);
   });

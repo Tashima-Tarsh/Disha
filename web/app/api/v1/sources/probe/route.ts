@@ -14,7 +14,7 @@ export async function POST(req: NextRequest) {
   return withContext(req, "agent:read", async (ctx) => {
     const body = probeSchema.parse(await req.json());
     const probes = await probeSources(body.sourceId);
-    appendEvidenceEvent({
+    await appendEvidenceEvent({
       missionId: body.missionId,
       actor: ctx.principal.userId,
       action: "source_registry_probe_completed",

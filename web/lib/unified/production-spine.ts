@@ -27,11 +27,11 @@ export function getSevenProductionCapabilities(): ProductionCapability[] {
     {
       id: "persistent-evidence",
       title: "Persistent Evidence Ledger Schema",
-      status: "partial",
+      status: "working",
       openSourcePath: "web/database/schema.sql",
       openAiPath: "OpenAI advisory output must reference evidence event ids.",
       evidenceRule: "Evidence events must remain hash-chain verifiable after database persistence.",
-      nextHardening: ["Move in-memory mission/evidence maps behind a database adapter.", "Add migration tests."],
+      nextHardening: ["Add migration tests.", "Persist mission results behind a database adapter.", "Add deployment smoke checks for DATABASE_URL."],
     },
     {
       id: "claim-provenance",

@@ -7,8 +7,8 @@ import { runModelIntelligence } from "../lib/unified/model-provider";
 import { clearMissionsForTests, runMission } from "../lib/unified/orchestrator";
 
 describe("DISHA governed model intelligence layer", () => {
-  beforeEach(() => {
-    clearEvidenceLedgerForTests();
+  beforeEach(async () => {
+    await clearEvidenceLedgerForTests();
     clearLearningMemoryForTests();
     clearMissionsForTests();
   });
@@ -53,7 +53,7 @@ describe("DISHA governed model intelligence layer", () => {
     expect(result.modelIntelligence.evidenceEventIds).toEqual(result.evidenceEventIds);
     expect(result.learning?.sourceEventIds).toEqual(result.evidenceEventIds.slice(0, -1));
     expect(getLearningMemory(result.mission.missionId)).toHaveLength(1);
-    expect(verifyEvidenceChain(getEvidenceEvents(result.mission.missionId)).ok).toBe(true);
+    expect(verifyEvidenceChain(await getEvidenceEvents(result.mission.missionId)).ok).toBe(true);
   });
 
   it("redacts controlled mission learning memory", async () => {
