@@ -11,6 +11,6 @@ const exportSchema = z.object({
 export async function POST(req: NextRequest) {
   return withContext(req, "export", async (ctx) => {
     const { missionId } = exportSchema.parse(await req.json());
-    return NextResponse.json(exportEvidenceReport(missionId), { headers: { "X-Request-ID": ctx.requestId } });
+    return NextResponse.json(await exportEvidenceReport(missionId), { headers: { "X-Request-ID": ctx.requestId } });
   });
 }

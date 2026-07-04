@@ -17,7 +17,7 @@ export type AgenticMissionResult = {
 export async function runAgenticMission(input: AgenticMissionInput): Promise<AgenticMissionResult> {
   const mission = await runMission(input);
   const modelIntelligence = await runModelIntelligence({ mission, operatorInstruction: input.operatorInstruction });
-  const modelEvent = appendEvidenceEvent({
+  const modelEvent = await appendEvidenceEvent({
     missionId: mission.missionId,
     actor: "model-intelligence-adapter",
     action: "model_intelligence_completed",
@@ -38,7 +38,7 @@ export async function runAgenticMission(input: AgenticMissionInput): Promise<Age
   mission.evidenceEventIds = [...mission.evidenceEventIds, modelEvent.eventId];
 
   const learning = learnFromMission(mission, modelIntelligence);
-  const learningEvent = appendEvidenceEvent({
+  const learningEvent = await appendEvidenceEvent({
     missionId: mission.missionId,
     actor: "evidence-learning-memory",
     action: "learning_memory_recorded",

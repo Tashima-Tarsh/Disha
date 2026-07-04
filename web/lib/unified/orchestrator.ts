@@ -56,42 +56,42 @@ export async function runMission(input: MissionInput): Promise<MissionResult> {
   const signal = normalizeMission(input);
   const eventIds: string[] = [];
 
-  eventIds.push(appendEvidenceEvent({
+  eventIds.push((await appendEvidenceEvent({
     missionId: signal.missionId ?? signal.id,
     actor: signal.userId,
     action: "user_command_received",
     input,
-  }).eventId);
+  })).eventId);
 
-  eventIds.push(appendEvidenceEvent({
+  eventIds.push((await appendEvidenceEvent({
     missionId: signal.missionId ?? signal.id,
     actor: signal.userId,
     action: "signal_normalized",
     input,
     output: signal,
-  }).eventId);
+  })).eventId);
 
   const selected = selectLenses(signal);
-  eventIds.push(appendEvidenceEvent({
+  eventIds.push((await appendEvidenceEvent({
     missionId: signal.missionId ?? signal.id,
     actor: "disha-orchestrator",
     action: "lens_selected",
     input: signal,
     output: selected.map((lens) => lens.name),
-  }).eventId);
+  })).eventId);
 
   const lensResults = await Promise.all(selected.map((lens) => lens.analyze(signal)));
-  eventIds.push(appendEvidenceEvent({
+  eventIds.push((await appendEvidenceEvent({
     missionId: signal.missionId ?? signal.id,
     actor: "disha-orchestrator",
     action: "lens_analysis_completed",
     input: selected.map((lens) => lens.name),
     output: lensResults,
     lensResults: lensResults.map((result) => result.lens),
-  }).eventId);
+  })).eventId);
 
   const policyDecision = evaluatePolicy(signal, lensResults);
-  const policyEvent = appendEvidenceEvent({
+  const policyEvent = await appendEvidenceEvent({
     missionId: signal.missionId ?? signal.id,
     actor: "policy-gate",
     action: "policy_decision_made",
@@ -118,14 +118,14 @@ export async function runMission(input: MissionInput): Promise<MissionResult> {
     evidenceEventIds: eventIds,
   };
 
-  eventIds.push(appendEvidenceEvent({
+  eventIds.push((await appendEvidenceEvent({
     missionId: result.missionId,
     actor: "disha-orchestrator",
     action: "report_generated",
     input: { missionId: result.missionId },
     output: result,
     policyDecision: responsePolicyDecision,
-  }).eventId);
+  })).eventId);
   result.evidenceEventIds = eventIds;
   missions.set(result.missionId, result);
   return result;

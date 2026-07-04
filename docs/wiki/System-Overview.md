@@ -1,21 +1,50 @@
 # System Overview
 
-DISHA OS is a purpose-built OS for:
-- secure AI execution (policy-gated tools and workflows)
-- security monitoring (telemetry, anomaly detection, explainable alerts)
-- evidence-grade audit (who did what, when, why, and what data changed)
+DISHA v6.6 is a source-first intelligence product. It receives a mission, normalizes it into a typed signal, runs governed lenses, evaluates policy, records evidence, and returns an auditable result.
 
-## Core runtimes
+## What DISHA Is Today
 
-- **DISHA Web** (`web/`): operator console and assistant API surface (auth/RBAC/CSRF/rate limiting/audit).
-- **DISHA Brain** (`disha/brain/`): local intelligence core (decisioning, memory, SQLite store, module adapters).
-- **DISHA OS image** (`os/`): bootable ISO build system (x86_64 BIOS+UEFI) plus systemd service overlay.
+- Next.js product runtime in `web/`
+- API v1 mission and agentic endpoints
+- Unified contracts in `web/lib/unified/contracts.ts`
+- Source registry for official/public sources
+- Policy gate before action state
+- Evidence ledger with hash-chain verification
+- OpenAI-compatible governed model adapter
+- Claim provenance guard for dashboard publication
+- Database schema for evidence, source ingestion, and claim provenance
 
-## What works offline vs online
+## What DISHA Is Not Yet
 
-Offline:
-- UI, workflow execution (non-network nodes), audit/event capture, evidence packaging.
+- It is not a fully parsed government data warehouse.
+- It is not a certified legal authority.
+- It is not a complete 2012-2026 crime statistics database.
+- It is not a live surveillance system.
+- It is not an autonomous action system.
 
-Online:
-- Cloud model calls (OpenAI Responses API) and any workflow node fetching public sources.
+## Product Flow
 
+```text
+source registry -> mission -> DishaSignal -> lenses -> fusion -> policy gate -> evidence ledger -> dashboard/API response
+```
+
+## Product Categories
+
+DISHA combines:
+
+- civic intelligence workbench,
+- AI governance layer,
+- source provenance system,
+- policy-gated agent runtime,
+- claim verification infrastructure,
+- public-sector analytics foundation.
+
+## Active Verification
+
+Run:
+
+```bash
+npm run verify
+```
+
+This runs TypeScript checks, tests, and the production build.

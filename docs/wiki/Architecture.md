@@ -1,33 +1,47 @@
 # Architecture
 
-DISHA OS is built as a layered appliance OS with a local “Brain” at the center.
+DISHA is architected as one governed mission pipeline, not a collection of disconnected AI demos.
 
-## Layers
+## Active Runtime Layers
 
-1. Boot trust (future phase): Secure Boot + TPM measured boot.
-2. Base OS: minimal, patched, locked down.
-3. Isolation: systemd hardening + MAC (AppArmor/SELinux in later phase).
-4. DISHA Brain: policy engine, decisioning, memory, SQLite store.
-5. DISHA Web: operator console + assistant API surface.
-6. Optional lab plane: isolated VM network for honeypots/sandboxing.
+1. UI and dashboard: `web/app`
+2. API v1: `web/app/api/v1`
+3. Contracts: `web/lib/unified/contracts.ts`
+4. Orchestrator: `web/lib/unified/orchestrator.ts`
+5. Lenses: `web/lib/unified/lenses.ts`
+6. Policy gate: `web/lib/unified/policy-gate.ts`
+7. Evidence ledger: `web/lib/unified/evidence-ledger.ts`
+8. Source registry: `web/lib/unified/source-registry.ts`
+9. Source ingestion: `web/lib/unified/source-ingestion.ts`
+10. Claim provenance: `web/lib/unified/claim-provenance.ts`
+11. Production spine: `web/lib/unified/production-spine.ts`
 
-## Data flows
-
-- Requests enter DISHA Web (auth + RBAC + CSRF + rate limit).
-- Web calls:
-  - Brain for persistence (audit/cache/graph) in OS mode.
-  - OpenAI for model inference when `OPENAI_API_KEY` is configured.
-- Brain persists:
-  - events, telemetry, risk logs
-  - OS-mode web audit/cache/memory-graph (SQLite)
-
-## Mermaid (high-level)
+## Architecture Diagram
 
 ```mermaid
 flowchart LR
-  UI["DISHA Web (Operator Console)"] -->|auth+rbac+csrf| SVC["Server Controllers"]
-  SVC -->|audit/cache/graph| BRAIN["DISHA Brain (SQLite)"]
-  SVC -->|model calls (online)| OPENAI["OpenAI (Responses API)"]
-  BRAIN --> ALERTS["Alerts/WebSocket"]
+  A["Mission / Analyst Request"] --> B["DishaSignal"]
+  B --> C["Lens Selection"]
+  C --> D["Cyber / Geospatial / Governance / Strategy / Yudh / Quantum Lenses"]
+  D --> E["Fusion Result"]
+  E --> F["Policy Gate"]
+  F --> G["Evidence Ledger"]
+  G --> H["Dashboard / API Response / Evidence Export"]
+  I["Source Registry"] --> C
+  I --> J["Source Parser Plans"]
+  J --> K["Claim Provenance"]
+  K --> H
+  L["OpenAI Optional Adapter"] --> E
 ```
 
+## Architecture Rule
+
+No model, parser, legacy module, or dashboard value becomes production unless it passes through:
+
+```text
+contract -> policy -> evidence -> test
+```
+
+## Archive Boundary
+
+Folders such as `legacy/`, `disha/legacy-root-src`, `disha/ai`, and integration archives are not active production runtime. They are promotion candidates only.
