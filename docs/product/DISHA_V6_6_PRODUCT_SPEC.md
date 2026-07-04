@@ -20,6 +20,7 @@ Active runtime path:
 - `web/lib/unified/policy-gate.ts`
 - `web/lib/unified/evidence-ledger.ts`
 - `web/lib/unified/data-integration.ts`
+- `web/lib/unified/architecture-control-plane.ts`
 - `web/app/api/v1/*`
 
 ## Mission Flow
@@ -36,6 +37,16 @@ Active runtime path:
 10. API/dashboard response
 
 No lens executes actions directly. No controlled data query bypasses policy and evidence logging.
+
+## Architecture Control Plane
+
+DISHA exposes the architecture itself as an API-backed product contract:
+
+```text
+GET /api/v1/architecture
+```
+
+The control plane defines the active runtime, archived research zones, governed promotion paths, evidence and policy boundaries, source-truth rule, agentic readiness, premium USP, and production gaps. This is the guardrail that keeps DISHA from becoming a loose mix of dashboard UI, legacy imports, and unverified data claims.
 
 ## Lenses
 
