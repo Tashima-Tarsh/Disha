@@ -13,6 +13,8 @@ The product contract is simple: receive a mission, normalize it into a typed sig
 - `docs/product/DISHA_V6_6_PRODUCT_SPEC.md`: product specification.
 - `docs/architecture/UNIFIED_INTELLIGENCE_OS.md`: architecture.
 - `docs/architecture/PREMIUM_REARCHITECTURE_2026.md`: 2026 premium re-architecture and product control-plane doctrine.
+- `docs/venture/DISHA_SCALE_TRANSFORMATION_AUDIT.md`: DISHA-scale product, enterprise, market, monetization, moat, and execution audit.
+- `docs/book/THE_CONSTITUTIONAL_EVIDENCE_OS.md`: full book structure for the technical, product, enterprise, agentic, and business thesis.
 - `docs/security/POLICY_GATE.md`: policy and safety boundary.
 - `docs/data_governance/OPEN_AND_CONTROLLED_DATA.md`: source and controlled-data rules.
 - `docs/api/API_REFERENCE.md`: API v1 reference.
