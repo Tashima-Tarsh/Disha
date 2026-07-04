@@ -94,6 +94,33 @@ These gaps must not be hidden:
 - dependency and security advisory resolution,
 - deployment health checks for Docker, Vercel, and OS packaging.
 
+## Seven-Part Production Spine
+
+DISHA now treats the next production phase as seven explicit capabilities:
+
+1. Official source parser registry.
+2. Persistent evidence ledger schema.
+3. Claim-level provenance.
+4. Dashboard-safe data feed.
+5. Policy-gated agent runtime.
+6. Security and controlled-data boundaries.
+7. Deployment readiness contract.
+
+These are exposed through:
+
+```text
+GET /api/v1/production/readiness
+```
+
+Open-source operation remains the default. The product can run deterministically without a model provider. OpenAI is optional and governed:
+
+```text
+DISHA_MODEL_PROVIDER=openai
+OPENAI_API_KEY=...
+```
+
+OpenAI may summarize, structure, and advise on mission evidence. It may not invent records, government figures, incident counts, parser output, source rows, or dashboard values.
+
 ## Final Direction
 
 DISHA should feel like a serious public-interest intelligence institution in software form. It should not be sold as magic. It should be trusted because it refuses to fake certainty.
