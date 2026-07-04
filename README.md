@@ -12,6 +12,7 @@ The product contract is simple: receive a mission, normalize it into a typed sig
 - `web/tests/unified-os.test.ts`: product-spine tests.
 - `docs/product/DISHA_V6_6_PRODUCT_SPEC.md`: product specification.
 - `docs/architecture/UNIFIED_INTELLIGENCE_OS.md`: architecture.
+- `docs/architecture/PREMIUM_REARCHITECTURE_2026.md`: 2026 premium re-architecture and product control-plane doctrine.
 - `docs/security/POLICY_GATE.md`: policy and safety boundary.
 - `docs/data_governance/OPEN_AND_CONTROLLED_DATA.md`: source and controlled-data rules.
 - `docs/api/API_REFERENCE.md`: API v1 reference.
@@ -54,6 +55,16 @@ Archived code must be promoted through the v6.6 contracts before it becomes prod
 - governance work through the policy gate,
 - evidence work through the evidence ledger,
 - data work through open or controlled connector contracts.
+
+## Architecture Control Plane
+
+DISHA exposes its product architecture as data:
+
+```text
+GET /api/v1/architecture
+```
+
+This endpoint identifies the active runtime, governed promotion zones, archived code, source-truth boundaries, agentic readiness, premium USP, and remaining production gaps. It is the product map for keeping DISHA one clean system instead of a mixed repository of demos.
 
 ## Accuracy Rule
 
