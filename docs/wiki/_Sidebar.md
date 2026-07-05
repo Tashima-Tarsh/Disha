@@ -1,6 +1,7 @@
 # DISHA Wiki
 
 - [Home](Home)
+- [Public Page and Private Repository Boundary](Public-Page-and-Private-Repository-Boundary)
 - [System Overview](System-Overview)
 - [Architecture](Architecture)
 - [Architecture Control Plane](Architecture-Control-Plane)

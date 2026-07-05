@@ -2,19 +2,21 @@
 
 DISHA is architected as one governed mission pipeline, not a collection of disconnected AI demos.
 
-## Active Runtime Layers
+## Runtime Layers
 
-1. UI and dashboard: `web/app`
-2. API v1: `web/app/api/v1`
-3. Contracts: `web/lib/unified/contracts.ts`
-4. Orchestrator: `web/lib/unified/orchestrator.ts`
-5. Lenses: `web/lib/unified/lenses.ts`
-6. Policy gate: `web/lib/unified/policy-gate.ts`
-7. Evidence ledger: `web/lib/unified/evidence-ledger.ts`
-8. Source registry: `web/lib/unified/source-registry.ts`
-9. Source ingestion: `web/lib/unified/source-ingestion.ts`
-10. Claim provenance: `web/lib/unified/claim-provenance.ts`
-11. Production spine: `web/lib/unified/production-spine.ts`
+| Layer | Path | Responsibility |
+| --- | --- | --- |
+| User surface | `web/app` | UI, app routes, product experience |
+| API v1 | `web/app/api/v1` | Product endpoints and contracts |
+| Contracts | `web/lib/unified/contracts.ts` | Shared typed product language |
+| Orchestrator | `web/lib/unified/orchestrator.ts` | Mission execution path |
+| Lenses | `web/lib/unified/lenses.ts` | Domain-specific analysis |
+| Policy gate | `web/lib/unified/policy-gate.ts` | Safety and action boundary |
+| Evidence ledger | `web/lib/unified/evidence-ledger.ts` | Traceable evidence record |
+| Source registry | `web/lib/unified/source-registry.ts` | Source truth boundary |
+| Source ingestion | `web/lib/unified/source-ingestion.ts` | Controlled data intake |
+| Claim provenance | `web/lib/unified/claim-provenance.ts` | Dashboard-safe proof chain |
+| Production spine | `web/lib/unified/production-spine.ts` | Readiness and product coherence |
 
 ## Architecture Diagram
 
@@ -22,7 +24,7 @@ DISHA is architected as one governed mission pipeline, not a collection of disco
 flowchart LR
   A["Mission / Analyst Request"] --> B["DishaSignal"]
   B --> C["Lens Selection"]
-  C --> D["Cyber / Geospatial / Governance / Strategy / Yudh / Quantum Lenses"]
+  C --> D["Cyber / Geospatial / Governance / Strategy / Yudh / Finance"]
   D --> E["Fusion Result"]
   E --> F["Policy Gate"]
   F --> G["Evidence Ledger"]
@@ -31,10 +33,20 @@ flowchart LR
   I --> J["Source Parser Plans"]
   J --> K["Claim Provenance"]
   K --> H
-  L["OpenAI Optional Adapter"] --> E
+  L["Governed Model Adapter"] --> E
 ```
 
-## Architecture Rule
+## Architectural Rules
+
+| Rule | Meaning |
+| --- | --- |
+| Contract first | Runtime behavior must map to typed DISHA contracts. |
+| Policy before action | Sensitive outputs pass through the policy gate. |
+| Evidence before output | Claims must carry provenance or remain unverified. |
+| Archive is not product | Legacy code is source material until promoted. |
+| Public docs are separate | Public pages must not publish private runtime state. |
+
+## Promotion Gate
 
 No model, parser, legacy module, or dashboard value becomes production unless it passes through:
 
@@ -44,4 +56,4 @@ contract -> policy -> evidence -> test
 
 ## Archive Boundary
 
-Folders such as `legacy/`, `disha/legacy-root-src`, `disha/ai`, and integration archives are not active production runtime. They are promotion candidates only.
+Folders such as `legacy/`, older app folders, and integration archives are promotion candidates only. They are not active production runtime unless explicitly wired into the v6.6 contracts and tests.
