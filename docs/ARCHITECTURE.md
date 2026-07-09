@@ -36,6 +36,18 @@ Every graph result returns version, evidence class, source list, confidence leve
 
 No-First-Use is enforced before recommendation finalization. DISHA may recommend defensive monitoring, containment, evidence preservation, alerting, reporting, and recovery. It may not recommend retaliation, unauthorized access, malware, DDoS, brute forcing, exploitation, or third-party attack.
 
+## Evidence Persistence Boundary
+
+The active TypeScript product spine writes evidence events through `web/lib/unified/evidence-ledger.ts`.
+
+Production mode requires PostgreSQL through `DATABASE_URL`. The database table `evidence_events` stores one ordered hash chain per mission:
+
+```text
+mission_id + chain_index + payload_hash + previous_hash -> event_hash
+```
+
+This makes DISHA restart-safe and gives auditors a deterministic way to detect missing, reordered, or modified events. The memory ledger is retained only for tests and explicit local development.
+
 ## Integration Direction
 
 The graph is currently callable as Python code. The next production step is to expose a narrow FastAPI endpoint that accepts `GraphInput`, authenticates the caller, writes audit records to persistent storage, and returns `DishaGraphResult`.

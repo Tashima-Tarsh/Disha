@@ -1,7 +1,7 @@
 {
   "name": "@tashima-tarsh/disha",
   "version": "6.6.0",
-  "description": "DISHA v6.6 unified evidence-first intelligence product.",
+  "description": "DISHA 6.6 Constitutional Evidence Operating System: evidence-first governance intelligence with policy gates and provenance.",
   "license": "UNLICENSED",
   "private": true,
   "type": "module",
@@ -12,6 +12,10 @@
     "test": "npm --prefix web run test",
     "type-check": "npm --prefix web run type-check",
     "audit": "npm --prefix web audit --audit-level=moderate",
+    "external:sync": "node scripts/sync-external-intelligence.mjs",
+    "external:status": "node scripts/sync-external-intelligence.mjs --status",
+    "external:runtime": "node scripts/external-runtime.mjs --status",
+    "external:up": "node scripts/external-runtime.mjs --up pentagi-ui",
     "verify": "npm --prefix web run type-check && npm --prefix web run test && npm --prefix web run build"
   },
   "engines": {

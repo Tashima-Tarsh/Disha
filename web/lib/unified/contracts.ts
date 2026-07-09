@@ -37,22 +37,22 @@ export const dataSourceRefSchema = z.object({
 });
 
 export const dishaSignalSchema = z.object({
-  id: z.string().min(1),
+  id: z.string().min(1).max(128),
   timestamp: z.string().datetime(),
-  userId: z.string().min(1),
-  deviceId: z.string().optional(),
-  missionId: z.string().optional(),
+  userId: z.string().min(1).max(256),
+  deviceId: z.string().max(256).optional(),
+  missionId: z.string().max(128).optional(),
   input: z.object({
-    rawText: z.string().default(""),
+    rawText: z.string().max(20_000).default(""),
     files: z.array(evidenceFileSchema).default([]),
     locations: z.array(geoPointSchema).default([]),
     indicators: z.array(threatIndicatorSchema).default([]),
-    requestedAction: z.string().optional(),
+    requestedAction: z.string().max(2_000).optional(),
   }),
   context: z.object({
-    intent: z.string().default("analysis"),
+    intent: z.string().max(256).default("analysis"),
     entities: z.array(entitySchema).default([]),
-    memoryRefs: z.array(z.string()).default([]),
+    memoryRefs: z.array(z.string().max(256)).default([]),
     dataSources: z.array(dataSourceRefSchema).default([]),
     sensitivity: sensitivitySchema.default("public"),
   }),
@@ -114,6 +114,8 @@ export const policyDecisionResultSchema = z.object({
 
 export const evidenceEventSchema = z.object({
   eventId: z.string(),
+  missionId: z.string().min(1),
+  chainIndex: z.number().int().nonnegative(),
   timestamp: z.string().datetime(),
   actor: z.string(),
   action: z.string(),
@@ -123,6 +125,9 @@ export const evidenceEventSchema = z.object({
   lensResults: z.array(z.string()).optional(),
   parentEventId: z.string().optional(),
   previousHash: z.string().optional(),
+  payloadHash: z.string(),
+  hashAlgorithm: z.literal("sha256").default("sha256"),
+  ledgerVersion: z.literal(2).default(2),
   eventHash: z.string(),
 });
 

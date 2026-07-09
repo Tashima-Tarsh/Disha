@@ -57,7 +57,6 @@ export function getArchitectureControlPlane(): ArchitectureControlPlane {
     ],
     activeRuntime: {
       entrypoints: [
-        "/dashboard",
         "/api/v1/mission",
         "/api/v1/agentic/mission",
         "/api/v1/lenses/{lens}/analyze",
@@ -67,6 +66,7 @@ export function getArchitectureControlPlane(): ArchitectureControlPlane {
         "/api/v1/policy/evaluate",
         "/api/v1/evidence/export",
         "/api/v1/architecture",
+        "/api/v1/production/readiness",
       ],
       contracts: [
         "DishaSignal",
@@ -95,7 +95,7 @@ export function getArchitectureControlPlane(): ArchitectureControlPlane {
         paths: ["web/app", "web/lib/unified", "web/lib/server", "web/tests"],
         purpose: "Single production runtime for UI, API v1, contracts, policy, evidence, source registry, and mission orchestration.",
         promotionRule: "Changes must pass npm run verify and preserve evidence/policy contracts.",
-        productionRisk: "Next canary dependency and in-memory mission/evidence stores need production hardening.",
+        productionRisk: "In-process mission result cache still needs durable storage; Evidence Ledger v2 is PostgreSQL-backed in production.",
       },
       {
         id: "connectors",
@@ -151,7 +151,7 @@ export function getArchitectureControlPlane(): ArchitectureControlPlane {
       "Promotion Firewall: legacy, OS, cyber, and integration code cannot silently become product code without adapter tests.",
     ],
     productionGaps: [
-      "Persist missions and evidence ledger outside process memory.",
+      "Persist mission result summaries outside process memory.",
       "Add scheduled source monitors and parser jobs for CAG, finance, NCRB, CERT-In, Gazette, LGD, WRIS, and NDMA sources.",
       "Add claim-level provenance tables so dashboard values can link to exact source records.",
       "Add prompt-injection and model-output quarantine tests for provider adapters.",

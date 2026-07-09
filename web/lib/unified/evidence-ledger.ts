@@ -1,9 +1,10 @@
 import crypto from "node:crypto";
-import type { Pool } from "pg";
+import type { Pool, PoolClient } from "pg";
 
 import type { EvidenceEvent, PolicyDecision } from "./contracts";
-import { canonicalJson, hashValue } from "./hash";
+import { hashValue } from "./hash";
 import { getDbPool } from "../server/db";
+import { getEnv, isProduction } from "../server/env";
 
 export type EvidenceAppendInput = {
   missionId: string;
@@ -27,7 +28,7 @@ class MemoryEvidenceLedgerStore implements EvidenceLedgerStore {
 
   async append(input: EvidenceAppendInput): Promise<EvidenceEvent> {
     const chain = this.eventsByMission.get(input.missionId) ?? [];
-    const event = buildEvidenceEvent(input, chain.at(-1)?.eventHash);
+    const event = buildEvidenceEvent(input, chain.length, chain.at(-1)?.eventHash);
     chain.push(event);
     this.eventsByMission.set(input.missionId, chain);
     return event;
@@ -46,37 +47,32 @@ class PostgresEvidenceLedgerStore implements EvidenceLedgerStore {
   constructor(private readonly pool: Pool) {}
 
   async append(input: EvidenceAppendInput): Promise<EvidenceEvent> {
-    const previous = await this.pool.query<{ event_hash: string }>(
-      "select event_hash from evidence_events where mission_id = $1 order by event_timestamp desc, created_at desc limit 1",
-      [input.missionId],
-    );
-    const event = buildEvidenceEvent(input, previous.rows[0]?.event_hash);
-    await this.pool.query(
-      `insert into evidence_events (
-        event_id, mission_id, actor, action, input_hash, output_hash, policy_decision,
-        lens_results, parent_event_id, previous_hash, event_hash, event_timestamp
-      ) values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12)`,
-      [
-        event.eventId,
-        input.missionId,
-        event.actor,
-        event.action,
-        event.inputHash,
-        event.outputHash ?? null,
-        event.policyDecision ? JSON.stringify(event.policyDecision) : null,
-        event.lensResults ?? [],
-        event.parentEventId ?? null,
-        event.previousHash ?? null,
-        event.eventHash,
-        event.timestamp,
-      ],
-    );
-    return event;
+    const client = await this.pool.connect();
+    try {
+      await client.query("begin");
+      await client.query("select pg_advisory_xact_lock(hashtext($1))", [input.missionId]);
+      const previous = await client.query<{ chain_index: number; event_hash: string }>(
+        "select chain_index, event_hash from evidence_events where mission_id = $1 order by chain_index desc limit 1",
+        [input.missionId],
+      );
+      const last = previous.rows[0];
+      const event = buildEvidenceEvent(input, last ? last.chain_index + 1 : 0, last?.event_hash);
+      await insertEvidenceEvent(client, event);
+      await client.query("commit");
+      return event;
+    } catch (error) {
+      await client.query("rollback");
+      throw error;
+    } finally {
+      client.release();
+    }
   }
 
   async list(missionId: string): Promise<EvidenceEvent[]> {
     const result = await this.pool.query<{
       event_id: string;
+      mission_id: string;
+      chain_index: number;
       actor: string;
       action: string;
       input_hash: string;
@@ -85,18 +81,23 @@ class PostgresEvidenceLedgerStore implements EvidenceLedgerStore {
       lens_results: string[] | null;
       parent_event_id: string | null;
       previous_hash: string | null;
+      payload_hash: string | null;
+      hash_algorithm: "sha256" | null;
+      ledger_version: number | null;
       event_hash: string;
       event_timestamp: Date;
     }>(
-      `select event_id, actor, action, input_hash, output_hash, policy_decision, lens_results,
-        parent_event_id, previous_hash, event_hash, event_timestamp
+      `select event_id, mission_id, chain_index, actor, action, input_hash, output_hash, policy_decision, lens_results,
+        parent_event_id, previous_hash, payload_hash, hash_algorithm, ledger_version, event_hash, event_timestamp
        from evidence_events
        where mission_id = $1
-       order by event_timestamp asc, created_at asc`,
+       order by chain_index asc`,
       [missionId],
     );
     return result.rows.map((row) => ({
       eventId: row.event_id,
+      missionId: row.mission_id,
+      chainIndex: row.chain_index,
       timestamp: row.event_timestamp.toISOString(),
       actor: row.actor,
       action: row.action,
@@ -106,6 +107,9 @@ class PostgresEvidenceLedgerStore implements EvidenceLedgerStore {
       lensResults: row.lens_results ?? undefined,
       parentEventId: row.parent_event_id ?? undefined,
       previousHash: row.previous_hash ?? undefined,
+      payloadHash: row.payload_hash ?? "",
+      hashAlgorithm: row.hash_algorithm ?? "sha256",
+      ledgerVersion: row.ledger_version === 2 ? 2 : 2,
       eventHash: row.event_hash,
     }));
   }
@@ -128,11 +132,13 @@ export async function getEvidenceEvents(missionId: string): Promise<EvidenceEven
 
 export async function exportEvidenceReport(missionId: string) {
   const events = await getEvidenceEvents(missionId);
+  const verification = verifyEvidenceChain(events);
   return {
     missionId,
     exportedAt: new Date().toISOString(),
     eventCount: events.length,
-    verified: verifyEvidenceChain(events).ok,
+    verified: verification.ok,
+    verification,
     events,
   };
 }
@@ -142,11 +148,24 @@ export function verifyEvidenceChain(events: EvidenceEvent[]): { ok: boolean; err
   let previousHash: string | undefined;
 
   events.forEach((event, index) => {
+    if (event.chainIndex !== index) {
+      errors.push(`event ${index} chainIndex mismatch`);
+    }
     if (event.previousHash !== previousHash) {
       errors.push(`event ${index} previousHash mismatch`);
     }
-    const { eventHash, ...base } = event;
-    const expected = hashValue(`${canonicalJson(base)}:${previousHash ?? "GENESIS"}`);
+    if (event.hashAlgorithm !== "sha256") {
+      errors.push(`event ${index} hashAlgorithm mismatch`);
+    }
+    if (event.ledgerVersion !== 2) {
+      errors.push(`event ${index} ledgerVersion mismatch`);
+    }
+    const { eventHash, payloadHash, ...payload } = event;
+    const expectedPayloadHash = hashValue(payload);
+    if (payloadHash !== expectedPayloadHash) {
+      errors.push(`event ${index} payloadHash mismatch`);
+    }
+    const expected = hashValue(`${expectedPayloadHash}:${previousHash ?? "GENESIS"}`);
     if (eventHash !== expected) {
       errors.push(`event ${index} eventHash mismatch`);
     }
@@ -167,12 +186,48 @@ export function useEvidenceLedgerStoreForTests(store: EvidenceLedgerStore | null
 function getEvidenceLedgerStore(): EvidenceLedgerStore {
   if (overrideStore) return overrideStore;
   const pool = getDbPool();
-  return pool ? new PostgresEvidenceLedgerStore(pool) : memoryStore;
+  if (pool) return new PostgresEvidenceLedgerStore(pool);
+
+  const env = getEnv();
+  const mode = env.DISHA_EVIDENCE_LEDGER_MODE ?? (isProduction() ? "postgres" : "memory-dev");
+  if (process.env.NODE_ENV === "test" || mode === "memory-dev") return memoryStore;
+
+  throw new Error("Persistent Evidence Ledger requires DATABASE_URL or DISHA_EVIDENCE_LEDGER_MODE=memory-dev outside production");
 }
 
-function buildEvidenceEvent(input: EvidenceAppendInput, previousHash?: string): EvidenceEvent {
-  const base = {
+async function insertEvidenceEvent(client: PoolClient, event: EvidenceEvent): Promise<void> {
+  await client.query(
+    `insert into evidence_events (
+      event_id, mission_id, chain_index, actor, action, input_hash, output_hash, policy_decision,
+      lens_results, parent_event_id, previous_hash, payload_hash, hash_algorithm, ledger_version,
+      event_hash, event_timestamp
+    ) values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16)`,
+    [
+      event.eventId,
+      event.missionId,
+      event.chainIndex,
+      event.actor,
+      event.action,
+      event.inputHash,
+      event.outputHash ?? null,
+      event.policyDecision ? JSON.stringify(event.policyDecision) : null,
+      event.lensResults ?? [],
+      event.parentEventId ?? null,
+      event.previousHash ?? null,
+      event.payloadHash,
+      event.hashAlgorithm,
+      event.ledgerVersion,
+      event.eventHash,
+      event.timestamp,
+    ],
+  );
+}
+
+function buildEvidenceEvent(input: EvidenceAppendInput, chainIndex: number, previousHash?: string): EvidenceEvent {
+  const payload = {
     eventId: crypto.randomUUID(),
+    missionId: input.missionId,
+    chainIndex,
     timestamp: new Date().toISOString(),
     actor: input.actor,
     action: input.action,
@@ -182,7 +237,10 @@ function buildEvidenceEvent(input: EvidenceAppendInput, previousHash?: string): 
     lensResults: input.lensResults,
     parentEventId: input.parentEventId,
     previousHash,
+    hashAlgorithm: "sha256" as const,
+    ledgerVersion: 2 as const,
   };
-  const eventHash = hashValue(`${canonicalJson(base)}:${previousHash ?? "GENESIS"}`);
-  return { ...base, eventHash };
+  const payloadHash = hashValue(payload);
+  const eventHash = hashValue(`${payloadHash}:${previousHash ?? "GENESIS"}`);
+  return { ...payload, payloadHash, eventHash };
 }

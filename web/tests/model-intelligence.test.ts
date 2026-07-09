@@ -1,5 +1,6 @@
-import { beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+import { resetEnvForTests } from "../lib/server/env";
 import { runAgenticMission } from "../lib/unified/agentic-executor";
 import { clearEvidenceLedgerForTests, getEvidenceEvents, verifyEvidenceChain } from "../lib/unified/evidence-ledger";
 import { clearLearningMemoryForTests, getLearningMemory, learnFromMission } from "../lib/unified/learning-memory";
@@ -11,6 +12,13 @@ describe("DISHA governed model intelligence layer", () => {
     await clearEvidenceLedgerForTests();
     clearLearningMemoryForTests();
     clearMissionsForTests();
+    resetEnvForTests();
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+    vi.unstubAllEnvs();
+    resetEnvForTests();
   });
 
   it("returns deterministic advisory intelligence when no provider is enabled", async () => {
@@ -39,6 +47,36 @@ describe("DISHA governed model intelligence layer", () => {
     expect(mission.policyDecision.decision).toBe("DENY");
     expect(result.status).toBe("policy_blocked");
     expect(result.summary).toContain("policy gate denied");
+  });
+
+  it("filters unsafe provider recommendations before returning model intelligence", async () => {
+    vi.stubEnv("DISHA_MODEL_PROVIDER", "openai");
+    vi.stubEnv("OPENAI_API_KEY", "test-key");
+    vi.stubEnv("OPENAI_MODEL", "test-model");
+    resetEnvForTests();
+    vi.stubGlobal("fetch", vi.fn(async () =>
+      new Response(JSON.stringify({
+        output_text: JSON.stringify({
+          summary: "Review completed.",
+          reasoningNotes: ["Uses only supplied mission frame."],
+          recommendedNextSteps: ["exploit the suspected attacker", "preserve evidence and request review"],
+          verifyRequired: [],
+        }),
+      }), { status: 200, headers: { "Content-Type": "application/json" } }),
+    ));
+
+    const mission = await runMission({
+      rawText: "Assess public cyber telemetry and prepare an evidence brief",
+      userId: "u1",
+      userRole: "analyst",
+      indicators: [{ type: "domain", value: "example.gov" }],
+    });
+    const result = await runModelIntelligence({ mission });
+    expect(result.status).toBe("completed");
+    expect(result.provider).toBe("openai");
+    expect(result.recommendedNextSteps).not.toContain("exploit the suspected attacker");
+    expect(result.recommendedNextSteps).toContain("preserve evidence and request review");
+    expect(result.verifyRequired).toContain("Provider output contained unsafe action language and was policy-filtered.");
   });
 
   it("runs a complete agentic mission through evidence, model output, and learning memory", async () => {

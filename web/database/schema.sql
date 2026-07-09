@@ -54,6 +54,7 @@ create table if not exists ai_decisions (
 create table if not exists evidence_events (
   event_id text primary key,
   mission_id text not null,
+  chain_index integer not null,
   actor text not null,
   action text not null,
   input_hash text not null,
@@ -62,12 +63,43 @@ create table if not exists evidence_events (
   lens_results text[] default array[]::text[],
   parent_event_id text,
   previous_hash text,
+  payload_hash text not null,
+  hash_algorithm text not null default 'sha256' check (hash_algorithm = 'sha256'),
+  ledger_version integer not null default 2 check (ledger_version = 2),
   event_hash text not null,
   event_timestamp timestamptz not null,
   created_at timestamptz not null default now()
 );
 
-create index if not exists evidence_events_mission_idx on evidence_events (mission_id, event_timestamp);
+alter table evidence_events add column if not exists chain_index integer;
+alter table evidence_events add column if not exists payload_hash text;
+alter table evidence_events add column if not exists hash_algorithm text not null default 'sha256';
+alter table evidence_events add column if not exists ledger_version integer not null default 2;
+
+with ordered_events as (
+  select event_id, row_number() over (partition by mission_id order by event_timestamp asc, created_at asc) - 1 as computed_chain_index
+  from evidence_events
+)
+update evidence_events
+set chain_index = ordered_events.computed_chain_index
+from ordered_events
+where evidence_events.event_id = ordered_events.event_id
+  and evidence_events.chain_index is null;
+
+update evidence_events
+set payload_hash = event_hash
+where payload_hash is null;
+
+alter table evidence_events alter column chain_index set not null;
+alter table evidence_events alter column payload_hash set not null;
+alter table evidence_events drop constraint if exists evidence_events_hash_algorithm_check;
+alter table evidence_events add constraint evidence_events_hash_algorithm_check check (hash_algorithm = 'sha256');
+alter table evidence_events drop constraint if exists evidence_events_ledger_version_check;
+alter table evidence_events add constraint evidence_events_ledger_version_check check (ledger_version = 2);
+
+create unique index if not exists evidence_events_mission_chain_idx on evidence_events (mission_id, chain_index);
+create unique index if not exists evidence_events_mission_event_hash_idx on evidence_events (mission_id, event_hash);
+create index if not exists evidence_events_mission_idx on evidence_events (mission_id, chain_index);
 
 create table if not exists source_ingestion_runs (
   id bigserial primary key,

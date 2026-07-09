@@ -1,60 +1,65 @@
-# Contributing to DishaOS
+# Contributing to DISHA
 
-First off, thank you for considering contributing to DishaOS. It's people like you that make DishaOS an elite autonomous intelligence framework. 
+DISHA is an evidence-first governance and intelligence project. Contributions should strengthen public-interest accountability, not add spectacle.
 
-### 1. Where do I go from here?
+## Contribution Standard
 
-If you've noticed a bug or have a feature request, make sure to check if there is an [open issue](https://github.com/Tashima-Tarsh/Disha/issues) already. If not, open a new one using our templates!
+Every meaningful change must preserve the product rule:
 
-### 2. Fork & create a branch
-
-If this is something you think you can fix, then [fork DishaOS](https://github.com/Tashima-Tarsh/Disha/fork) and create a branch with a descriptive name.
-
-```bash
-git checkout -b feat/your-feature-name
+```text
+source -> signal -> lens -> policy -> evidence -> reviewable output
 ```
 
-### 3. Implement your fix or feature
+Do not add claims, statistics, legal conclusions, government references, incident names, or data-source assertions unless the repository contains a verifiable source path. If verification is incomplete, mark the claim as `[VERIFY REQUIRED]`.
 
-At this point, you're ready to make your changes. Feel free to ask for help; everyone is a beginner at first.
+## What Belongs
 
-### 4. Code Quality & Standards
+- Stronger contracts for `DishaSignal`, lenses, policy decisions, evidence events, and source records.
+- Tests for policy-gate behavior, evidence-chain integrity, source provenance, and controlled-data boundaries.
+- Public documentation that is precise, restrained, and useful to researchers, journalists, policymakers, and developers.
+- Connectors that register source provenance without copying private, controlled, or unlawful data into the repo.
+- Security hardening, logging, migration tooling, deployment checks, and observability.
 
-DishaOS operates at a top-tier standard. Before you commit, you must ensure your code is linted and tested.
+## What Does Not Belong
 
-**For TypeScript/JavaScript:**
-```bash
-bun run lint
-```
+- Offensive cyber capability.
+- Unverified intelligence claims.
+- Scraped private or controlled records.
+- Model output promoted as fact.
+- Decorative dashboards that do not improve evidence review.
+- Generic AI branding, exaggerated marketing, or unsupported authority claims.
 
-**For Python (AI Platform):**
-```bash
-ruff check disha/ --output-format=github
-ruff format disha/ --check
-```
+## Development Workflow
 
-### 5. Make a Pull Request
-
-At this point, you should switch back to your master branch and make sure it's up to date with DishaOS's master branch:
-
-```bash
-git remote add upstream https://github.com/Tashima-Tarsh/Disha.git
-git checkout main
-git pull upstream main
-```
-
-Then update your feature branch from your local copy of main, and push it!
+Create a focused branch:
 
 ```bash
-git checkout feat/your-feature-name
-git rebase main
-git push --set-upstream origin feat/your-feature-name
+git checkout -b feat/evidence-ledger-migration
 ```
 
-Finally, go to GitHub and [make a Pull Request](https://github.com/Tashima-Tarsh/Disha/compare) :D
+Run the product-spine checks from `web/`:
 
-### 6. Code Review
+```bash
+npm.cmd run type-check:full
+npm.cmd test
+```
 
-Your PR will be reviewed by the core team. We may ask for changes or further testing. Once approved, it will be merged into the `main` branch.
+For repository-wide verification, use the root scripts when available:
 
-Welcome to the inner circle.
+```bash
+npm.cmd run verify
+```
+
+## Pull Request Checklist
+
+- The change is scoped and does not rewrite unrelated legacy surfaces.
+- Public claims are sourced or marked `[VERIFY REQUIRED]`.
+- Any new data source includes license/status, retrieval path, and provenance notes.
+- Any new API route has authentication, rate limiting, validation, and error handling.
+- Any model/agent path remains policy-gated and evidence-logged.
+- Tests cover the new behavior.
+- No secrets, local databases, private evidence, or credentials are committed.
+
+## Review Principle
+
+Review should be strict because DISHA's credibility depends on restraint. A smaller verified feature is better than a larger unverifiable one.

@@ -1,4 +1,4 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="utf-8" />
@@ -8,6 +8,9 @@
       name="description"
       content="DISHA 6.6 is a constitutional evidence operating system for civic, cyber, finance, source, and governance intelligence."
     />
+    <meta property="og:title" content="DISHA 6.6 | Constitutional Evidence OS" />
+    <meta property="og:description" content="Evidence-first governance intelligence with policy gates, provenance, and citizen accountability." />
+    <meta property="og:image" content="./assets/social-preview.svg" />
     <link rel="stylesheet" href="./assets/site.css" />
   </head>
   <body>
@@ -22,7 +25,9 @@
         </a>
         <div class="navlinks">
           <a href="#method">Method</a>
+          <a href="#different">Difference</a>
           <a href="#architecture">Architecture</a>
+          <a href="#demo">Demo</a>
           <a href="#boundary">Boundary</a>
           <a href="#release">Release</a>
         </div>
@@ -34,10 +39,10 @@
         <div class="shell hero-grid">
           <div>
             <p class="eyebrow">Constitutional evidence operating system</p>
-            <h1>DISHA 6.6 turns intelligence work into governed evidence.</h1>
+            <h1>DISHA makes public-interest intelligence answerable to evidence.</h1>
             <p class="dek">
-              DISHA is built for public-interest analysis where every mission must keep source,
-              policy, evidence, and action in one accountable chain.
+              The project is built around one rule: a conclusion is not complete until its
+              source, policy decision, uncertainty, and evidence chain can be inspected.
             </p>
           </div>
           <aside class="hero-card" aria-label="Project facts">
@@ -68,9 +73,9 @@
           <div class="section-head">
             <h2>Method</h2>
             <p>
-              The public method is not a marketing layer. It is the operating discipline behind
-              the private product: source registration, mission framing, policy evaluation,
-              evidence capture, and traceable action.
+              DISHA treats intelligence as a civic responsibility. It begins with a bounded
+              mission, records what evidence was used, applies policy before action, and keeps
+              unresolved claims visible instead of hiding them inside confident prose.
             </p>
           </div>
           <div class="grid-3">
@@ -102,6 +107,37 @@
         </div>
       </section>
 
+      <section id="different" class="band">
+        <div class="shell">
+          <div class="section-head">
+            <h2>Why DISHA is different</h2>
+            <p>
+              DISHA is not positioned as a faster chatbot or a decorative command center. Its
+              claim is narrower and more serious: public-interest reasoning should be auditable,
+              policy-gated, and accountable to the citizen.
+            </p>
+          </div>
+          <div class="grid-4">
+            <article class="panel">
+              <h3>Constitutional lens</h3>
+              <p>Public authority, citizen visibility, and institutional duty are first-class design concerns.</p>
+            </article>
+            <article class="panel">
+              <h3>Deny by default</h3>
+              <p>Controlled data and unsafe actions remain blocked unless a lawful authority path is present.</p>
+            </article>
+            <article class="panel">
+              <h3>Provenance first</h3>
+              <p>Every mission result must show the evidence chain or mark the gap for review.</p>
+            </article>
+            <article class="panel">
+              <h3>Human restraint</h3>
+              <p>Model output is advisory. Policy, evidence, and accountable review remain authoritative.</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
       <section id="architecture" class="band">
         <div class="shell">
           <div class="section-head">
@@ -128,6 +164,49 @@
             <article class="panel">
               <h3>Runtime</h3>
               <p>Runs private product services, dashboards, agent tooling, and source connectors.</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section id="demo" class="band">
+        <div class="shell">
+          <div class="section-head">
+            <h2>Safe read-only demo</h2>
+            <p>
+              The public demo should show capability without exposing private code, credentials,
+              operational data, or unverifiable claims. Its purpose is to demonstrate the method,
+              not to publish intelligence as fact.
+            </p>
+          </div>
+          <div class="ledger">
+            <article class="panel">
+              <h3>Evidence Chain Explorer</h3>
+              <ul class="rule-list">
+                <li>Mission received</li>
+                <li>Signal normalized</li>
+                <li>Lenses selected</li>
+                <li>Policy decision made</li>
+                <li>Report generated with verification status</li>
+              </ul>
+            </article>
+            <article class="panel demo-card" aria-labelledby="demo-title">
+              <div class="demo-head">
+                <div>
+                  <p class="kicker">Interactive sample</p>
+                  <h3 id="demo-title">Mission chain</h3>
+                </div>
+                <span id="demo-status" class="pill ok">Verified</span>
+              </div>
+              <div class="demo-controls" aria-label="Evidence demo controls">
+                <button type="button" data-demo="verified" aria-pressed="true">Verified chain</button>
+                <button type="button" data-demo="verify">Verify required</button>
+                <button type="button" data-demo="broken">Broken chain</button>
+              </div>
+              <ol id="chain-list" class="chain-list"></ol>
+              <p id="demo-note" class="demo-note">
+                This read-only sample demonstrates the product method. It is not a government statistic or operational intelligence.
+              </p>
             </article>
           </div>
         </div>
@@ -170,9 +249,9 @@
           <div class="section-head">
             <h2>Latest public note</h2>
             <p>
-              DISHA 6.6 currently presents as a private constitutional evidence product with a
-              public doctrine page, a local DISHA-branded Pentagi runtime, OpenAI provider
-              configuration, and an external intelligence integration layer.
+              DISHA 6.6 is being hardened around a persistent Evidence Ledger v2, authenticated
+              API boundaries, governed model use, and public documentation that can stand apart
+              from the private runtime.
             </p>
           </div>
           <div class="note">
@@ -201,9 +280,70 @@
 
     <footer class="shell footer">
       <p>
-        DISHA 6.6 public page. Last updated 2026-07-06. No secret keys, private data,
+        DISHA 6.6 public page. Last updated 2026-07-10. No secret keys, private data,
         operational evidence, or source code are published here.
       </p>
     </footer>
+    <script>
+      const states = {
+        verified: {
+          status: "Verified",
+          cls: "pill ok",
+          note: "All sample events are ordered and hash-linked. The UI is demonstrating ledger verification behavior only.",
+          events: [
+            ["01", "user_command_received", "Mission received from authenticated analyst."],
+            ["02", "signal_normalized", "Mission converted into DishaSignal."],
+            ["03", "lens_selected", "Governance and source lenses selected."],
+            ["04", "policy_decision_made", "Policy gate allowed read-only analysis."],
+            ["05", "report_generated", "Report generated with evidence export."],
+          ],
+        },
+        verify: {
+          status: "Verify required",
+          cls: "pill warn",
+          note: "The chain is intact, but one factual claim still needs a named source before publication.",
+          events: [
+            ["01", "user_command_received", "Mission received from authenticated analyst."],
+            ["02", "signal_normalized", "Claim marked [VERIFY REQUIRED]."],
+            ["03", "lens_selected", "Governance and source lenses selected."],
+            ["04", "policy_decision_made", "Policy gate requires source review."],
+            ["05", "report_generated", "Draft report blocks unsupported publication."],
+          ],
+        },
+        broken: {
+          status: "Broken",
+          cls: "pill bad",
+          note: "A missing or reordered event would be shown plainly. DISHA must not hide broken evidence chains.",
+          events: [
+            ["01", "user_command_received", "Mission received from authenticated analyst."],
+            ["02", "signal_normalized", "Mission converted into DishaSignal."],
+            ["--", "missing_event", "Previous hash mismatch detected."],
+            ["04", "policy_decision_made", "Verification failed before publication."],
+          ],
+        },
+      };
+
+      const statusNode = document.getElementById("demo-status");
+      const chainNode = document.getElementById("chain-list");
+      const noteNode = document.getElementById("demo-note");
+      const buttons = Array.from(document.querySelectorAll("[data-demo]"));
+
+      function renderDemo(key) {
+        const state = states[key] || states.verified;
+        statusNode.textContent = state.status;
+        statusNode.className = state.cls;
+        noteNode.textContent = state.note;
+        chainNode.innerHTML = state.events.map(([index, action, text]) => `
+          <li>
+            <span>${index}</span>
+            <div><strong>${action}</strong><p>${text}</p></div>
+          </li>
+        `).join("");
+        buttons.forEach((button) => button.setAttribute("aria-pressed", String(button.dataset.demo === key)));
+      }
+
+      buttons.forEach((button) => button.addEventListener("click", () => renderDemo(button.dataset.demo)));
+      renderDemo("verified");
+    </script>
   </body>
 </html>

@@ -29,6 +29,8 @@ type ProviderPayload = {
   user: string;
 };
 
+const unsafeRecommendationPattern = /hack|exploit|ddos|malware|credential|brute force|bypass authentication|surveillance abuse|targeting/i;
+
 export async function runModelIntelligence(input: ModelIntelligenceRequest): Promise<ModelIntelligenceResult> {
   const env = getEnv();
   const mission = input.mission;
@@ -219,10 +221,34 @@ function coerceProviderResult(
     model: payload.model,
     summary: stringValue(parsed.summary, fallback.summary),
     reasoningNotes: stringArray(parsed.reasoningNotes, fallback.reasoningNotes),
-    recommendedNextSteps: stringArray(parsed.recommendedNextSteps, fallback.recommendedNextSteps),
-    verifyRequired: stringArray(parsed.verifyRequired, fallback.verifyRequired),
+    recommendedNextSteps: governedRecommendations(stringArray(parsed.recommendedNextSteps, fallback.recommendedNextSteps), fallback),
+    verifyRequired: governedVerifyRequired(
+      stringArray(parsed.verifyRequired, fallback.verifyRequired),
+      stringArray(parsed.recommendedNextSteps, fallback.recommendedNextSteps),
+      fallback,
+    ),
     rawProviderText,
   };
+}
+
+function governedRecommendations(recommendations: string[], fallback: ModelIntelligenceResult): string[] {
+  const safe = recommendations.filter((item) => !unsafeRecommendationPattern.test(item));
+  if (safe.length > 0) return safe.slice(0, 12);
+  return fallback.recommendedNextSteps.length
+    ? fallback.recommendedNextSteps
+    : ["Do not execute external action; preserve evidence and request human review."];
+}
+
+function governedVerifyRequired(
+  verifyRequired: string[],
+  recommendations: string[],
+  fallback: ModelIntelligenceResult,
+): string[] {
+  const entries = new Set([...fallback.verifyRequired, ...verifyRequired]);
+  if ([...verifyRequired, ...recommendations].some((item) => unsafeRecommendationPattern.test(item))) {
+    entries.add("Provider output contained unsafe action language and was policy-filtered.");
+  }
+  return Array.from(entries).slice(0, 20);
 }
 
 function parseJsonObject(text: string): Record<string, unknown> | null {

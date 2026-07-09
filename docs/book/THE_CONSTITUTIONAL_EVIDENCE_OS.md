@@ -161,23 +161,23 @@ Evidence required:
 
 ## Part III: The Product
 
-### Chapter 6: The Analyst Workbench
+### Chapter 6: The Evidence Review Workbench
 
 Purpose: Describe the practical user journey.
 
 Key arguments:
 
 - Analysts need to know what can be trusted, what is missing, and what is blocked.
-- The dashboard should show source readiness, parser state, evidence chain, and review status.
+- The product should show source readiness, parser state, evidence chain, and review status.
 
 Diagrams needed:
 
-- Dashboard panels: source registry, parser queue, claim table, evidence export.
+- Evidence review panels: source registry, parser queue, claim table, evidence export.
 
 Technical sections:
 
-- `/dashboard`
-- `/api/dashboard/builder`
+- `/api/v1/mission`
+- `/api/v1/evidence/export`
 - `/api/v1/production/readiness`
 
 Business sections:
@@ -186,8 +186,9 @@ Business sections:
 
 Evidence required:
 
-- `web/app/dashboard`
-- `web/lib/dashboard-builder-feed.ts`
+- `web/lib/unified/orchestrator.ts`
+- `web/lib/unified/evidence-ledger.ts`
+- `docs/product/EVIDENCE_CHAIN_EXPLORER.md`
 
 ### Chapter 7: Review, Approval, And Publication
 

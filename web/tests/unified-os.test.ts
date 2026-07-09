@@ -50,6 +50,8 @@ describe("DISHA v6.6 unified product contracts", () => {
     const second = await appendEvidenceEvent({ missionId: "m1", actor: "policy-gate", action: "policy_decision_made", input: first, output: { ok: true } });
     expect(verifyEvidenceChain([first, second]).ok).toBe(true);
     expect(verifyEvidenceChain([{ ...second, previousHash: "bad" }]).ok).toBe(false);
+    expect(verifyEvidenceChain([{ ...first, chainIndex: 3 }]).errors).toContain("event 0 chainIndex mismatch");
+    expect(verifyEvidenceChain([{ ...first, payloadHash: "bad" }]).errors).toContain("event 0 payloadHash mismatch");
   });
 
   it("returns open-data records with provenance hashes", async () => {

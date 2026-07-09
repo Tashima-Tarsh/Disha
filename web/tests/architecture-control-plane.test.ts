@@ -6,7 +6,7 @@ import { listSourceRegistry } from "../lib/unified/source-registry";
 describe("DISHA architecture control plane", () => {
   it("exposes the active runtime and architecture endpoint", () => {
     const plane = getArchitectureControlPlane();
-    expect(plane.activeRuntime.entrypoints).toEqual(expect.arrayContaining(["/dashboard", "/api/v1/architecture", "/api/v1/mission"]));
+    expect(plane.activeRuntime.entrypoints).toEqual(expect.arrayContaining(["/api/v1/architecture", "/api/v1/mission", "/api/v1/production/readiness"]));
     expect(plane.activeRuntime.contracts).toEqual(expect.arrayContaining(["DishaSignal", "DishaLensResult", "EvidenceEvent"]));
   });
 
@@ -34,7 +34,7 @@ describe("DISHA architecture control plane", () => {
   it("does not claim production completion where gaps remain", () => {
     const plane = getArchitectureControlPlane();
     expect(plane.productionGaps).toEqual(expect.arrayContaining([
-      "Persist missions and evidence ledger outside process memory.",
+      "Persist mission result summaries outside process memory.",
       "Add claim-level provenance tables so dashboard values can link to exact source records.",
     ]));
   });

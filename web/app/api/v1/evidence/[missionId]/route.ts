@@ -8,7 +8,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ miss
     const { missionId } = await params;
     return NextResponse.json({
       missionId,
-      events: getMissionEvidence(missionId),
+      events: await getMissionEvidence(missionId),
     }, { headers: { "X-Request-ID": ctx.requestId } });
   });
 }

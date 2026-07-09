@@ -291,6 +291,114 @@ h2 {
   background: var(--green);
 }
 
+.demo-card {
+  display: grid;
+  gap: 18px;
+}
+
+.demo-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.demo-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.demo-controls button {
+  border: 1px solid var(--line);
+  background: var(--paper);
+  color: var(--ink);
+  padding: 9px 11px;
+  font-family: Arial, sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.demo-controls button[aria-pressed="true"] {
+  border-color: var(--ink);
+  background: var(--ink);
+  color: var(--white);
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  min-height: 30px;
+  padding: 0 10px;
+  border: 1px solid currentColor;
+  font-family: Arial, sans-serif;
+  font-size: 12px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.pill.ok {
+  color: var(--green);
+}
+
+.pill.warn {
+  color: var(--saffron);
+}
+
+.pill.bad {
+  color: var(--red);
+}
+
+.chain-list {
+  display: grid;
+  gap: 10px;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.chain-list li {
+  display: grid;
+  grid-template-columns: 42px 1fr;
+  gap: 12px;
+  align-items: start;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--line);
+}
+
+.chain-list li:last-child {
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+
+.chain-list span {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  border: 1px solid var(--line);
+  background: var(--paper);
+  font-family: Arial, sans-serif;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.chain-list strong {
+  display: block;
+  font-family: Arial, sans-serif;
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.chain-list p,
+.demo-note {
+  margin: 4px 0 0;
+  color: var(--muted);
+  font-size: 15px;
+}
+
 .cta {
   display: grid;
   grid-template-columns: 1fr auto;

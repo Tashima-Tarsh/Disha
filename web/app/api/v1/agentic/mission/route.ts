@@ -5,30 +5,30 @@ import { runAgenticMission } from "@/lib/unified/agentic-executor";
 import { withContext } from "@/lib/unified/api";
 
 const agenticMissionRequestSchema = z.object({
-  rawText: z.string().default(""),
-  requestedAction: z.string().optional(),
-  operatorInstruction: z.string().optional(),
+  rawText: z.string().max(20_000).default(""),
+  requestedAction: z.string().max(2_000).optional(),
+  operatorInstruction: z.string().max(4_000).optional(),
   sensitivity: z.enum(["public", "internal", "controlled", "classified"]).default("public"),
   deviceId: z.string().optional(),
   deviceTrust: z.number().min(0).max(1).optional(),
-  missionId: z.string().optional(),
+  missionId: z.string().max(128).optional(),
   indicators: z.array(z.object({
     type: z.enum(["ip", "domain", "url", "hash", "cve", "email", "other"]),
-    value: z.string(),
-    source: z.string().optional(),
-  })).default([]),
+    value: z.string().max(2_000),
+    source: z.string().max(512).optional(),
+  })).max(100).default([]),
   locations: z.array(z.object({
     latitude: z.number().min(-90).max(90),
     longitude: z.number().min(-180).max(180),
     accuracyM: z.number().nonnegative().optional(),
-    label: z.string().optional(),
-  })).default([]),
+    label: z.string().max(512).optional(),
+  })).max(100).default([]),
   dataSources: z.array(z.object({
     sourceId: z.string().min(1),
     name: z.string().min(1),
     url: z.string().url().optional(),
     sensitivity: z.enum(["public", "internal", "controlled", "classified"]).default("public"),
-  })).default([]),
+  })).max(100).default([]),
 });
 
 export async function POST(req: NextRequest) {

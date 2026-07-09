@@ -1,8 +1,14 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { hashSecret, signJson, verifySecret, verifySignedJson } from "../lib/server/crypto";
+import { getEnv, resetEnvForTests } from "../lib/server/env";
 import { can, assertCan } from "../lib/server/policy";
 import { createShareSchema, fileWriteSchema, loginSchema } from "../lib/server/schemas/api";
 import type { Principal } from "../lib/server/types";
+
+afterEach(() => {
+  vi.unstubAllEnvs();
+  resetEnvForTests();
+});
 
 const analyst: Principal = {
   userId: "analyst@example.com",
@@ -52,5 +58,28 @@ describe("schemas", () => {
         expiry: "1h",
       }),
     ).toThrow();
+  });
+});
+
+describe("production environment hardening", () => {
+  it("does not use dev fallback configuration in production", () => {
+    vi.stubEnv("NODE_ENV", "production");
+    vi.stubEnv("DISHA_AUTH_MODE", "dev-jwt");
+    vi.stubEnv("DISHA_JWT_SECRET", "a".repeat(32));
+    vi.stubEnv("DATABASE_URL", "postgres://user:pass@localhost:5432/disha");
+    resetEnvForTests();
+    expect(() => getEnv()).toThrow("dev-jwt is not allowed");
+  });
+
+  it("requires DATABASE_URL in production", () => {
+    vi.stubEnv("NODE_ENV", "production");
+    vi.stubEnv("DISHA_AUTH_MODE", "oidc");
+    vi.stubEnv("DISHA_JWT_SECRET", "a".repeat(32));
+    vi.stubEnv("DISHA_OIDC_ISSUER", "https://issuer.example");
+    vi.stubEnv("DISHA_OIDC_CLIENT_ID", "client");
+    vi.stubEnv("DISHA_OIDC_CLIENT_SECRET", "secret");
+    vi.stubEnv("DATABASE_URL", "");
+    resetEnvForTests();
+    expect(() => getEnv()).toThrow("DATABASE_URL is required");
   });
 });
