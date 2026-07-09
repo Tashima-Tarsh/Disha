@@ -8,7 +8,7 @@ require (
 	github.com/golang-jwt/jwt/v5 v5.2.2
 	github.com/graphql-go/graphql v0.8.1
 	github.com/graphql-go/handler v0.2.3
-	github.com/jackc/pgx/v5 v5.9.0
+	github.com/jackc/pgx/v5 v5.9.2
 	github.com/joho/godotenv v1.5.1
 	go.uber.org/zap v1.27.0
 	golang.org/x/crypto v0.52.0

@@ -28,6 +28,7 @@ All notable project changes should be recorded here.
 - Removed silent production fallback for weak development environment configuration.
 - Added regression tests for ledger tamper detection, production environment hardening, and model-output filtering.
 - Raised vulnerable integration dependency pins flagged by Dependabot in archived Go/Python integration manifests.
+- Raised remaining Dependabot-flagged archived integration pins for Ollama, OpenTelemetry, pgx, llama-index, pytest, and python-dotenv.
 
 ### Verification
 
