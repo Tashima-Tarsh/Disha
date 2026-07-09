@@ -10,6 +10,7 @@ All notable project changes should be recorded here.
 - PostgreSQL production requirement for durable evidence persistence.
 - Governed model-output filtering for unsafe recommendations.
 - Evidence Chain Explorer product specification.
+- Agentic Workbench route at `/workbench` with mission input, signal normalization, lens routing, policy gate, evidence chain, and export-ready demo flow.
 - Public landing page sections for constitutional accountability, differentiators, and safe read-only demo.
 - Updated API reference, roadmap, contribution guide, and project vision.
 

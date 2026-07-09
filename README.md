@@ -185,6 +185,7 @@ DISHA must not invent facts. Statistics, legal claims, government references, in
 ## Key Documents
 
 - [Why DISHA](docs/product/WHY_DISHA.md)
+- [Agentic Workbench](docs/product/AGENTIC_WORKBENCH.md)
 - [Architecture](docs/ARCHITECTURE.md)
 - [Evidence Model](docs/EVIDENCE_MODEL.md)
 - [Evidence Chain Explorer](docs/product/EVIDENCE_CHAIN_EXPLORER.md)
