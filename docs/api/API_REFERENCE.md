@@ -91,6 +91,14 @@ Lists registered public-source manifests and their usage boundary.
 
 Runs a source registry probe and writes the result to the mission evidence chain.
 
+`GET /api/v1/sources/admit`
+
+Lists operational security sources that are allowed to enter DISHA as public-source references.
+
+`POST /api/v1/sources/admit`
+
+Evaluates whether a source reference can be operated by DISHA. Registered official/public sources are admitted, unregistered sources require manual review, and leak/credential/private-key/exfiltrated material is blocked. If `missionId` is supplied, the decision is written to the evidence ledger.
+
 ## Architecture And Readiness
 
 `GET /api/v1/architecture`

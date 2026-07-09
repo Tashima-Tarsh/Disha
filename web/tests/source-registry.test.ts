@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import { queryOpenData } from "../lib/unified/data-integration";
 import { getConstitutionalCore } from "../lib/unified/constitutional-core";
-import { listSourceRegistry, probeSource } from "../lib/unified/source-registry";
+import { admitSourceForOperation, listOperationalSecuritySources, listSourceRegistry, probeSource } from "../lib/unified/source-registry";
 
 describe("DISHA constitutional evidence source registry", () => {
   it("covers core Indian civic intelligence source domains", () => {
@@ -28,6 +28,11 @@ describe("DISHA constitutional evidence source registry", () => {
       "india-wris",
       "ndma",
       "ncrb",
+      "cert-in-vulnerability-notes",
+      "cisa-kev-catalog",
+      "nvd-vulnerability-database",
+      "github-advisory-database",
+      "cve-org",
       "rbi-dbie",
     ]));
     const domains = new Set(sources.map((source) => source.domain));
@@ -47,6 +52,7 @@ describe("DISHA constitutional evidence source registry", () => {
       "water",
       "disaster",
       "crime",
+      "vulnerability_intelligence",
       "macro_economy",
       "api_directory",
     ]) {
@@ -104,5 +110,27 @@ describe("DISHA constitutional evidence source registry", () => {
     expect(result.status).toBeNull();
     expect(result.error).toContain("network closed");
     expect(result.provenanceHash).toMatch(/^[a-f0-9]{64}$/);
+  });
+
+  it("admits only registered public security sources for operation", () => {
+    const operationalSecuritySources = listOperationalSecuritySources().map((source) => source.sourceId);
+    expect(operationalSecuritySources).toEqual(expect.arrayContaining([
+      "cert-in-vulnerability-notes",
+      "cisa-kev-catalog",
+      "nvd-vulnerability-database",
+      "github-advisory-database",
+      "cve-org",
+    ]));
+
+    const official = admitSourceForOperation("cert-in-vulnerability-notes");
+    expect(official.decision).toBe("ALLOW_PUBLIC_SOURCE");
+    expect(official.evidenceRequired).toContain("retrieval timestamp");
+
+    const leaked = admitSourceForOperation("leaked source code with token dump and private keys");
+    expect(leaked.decision).toBe("BLOCK_UNAUTHORIZED_LEAK");
+    expect(leaked.reasons.join(" ")).toContain("unauthorized private data");
+
+    const unknown = admitSourceForOperation("https://example.com/security-feed");
+    expect(unknown.decision).toBe("REQUIRE_MANUAL_REVIEW");
   });
 });

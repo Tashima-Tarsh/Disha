@@ -18,6 +18,7 @@ export type SourceDomain =
   | "crime"
   | "cybercrime"
   | "cyber_incident"
+  | "vulnerability_intelligence"
   | "consumer_finance_protection"
   | "macro_economy"
   | "api_directory";
@@ -59,6 +60,15 @@ export type SourceProbeResult = {
   etag?: string;
   provenanceHash: string;
   error?: string;
+};
+
+export type SourceAdmissionDecision = {
+  decision: "ALLOW_PUBLIC_SOURCE" | "REQUIRE_MANUAL_REVIEW" | "BLOCK_UNAUTHORIZED_LEAK";
+  sourceId?: string;
+  sourceName?: string;
+  reasons: string[];
+  evidenceRequired: string[];
+  provenanceHash: string;
 };
 
 type FetchLike = (input: string, init?: RequestInit) => Promise<Response>;
@@ -415,6 +425,76 @@ export const sourceRegistry: SourceDefinition[] = [
     verification: { verifiedOn: "2026-07-02", basis: "Official CERT-In annual report index." },
   },
   {
+    sourceId: "cert-in-vulnerability-notes",
+    sourceName: "CERT-In vulnerability notes",
+    owner: "Indian Computer Emergency Response Team",
+    domain: "vulnerability_intelligence",
+    sourceType: "report_index",
+    url: "https://www.cert-in.org.in/s2cMainServlet?pageid=PUBVLNOTES",
+    license: "Official public website terms",
+    geographyLevel: ["union", "national"],
+    updateMode: "download_and_parse",
+    endpoints: [{ url: "https://www.cert-in.org.in/s2cMainServlet?pageid=PUBVLNOTES", method: "GET", purpose: "Official CERT-In vulnerability notes and advisories", requiresAuth: false }],
+    knownLimitations: ["Advisory text can support vulnerability awareness and defensive triage only; exploit instructions must not be generated."],
+    verification: { verifiedOn: "2026-07-10", basis: "Official CERT-In vulnerability notes page responded to live probe." },
+  },
+  {
+    sourceId: "cisa-kev-catalog",
+    sourceName: "CISA Known Exploited Vulnerabilities Catalog",
+    owner: "Cybersecurity and Infrastructure Security Agency",
+    domain: "vulnerability_intelligence",
+    sourceType: "catalog",
+    url: "https://www.cisa.gov/known-exploited-vulnerabilities-catalog",
+    license: "Official public website terms",
+    geographyLevel: ["national"],
+    updateMode: "download_and_parse",
+    endpoints: [{ url: "https://www.cisa.gov/known-exploited-vulnerabilities-catalog", method: "GET", purpose: "Known exploited vulnerability catalog for defensive prioritization", requiresAuth: false }],
+    knownLimitations: ["Use for defensive prioritization only; do not infer compromise or exploitation without local evidence."],
+    verification: { verifiedOn: "2026-07-10", basis: "Official CISA KEV catalog page responded to live probe." },
+  },
+  {
+    sourceId: "nvd-vulnerability-database",
+    sourceName: "National Vulnerability Database",
+    owner: "National Institute of Standards and Technology",
+    domain: "vulnerability_intelligence",
+    sourceType: "catalog",
+    url: "https://nvd.nist.gov/vuln",
+    license: "Official public website terms",
+    geographyLevel: ["national"],
+    updateMode: "download_and_parse",
+    endpoints: [{ url: "https://nvd.nist.gov/vuln", method: "GET", purpose: "CVE and vulnerability metadata discovery", requiresAuth: false }],
+    knownLimitations: ["CVSS and metadata must be versioned; DISHA must not turn vulnerability metadata into exploitation guidance."],
+    verification: { verifiedOn: "2026-07-10", basis: "Official NVD vulnerability page responded to live probe." },
+  },
+  {
+    sourceId: "github-advisory-database",
+    sourceName: "GitHub Advisory Database",
+    owner: "GitHub",
+    domain: "vulnerability_intelligence",
+    sourceType: "catalog",
+    url: "https://github.com/advisories",
+    license: "Public advisory database terms",
+    geographyLevel: ["national"],
+    updateMode: "download_and_parse",
+    endpoints: [{ url: "https://github.com/advisories", method: "GET", purpose: "Open-source package advisory discovery", requiresAuth: false }],
+    knownLimitations: ["Package impact must be matched to the repository dependency graph before claiming exposure."],
+    verification: { verifiedOn: "2026-07-10", basis: "GitHub Advisory Database page responded to live probe." },
+  },
+  {
+    sourceId: "cve-org",
+    sourceName: "CVE Program",
+    owner: "CVE Program",
+    domain: "vulnerability_intelligence",
+    sourceType: "catalog",
+    url: "https://www.cve.org/",
+    license: "Public CVE Program terms",
+    geographyLevel: ["national"],
+    updateMode: "download_and_parse",
+    endpoints: [{ url: "https://www.cve.org/", method: "GET", purpose: "CVE program records, numbering authorities, and vulnerability references", requiresAuth: false }],
+    knownLimitations: ["CVE existence does not prove local exploitability; source-specific parser must preserve CVE id and publication metadata."],
+    verification: { verifiedOn: "2026-07-10", basis: "Official CVE Program site responded to live probe." },
+  },
+  {
     sourceId: "pib-cyber-awareness",
     sourceName: "PIB cyber awareness and MHA cybercrime releases",
     owner: "Press Information Bureau, Government of India",
@@ -458,12 +538,84 @@ export const sourceRegistry: SourceDefinition[] = [
   },
 ];
 
+const unauthorizedLeakPatterns = [
+  /\bleaked?\s+(source|code|database|db|credentials?|passwords?|tokens?|api\s*keys?|private\s*keys?)\b/i,
+  /\bcredential\s*(dump|leak|list)\b/i,
+  /\bpassword\s*(dump|leak|list)\b/i,
+  /\btoken\s*(dump|leak|list)\b/i,
+  /\bprivate\s*key\s*(dump|leak|list)\b/i,
+  /\bexfiltrated\b/i,
+  /\bhacked\s+(database|server|dump|repo|repository)\b/i,
+  /\bdark\s*web\s+dump\b/i,
+];
+
 export function listSourceRegistry(domain?: SourceDomain): SourceDefinition[] {
   return domain ? sourceRegistry.filter((source) => source.domain === domain) : [...sourceRegistry];
 }
 
 export function getSourceDefinition(sourceId: string): SourceDefinition | null {
   return sourceRegistry.find((source) => source.sourceId === sourceId) ?? null;
+}
+
+export function listOperationalSecuritySources(): SourceDefinition[] {
+  return sourceRegistry.filter((source) =>
+    ["cybercrime", "cyber_incident", "vulnerability_intelligence"].includes(source.domain),
+  );
+}
+
+export function admitSourceForOperation(sourceReference: string): SourceAdmissionDecision {
+  const trimmed = sourceReference.trim();
+  const normalized = trimmed.toLowerCase();
+  const matchedSource = sourceRegistry.find((source) =>
+    source.sourceId.toLowerCase() === normalized ||
+    source.url.toLowerCase() === normalized ||
+    source.endpoints.some((endpoint) => endpoint.url.toLowerCase() === normalized),
+  );
+
+  if (matchedSource) {
+    const decision = {
+      decision: "ALLOW_PUBLIC_SOURCE" as const,
+      sourceId: matchedSource.sourceId,
+      sourceName: matchedSource.sourceName,
+      reasons: [
+        "Source is registered in DISHA's public source registry.",
+        "Only metadata, retrieval timestamp, and provenance hash may be stored until a source-specific parser is approved.",
+      ],
+      evidenceRequired: [
+        "source URL",
+        "retrieval timestamp",
+        "content hash or response metadata hash",
+        "license or official-public-source boundary",
+      ],
+    };
+    return { ...decision, provenanceHash: hashValue(decision) };
+  }
+
+  if (unauthorizedLeakPatterns.some((pattern) => pattern.test(trimmed))) {
+    const decision = {
+      decision: "BLOCK_UNAUTHORIZED_LEAK" as const,
+      reasons: [
+        "Source text appears to reference leaked, exfiltrated, credential, token, private-key, or hacked material.",
+        "DISHA does not ingest or operationalize unauthorized private data.",
+      ],
+      evidenceRequired: [
+        "lawful public-source proof",
+        "owner authorization or official publication page",
+        "policy review before any connector is created",
+      ],
+    };
+    return { ...decision, provenanceHash: hashValue(decision) };
+  }
+
+  const decision = {
+    decision: "REQUIRE_MANUAL_REVIEW" as const,
+    reasons: [
+      "Source is not registered in DISHA's public source registry.",
+      "A reviewer must confirm legality, license, sensitivity, and parser boundary before operation.",
+    ],
+    evidenceRequired: ["source owner", "official URL", "license or terms", "data classification", "allowed use case"],
+  };
+  return { ...decision, provenanceHash: hashValue(decision) };
 }
 
 export async function probeSource(sourceId: string, fetcher: FetchLike = fetch): Promise<SourceProbeResult> {
