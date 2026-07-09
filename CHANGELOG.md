@@ -26,6 +26,7 @@ All notable project changes should be recorded here.
 - Fixed `/api/v1/evidence/[missionId]` to await mission evidence events before returning JSON.
 - Removed silent production fallback for weak development environment configuration.
 - Added regression tests for ledger tamper detection, production environment hardening, and model-output filtering.
+- Raised vulnerable integration dependency pins flagged by Dependabot in archived Go/Python integration manifests.
 
 ### Verification
 
