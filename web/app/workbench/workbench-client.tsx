@@ -68,7 +68,21 @@ type LiveAgenticMissionResult = {
     }>;
     skipped: Array<{ extensionId: string; reason: string }>;
     evidenceEventIds: string[];
+    lifecycle: Array<{ extensionId: string; phase: string; evidenceEventId: string }>;
   };
+};
+
+type LiveEvidenceEvent = {
+  eventId: string;
+  missionId: string;
+  chainIndex: number;
+  actor: string;
+  action: string;
+  policyDecision?: { decision?: string; riskScore?: number } | null;
+  lensResults?: string[];
+  previousHash?: string | null;
+  eventHash: string;
+  eventTimestamp: string;
 };
 
 const DEFAULT_MISSION =
@@ -96,6 +110,7 @@ export function DishaWorkbench() {
   const [running, setRunning] = useState(false);
   const [liveMode, setLiveMode] = useState(false);
   const [liveResult, setLiveResult] = useState<LiveAgenticMissionResult | null>(null);
+  const [liveEvidence, setLiveEvidence] = useState<LiveEvidenceEvent[]>([]);
   const [liveError, setLiveError] = useState<string | null>(null);
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
   const [stages, setStages] = useState<FlowStage[]>(createInitialStages());
@@ -132,6 +147,7 @@ export function DishaWorkbench() {
     setExtensions([]);
     setLedger([]);
     setLiveResult(null);
+    setLiveEvidence([]);
     setLiveError(null);
 
     setStage("mission", "complete");
@@ -179,7 +195,12 @@ export function DishaWorkbench() {
     setExtensions(extensionResults);
     if (liveMode) {
       const live = await runLiveMission(mission, normalized.sensitivity);
-      if (live.result) setLiveResult(live.result);
+      if (live.result) {
+        setLiveResult(live.result);
+        const evidence = await fetchLiveEvidence(live.result.mission.missionId);
+        if (evidence.events) setLiveEvidence(evidence.events);
+        if (evidence.error) setLiveError(evidence.error);
+      }
       if (live.error) setLiveError(live.error);
     }
     setStage("extensions", "complete");
@@ -201,7 +222,7 @@ export function DishaWorkbench() {
   }
 
   function downloadJson() {
-    const payload = JSON.stringify({ signal, executions, fusion, policy, extensions, ledger, liveResult, generatedAt: new Date().toISOString() }, null, 2);
+    const payload = JSON.stringify({ signal, executions, fusion, policy, extensions, ledger, liveResult, liveEvidence, generatedAt: new Date().toISOString() }, null, 2);
     const url = URL.createObjectURL(new Blob([payload], { type: "application/json" }));
     const link = document.createElement("a");
     link.href = url;
@@ -420,7 +441,7 @@ export function DishaWorkbench() {
                     </article>
                   ))}
                 </div>
-                <LiveExtensionResult result={liveResult} error={liveError} />
+                <LiveExtensionResult result={liveResult} evidence={liveEvidence} error={liveError} />
               </>
             ) : (
               <EmptyState text="Governed extensions are evaluated after policy." />
@@ -429,7 +450,9 @@ export function DishaWorkbench() {
 
           <section className={styles.panel}>
             <PanelTitle icon={<Database size={18} />} title="8. Evidence Ledger" subtitle="A visible demo hash chain for provenance review." />
-            {ledger.length ? (
+            {liveEvidence.length ? (
+              <LiveEvidenceChain events={liveEvidence} />
+            ) : ledger.length ? (
               <div className={styles.ledger}>
                 {ledger.map((node) => (
                   <div className={styles.ledgerNode} key={node.id}>
@@ -519,7 +542,15 @@ function EmptyState({ text }: { text: string }) {
   return <p className={styles.empty}>{text}</p>;
 }
 
-function LiveExtensionResult({ result, error }: { result: LiveAgenticMissionResult | null; error: string | null }) {
+function LiveExtensionResult({
+  result,
+  evidence,
+  error,
+}: {
+  result: LiveAgenticMissionResult | null;
+  evidence: LiveEvidenceEvent[];
+  error: string | null;
+}) {
   if (error) {
     return (
       <div className={styles.liveResult} data-status="error">
@@ -539,8 +570,16 @@ function LiveExtensionResult({ result, error }: { result: LiveAgenticMissionResu
         <span>Live mission</span>
         <strong>{result.mission.missionId}</strong>
         <small>
-          Policy {result.mission.policyDecision.decision} · Evidence events {result.mission.evidenceEventIds.length}
+          Policy {result.mission.policyDecision.decision} · Evidence events {evidence.length || result.mission.evidenceEventIds.length}
         </small>
+      </div>
+      <div className={styles.lifecycleStrip}>
+        {result.governedExtensions.lifecycle.map((event) => (
+          <span key={`${event.extensionId}-${event.phase}-${event.evidenceEventId}`}>
+            {event.extensionId} / {event.phase}
+          </span>
+        ))}
+        {result.governedExtensions.lifecycle.length === 0 ? <span>No extension lifecycle events recorded.</span> : null}
       </div>
       <div className={styles.liveExtensions}>
         {result.governedExtensions.results.map((extension) => (
@@ -561,6 +600,29 @@ function LiveExtensionResult({ result, error }: { result: LiveAgenticMissionResu
           </article>
         ) : null}
       </div>
+    </div>
+  );
+}
+
+function LiveEvidenceChain({ events }: { events: LiveEvidenceEvent[] }) {
+  return (
+    <div className={styles.liveEvidenceTable}>
+      <div className={styles.liveEvidenceHeader}>
+        <span>#</span>
+        <span>Action</span>
+        <span>Actor</span>
+        <span>Policy</span>
+        <span>Hash</span>
+      </div>
+      {events.map((event) => (
+        <div className={styles.liveEvidenceRow} key={event.eventId}>
+          <span>{event.chainIndex}</span>
+          <strong>{event.action}</strong>
+          <span>{event.actor}</span>
+          <span>{event.policyDecision?.decision ?? "record"}</span>
+          <code title={event.eventHash}>{event.eventHash.slice(0, 16)}</code>
+        </div>
+      ))}
     </div>
   );
 }
@@ -670,5 +732,18 @@ async function runLiveMission(rawText: string, sensitivity: WorkbenchSignal["sen
     return { result: payload as LiveAgenticMissionResult, error: null };
   } catch (error) {
     return { result: null, error: error instanceof Error ? error.message : "Live API request failed." };
+  }
+}
+
+async function fetchLiveEvidence(missionId: string): Promise<{ events: LiveEvidenceEvent[] | null; error: string | null }> {
+  try {
+    const response = await fetch(`/api/v1/evidence/${encodeURIComponent(missionId)}`);
+    const payload = await response.json();
+    if (!response.ok) {
+      return { events: null, error: payload?.error?.message ?? payload?.message ?? `Evidence API failed with ${response.status}` };
+    }
+    return { events: payload.events as LiveEvidenceEvent[], error: null };
+  } catch (error) {
+    return { events: null, error: error instanceof Error ? error.message : "Live evidence request failed." };
   }
 }

@@ -65,6 +65,7 @@ export function getArchitectureControlPlane(): ArchitectureControlPlane {
         "/api/v1/lenses/{lens}/analyze",
         "/api/v1/sources/registry",
         "/api/v1/sources/probe",
+        "/api/v1/sources/ingestion/run",
         "/api/v1/data/open/query",
         "/api/v1/policy/evaluate",
         "/api/v1/evidence/export",
@@ -107,7 +108,7 @@ export function getArchitectureControlPlane(): ArchitectureControlPlane {
         paths: ["web/lib/unified/source-registry.ts", "web/lib/unified/data-integration.ts", "web/lib/*-connector.ts"],
         purpose: "Maintain official/public source manifests and provenance-bearing access paths.",
         promotionRule: "Each connector needs source terms, parser tests, freshness metadata, and claim-level provenance.",
-        productionRisk: "Many sources are manifests today; dataset-specific parsers and scheduled monitors remain incomplete.",
+        productionRisk: "Scheduled source monitors are active for priority public sources; dataset-specific parsers and claim-level provenance remain incomplete.",
       },
       {
         id: "agentic-skills",
@@ -155,7 +156,7 @@ export function getArchitectureControlPlane(): ArchitectureControlPlane {
     ],
     productionGaps: [
       "Add migration smoke tests that prove mission_results and evidence_events are present before deployment.",
-      "Add scheduled source monitors and parser jobs for CAG, finance, NCRB, CERT-In, Gazette, LGD, WRIS, and NDMA sources.",
+      "Promote scheduled source monitors into parser-backed claim provenance for CAG, finance, NCRB, CERT-In, Gazette, LGD, WRIS, and NDMA sources.",
       "Add claim-level provenance tables so dashboard values can link to exact source records.",
       "Add prompt-injection and model-output quarantine tests for provider adapters.",
       "Add deployment health checks for Docker, Vercel, and OS packaging paths.",

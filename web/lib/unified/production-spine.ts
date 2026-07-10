@@ -21,10 +21,10 @@ export function getSevenProductionCapabilities(): ProductionCapability[] {
       id: "source-parsers",
       title: "Official Source Parser Registry",
       status: ingestion.parserRequired > 0 ? "partial" : "working",
-      openSourcePath: "web/lib/unified/source-ingestion.ts",
+      openSourcePath: "web/lib/unified/source-ingestion.ts + web/lib/unified/scheduled-source-ingestion.ts",
       openAiPath: "OpenAI may summarize parser-backed records only after provenance is attached.",
       evidenceRule: "No parsed source record means no dashboard statistic.",
-      nextHardening: ["Add source fixtures.", "Add parser jobs.", "Attach parserKey to every parsed record."],
+      nextHardening: ["Add source fixtures.", "Promote scheduled metadata probes into source-specific claim-provenance parsers.", "Attach parserKey to every parsed record."],
     },
     {
       id: "persistent-evidence",

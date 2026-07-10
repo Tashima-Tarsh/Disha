@@ -12,6 +12,7 @@ describe("DISHA architecture control plane", () => {
       "/api/v1/extensions/runtime/health",
       "/api/v1/mission",
       "/api/v1/production/readiness",
+      "/api/v1/sources/ingestion/run",
     ]));
     expect(plane.activeRuntime.contracts).toEqual(expect.arrayContaining(["DishaSignal", "DishaLensResult", "EvidenceEvent"]));
   });

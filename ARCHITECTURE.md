@@ -78,6 +78,7 @@ Responsibilities:
 - Evidence Ledger v2.
 - Durable mission-result persistence.
 - Source registry and source admission.
+- Scheduled priority public-source ingestion.
 - API routes under `web/app/api/v1/`.
 - The `/workbench` constitutional intelligence flow.
 - Tests proving contract, policy, evidence, and API behavior.
@@ -92,6 +93,7 @@ Key files:
 | `web/lib/unified/evidence-ledger.ts` | Persistent tamper-evident ledger behavior |
 | `web/lib/unified/mission-store.ts` | PostgreSQL-backed mission-result persistence with result hash verification |
 | `web/lib/unified/source-registry.ts` | Public/official source definitions and probes |
+| `web/lib/unified/scheduled-source-ingestion.ts` | Priority public-source scheduled probes and parser-readiness run records |
 | `web/app/api/v1/` | Versioned production API surface |
 | `web/app/workbench/` | Interactive mission workbench |
 | `web/tests/` | Product-spine tests |
@@ -104,6 +106,13 @@ Mission persistence rule:
 - Mission summaries are persisted in `mission_results` after policy evaluation and report generation.
 - Stored mission summaries include the evidence event IDs and a result hash so API retrieval can detect tampering or corruption.
 - Development and tests can use the in-memory mission store only when `DATABASE_URL` is not configured.
+
+Source-ingestion rule:
+
+- Priority public sources are scheduled as source probes first.
+- Scheduled runs persist to `source_ingestion_runs` and emit an evidence event when invoked through `/api/v1/sources/ingestion/run`.
+- A scheduled probe does not make a dashboard claim publishable.
+- CAG, finance, NCRB, CERT-In, Gazette, LGD, WRIS, NDMA, and tax sources require source-specific parsers plus claim-level provenance before figures appear as facts.
 
 ## Governed Extension Layer
 
