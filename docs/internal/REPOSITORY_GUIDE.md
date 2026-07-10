@@ -18,10 +18,10 @@ DISHA is intentionally separated into active product code, public documentation,
 | --- | --- |
 | `README.md` | GitHub front door |
 | `docs/public/` | GitHub Pages public documentation source |
-| `docs/api/API_REFERENCE.md` | API v1 reference |
-| `docs/product/WHY_DISHA.md` | Product vision and constitutional thesis |
-| `docs/product/EVIDENCE_CHAIN_EXPLORER.md` | Signature feature specification |
-| `docs/ROADMAP.md` | Release and product roadmap |
+| `docs/internal/api/API_REFERENCE.md` | API v1 reference |
+| `docs/internal/product/WHY_DISHA.md` | Product vision and constitutional thesis |
+| `docs/internal/product/EVIDENCE_CHAIN_EXPLORER.md` | Signature feature specification |
+| `docs/internal/ROADMAP.md` | Release and product roadmap |
 
 ## Integration And Runtime Helpers
 

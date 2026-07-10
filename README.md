@@ -143,7 +143,7 @@ Important endpoints:
 - `GET /api/v1/architecture`
 - `GET /api/v1/production/readiness`
 
-See [docs/api/API_REFERENCE.md](docs/api/API_REFERENCE.md).
+See [docs/internal/api/API_REFERENCE.md](docs/internal/api/API_REFERENCE.md).
 
 ## Documentation Map
 
@@ -154,9 +154,9 @@ See [docs/api/API_REFERENCE.md](docs/api/API_REFERENCE.md).
 | [docs/public/](docs/public/) | Published public page |
 | [docs/internal/](docs/internal/) | Maintainer notes, release checklists, and baselines |
 | [docs/archive/](docs/archive/) | Historical or outdated material |
-| [docs/api/API_REFERENCE.md](docs/api/API_REFERENCE.md) | API reference |
-| [docs/product/WHY_DISHA.md](docs/product/WHY_DISHA.md) | Product thesis |
-| [docs/security/POLICY_GATE.md](docs/security/POLICY_GATE.md) | Policy gate details |
+| [docs/internal/api/API_REFERENCE.md](docs/internal/api/API_REFERENCE.md) | API reference |
+| [docs/internal/product/WHY_DISHA.md](docs/internal/product/WHY_DISHA.md) | Product thesis |
+| [docs/internal/security/POLICY_GATE.md](docs/internal/security/POLICY_GATE.md) | Policy gate details |
 | [CHANGELOG.md](CHANGELOG.md) | Release history |
 
 ## Contribution Standard

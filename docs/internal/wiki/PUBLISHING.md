@@ -2,7 +2,7 @@
 
 GitHub Wikis are stored in a separate git repository (`<repo>.wiki.git`).
 
-This repo keeps Wiki content under `docs/wiki/` so it can be reviewed via PRs and CI.
+This repo keeps Wiki content under `docs/internal/wiki/` so it can be reviewed via PRs and CI.
 
 To publish:
 
@@ -13,5 +13,5 @@ To publish:
 git clone https://github.com/<owner>/<repo>.wiki.git
 ```
 
-3. Copy contents of `docs/wiki/` into the wiki repo root, then commit/push.
+3. Copy contents of `docs/internal/wiki/` into the wiki repo root, then commit/push.
 

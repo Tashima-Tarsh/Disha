@@ -188,7 +188,7 @@ Evidence required:
 
 - `web/lib/unified/orchestrator.ts`
 - `web/lib/unified/evidence-ledger.ts`
-- `docs/product/EVIDENCE_CHAIN_EXPLORER.md`
+- `docs/internal/product/EVIDENCE_CHAIN_EXPLORER.md`
 
 ### Chapter 7: Review, Approval, And Publication
 
