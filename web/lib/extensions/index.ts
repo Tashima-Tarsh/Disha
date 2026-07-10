@@ -1,6 +1,7 @@
 export * from "./contracts";
 export * from "./architecture";
 export * from "./catalog";
+export * from "./control-plane";
 export * from "./evidence-emitter";
 export * from "./registry";
 export * from "./runner";

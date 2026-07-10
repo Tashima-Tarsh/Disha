@@ -21,8 +21,8 @@ export const dishaBrainExtension: GovernedExtension = {
     defensivePosture: "read_only",
     requiredControls: ["read-only adapter", "node allowlist", "prompt/data minimization", "evidence event mapping"],
     currentLimitations: [
-      "The Python Brain service is not invoked by this adapter.",
-      "Graph node outputs require a stable JSON contract before live execution is enabled.",
+      "The Python Brain service is not invoked by default; optional runtime use remains read-only.",
+      "Graph node outputs require source-hash binding and a stable JSON contract before live execution is enabled.",
     ],
   },
   id: "disha-brain",

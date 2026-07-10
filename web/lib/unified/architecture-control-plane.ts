@@ -59,6 +59,9 @@ export function getArchitectureControlPlane(): ArchitectureControlPlane {
       entrypoints: [
         "/api/v1/mission",
         "/api/v1/agentic/mission",
+        "/api/v1/extensions",
+        "/api/v1/extensions/control-plane",
+        "/api/v1/extensions/runtime/health",
         "/api/v1/lenses/{lens}/analyze",
         "/api/v1/sources/registry",
         "/api/v1/sources/probe",

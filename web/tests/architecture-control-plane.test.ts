@@ -6,7 +6,13 @@ import { listSourceRegistry } from "../lib/unified/source-registry";
 describe("DISHA architecture control plane", () => {
   it("exposes the active runtime and architecture endpoint", () => {
     const plane = getArchitectureControlPlane();
-    expect(plane.activeRuntime.entrypoints).toEqual(expect.arrayContaining(["/api/v1/architecture", "/api/v1/mission", "/api/v1/production/readiness"]));
+    expect(plane.activeRuntime.entrypoints).toEqual(expect.arrayContaining([
+      "/api/v1/architecture",
+      "/api/v1/extensions/control-plane",
+      "/api/v1/extensions/runtime/health",
+      "/api/v1/mission",
+      "/api/v1/production/readiness",
+    ]));
     expect(plane.activeRuntime.contracts).toEqual(expect.arrayContaining(["DishaSignal", "DishaLensResult", "EvidenceEvent"]));
   });
 

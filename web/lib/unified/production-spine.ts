@@ -1,5 +1,6 @@
 import { getAgenticReadinessReport } from "./agentic-readiness";
 import { summarizeIngestionReadiness } from "./source-ingestion";
+import { getGovernedExtensionControlPlane } from "../extensions";
 
 export type ProductionCapability = {
   id: string;
@@ -14,6 +15,7 @@ export type ProductionCapability = {
 export function getSevenProductionCapabilities(): ProductionCapability[] {
   const ingestion = summarizeIngestionReadiness();
   const agentic = getAgenticReadinessReport();
+  const extensions = getGovernedExtensionControlPlane();
   return [
     {
       id: "source-parsers",
@@ -54,11 +56,15 @@ export function getSevenProductionCapabilities(): ProductionCapability[] {
     {
       id: "agent-policy-runtime",
       title: "Policy-Gated Agent Runtime",
-      status: agentic.readiness.partial > 0 ? "partial" : "working",
-      openSourcePath: "web/lib/unified/orchestrator.ts",
+      status: agentic.readiness.partial > 0 || extensions.status !== "pass" ? "partial" : "working",
+      openSourcePath: "web/lib/unified/orchestrator.ts + web/lib/extensions",
       openAiPath: "DISHA_MODEL_PROVIDER=openai uses the governed Responses API adapter.",
-      evidenceRule: "Model output is advisory and never bypasses policy.",
-      nextHardening: ["Add prompt-injection fixtures.", "Add request signing for provider calls."],
+      evidenceRule: "Model and extension output is advisory until policy-gated and ledger-recorded.",
+      nextHardening: [
+        "Add prompt-injection fixtures.",
+        "Add request signing for provider calls.",
+        ...(extensions.status === "pass" ? [] : ["Resolve governed extension quality-gate warnings."]),
+      ],
     },
     {
       id: "security-boundaries",
@@ -83,6 +89,7 @@ export function getSevenProductionCapabilities(): ProductionCapability[] {
 
 export function getProductionSpineReport() {
   const capabilities = getSevenProductionCapabilities();
+  const governedExtensions = getGovernedExtensionControlPlane();
   return {
     product: "DISHA 6.6 production spine",
     generatedAt: new Date().toISOString(),
@@ -92,6 +99,7 @@ export function getProductionSpineReport() {
     noSyntheticDataRule: "OpenAI or any model may not invent records, source rows, government statistics, or dashboard values.",
     capabilityScore: Number((capabilities.filter((item) => item.status === "working").length / capabilities.length).toFixed(2)),
     capabilities,
+    governedExtensions,
     ingestion: summarizeIngestionReadiness(),
   };
 }

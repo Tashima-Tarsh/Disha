@@ -48,7 +48,7 @@ export const honeypotEvidenceExtension: GovernedExtension = {
     ],
     inputContract: "OwnedHoneypotEvent",
     outputContract: "EvidenceAppendInput + GovernedExtensionAnalysis",
-    policyBoundary: "Only owned or explicitly authorized lab telemetry is admitted; third-party targeting is blocked.",
+    policyBoundary: "Policy Gate admits only owned or explicitly authorized lab telemetry; third-party targeting is blocked.",
     evidenceBoundary: "Raw event digest, source sensor, timestamp, ownership proof hash, and chain hash are recorded before analysis.",
     defensivePosture: "evidence_preservation",
     requiredControls: ["owned-environment proof", "sensor identity", "raw event hash", "PII redaction"],

@@ -28,7 +28,7 @@ export const physicsSimulationExtension: GovernedExtension = {
     sourcePaths: ["disha/ai/physics", "disha/ai/models/physics_engine", "disha/ai/models/simulation"],
     inputContract: "MissionResult + BoundedSimulationRequest",
     outputContract: "GovernedExtensionAnalysis",
-    policyBoundary: "Simulation stays advisory and cannot assert factual prediction without calibration evidence.",
+    policyBoundary: "Policy Gate keeps simulation advisory and blocks factual prediction claims without calibration evidence.",
     evidenceBoundary: "Model assumptions, runtime bounds, calibration gaps, and source references are recorded in Evidence Ledger v2.",
     defensivePosture: "bounded_simulation",
     requiredControls: ["assumption capture", "calibration label", "no factual prediction", "resource bounds"],

@@ -22,7 +22,7 @@ export const cognitiveEngineExtension: GovernedExtension = {
     requiredControls: ["phase audit", "decision proposal only", "tool/action deny-by-default", "loop bounds"],
     currentLimitations: [
       "The cognitive loop is not executed by this adapter.",
-      "Tool use remains disabled until a separate governed execution contract exists.",
+      "Read-only runtime observations require source hashes and cannot execute tools until a separate governed execution contract exists.",
     ],
   },
   id: "cognitive-engine",
@@ -91,7 +91,7 @@ export const cognitiveEngineExtension: GovernedExtension = {
       proposedActions: [],
       limitations: [
         "This adapter does not execute agents or tools.",
-        "Action phase remains disabled until governed execution controls are implemented.",
+        "Read-only runtime observations require source hashes; action phase remains disabled until governed execution controls are implemented.",
         ...runtime.limitations,
       ],
     };

@@ -58,4 +58,18 @@ describe("DISHA seven-part production spine", () => {
     expect(report.noSyntheticDataRule).toContain("may not invent records");
     expect(report.openAiMode).toContain("DISHA_MODEL_PROVIDER=openai");
   });
+
+  it("includes governed extension quality in production readiness", () => {
+    const report = getProductionSpineReport();
+    expect(report.governedExtensions.status).toBe("pass");
+    expect(report.governedExtensions.score).toBe(1);
+    expect(report.governedExtensions.gates.map((gate) => gate.id)).toEqual(expect.arrayContaining([
+      "vyuha-defense-engine",
+      "disha-brain",
+      "cognitive-engine",
+      "memory-graph",
+      "honeypot-evidence",
+      "quantum-physics-simulation",
+    ]));
+  });
 });

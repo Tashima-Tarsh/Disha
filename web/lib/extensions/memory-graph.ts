@@ -22,7 +22,7 @@ export const memoryGraphExtension: GovernedExtension = {
     requiredControls: ["retention policy", "redaction", "source-hash binding", "controlled-data block"],
     currentLimitations: [
       "Durable governed memory store is not yet connected to Evidence Ledger v2.",
-      "Graph claims still require claim-level provenance before publication.",
+      "Read-only runtime graph claims still require source-hash binding and claim-level provenance before publication.",
     ],
   },
   id: "memory-graph",

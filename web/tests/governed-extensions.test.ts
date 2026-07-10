@@ -4,6 +4,7 @@ import {
   boundedSimulationRequestSchema,
   buildResearchRuntimeRequest,
   checkGovernedResearchRuntimeHealth,
+  getGovernedExtensionControlPlane,
   getGovernedExtensionArchitecture,
   ingestOwnedHoneypotEvent,
   listGovernedExtensionManifests,
@@ -128,6 +129,19 @@ describe("DISHA governed extension layer", () => {
     expect(architecture.invariant).toContain("Policy Gate");
     expect(architecture.systemDiagram).toContain("flowchart LR");
     expect(architecture.decisionFlowDiagram).toContain("sequenceDiagram");
+  });
+
+  it("passes the governed extension control-plane quality gate", () => {
+    const controlPlane = getGovernedExtensionControlPlane(new Date("2026-07-10T00:00:00.000Z"));
+
+    expect(controlPlane.status).toBe("pass");
+    expect(controlPlane.score).toBe(1);
+    expect(controlPlane.activeExtensions).toBeGreaterThanOrEqual(6);
+    expect(controlPlane.blockers).toHaveLength(0);
+    expect(controlPlane.gates.every((gate) => gate.status === "pass")).toBe(true);
+    expect(controlPlane.gates.find((gate) => gate.id === "vyuha-defense-engine")?.checks.map((check) => check.id)).toEqual(
+      expect.arrayContaining(["policy-boundary", "evidence-boundary", "safe-posture"]),
+    );
   });
 
   it("converts owned honeypot telemetry into EvidenceAppendInput and ledger evidence", async () => {

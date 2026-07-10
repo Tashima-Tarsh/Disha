@@ -156,6 +156,15 @@ Extension validation:
 - Defensive posture must match the manifest.
 - The runner records a lifecycle trace: `request`, `policy_evaluation`, and `result_record`.
 
+Extension quality gate:
+
+- Every registered extension must have a catalog manifest.
+- Manifest and runtime identity must match.
+- Policy and evidence boundaries must be explicit.
+- Source paths and required controls must be declared.
+- Runtime-backed adapters must declare read-only/source-hash limitations.
+- The production readiness report includes `governedExtensions` from the extension control plane.
+
 Optional research runtime:
 
 - Environment: `DISHA_RESEARCH_RUNTIME_URL`.
@@ -170,6 +179,8 @@ The extension catalog is exposed at:
 
 ```text
 GET /api/v1/extensions
+GET /api/v1/extensions/control-plane
+GET /api/v1/extensions/runtime/health
 ```
 
 Extension rule:
