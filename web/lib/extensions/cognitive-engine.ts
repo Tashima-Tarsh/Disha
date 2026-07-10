@@ -1,7 +1,12 @@
 import type { DishaLensResult } from "../unified/contracts";
 import { repoEvidence, severityForRisk } from "../unified/adapters/shared";
 import { hashValue } from "../unified/hash";
-import type { GovernedExtension, GovernedExtensionAnalysis, GovernedExtensionRequest } from "./contracts";
+import type {
+  GovernedExtension,
+  GovernedExtensionAction,
+  GovernedExtensionAnalysis,
+  GovernedExtensionRequest,
+} from "./contracts";
 import { queryGovernedResearchRuntime } from "./research-runtime";
 
 const COGNITIVE_SOURCE_PATH = "disha/ai/core";
@@ -88,7 +93,7 @@ export const cognitiveEngineExtension: GovernedExtension = {
       summary: lensResult.summary,
       defensivePosture: "read_only",
       lensResult,
-      proposedActions: [],
+      proposedActions: cognitivePhaseActions(),
       limitations: [
         "This adapter does not execute agents or tools.",
         "Read-only runtime observations require source hashes; action phase remains disabled until governed execution controls are implemented.",
@@ -97,3 +102,17 @@ export const cognitiveEngineExtension: GovernedExtension = {
     };
   },
 };
+
+function cognitivePhaseActions(): GovernedExtensionAction[] {
+  return [{
+    id: "cognitive-phase-log",
+    label: "Record cognitive phase log",
+    policyActionId: "evidence.phase_log",
+    description: "Record perception, deliberation, decision, and audit phase metadata without executing tools or external actions.",
+    risk: 0.2,
+    requiresApproval: false,
+    scope: "public_analysis",
+    params: { phases: ["perception", "deliberation", "decision", "audit"] },
+    reason: "Reasoning transparency is required before a cognitive output can influence a governed report.",
+  }];
+}

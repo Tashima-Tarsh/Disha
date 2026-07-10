@@ -176,7 +176,7 @@ Extension validation:
 - Extension output must include at least one finding and one evidence item.
 - Proposed actions must be mirrored as `DishaLensResult.recommendedActions`.
 - Defensive posture must match the manifest.
-- The runner records a lifecycle trace: `request`, `policy_evaluation`, and `result_record`.
+- The runner records a lifecycle trace: `request`, `analysis`, `policy_evaluation`, and `result_record`.
 - Failed analysis or validation records `extension_failed`; it never silently disappears and does not erase independent extension results.
 
 Extension quality gate:

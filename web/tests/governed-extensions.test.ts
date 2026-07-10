@@ -72,11 +72,11 @@ describe("DISHA governed extension layer", () => {
       expect.arrayContaining(["evidence.preserve", "traffic.rate_limit", "honeypot.deploy_owned", "alert.emit"]),
     );
     expect(vyuha?.actionPolicyDecisions.every((item) => item.decision.reasons.length > 0)).toBe(true);
-    expect(run.evidenceEventIds).toHaveLength(run.results.length * 3);
+    expect(run.evidenceEventIds).toHaveLength(run.results.length * 4);
 
     const evidence = await getEvidenceEvents(mission.missionId);
     expect(evidence.map((event) => event.action)).toEqual(
-      expect.arrayContaining(["extension_requested", "extension_policy_evaluated", "extension_result_recorded"]),
+      expect.arrayContaining(["extension_requested", "extension_analysis_completed", "extension_policy_evaluated", "extension_result_recorded"]),
     );
     expect(verifyEvidenceChain(evidence).ok).toBe(true);
   });
@@ -140,8 +140,8 @@ describe("DISHA governed extension layer", () => {
       "quantum-physics-simulation",
     ]));
     expect(run.results.every((result) => result.policyDecision.decision !== "DENY")).toBe(true);
-    expect(run.evidenceEventIds.length).toBe(run.results.length * 3);
-    expect(run.lifecycle.map((event) => event.phase)).toEqual(expect.arrayContaining(["request", "policy_evaluation", "result_record"]));
+    expect(run.evidenceEventIds.length).toBe(run.results.length * 4);
+    expect(run.lifecycle.map((event) => event.phase)).toEqual(expect.arrayContaining(["request", "analysis", "policy_evaluation", "result_record"]));
     for (const result of run.results) {
       const lifecycleEvents = run.lifecycle.filter((event) => event.extensionId === result.extensionId);
       expect(lifecycleEvents.map((event) => event.evidenceEventId)).toEqual(result.evidenceEventIds);

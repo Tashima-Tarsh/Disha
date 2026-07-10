@@ -72,6 +72,28 @@ export async function runGovernedExtensions(mission: MissionResult, actor = "gov
       continue;
     }
 
+    const analysisEventId = await emitter.emit({
+      extensionId: extension.id,
+      phase: "analysis",
+      missionId: mission.missionId,
+      actor,
+      action: "extension_analysis_completed",
+      input: {
+        extensionId: extension.id,
+        findingIds: analysis.lensResult.findings.map((finding) => finding.id),
+        evidenceIds: analysis.lensResult.evidence.map((item) => item.id),
+      },
+      output: {
+        summary: analysis.summary,
+        limitations: analysis.limitations,
+        proposedActionIds: analysis.proposedActions.map((action) => action.id),
+      },
+      policyDecision: mission.policyDecision,
+      lensResults: [analysis.lensResult.lens],
+      parentEventId: requestedEventId,
+    });
+    evidenceEventIds.push(analysisEventId);
+
     const policyEvaluation = policyAdapter.evaluate(mission.signal, analysis, mission.lensResults);
     const policyDecision = policyEvaluation.decision;
     const policyEventId = await emitter.emit({
@@ -98,7 +120,7 @@ export async function runGovernedExtensions(mission: MissionResult, actor = "gov
       status: policyDecision.decision === "DENY" ? "policy_blocked" : "completed",
       policyDecision: { ...policyDecision, evidenceEventId: policyEventId },
       actionPolicyDecisions: policyEvaluation.actionDecisions,
-      evidenceEventIds: [requestedEventId, policyEventId],
+      evidenceEventIds: [requestedEventId, analysisEventId, policyEventId],
     };
 
     const recordedEventId = await emitter.emit({

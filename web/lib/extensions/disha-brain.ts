@@ -1,7 +1,12 @@
 import type { DishaLensResult } from "../unified/contracts";
 import { repoEvidence, severityForRisk } from "../unified/adapters/shared";
 import { hashValue } from "../unified/hash";
-import type { GovernedExtension, GovernedExtensionAnalysis, GovernedExtensionRequest } from "./contracts";
+import type {
+  GovernedExtension,
+  GovernedExtensionAction,
+  GovernedExtensionAnalysis,
+  GovernedExtensionRequest,
+} from "./contracts";
 import { queryGovernedResearchRuntime } from "./research-runtime";
 
 const BRAIN_SOURCE_PATH = "disha/brain";
@@ -88,7 +93,7 @@ export const dishaBrainExtension: GovernedExtension = {
       summary: lensResult.summary,
       defensivePosture: "read_only",
       lensResult,
-      proposedActions: [],
+      proposedActions: brainContextActions(),
       limitations: [
         "Read-only adapter only; it does not start the Brain runtime.",
         "All cognitive claims require source-hash binding before external publication.",
@@ -97,3 +102,17 @@ export const dishaBrainExtension: GovernedExtension = {
     };
   },
 };
+
+function brainContextActions(): GovernedExtensionAction[] {
+  return [{
+    id: "brain-source-map",
+    label: "Attach source map before report export",
+    policyActionId: "evidence.source_map",
+    description: "Attach source-bound Brain graph and memory references to the governed report without asserting unsupported facts.",
+    risk: 0.22,
+    requiresApproval: false,
+    scope: "public_analysis",
+    params: { requireSourceHashes: true, readOnly: true },
+    reason: "Brain context must remain traceable to admitted evidence before publication.",
+  }];
+}
