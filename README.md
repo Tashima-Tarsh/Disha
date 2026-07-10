@@ -251,7 +251,7 @@ The repository currently contains a placeholder license file and is detected by 
 - [API Reference](docs/api/API_REFERENCE.md)
 - [Repository Guide](docs/REPOSITORY_GUIDE.md)
 - [Roadmap](docs/ROADMAP.md)
-- [Launch Plan](docs/launch/TRENDING_LAUNCH_PLAN.md)
+- [Public Launch Checklist](docs/release/PUBLIC_LAUNCH_CHECKLIST.md)
 - [Changelog](CHANGELOG.md)
 
 ## Star
