@@ -56,11 +56,16 @@ describe("DISHA database migration contract", () => {
     }
   });
 
-  it("runs migrations against Postgres in GitHub Actions", () => {
+  it("runs migration rehearsal and approved production migration in GitHub Actions", () => {
     const workflow = fs.readFileSync(path.join(repoRoot, ".github/workflows/db-migrations.yml"), "utf8");
 
     expect(workflow).toContain("postgres:16-alpine");
     expect(workflow).toContain("npm run db:migrate");
     expect(workflow).toContain("npm run db:verify-schema");
+    expect(workflow).toContain("npm run db:rollback");
+    expect(workflow).toContain("environment:");
+    expect(workflow).toContain("name: production");
+    expect(workflow).toContain("PRODUCTION_DATABASE_URL");
+    expect(workflow).toContain("RUN_PRODUCTION_MIGRATIONS");
   });
 });

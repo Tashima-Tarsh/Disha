@@ -5,6 +5,13 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
+  workflow_dispatch:
+    inputs:
+      run_production_migration:
+        description: "Run approved production migration after CI rehearsal"
+        required: true
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -14,8 +21,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  postgres-migrations:
-    name: Postgres migration verification
+  migration-rehearsal:
+    name: Postgres migration rehearsal
     runs-on: ubuntu-latest
     services:
       postgres:
@@ -31,6 +38,8 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 10
+          --cpus 1
+          --memory 1g
 
     defaults:
       run:
@@ -55,4 +64,54 @@ jobs:
         run: npm run db:migrate
 
       - name: Verify migrated schema
+        run: npm run db:verify-schema
+
+      - name: Rehearse rollback
+        env:
+          DISHA_CONFIRM_ROLLBACK: I_UNDERSTAND_DATA_LOSS
+        run: npm run db:rollback
+
+      - name: Re-apply migrations after rollback
+        run: npm run db:migrate
+
+      - name: Verify schema after rollback rehearsal
+        run: npm run db:verify-schema
+
+  production-migration:
+    name: Approved production migration
+    needs: migration-rehearsal
+    runs-on: ubuntu-latest
+    if: >-
+      (github.event_name == 'push' && github.ref == 'refs/heads/main' && vars.RUN_PRODUCTION_MIGRATIONS == 'true') ||
+      (github.event_name == 'workflow_dispatch' && inputs.run_production_migration)
+    environment:
+      name: production
+    defaults:
+      run:
+        working-directory: web
+    env:
+      DATABASE_URL: ${{ secrets.PRODUCTION_DATABASE_URL }}
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Require production database secret
+        run: |
+          if [ -z "$DATABASE_URL" ]; then
+            echo "PRODUCTION_DATABASE_URL environment secret is required for production migrations." >&2
+            exit 1
+          fi
+
+      - name: Apply approved production migrations
+        run: npm run db:migrate
+
+      - name: Verify production schema
         run: npm run db:verify-schema

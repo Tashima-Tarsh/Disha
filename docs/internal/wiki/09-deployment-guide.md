@@ -37,7 +37,9 @@ DATABASE_URL=postgresql://disha:postgres@localhost:5432/disha npm --prefix web r
 
 CI validates code quality, module-specific pipelines, security scans, CodeQL analysis, and PostgreSQL migration safety through GitHub Actions.
 
-The database migration workflow starts a disposable Postgres service, runs `npm --prefix web run db:migrate`, then runs `npm --prefix web run db:verify-schema`.
+The database migration workflow starts a disposable Postgres service, runs `db:migrate`, verifies the schema, rehearses `db:rollback`, re-applies migrations, and verifies again.
+
+Production migrations are gated through the GitHub `production` environment. Required reviewers must approve the job before it can access `PRODUCTION_DATABASE_URL`.
 
 ## Rollback
 

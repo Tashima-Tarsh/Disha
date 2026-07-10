@@ -15,14 +15,31 @@ The migration command writes structured JSON logs with `type=db_migration`, stat
 
 ## CI/CD migration check
 
-`.github/workflows/db-migrations.yml` starts a disposable `postgres:16-alpine` service and runs:
+`.github/workflows/db-migrations.yml` starts a disposable `postgres:16-alpine` service and runs a full migration rehearsal:
 
 ```bash
 npm --prefix web run db:migrate
 npm --prefix web run db:verify-schema
+DISHA_CONFIRM_ROLLBACK=I_UNDERSTAND_DATA_LOSS npm --prefix web run db:rollback
+npm --prefix web run db:migrate
+npm --prefix web run db:verify-schema
 ```
 
-The workflow fails if the schema cannot be applied or if required tables/indexes are missing.
+The workflow fails if the schema cannot be applied, rolled back, re-applied, or verified.
+
+## Production approval gate
+
+Production migrations use the GitHub Environment named `production`.
+
+The environment has required reviewers enabled. A production migration job cannot access environment secrets or run migration commands until the deployment is manually approved in GitHub Actions.
+
+Production migration execution is intentionally opt-in:
+
+- On `main`, set repository or environment variable `RUN_PRODUCTION_MIGRATIONS=true` to enable the production migration job.
+- For manual execution, run the `DISHA Database Migrations` workflow with `run_production_migration=true`.
+- Store the target database connection string as the `PRODUCTION_DATABASE_URL` environment secret on the `production` environment.
+
+The production job runs only after the CI rehearsal job passes.
 
 ## Production Compose behavior
 
@@ -65,5 +82,7 @@ npm --prefix web run db:rollback
 ```
 
 5. Verify the database and application release together.
+
+CI rehearses rollback on an empty disposable Postgres database. This proves the rollback script is syntactically valid and can reverse/re-apply the current migration sequence. It does not replace a production backup restore drill.
 
 Future migrations should prefer additive changes and narrow rollback SQL so rollbacks do not require dropping the baseline schema.
