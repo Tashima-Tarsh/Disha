@@ -1,4 +1,5 @@
 import { openDataSources } from "./data-integration";
+import { listGovernedExtensions } from "../extensions";
 import { lensRegistry } from "./lenses";
 import { listSourceRegistry } from "./source-registry";
 import { getConstitutionalCore } from "./constitutional-core";
@@ -62,6 +63,35 @@ const commonEvidenceBoundary = "Every result must include evidence items and mis
 
 export function listAgentSkills(): AgentSkillDefinition[] {
   return [
+    {
+      id: "governed-extension-layer",
+      title: "Governed Extension Layer",
+      purpose: "Make advanced capabilities native to DISHA while forcing policy evaluation and evidence logging before output.",
+      inputContract: "MissionResult",
+      outputContract: "GovernedExtensionRun",
+      allowedData: listGovernedExtensions().map((extension) => extension.id),
+      policyBoundary: "Every extension result is re-evaluated by policy-gate.ts before it is returned.",
+      evidenceBoundary: "Every extension request, policy decision, and result is appended to evidence-ledger.ts.",
+      learningMode: "evidence_memory",
+      status: "ready",
+      readinessScore: 0.82,
+      blockers: [],
+    },
+    {
+      id: "vyuha-defense-engine",
+      title: "Vyuha Defense Engine",
+      purpose: "Produce No-First-Use defensive posture proposals for evidence preservation, containment, alerting, and owned-environment honeypots.",
+      lensBinding: "cyber",
+      inputContract: "MissionResult + DishaSignal.input.indicators",
+      outputContract: "GovernedExtensionResult",
+      allowedData: ["public/internal cyber telemetry", "mission indicators", "owned-environment defensive context"],
+      policyBoundary: "No execution; proposals pass through the policy gate and deny offensive or unauthorized action.",
+      evidenceBoundary: "Vyuha source constraints, policy action ids, proposed actions, and extension result are ledger-recorded.",
+      learningMode: "evidence_memory",
+      status: "ready",
+      readinessScore: 0.8,
+      blockers: [],
+    },
     {
       id: "mission-intake",
       title: "Mission Intake Agent",

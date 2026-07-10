@@ -26,9 +26,11 @@ import {
   executeLens,
   fuseLensResults,
   normalizeMission,
+  previewGovernedExtensions,
   recommendLenses,
   type EvidenceNode,
   type FusionResult,
+  type GovernedExtensionPreview,
   type LensExecution,
   type LensId,
   type LensRecommendation,
@@ -38,7 +40,7 @@ import {
 } from "./demo-engine";
 import styles from "./workbench.module.css";
 
-type FlowStageId = "mission" | "signal" | "routing" | "execution" | "fusion" | "policy" | "ledger" | "report";
+type FlowStageId = "mission" | "signal" | "routing" | "execution" | "fusion" | "policy" | "extensions" | "ledger" | "report";
 
 type FlowStage = {
   id: FlowStageId;
@@ -63,6 +65,7 @@ export function DishaWorkbench() {
   const [executions, setExecutions] = useState<LensExecution[]>([]);
   const [fusion, setFusion] = useState<FusionResult | null>(null);
   const [policy, setPolicy] = useState<PolicyResult | null>(null);
+  const [extensions, setExtensions] = useState<GovernedExtensionPreview[]>([]);
   const [ledger, setLedger] = useState<EvidenceNode[]>([]);
   const [confirmed, setConfirmed] = useState(false);
   const [reportReady, setReportReady] = useState(false);
@@ -75,8 +78,8 @@ export function DishaWorkbench() {
   const activeRecommendations = recommendations.length ? recommendations : recommendLenses(previewSignal);
   const selectedRecommendationObjects = activeRecommendations.filter((item) => selectedLenses.includes(item.id));
   const finalReport = useMemo(
-    () => buildReport(signal, executions, fusion, policy, ledger),
-    [signal, executions, fusion, policy, ledger],
+    () => buildReport(signal, executions, fusion, policy, extensions, ledger),
+    [signal, executions, fusion, policy, extensions, ledger],
   );
 
   function setStage(id: FlowStageId, status: StageStatus) {
@@ -100,6 +103,7 @@ export function DishaWorkbench() {
     setExecutions([]);
     setFusion(null);
     setPolicy(null);
+    setExtensions([]);
     setLedger([]);
 
     setStage("mission", "complete");
@@ -141,9 +145,15 @@ export function DishaWorkbench() {
     setPolicy(policyResult);
     setStage("policy", "complete");
 
+    setStage("extensions", "active");
+    await wait(330);
+    const extensionResults = previewGovernedExtensions(normalized, partial);
+    setExtensions(extensionResults);
+    setStage("extensions", "complete");
+
     setStage("ledger", "active");
     await wait(350);
-    setLedger(buildEvidenceChain(normalized, partial, policyResult));
+    setLedger(buildEvidenceChain(normalized, partial, policyResult, extensionResults));
     setStage("ledger", "complete");
 
     setStage("report", "active");
@@ -158,7 +168,7 @@ export function DishaWorkbench() {
   }
 
   function downloadJson() {
-    const payload = JSON.stringify({ signal, executions, fusion, policy, ledger, generatedAt: new Date().toISOString() }, null, 2);
+    const payload = JSON.stringify({ signal, executions, fusion, policy, extensions, ledger, generatedAt: new Date().toISOString() }, null, 2);
     const url = URL.createObjectURL(new Blob([payload], { type: "application/json" }));
     const link = document.createElement("a");
     link.href = url;
@@ -349,7 +359,33 @@ export function DishaWorkbench() {
           </section>
 
           <section className={styles.panel}>
-            <PanelTitle icon={<Database size={18} />} title="7. Evidence Ledger" subtitle="A visible demo hash chain for provenance review." />
+            <PanelTitle icon={<ShieldCheck size={18} />} title="7. Governed Extensions" subtitle="Advanced capabilities appear only as policy-gated, evidence-recorded proposals." />
+            {extensions.length ? (
+              <div className={styles.extensionGrid}>
+                {extensions.map((extension) => (
+                  <article className={styles.extensionCard} key={extension.id} data-status={extension.status}>
+                    <span>{extension.status === "policy_gated" ? "Policy gated" : "Not applicable"}</span>
+                    <strong>{extension.title}</strong>
+                    <p>{extension.summary}</p>
+                    {extension.proposedActions.length ? (
+                      <ul>
+                        {extension.proposedActions.map((action) => (
+                          <li key={`${action.policyActionId}-${action.label}`}>
+                            {action.label} <code>{action.policyActionId}</code>{action.requiresApproval ? " approval required" : ""}
+                          </li>
+                        ))}
+                      </ul>
+                    ) : null}
+                  </article>
+                ))}
+              </div>
+            ) : (
+              <EmptyState text="Governed extensions are evaluated after policy." />
+            )}
+          </section>
+
+          <section className={styles.panel}>
+            <PanelTitle icon={<Database size={18} />} title="8. Evidence Ledger" subtitle="A visible demo hash chain for provenance review." />
             {ledger.length ? (
               <div className={styles.ledger}>
                 {ledger.map((node) => (
@@ -367,7 +403,7 @@ export function DishaWorkbench() {
           </section>
 
           <section className={styles.panel}>
-            <PanelTitle icon={<FileText size={18} />} title="8. Final Report + Export" subtitle="Readable output with explicit demo/source limits." />
+            <PanelTitle icon={<FileText size={18} />} title="9. Final Report + Export" subtitle="Readable output with explicit demo/source limits." />
             {reportReady ? (
               <>
                 <pre className={styles.report}>{finalReport}</pre>
@@ -448,6 +484,7 @@ function createInitialStages(): FlowStage[] {
     { id: "execution", label: "Lens Execution", status: "waiting" },
     { id: "fusion", label: "Fusion", status: "waiting" },
     { id: "policy", label: "Policy Gate", status: "waiting" },
+    { id: "extensions", label: "Extensions", status: "waiting" },
     { id: "ledger", label: "Evidence Ledger", status: "waiting" },
     { id: "report", label: "Final Report", status: "waiting" },
   ];
@@ -476,6 +513,7 @@ function buildReport(
   executions: LensExecution[],
   fusion: FusionResult | null,
   policy: PolicyResult | null,
+  extensions: GovernedExtensionPreview[],
   ledger: EvidenceNode[],
 ): string {
   if (!signal || !fusion || !policy) return "Report not ready.";
@@ -495,6 +533,10 @@ function buildReport(
     "",
     `Policy Decision: ${policy.decision}`,
     ...policy.reasons.map((reason) => `- ${reason}`),
+    "",
+    "Governed Extensions:",
+    ...extensions.map((extension) => `- ${extension.title}: ${extension.summary}`),
+    ...extensions.flatMap((extension) => extension.proposedActions.map((action) => `  - ${action.label} (${action.policyActionId})`)),
     "",
     "Evidence Chain:",
     ...ledger.map((node) => `- ${node.id} ${node.action} hash=${node.hash} previous=${node.previousHash}`),

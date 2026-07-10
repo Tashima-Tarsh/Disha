@@ -53,6 +53,18 @@ export type PolicyResult = {
   requiredHumanStep: string;
 };
 
+export type GovernedExtensionPreview = {
+  id: string;
+  title: string;
+  status: "not_applicable" | "policy_gated";
+  summary: string;
+  proposedActions: Array<{
+    label: string;
+    policyActionId: string;
+    requiresApproval: boolean;
+  }>;
+};
+
 export type EvidenceNode = {
   id: string;
   label: string;
@@ -275,13 +287,59 @@ export function evaluatePolicy(signal: WorkbenchSignal, results: LensExecution[]
   };
 }
 
-export function buildEvidenceChain(signal: WorkbenchSignal, results: LensExecution[], policy: PolicyResult): EvidenceNode[] {
+export function previewGovernedExtensions(signal: WorkbenchSignal, results: LensExecution[]): GovernedExtensionPreview[] {
+  const text = signal.rawText.toLowerCase();
+  const cyberSelected = results.some((result) => result.id === "cyber");
+
+  if (!cyberSelected && !/vyuha|honeypot|contain|quarantine|telemetry|defen[cs]e/.test(text)) {
+    return [{
+      id: "vyuha-defense-engine",
+      title: "Vyuha Defense Engine",
+      status: "not_applicable",
+      summary: "No defensive extension is needed for this mission scope.",
+      proposedActions: [],
+    }];
+  }
+
+  const proposedActions = [
+    { label: "Preserve incident logs", policyActionId: "evidence.preserve", requiresApproval: false },
+    { label: "Notify approved administrator", policyActionId: "alert.emit", requiresApproval: false },
+  ];
+
+  if (/honeypot|canary|decoy/.test(text)) {
+    proposedActions.push({ label: "Prepare owned honeypot deployment", policyActionId: "honeypot.deploy_owned", requiresApproval: true });
+  }
+  if (/quarantine|malware|ransomware/.test(text)) {
+    proposedActions.push({ label: "Quarantine local suspicious file", policyActionId: "file.quarantine", requiresApproval: true });
+  }
+  if (/contain|isolate|active intrusion/.test(text)) {
+    proposedActions.push({ label: "Prepare local isolation profile", policyActionId: "device.isolate", requiresApproval: true });
+  }
+
+  return [{
+    id: "vyuha-defense-engine",
+    title: "Vyuha Defense Engine",
+    status: "policy_gated",
+    summary: "Defensive proposals are available, but the extension cannot execute them. DISHA policy and evidence gates remain mandatory.",
+    proposedActions,
+  }];
+}
+
+export function buildEvidenceChain(
+  signal: WorkbenchSignal,
+  results: LensExecution[],
+  policy: PolicyResult,
+  extensions: GovernedExtensionPreview[] = [],
+): EvidenceNode[] {
   const actions = [
     ["Mission captured", "Mission Input"],
     ["Signal normalized", "DishaSignal"],
     ["Lenses routed", results.map((result) => result.label).join(", ")],
     ["Lens findings fused", "Fusion Stage"],
     [`Policy gate: ${policy.decision}`, "Policy Gate"],
+    ...(extensions.some((extension) => extension.status === "policy_gated")
+      ? ([["Governed extension evaluated", "Vyuha Defense Engine"]] as const)
+      : []),
     ["Report prepared", "Final Report"],
   ] as const;
 

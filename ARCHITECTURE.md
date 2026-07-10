@@ -6,11 +6,10 @@ This file is the repository's single source of truth for architecture. Older arc
 
 ## Architecture Rule
 
-DISHA has two layers.
+DISHA presents as one system. Internally, it has a governed core and a governed extension layer.
 
 ```text
-Layer 1: Governed Intelligence Core
-Layer 2: Sovereign Cognitive Extensions
+User/API/Workbench -> Governed Intelligence Core -> Governed Extension Layer -> Policy -> Evidence
 ```
 
 Nothing becomes product behavior until it passes:
@@ -19,7 +18,36 @@ Nothing becomes product behavior until it passes:
 contract -> policy -> evidence -> test
 ```
 
-## Layer 1: Governed Intelligence Core
+## Unified Runtime
+
+From the outside, DISHA is a single Constitutional Evidence Operating System. Users submit missions through the Workbench or API and receive one policy-gated, evidence-backed result.
+
+Internally, DISHA keeps a strict boundary:
+
+- Core capabilities live in `web/lib/unified/`.
+- Advanced capabilities enter through `web/lib/extensions/`.
+- Research/source material remains in `disha/` or `skills/` until promoted through an extension adapter.
+
+```mermaid
+flowchart LR
+    A["Workbench / API v1"] --> B["Mission Orchestrator"]
+    B --> C["Core Lenses"]
+    C --> D["Policy Gate"]
+    D --> E["Evidence Ledger v2"]
+    D --> F["Governed Extension Layer"]
+    F --> G["Vyuha Defense Extension"]
+    F --> H["DISHA Brain Adapter (future)"]
+    F --> I["Honeypot Adapter (future)"]
+    G --> D
+    H --> D
+    I --> D
+    G --> E
+    H --> E
+    I --> E
+    E --> J["Unified Report"]
+```
+
+## Governed Intelligence Core
 
 Location:
 
@@ -58,17 +86,50 @@ Key files:
 
 Layer 1 may read from approved external sources and optional services only through typed contracts, policy gates, source provenance, and tests. Model output is advisory; it is not a source of fact.
 
-## Layer 2: Sovereign Cognitive Extensions
+## Governed Extension Layer
+
+Location:
+
+- `web/lib/extensions/`
+
+Status:
+
+- Active bridge for advanced capabilities.
+- Native to the user-facing DISHA experience.
+- Not a bypass around core governance.
+
+Responsibilities:
+
+- Define `GovernedExtension` contracts.
+- Convert advanced capability output into typed proposals and evidence-backed analysis.
+- Re-run Policy Gate evaluation for extension outputs.
+- Append extension request, policy, and result events to Evidence Ledger v2.
+- Return extension results as part of the unified mission response.
+
+Current first-class extension:
+
+| Extension | Source | Status |
+| --- | --- | --- |
+| Vyuha Defense Engine | `skills/vyuha-defense-engine/` | Defensive proposal adapter active in `web/lib/extensions/vyuha-defense.ts` |
+
+Extension rule:
+
+```text
+extension source -> adapter contract -> policy gate -> evidence ledger -> unified mission result
+```
+
+## Sovereign Cognitive Source Material
 
 Location:
 
 - `disha/`
+- `skills/vyuha-defense-engine/`
 
 Status:
 
-- Research and extension layer.
+- Research/source layer.
 - Disabled from the default product path.
-- Enabled only through Docker `--profile full` or explicit maintainer action.
+- Used only through governed adapters or Docker `--profile full` where applicable.
 
 Responsibilities:
 
@@ -78,8 +139,8 @@ Responsibilities:
 
 Boundary rule:
 
-- Layer 2 cannot directly influence user-facing conclusions, policy decisions, or evidence records.
-- A Layer 2 capability can be promoted only by adding a Layer 1 contract, a policy rule, evidence logging, tests, and documentation.
+- Source material cannot directly influence user-facing conclusions, policy decisions, or evidence records.
+- A capability can be promoted only by adding a governed extension adapter, policy evaluation, evidence logging, tests, and documentation.
 
 ## Documentation Layout
 
@@ -138,6 +199,7 @@ Any new capability must answer yes to every item:
 - Is there a Layer 1 contract?
 - Is the policy behavior explicit?
 - Is the evidence trail written and testable?
+- If advanced, does it enter through `web/lib/extensions/`?
 - Are public claims sourced or marked `[VERIFY REQUIRED]`?
 - Are auth, validation, rate limiting, and errors handled?
 - Are tests present in `web/tests/` or an equivalent product-spine test path?

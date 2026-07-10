@@ -1,4 +1,5 @@
 import { appendEvidenceEvent } from "./evidence-ledger";
+import { runGovernedExtensions, type GovernedExtensionRun } from "../extensions";
 import { learnFromMission, type LearningMemoryRecord } from "./learning-memory";
 import { runModelIntelligence, type ModelIntelligenceResult } from "./model-provider";
 import { runMission, type MissionInput, type MissionResult } from "./orchestrator";
@@ -9,6 +10,7 @@ export type AgenticMissionInput = MissionInput & {
 
 export type AgenticMissionResult = {
   mission: MissionResult;
+  governedExtensions: GovernedExtensionRun;
   modelIntelligence: ModelIntelligenceResult;
   learning: LearningMemoryRecord | null;
   evidenceEventIds: string[];
@@ -16,6 +18,9 @@ export type AgenticMissionResult = {
 
 export async function runAgenticMission(input: AgenticMissionInput): Promise<AgenticMissionResult> {
   const mission = await runMission(input);
+  const governedExtensions = await runGovernedExtensions(mission);
+  mission.evidenceEventIds = [...mission.evidenceEventIds, ...governedExtensions.evidenceEventIds];
+
   const modelIntelligence = await runModelIntelligence({ mission, operatorInstruction: input.operatorInstruction });
   const modelEvent = await appendEvidenceEvent({
     missionId: mission.missionId,
@@ -57,6 +62,7 @@ export async function runAgenticMission(input: AgenticMissionInput): Promise<Age
 
   return {
     mission,
+    governedExtensions,
     modelIntelligence: {
       ...modelIntelligence,
       evidenceEventIds: mission.evidenceEventIds,

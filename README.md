@@ -39,14 +39,15 @@ mission -> signal -> lens -> fusion -> policy -> evidence -> report
 
 ## Architecture Boundary
 
-DISHA v6.6 has a strict two-layer architecture.
+DISHA v6.6 presents as one coherent product. Internally, advanced capabilities enter through a Governed Extension Layer so they feel native without bypassing policy or evidence.
 
-| Layer | Path | Status |
+| Zone | Path | Status |
 | --- | --- | --- |
 | Governed Intelligence Core | `web/`, `web/lib/unified/` | Active production spine |
-| Sovereign Cognitive Extensions | `disha/` | Research and extension layer |
+| Governed Extension Layer | `web/lib/extensions/` | Active bridge for advanced capabilities |
+| Sovereign Source Material | `disha/`, `skills/vyuha-defense-engine/` | Research/source material promoted only through governed adapters |
 
-Only Layer 1 is active by default. Layer 2 can be started for research with Docker `--profile full`, but it cannot influence product decisions or evidence unless promoted through Layer 1.
+The first governed extension is Vyuha Defense Engine. It returns defensive proposals only; each proposal is policy-evaluated and evidence-recorded before becoming part of the unified mission result.
 
 Every production change must pass:
 
@@ -76,6 +77,7 @@ Read [ARCHITECTURE.md](ARCHITECTURE.md) before changing core behavior.
 | `web/lib/unified/policy-gate.ts` | Deny, read-only, sandbox, escalation, and approval decisions |
 | `web/lib/unified/evidence-ledger.ts` | Evidence Ledger v2 |
 | `web/lib/unified/source-registry.ts` | Source registry, probes, and source admission |
+| `web/lib/extensions/` | Governed extension contracts and adapters |
 | `web/tests/` | Product-spine regression tests |
 
 ## Run Locally
