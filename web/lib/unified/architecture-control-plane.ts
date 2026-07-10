@@ -98,7 +98,7 @@ export function getArchitectureControlPlane(): ArchitectureControlPlane {
         paths: ["web/app", "web/lib/unified", "web/lib/server", "web/tests"],
         purpose: "Single production runtime for UI, API v1, contracts, policy, evidence, source registry, and mission orchestration.",
         promotionRule: "Changes must pass npm run verify and preserve evidence/policy contracts.",
-        productionRisk: "In-process mission result cache still needs durable storage; Evidence Ledger v2 is PostgreSQL-backed in production.",
+        productionRisk: "Mission results and Evidence Ledger v2 are PostgreSQL-backed in production; deployment smoke tests must prove both tables are migrated before release.",
       },
       {
         id: "connectors",
@@ -154,7 +154,7 @@ export function getArchitectureControlPlane(): ArchitectureControlPlane {
       "Promotion Firewall: legacy, OS, cyber, and integration code cannot silently become product code without adapter tests.",
     ],
     productionGaps: [
-      "Persist mission result summaries outside process memory.",
+      "Add migration smoke tests that prove mission_results and evidence_events are present before deployment.",
       "Add scheduled source monitors and parser jobs for CAG, finance, NCRB, CERT-In, Gazette, LGD, WRIS, and NDMA sources.",
       "Add claim-level provenance tables so dashboard values can link to exact source records.",
       "Add prompt-injection and model-output quarantine tests for provider adapters.",

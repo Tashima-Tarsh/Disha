@@ -10,8 +10,7 @@ import {
 import { appendEvidenceEvent, getEvidenceEvents } from "./evidence-ledger";
 import { evaluatePolicy } from "./policy-gate";
 import { lensRegistry, selectLenses } from "./lenses";
-
-const missions = new Map<string, MissionResult>();
+import { clearMissionStoreForTests, getMissionResult, saveMissionResult } from "./mission-store";
 
 export type MissionInput = {
   rawText: string;
@@ -127,7 +126,7 @@ export async function runMission(input: MissionInput): Promise<MissionResult> {
     policyDecision: responsePolicyDecision,
   })).eventId);
   result.evidenceEventIds = eventIds;
-  missions.set(result.missionId, result);
+  await saveMissionResult(result);
   return result;
 }
 
@@ -135,8 +134,8 @@ export async function analyzeLens(name: LensName, signal: DishaSignal): Promise<
   return lensRegistry[name].analyze(dishaSignalSchema.parse(signal));
 }
 
-export function getMission(missionId: string): MissionResult | null {
-  return missions.get(missionId) ?? null;
+export function getMission(missionId: string): Promise<MissionResult | null> {
+  return getMissionResult(missionId);
 }
 
 export function getMissionEvidence(missionId: string) {
@@ -255,6 +254,6 @@ function executionState(policy: PolicyDecision): MissionResult["safeExecution"] 
   return "denied";
 }
 
-export function clearMissionsForTests(): void {
-  missions.clear();
+export function clearMissionsForTests(): Promise<void> {
+  return clearMissionStoreForTests();
 }

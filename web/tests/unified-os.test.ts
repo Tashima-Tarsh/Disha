@@ -5,12 +5,12 @@ import { dishaSignalSchema, type DishaLensResult } from "../lib/unified/contract
 import { appendEvidenceEvent, clearEvidenceLedgerForTests, getEvidenceEvents, verifyEvidenceChain } from "../lib/unified/evidence-ledger";
 import { lensRegistry } from "../lib/unified/lenses";
 import { evaluatePolicy } from "../lib/unified/policy-gate";
-import { clearMissionsForTests, normalizeMission, runMission } from "../lib/unified/orchestrator";
+import { clearMissionsForTests, getMission, normalizeMission, runMission } from "../lib/unified/orchestrator";
 
 describe("DISHA v6.6 unified product contracts", () => {
   beforeEach(async () => {
     await clearEvidenceLedgerForTests();
-    clearMissionsForTests();
+    await clearMissionsForTests();
   });
 
   it("validates DishaSignal schema", () => {
@@ -159,6 +159,21 @@ describe("DISHA v6.6 unified product contracts", () => {
     expect(result.evidenceEventIds.length).toBeGreaterThanOrEqual(5);
     expect(result.fusedIntelligence.riskDrivers.length).toBeGreaterThanOrEqual(1);
     expect(result.fusedSummary).toContain("Risk drivers:");
+  });
+
+  it("persists governed mission results through the mission store", async () => {
+    const result = await runMission({
+      rawText: "Assess cyber telemetry report with provenance",
+      userId: "u1",
+      userRole: "analyst",
+      indicators: [{ type: "domain", value: "example.gov" }],
+    });
+
+    const stored = await getMission(result.missionId);
+
+    expect(stored?.missionId).toBe(result.missionId);
+    expect(stored?.policyDecision.decision).toBe(result.policyDecision.decision);
+    expect(stored?.evidenceEventIds).toEqual(result.evidenceEventIds);
   });
 
   it("fused result contains missing evidence and verify-required items", async () => {

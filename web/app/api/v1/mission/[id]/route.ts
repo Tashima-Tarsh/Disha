@@ -6,7 +6,7 @@ import { withContext } from "@/lib/unified/api";
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   return withContext(req, "agent:read", async (ctx) => {
     const { id } = await params;
-    const mission = getMission(id);
+    const mission = await getMission(id);
     if (!mission) {
       return NextResponse.json({ error: "Mission not found" }, { status: 404 });
     }

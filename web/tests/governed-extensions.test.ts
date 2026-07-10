@@ -22,7 +22,7 @@ describe("DISHA governed extension layer", () => {
     delete process.env.DISHA_RESEARCH_RUNTIME_TOKEN;
     resetEnvForTests();
     await clearEvidenceLedgerForTests();
-    clearMissionsForTests();
+    await clearMissionsForTests();
   });
 
   afterEach(() => {

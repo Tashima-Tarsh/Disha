@@ -34,6 +34,7 @@ flowchart LR
     B --> C["Core Lenses"]
     C --> D["Policy Gate"]
     D --> E["Evidence Ledger v2"]
+    E --> N["Mission Result Store"]
     D --> F["Governed Extension Layer"]
     F --> G["Vyuha Defense Extension"]
     F --> H["DISHA Brain Adapter"]
@@ -53,7 +54,7 @@ flowchart LR
     K --> E
     L --> E
     M --> E
-    E --> J["Unified Report"]
+    N --> J["Unified Report"]
 ```
 
 ## Governed Intelligence Core
@@ -75,6 +76,7 @@ Responsibilities:
 - Mission orchestration.
 - Deny-by-default policy evaluation.
 - Evidence Ledger v2.
+- Durable mission-result persistence.
 - Source registry and source admission.
 - API routes under `web/app/api/v1/`.
 - The `/workbench` constitutional intelligence flow.
@@ -88,12 +90,20 @@ Key files:
 | `web/lib/unified/orchestrator.ts` | Signal normalization, routing, fusion, and mission orchestration |
 | `web/lib/unified/policy-gate.ts` | Deny-by-default policy decisions |
 | `web/lib/unified/evidence-ledger.ts` | Persistent tamper-evident ledger behavior |
+| `web/lib/unified/mission-store.ts` | PostgreSQL-backed mission-result persistence with result hash verification |
 | `web/lib/unified/source-registry.ts` | Public/official source definitions and probes |
 | `web/app/api/v1/` | Versioned production API surface |
 | `web/app/workbench/` | Interactive mission workbench |
 | `web/tests/` | Product-spine tests |
 
 Layer 1 may read from approved external sources and optional services only through typed contracts, policy gates, source provenance, and tests. Model output is advisory; it is not a source of fact.
+
+Mission persistence rule:
+
+- Evidence events remain the audit source of truth.
+- Mission summaries are persisted in `mission_results` after policy evaluation and report generation.
+- Stored mission summaries include the evidence event IDs and a result hash so API retrieval can detect tampering or corruption.
+- Development and tests can use the in-memory mission store only when `DATABASE_URL` is not configured.
 
 ## Governed Extension Layer
 

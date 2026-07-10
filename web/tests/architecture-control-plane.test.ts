@@ -40,7 +40,7 @@ describe("DISHA architecture control plane", () => {
   it("does not claim production completion where gaps remain", () => {
     const plane = getArchitectureControlPlane();
     expect(plane.productionGaps).toEqual(expect.arrayContaining([
-      "Persist mission result summaries outside process memory.",
+      "Add migration smoke tests that prove mission_results and evidence_events are present before deployment.",
       "Add claim-level provenance tables so dashboard values can link to exact source records.",
     ]));
   });

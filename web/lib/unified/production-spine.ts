@@ -33,7 +33,7 @@ export function getSevenProductionCapabilities(): ProductionCapability[] {
       openSourcePath: "web/database/schema.sql",
       openAiPath: "OpenAI advisory output must reference evidence event ids.",
       evidenceRule: "Evidence events must remain hash-chain verifiable after database persistence.",
-      nextHardening: ["Add migration tests.", "Persist mission results behind a database adapter.", "Add deployment smoke checks for DATABASE_URL."],
+      nextHardening: ["Add migration tests for evidence_events and mission_results.", "Add deployment smoke checks for DATABASE_URL."],
     },
     {
       id: "claim-provenance",
@@ -59,7 +59,7 @@ export function getSevenProductionCapabilities(): ProductionCapability[] {
       status: agentic.readiness.partial > 0 || extensions.status !== "pass" ? "partial" : "working",
       openSourcePath: "web/lib/unified/orchestrator.ts + web/lib/extensions",
       openAiPath: "DISHA_MODEL_PROVIDER=openai uses the governed Responses API adapter.",
-      evidenceRule: "Model and extension output is advisory until policy-gated and ledger-recorded.",
+      evidenceRule: "Model and extension output is advisory until policy-gated, ledger-recorded, and attached to a durable mission result.",
       nextHardening: [
         "Add prompt-injection fixtures.",
         "Add request signing for provider calls.",

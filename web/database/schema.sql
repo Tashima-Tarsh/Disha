@@ -101,6 +101,23 @@ create unique index if not exists evidence_events_mission_chain_idx on evidence_
 create unique index if not exists evidence_events_mission_event_hash_idx on evidence_events (mission_id, event_hash);
 create index if not exists evidence_events_mission_idx on evidence_events (mission_id, chain_index);
 
+create table if not exists mission_results (
+  mission_id text primary key,
+  user_id text not null,
+  policy_decision text not null,
+  safe_execution text not null,
+  risk_score numeric not null,
+  selected_lenses text[] not null default array[]::text[],
+  evidence_event_ids text[] not null default array[]::text[],
+  result jsonb not null,
+  result_hash text not null,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create index if not exists mission_results_user_updated_idx on mission_results (user_id, updated_at desc);
+create index if not exists mission_results_policy_idx on mission_results (policy_decision);
+
 create table if not exists source_ingestion_runs (
   id bigserial primary key,
   source_id text not null,

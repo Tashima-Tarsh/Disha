@@ -11,7 +11,7 @@ describe("DISHA governed model intelligence layer", () => {
   beforeEach(async () => {
     await clearEvidenceLedgerForTests();
     clearLearningMemoryForTests();
-    clearMissionsForTests();
+    await clearMissionsForTests();
     resetEnvForTests();
   });
 
