@@ -8,8 +8,17 @@ export async function runGovernedExtensions(mission: MissionResult, actor = "gov
   const results: GovernedExtensionResult[] = [];
   const evidenceEventIds: string[] = [];
   const skipped: GovernedExtensionRun["skipped"] = [];
+  const extensions = listGovernedExtensions();
 
-  for (const extension of listGovernedExtensions()) {
+  if (mission.policyDecision.decision === "DENY") {
+    return {
+      results,
+      evidenceEventIds,
+      skipped: extensions.map((extension) => ({ extensionId: extension.id, reason: "mission_policy_denied" })),
+    };
+  }
+
+  for (const extension of extensions) {
     if (!extension.shouldRun(mission)) {
       skipped.push({ extensionId: extension.id, reason: "not_applicable" });
       continue;

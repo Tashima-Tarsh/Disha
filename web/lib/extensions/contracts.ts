@@ -37,7 +37,7 @@ export type GovernedExtensionAnalysis = {
   extensionId: string;
   title: string;
   summary: string;
-  defensivePosture: "defensive_only" | "read_only" | "evidence_preservation";
+  defensivePosture: "defensive_only" | "read_only" | "evidence_preservation" | "bounded_simulation";
   lensResult: DishaLensResult;
   proposedActions: GovernedExtensionAction[];
   limitations: string[];

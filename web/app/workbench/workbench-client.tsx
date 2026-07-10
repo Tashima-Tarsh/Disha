@@ -48,6 +48,29 @@ type FlowStage = {
   status: StageStatus;
 };
 
+type LiveAgenticMissionResult = {
+  mission: {
+    missionId: string;
+    policyDecision: { decision: string; riskScore: number; evidenceEventId?: string };
+    selectedLenses: string[];
+    evidenceEventIds: string[];
+  };
+  governedExtensions: {
+    results: Array<{
+      extensionId: string;
+      title: string;
+      summary: string;
+      status: string;
+      defensivePosture: string;
+      policyDecision: { decision: string; riskScore: number; evidenceEventId?: string };
+      evidenceEventIds: string[];
+      proposedActions: Array<{ label: string; policyActionId: string; requiresApproval: boolean }>;
+    }>;
+    skipped: Array<{ extensionId: string; reason: string }>;
+    evidenceEventIds: string[];
+  };
+};
+
 const DEFAULT_MISSION =
   "Assess a public-interest governance concern involving district infrastructure claims, CAG audit references, citizen complaints, and possible cyber-enabled fraud patterns. Produce a read-only evidence plan with policy gates and [VERIFY REQUIRED] markers.";
 
@@ -71,6 +94,9 @@ export function DishaWorkbench() {
   const [reportReady, setReportReady] = useState(false);
   const [saved, setSaved] = useState(false);
   const [running, setRunning] = useState(false);
+  const [liveMode, setLiveMode] = useState(false);
+  const [liveResult, setLiveResult] = useState<LiveAgenticMissionResult | null>(null);
+  const [liveError, setLiveError] = useState<string | null>(null);
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
   const [stages, setStages] = useState<FlowStage[]>(createInitialStages());
 
@@ -78,8 +104,8 @@ export function DishaWorkbench() {
   const activeRecommendations = recommendations.length ? recommendations : recommendLenses(previewSignal);
   const selectedRecommendationObjects = activeRecommendations.filter((item) => selectedLenses.includes(item.id));
   const finalReport = useMemo(
-    () => buildReport(signal, executions, fusion, policy, extensions, ledger),
-    [signal, executions, fusion, policy, extensions, ledger],
+    () => buildReport(signal, executions, fusion, policy, extensions, ledger, liveResult),
+    [signal, executions, fusion, policy, extensions, ledger, liveResult],
   );
 
   function setStage(id: FlowStageId, status: StageStatus) {
@@ -105,6 +131,8 @@ export function DishaWorkbench() {
     setPolicy(null);
     setExtensions([]);
     setLedger([]);
+    setLiveResult(null);
+    setLiveError(null);
 
     setStage("mission", "complete");
     setStage("signal", "active");
@@ -149,6 +177,11 @@ export function DishaWorkbench() {
     await wait(330);
     const extensionResults = previewGovernedExtensions(normalized, partial);
     setExtensions(extensionResults);
+    if (liveMode) {
+      const live = await runLiveMission(mission, normalized.sensitivity);
+      if (live.result) setLiveResult(live.result);
+      if (live.error) setLiveError(live.error);
+    }
     setStage("extensions", "complete");
 
     setStage("ledger", "active");
@@ -168,7 +201,7 @@ export function DishaWorkbench() {
   }
 
   function downloadJson() {
-    const payload = JSON.stringify({ signal, executions, fusion, policy, extensions, ledger, generatedAt: new Date().toISOString() }, null, 2);
+    const payload = JSON.stringify({ signal, executions, fusion, policy, extensions, ledger, liveResult, generatedAt: new Date().toISOString() }, null, 2);
     const url = URL.createObjectURL(new Blob([payload], { type: "application/json" }));
     const link = document.createElement("a");
     link.href = url;
@@ -194,8 +227,8 @@ export function DishaWorkbench() {
         </div>
         <div className={styles.heroPanel} aria-label="Workbench status">
           <span>Mode</span>
-          <strong>Safe read-only demo</strong>
-          <small>No live claim is asserted without source evidence.</small>
+          <strong>{liveMode ? "Live governed API" : "Safe read-only demo"}</strong>
+          <small>{liveMode ? "Runs through /api/v1/agentic/mission with policy and ledger events." : "No live claim is asserted without source evidence."}</small>
         </div>
       </section>
 
@@ -242,6 +275,13 @@ export function DishaWorkbench() {
                 </button>
               ))}
             </div>
+            <label className={styles.modeSwitch}>
+              <input checked={liveMode} onChange={(event) => setLiveMode(event.target.checked)} type="checkbox" />
+              <span>
+                <strong>Use live governed API</strong>
+                <small>Calls the production mission route and renders real extension, policy, and evidence results when backend access is available.</small>
+              </span>
+            </label>
             <button className={styles.primaryButton} disabled={running || mission.trim().length < 20} onClick={runMission} type="button">
               {running ? <Loader2 className={styles.spin} size={17} /> : <Play size={17} />}
               Run DISHA mission
@@ -361,24 +401,27 @@ export function DishaWorkbench() {
           <section className={styles.panel}>
             <PanelTitle icon={<ShieldCheck size={18} />} title="7. Governed Extensions" subtitle="Advanced capabilities appear only as policy-gated, evidence-recorded proposals." />
             {extensions.length ? (
-              <div className={styles.extensionGrid}>
-                {extensions.map((extension) => (
-                  <article className={styles.extensionCard} key={extension.id} data-status={extension.status}>
-                    <span>{extension.status === "policy_gated" ? "Policy gated" : "Not applicable"}</span>
-                    <strong>{extension.title}</strong>
-                    <p>{extension.summary}</p>
-                    {extension.proposedActions.length ? (
-                      <ul>
-                        {extension.proposedActions.map((action) => (
-                          <li key={`${action.policyActionId}-${action.label}`}>
-                            {action.label} <code>{action.policyActionId}</code>{action.requiresApproval ? " approval required" : ""}
-                          </li>
-                        ))}
-                      </ul>
-                    ) : null}
-                  </article>
-                ))}
-              </div>
+              <>
+                <div className={styles.extensionGrid}>
+                  {extensions.map((extension) => (
+                    <article className={styles.extensionCard} key={extension.id} data-status={extension.status}>
+                      <span>{extension.status === "policy_gated" ? "Policy gated" : "Not applicable"}</span>
+                      <strong>{extension.title}</strong>
+                      <p>{extension.summary}</p>
+                      {extension.proposedActions.length ? (
+                        <ul>
+                          {extension.proposedActions.map((action) => (
+                            <li key={`${action.policyActionId}-${action.label}`}>
+                              {action.label} <code>{action.policyActionId}</code>{action.requiresApproval ? " approval required" : ""}
+                            </li>
+                          ))}
+                        </ul>
+                      ) : null}
+                    </article>
+                  ))}
+                </div>
+                <LiveExtensionResult result={liveResult} error={liveError} />
+              </>
             ) : (
               <EmptyState text="Governed extensions are evaluated after policy." />
             )}
@@ -476,6 +519,52 @@ function EmptyState({ text }: { text: string }) {
   return <p className={styles.empty}>{text}</p>;
 }
 
+function LiveExtensionResult({ result, error }: { result: LiveAgenticMissionResult | null; error: string | null }) {
+  if (error) {
+    return (
+      <div className={styles.liveResult} data-status="error">
+        <strong>Live API unavailable</strong>
+        <p>{error}</p>
+      </div>
+    );
+  }
+
+  if (!result) {
+    return <p className={styles.liveHint}>Enable live governed API before running the mission to fetch production extension results.</p>;
+  }
+
+  return (
+    <div className={styles.liveResult} data-status="ok">
+      <div>
+        <span>Live mission</span>
+        <strong>{result.mission.missionId}</strong>
+        <small>
+          Policy {result.mission.policyDecision.decision} · Evidence events {result.mission.evidenceEventIds.length}
+        </small>
+      </div>
+      <div className={styles.liveExtensions}>
+        {result.governedExtensions.results.map((extension) => (
+          <article key={extension.extensionId}>
+            <span>{extension.status}</span>
+            <strong>{extension.title}</strong>
+            <p>{extension.summary}</p>
+            <small>
+              {extension.defensivePosture} · policy {extension.policyDecision.decision} · evidence {extension.evidenceEventIds.length}
+            </small>
+          </article>
+        ))}
+        {result.governedExtensions.results.length === 0 ? (
+          <article>
+            <span>No active extension</span>
+            <strong>Skipped by contract</strong>
+            <p>{result.governedExtensions.skipped.map((item) => `${item.extensionId}: ${item.reason}`).join("; ")}</p>
+          </article>
+        ) : null}
+      </div>
+    </div>
+  );
+}
+
 function createInitialStages(): FlowStage[] {
   return [
     { id: "mission", label: "Mission Input", status: "active" },
@@ -515,10 +604,11 @@ function buildReport(
   policy: PolicyResult | null,
   extensions: GovernedExtensionPreview[],
   ledger: EvidenceNode[],
+  liveResult: LiveAgenticMissionResult | null,
 ): string {
   if (!signal || !fusion || !policy) return "Report not ready.";
   return [
-    "DISHA 6.6 Mission Report (Demo Mode)",
+    `DISHA 6.6 Mission Report (${liveResult ? "Live Governed API + Demo View" : "Demo Mode"})`,
     `Mission: ${signal.missionId}`,
     `Intent: ${signal.intent}`,
     `Sensitivity: ${signal.sensitivity} (${Math.round(signal.sensitivityScore * 100)}%)`,
@@ -537,6 +627,18 @@ function buildReport(
     "Governed Extensions:",
     ...extensions.map((extension) => `- ${extension.title}: ${extension.summary}`),
     ...extensions.flatMap((extension) => extension.proposedActions.map((action) => `  - ${action.label} (${action.policyActionId})`)),
+    ...(liveResult
+      ? [
+          "",
+          "Live API Result:",
+          `- Mission: ${liveResult.mission.missionId}`,
+          `- Policy: ${liveResult.mission.policyDecision.decision}`,
+          `- Evidence events: ${liveResult.mission.evidenceEventIds.length}`,
+          ...liveResult.governedExtensions.results.map(
+            (extension) => `- ${extension.title}: ${extension.status}, policy=${extension.policyDecision.decision}, evidence=${extension.evidenceEventIds.length}`,
+          ),
+        ]
+      : []),
     "",
     "Evidence Chain:",
     ...ledger.map((node) => `- ${node.id} ${node.action} hash=${node.hash} previous=${node.previousHash}`),
@@ -547,4 +649,26 @@ function buildReport(
 
 function wait(ms: number) {
   return new Promise((resolve) => window.setTimeout(resolve, ms));
+}
+
+async function runLiveMission(rawText: string, sensitivity: WorkbenchSignal["sensitivity"]): Promise<{ result: LiveAgenticMissionResult | null; error: string | null }> {
+  try {
+    const response = await fetch("/api/v1/agentic/mission", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        rawText,
+        sensitivity,
+        requestedAction: "read-only governed workbench analysis",
+        operatorInstruction: "Return a governed extension result for the Workbench. Do not execute actions.",
+      }),
+    });
+    const payload = await response.json();
+    if (!response.ok) {
+      return { result: null, error: payload?.error?.message ?? payload?.message ?? `Live API failed with ${response.status}` };
+    }
+    return { result: payload as LiveAgenticMissionResult, error: null };
+  } catch (error) {
+    return { result: null, error: error instanceof Error ? error.message : "Live API request failed." };
+  }
 }
