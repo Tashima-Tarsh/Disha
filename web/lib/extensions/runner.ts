@@ -1,6 +1,8 @@
 import type { MissionResult } from "../unified/orchestrator";
 import type { GovernedExtensionAnalysis, GovernedExtensionResult, GovernedExtensionRun } from "./contracts";
 import { createLedgerEvidenceEmitter } from "./evidence-emitter";
+import { persistExtensionClaims } from "./extension-claim-store";
+import { recordExtensionObservation } from "./observability";
 import { CorePolicyAdapter } from "./policy-adapter";
 import { listGovernedExtensions } from "./registry";
 import { validateExtensionAnalysis } from "./validation";
@@ -119,11 +121,59 @@ export async function runGovernedExtensions(mission: MissionResult, actor = "gov
     if (extension.persist && policyDecision.decision !== "DENY") {
       try {
         await extension.persist({ mission, actor }, { analysisEventId, policyEventId, analysis, policyEvaluation });
+        recordExtensionObservation({
+          extensionId: extension.id,
+          missionId: mission.missionId,
+          stage: "extension_persistence",
+          status: "success",
+        });
       } catch (error) {
         const reason = sanitizeExtensionError(error);
+        recordExtensionObservation({
+          extensionId: extension.id,
+          missionId: mission.missionId,
+          stage: "extension_persistence",
+          status: "failure",
+          details: { reason },
+        });
         const failureEventId = await emitter.emit({
           extensionId: extension.id, phase: "failure", missionId: mission.missionId, actor,
           action: "extension_persistence_failed", input: { extensionId: extension.id, analysisEventId, policyEventId },
+          output: { status: "failed", reason }, policyDecision, parentEventId: policyEventId,
+        });
+        evidenceEventIds.push(failureEventId);
+        failures.push({
+          extensionId: extension.id,
+          stage: "persistence",
+          reason,
+          evidenceEventIds: [requestedEventId, analysisEventId, policyEventId, failureEventId],
+        });
+        continue;
+      }
+    }
+
+    if (policyDecision.decision !== "DENY") {
+      try {
+        await persistExtensionClaims({ mission, actor }, analysis, { analysisEventId, policyEventId, policyDecision });
+        recordExtensionObservation({
+          extensionId: extension.id,
+          missionId: mission.missionId,
+          stage: "claim_persistence",
+          status: "success",
+          details: { claimCount: analysis.claims?.length ?? 0 },
+        });
+      } catch (error) {
+        const reason = sanitizeExtensionError(error);
+        recordExtensionObservation({
+          extensionId: extension.id,
+          missionId: mission.missionId,
+          stage: "claim_persistence",
+          status: "failure",
+          details: { reason },
+        });
+        const failureEventId = await emitter.emit({
+          extensionId: extension.id, phase: "failure", missionId: mission.missionId, actor,
+          action: "extension_claim_persistence_failed", input: { extensionId: extension.id, analysisEventId, policyEventId },
           output: { status: "failed", reason }, policyDecision, parentEventId: policyEventId,
         });
         evidenceEventIds.push(failureEventId);

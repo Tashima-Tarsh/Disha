@@ -79,6 +79,26 @@ services:
       - ALL
     user: "10001:10001"
 
+  web-migrate:
+    build:
+      context: ./web
+      dockerfile: Dockerfile
+    command: ["node", "scripts/apply-schema.mjs"]
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgresql://disha:${POSTGRES_PASSWORD:-postgres}@postgres:5432/disha
+    depends_on:
+      postgres:
+        condition: service_healthy
+    read_only: true
+    tmpfs:
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    user: "1001:1001"
+
   web:
     build:
       context: ./web
@@ -99,6 +119,8 @@ services:
     volumes:
       - ./:/workspace:ro
     depends_on:
+      web-migrate:
+        condition: service_completed_successfully
       postgres:
         condition: service_healthy
       redis:

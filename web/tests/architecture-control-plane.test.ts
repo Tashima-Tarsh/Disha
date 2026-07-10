@@ -41,8 +41,8 @@ describe("DISHA architecture control plane", () => {
   it("does not claim production completion where gaps remain", () => {
     const plane = getArchitectureControlPlane();
     expect(plane.productionGaps).toEqual(expect.arrayContaining([
-      "Add migration smoke tests that prove mission_results and evidence_events are present before deployment.",
-      "Add claim-level provenance tables so dashboard values can link to exact source records.",
+      "Run db:migrate against managed Postgres in CI/CD before production rollout.",
+      "Connect public dashboard values to extension_claim_records or claim_provenance records before showing official-looking aggregates.",
     ]));
   });
 });

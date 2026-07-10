@@ -99,7 +99,7 @@ export function getArchitectureControlPlane(): ArchitectureControlPlane {
         paths: ["web/app", "web/lib/unified", "web/lib/server", "web/tests"],
         purpose: "Single production runtime for UI, API v1, contracts, policy, evidence, source registry, and mission orchestration.",
         promotionRule: "Changes must pass npm run verify and preserve evidence/policy contracts.",
-        productionRisk: "Mission results and Evidence Ledger v2 are PostgreSQL-backed in production; deployment smoke tests must prove both tables are migrated before release.",
+        productionRisk: "Mission results, Evidence Ledger v2, and extension claim records are PostgreSQL-backed in production; Compose runs a migration gate before web startup.",
       },
       {
         id: "connectors",
@@ -108,7 +108,7 @@ export function getArchitectureControlPlane(): ArchitectureControlPlane {
         paths: ["web/lib/unified/source-registry.ts", "web/lib/unified/data-integration.ts", "web/lib/*-connector.ts"],
         purpose: "Maintain official/public source manifests and provenance-bearing access paths.",
         promotionRule: "Each connector needs source terms, parser tests, freshness metadata, and claim-level provenance.",
-        productionRisk: "Scheduled source monitors are active for priority public sources; dataset-specific parsers and claim-level provenance remain incomplete.",
+        productionRisk: "Scheduled source monitors are active for priority public sources; dataset-specific parsers remain incomplete and must emit claim provenance before public dashboard use.",
       },
       {
         id: "agentic-skills",
@@ -155,9 +155,9 @@ export function getArchitectureControlPlane(): ArchitectureControlPlane {
       "Promotion Firewall: legacy, OS, cyber, and integration code cannot silently become product code without adapter tests.",
     ],
     productionGaps: [
-      "Add migration smoke tests that prove mission_results and evidence_events are present before deployment.",
+      "Run db:migrate against managed Postgres in CI/CD before production rollout.",
       "Promote scheduled source monitors into parser-backed claim provenance for CAG, finance, NCRB, CERT-In, Gazette, LGD, WRIS, and NDMA sources.",
-      "Add claim-level provenance tables so dashboard values can link to exact source records.",
+      "Connect public dashboard values to extension_claim_records or claim_provenance records before showing official-looking aggregates.",
       "Add prompt-injection and model-output quarantine tests for provider adapters.",
       "Add deployment health checks for Docker, Vercel, and OS packaging paths.",
       "Resolve dependency/security advisories before claiming production deployment readiness.",

@@ -21,6 +21,8 @@ RUN addgroup --system --gid 1001 nextjs \
 COPY --from=builder --chown=nextjs:nextjs /app/public ./public
 COPY --from=builder --chown=nextjs:nextjs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nextjs /app/.next/static ./.next/static
+COPY --from=builder --chown=nextjs:nextjs /app/database ./database
+COPY --from=builder --chown=nextjs:nextjs /app/scripts ./scripts
 
 USER nextjs
 

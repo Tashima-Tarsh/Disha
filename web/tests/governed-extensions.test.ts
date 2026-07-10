@@ -9,7 +9,9 @@ import {
   governedExtensionRegistry,
   ingestOwnedHoneypotEvent,
   listGovernedExtensionManifests,
+  clearExtensionClaimStoreForTests,
   clearMemoryGraphStoreForTests,
+  listExtensionClaimRecords,
   listMemoryGraphRecords,
   queryGovernedResearchRuntime,
   runGovernedExtensions,
@@ -26,6 +28,7 @@ describe("DISHA governed extension layer", () => {
     resetEnvForTests();
     await clearEvidenceLedgerForTests();
     await clearMissionsForTests();
+    await clearExtensionClaimStoreForTests();
     await clearMemoryGraphStoreForTests();
   });
 
@@ -81,6 +84,9 @@ describe("DISHA governed extension layer", () => {
     expect(evidence.map((event) => event.action)).toEqual(
       expect.arrayContaining(["extension_requested", "extension_analysis_completed", "extension_policy_evaluated", "extension_result_recorded"]),
     );
+    const claimRecords = await listExtensionClaimRecords(mission.missionId);
+    expect(claimRecords.map((record) => record.extensionId)).toContain("vyuha-defense-engine");
+    expect(claimRecords.every((record) => record.policyEventId.length > 0)).toBe(true);
     expect(verifyEvidenceChain(evidence).ok).toBe(true);
   });
 
@@ -168,6 +174,9 @@ describe("DISHA governed extension layer", () => {
     expect(records.every((record) => record.extensionId === "memory-graph")).toBe(true);
     expect(records.every((record) => record.analysisEventId.length > 0)).toBe(true);
     expect(records.map((record) => record.claim.claimId)).toEqual(memoryResult?.claims?.map((claim) => claim.claimId) ?? []);
+    const claimRecords = await listExtensionClaimRecords(mission.missionId);
+    expect(claimRecords.map((record) => record.claim.claimId)).toEqual(memoryResult?.claims?.map((claim) => claim.claimId) ?? []);
+    expect(claimRecords.every((record) => record.policyDecision !== "DENY")).toBe(true);
     const ledger = await getEvidenceEvents(mission.missionId);
     expect(ledger.find((event) => event.eventId === records[0]?.analysisEventId)?.action)
       .toBe("extension_analysis_completed");

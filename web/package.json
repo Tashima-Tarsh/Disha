@@ -6,6 +6,8 @@
     "dev": "next dev --port 3000",
     "build": "next build",
     "start": "next start",
+    "db:migrate": "node scripts/apply-schema.mjs",
+    "db:verify-schema": "node scripts/apply-schema.mjs --verify-only",
     "lint": "next lint",
     "type-check": "tsc --noEmit",
     "type-check:full": "tsc --noEmit -p tsconfig.full.json",

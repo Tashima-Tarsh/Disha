@@ -73,8 +73,26 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '1.5'
-          memory: 1G
+        cpus: '1.5'
+        memory: 1G
+
+  web-migrate:
+    image: ghcr.io/${GITHUB_REPOSITORY_OWNER:-tashima-tarsh}/disha-web:latest
+    command: ["node", "scripts/apply-schema.mjs"]
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgresql://disha:${POSTGRES_PASSWORD:?set-me}@postgres:5432/disha
+    depends_on:
+      postgres:
+        condition: service_healthy
+    read_only: true
+    tmpfs:
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    user: "1001:1001"
 
   web:
     image: ghcr.io/${GITHUB_REPOSITORY_OWNER:-tashima-tarsh}/disha-web:latest
@@ -94,6 +112,8 @@ services:
       OPENAI_MODEL: ${OPENAI_MODEL:-gpt-5.4-mini}
       OPENAI_BASE_URL: ${OPENAI_BASE_URL:-https://api.openai.com/v1}
     depends_on:
+      web-migrate:
+        condition: service_completed_successfully
       postgres:
         condition: service_healthy
       redis:
