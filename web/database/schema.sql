@@ -1,3 +1,15 @@
+create table if not exists schema_migrations (
+  id bigserial primary key,
+  version text not null,
+  name text not null,
+  direction text not null check (direction in ('up', 'down')),
+  checksum text not null,
+  applied_at timestamptz not null default now()
+);
+
+create index if not exists schema_migrations_version_idx
+  on schema_migrations (version, applied_at desc);
+
 create table if not exists users (
   id text primary key,
   email text not null unique,

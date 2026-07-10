@@ -8,6 +8,7 @@
     "start": "next start",
     "db:migrate": "node scripts/apply-schema.mjs",
     "db:verify-schema": "node scripts/apply-schema.mjs --verify-only",
+    "db:rollback": "node scripts/apply-schema.mjs --rollback",
     "lint": "next lint",
     "type-check": "tsc --noEmit",
     "type-check:full": "tsc --noEmit -p tsconfig.full.json",

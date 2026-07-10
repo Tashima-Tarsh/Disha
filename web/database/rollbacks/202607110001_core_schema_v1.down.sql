@@ -1,0 +1,11 @@
+drop table if exists extension_memory_records cascade;
+drop table if exists extension_claim_records cascade;
+drop table if exists claim_provenance cascade;
+drop table if exists source_ingestion_runs cascade;
+drop table if exists mission_results cascade;
+drop table if exists evidence_events cascade;
+drop table if exists ai_decisions cascade;
+drop table if exists shares cascade;
+drop table if exists audit_events cascade;
+drop table if exists refresh_tokens cascade;
+drop table if exists users cascade;

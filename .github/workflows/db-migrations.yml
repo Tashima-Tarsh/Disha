@@ -1,0 +1,58 @@
+name: DISHA Database Migrations
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: disha-db-migrations-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  postgres-migrations:
+    name: Postgres migration verification
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: disha_ci
+          POSTGRES_USER: disha
+          POSTGRES_PASSWORD: disha_ci_password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U disha -d disha_ci"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
+
+    defaults:
+      run:
+        working-directory: web
+
+    env:
+      DATABASE_URL: postgresql://disha:disha_ci_password@localhost:5432/disha_ci
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Apply migrations
+        run: npm run db:migrate
+
+      - name: Verify migrated schema
+        run: npm run db:verify-schema

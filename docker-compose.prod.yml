@@ -73,8 +73,8 @@ services:
     deploy:
       resources:
         limits:
-        cpus: '1.5'
-        memory: 1G
+          cpus: '1.5'
+          memory: 1G
 
   web-migrate:
     image: ghcr.io/${GITHUB_REPOSITORY_OWNER:-tashima-tarsh}/disha-web:latest

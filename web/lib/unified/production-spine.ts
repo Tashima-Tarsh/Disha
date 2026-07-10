@@ -33,7 +33,7 @@ export function getSevenProductionCapabilities(): ProductionCapability[] {
       openSourcePath: "web/database/schema.sql",
       openAiPath: "OpenAI advisory output must reference evidence event ids.",
       evidenceRule: "Evidence events must remain hash-chain verifiable after database persistence.",
-      nextHardening: ["Run web/scripts/apply-schema.mjs in CI/CD against managed Postgres.", "Add rollback rehearsal for schema changes."],
+      nextHardening: ["Run migration workflow on every protected branch.", "Add managed-Postgres backup validation before production rollout."],
     },
     {
       id: "claim-provenance",
