@@ -43,4 +43,10 @@ describe("DISHA agentic AI skill readiness", () => {
     expect(memory?.blockers.length).toBeGreaterThan(0);
     expect(report.readiness.partial).toBeGreaterThan(0);
   });
+
+  it("declares the governed extension bridge and Vyuha readiness", () => {
+    const skills = listAgentSkills();
+    expect(skills.find((skill) => skill.id === "governed-extension-layer")?.status).toBe("ready");
+    expect(skills.find((skill) => skill.id === "vyuha-defense-engine")?.status).toBe("ready");
+  });
 });

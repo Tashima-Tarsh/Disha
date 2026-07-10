@@ -1,4 +1,5 @@
 import type { GovernedExtension } from "./contracts";
+import { listGovernedExtensionManifests } from "./catalog";
 import { vyuhaDefenseExtension } from "./vyuha-defense";
 
 export const governedExtensionRegistry: Record<string, GovernedExtension> = {
@@ -8,3 +9,5 @@ export const governedExtensionRegistry: Record<string, GovernedExtension> = {
 export function listGovernedExtensions(): GovernedExtension[] {
   return Object.values(governedExtensionRegistry);
 }
+
+export { listGovernedExtensionManifests };

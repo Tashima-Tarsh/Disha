@@ -144,6 +144,7 @@ Important endpoints:
 - `POST /api/v1/sources/admit`
 - `GET /api/v1/architecture`
 - `GET /api/v1/production/readiness`
+- `GET /api/v1/extensions`
 
 See [docs/internal/api/API_REFERENCE.md](docs/internal/api/API_REFERENCE.md).
 

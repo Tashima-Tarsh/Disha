@@ -11,6 +11,24 @@ import type {
 const VYUHA_SOURCE_PATH = "skills/vyuha-defense-engine";
 
 export const vyuhaDefenseExtension: GovernedExtension = {
+  manifest: {
+    id: "vyuha-defense-engine",
+    title: "Vyuha Defense Engine",
+    kind: "defense",
+    maturity: "active",
+    description: "No-First-Use defensive posture planner for evidence preservation, containment, alerts, and owned-environment honeypots.",
+    sourcePaths: ["skills/vyuha-defense-engine", "policies/allowed-defense-actions.yaml"],
+    inputContract: "MissionResult + DishaSignal.input.indicators",
+    outputContract: "GovernedExtensionResult",
+    policyBoundary: "Every defensive proposal is re-evaluated by policy-gate.ts. The adapter never executes actions directly.",
+    evidenceBoundary: "Extension request, policy evaluation, and result summary are appended to Evidence Ledger v2.",
+    defensivePosture: "defensive_only",
+    requiredControls: ["No-First-Use", "owned-environment guard", "policy allowlist", "evidence ledger chain"],
+    currentLimitations: [
+      "Adapter proposes actions only; Python orchestrator execution remains disabled until an execution approval contract exists.",
+      "Honeypot deployment remains preparation-only and requires owned/authorized environment proof.",
+    ],
+  },
   id: "vyuha-defense-engine",
   title: "Vyuha Defense Engine",
   description: "Defensive cyber posture planner for evidence preservation, containment, alerts, and owned-environment honeypots.",

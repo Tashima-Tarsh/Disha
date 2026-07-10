@@ -112,6 +112,22 @@ Current first-class extension:
 | --- | --- | --- |
 | Vyuha Defense Engine | `skills/vyuha-defense-engine/` | Defensive proposal adapter active in `web/lib/extensions/vyuha-defense.ts` |
 
+Planned governed extensions:
+
+| Extension | Source | Admission Rule |
+| --- | --- | --- |
+| DISHA Brain | `disha/brain/` | Read-only graph/orchestration summaries only until a stable JSON adapter contract exists |
+| Cognitive Engine and Loop | `disha/ai/core/cognitive_loop.py`, `disha/ai/agents/` | Perception, deliberation, and decision phases become proposals; actions remain policy-denied by default |
+| Memory and Graph Knowledge | `disha/brain/memory/`, `disha/brain/graph/`, `disha/ai/core/memory/` | Context enrichment only; memory cannot become fact without evidence hashes |
+| Honeypot Evidence Intake | `disha/services/cyber/honeypot/`, Vyuha honeypot proposals | Owned/authorized telemetry only, with sensor identity and raw-event hash |
+| Quantum and Physics Simulation | `disha/ai/physics/`, `disha/ai/models/physics_engine/`, `disha/ai/models/simulation/` | Bounded advisory simulation only; no factual prediction without calibration evidence |
+
+The extension catalog is exposed at:
+
+```text
+GET /api/v1/extensions
+```
+
 Extension rule:
 
 ```text

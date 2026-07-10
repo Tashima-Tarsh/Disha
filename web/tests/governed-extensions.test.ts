@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from "vitest";
 
-import { runGovernedExtensions } from "../lib/extensions";
+import { listGovernedExtensionManifests, runGovernedExtensions } from "../lib/extensions";
 import { clearEvidenceLedgerForTests, getEvidenceEvents, verifyEvidenceChain } from "../lib/unified/evidence-ledger";
 import { clearMissionsForTests, runMission } from "../lib/unified/orchestrator";
 import { runAgenticMission } from "../lib/unified/agentic-executor";
@@ -9,6 +9,26 @@ describe("DISHA governed extension layer", () => {
   beforeEach(async () => {
     await clearEvidenceLedgerForTests();
     clearMissionsForTests();
+  });
+
+  it("catalogs all major intelligence components behind explicit governance contracts", () => {
+    const manifests = listGovernedExtensionManifests();
+    expect(manifests.map((manifest) => manifest.id)).toEqual(expect.arrayContaining([
+      "vyuha-defense-engine",
+      "disha-brain",
+      "cognitive-engine",
+      "memory-graph",
+      "honeypot-evidence",
+      "quantum-physics-simulation",
+    ]));
+    expect(manifests.find((manifest) => manifest.id === "vyuha-defense-engine")?.maturity).toBe("active");
+    expect(manifests.filter((manifest) => manifest.maturity === "planned").length).toBeGreaterThanOrEqual(5);
+    for (const manifest of manifests) {
+      expect(manifest.policyBoundary.length).toBeGreaterThan(30);
+      expect(manifest.evidenceBoundary.length).toBeGreaterThan(30);
+      expect(manifest.requiredControls.length).toBeGreaterThan(0);
+      expect(manifest.sourcePaths.length).toBeGreaterThan(0);
+    }
   });
 
   it("runs Vyuha as a governed defensive extension with policy and evidence events", async () => {

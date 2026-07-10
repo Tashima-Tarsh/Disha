@@ -2,6 +2,24 @@ import type { DishaLensResult, PolicyDecision } from "../unified/contracts";
 import type { MissionResult } from "../unified/orchestrator";
 
 export type GovernedExtensionStatus = "ready" | "not_applicable" | "policy_blocked" | "completed";
+export type GovernedExtensionMaturity = "active" | "planned" | "blocked";
+export type GovernedExtensionKind = "defense" | "cognitive" | "memory_graph" | "honeypot" | "simulation";
+
+export type GovernedExtensionManifest = {
+  id: string;
+  title: string;
+  kind: GovernedExtensionKind;
+  maturity: GovernedExtensionMaturity;
+  description: string;
+  sourcePaths: string[];
+  inputContract: string;
+  outputContract: string;
+  policyBoundary: string;
+  evidenceBoundary: string;
+  defensivePosture: "defensive_only" | "read_only" | "evidence_preservation" | "bounded_simulation";
+  requiredControls: string[];
+  currentLimitations: string[];
+};
 
 export type GovernedExtensionAction = {
   id: string;
@@ -37,6 +55,7 @@ export type GovernedExtensionRequest = {
 };
 
 export interface GovernedExtension {
+  manifest: GovernedExtensionManifest;
   id: string;
   title: string;
   description: string;
