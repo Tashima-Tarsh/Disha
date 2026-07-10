@@ -51,6 +51,14 @@ export const dishaBrainExtension: GovernedExtension = {
         ? [repoEvidence(signal, "disha/brain/runtime", `Governed Brain runtime response admitted with ${runtime.sourceHashes.length} source hash reference(s).`)]
         : []),
     ];
+    const claims = runtime.observations.map((observation) => ({
+      claimId: `brain-claim-${hashValue({ missionId: mission.missionId, observation }).slice(0, 16)}`,
+      text: observation.description,
+      confidence: observation.confidence,
+      sourceHashes: observation.sourceHashes,
+      sourceRefs: [BRAIN_SOURCE_PATH],
+      verifyRequired: observation.sourceHashes.length === 0,
+    }));
     const riskScore = Math.max(0.31, mission.riskScore * 0.72);
     const lensResult: DishaLensResult = {
       lens: "strategy",
@@ -101,6 +109,7 @@ export const dishaBrainExtension: GovernedExtension = {
       defensivePosture: "read_only",
       lensResult,
       proposedActions: brainContextActions(),
+      claims,
       limitations: [
         "Read-only adapter only; it does not start the Brain runtime.",
         "All cognitive claims require source-hash binding before external publication.",

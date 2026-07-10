@@ -9,6 +9,8 @@ import {
   governedExtensionRegistry,
   ingestOwnedHoneypotEvent,
   listGovernedExtensionManifests,
+  clearMemoryGraphStoreForTests,
+  listMemoryGraphRecords,
   queryGovernedResearchRuntime,
   runGovernedExtensions,
 } from "../lib/extensions";
@@ -24,6 +26,7 @@ describe("DISHA governed extension layer", () => {
     resetEnvForTests();
     await clearEvidenceLedgerForTests();
     await clearMissionsForTests();
+    await clearMemoryGraphStoreForTests();
   });
 
   afterEach(() => {
@@ -147,6 +150,28 @@ describe("DISHA governed extension layer", () => {
       expect(lifecycleEvents.map((event) => event.evidenceEventId)).toEqual(result.evidenceEventIds);
     }
     expect(verifyEvidenceChain(await getEvidenceEvents(mission.missionId)).ok).toBe(true);
+  });
+
+  it("persists Memory/Graph claims only after a ledger analysis event", async () => {
+    const mission = await runMission({
+      rawText: "Review memory graph provenance context for this mission.",
+      userId: "u1",
+      userRole: "admin",
+    });
+
+    const run = await runGovernedExtensions(mission);
+    const memoryResult = run.results.find((result) => result.extensionId === "memory-graph");
+    const records = await listMemoryGraphRecords(mission.missionId);
+
+    expect(memoryResult).toBeDefined();
+    expect(records.length).toBeGreaterThan(0);
+    expect(records.every((record) => record.extensionId === "memory-graph")).toBe(true);
+    expect(records.every((record) => record.analysisEventId.length > 0)).toBe(true);
+    expect(records.map((record) => record.claim.claimId)).toEqual(memoryResult?.claims?.map((claim) => claim.claimId) ?? []);
+    const ledger = await getEvidenceEvents(mission.missionId);
+    expect(ledger.find((event) => event.eventId === records[0]?.analysisEventId)?.action)
+      .toBe("extension_analysis_completed");
+    expect(verifyEvidenceChain(ledger).ok).toBe(true);
   });
 
   it("exposes the governed extension architecture from active contracts", () => {

@@ -83,6 +83,14 @@ export const vyuhaDefenseExtension: GovernedExtension = {
       defensivePosture: "defensive_only",
       lensResult,
       proposedActions: actions,
+      claims: [{
+        claimId: `vyuha-claim-${findingId}`,
+        text: lensResult.summary,
+        confidence: lensResult.confidence,
+        sourceHashes: evidence.map((item) => item.provenanceHash),
+        sourceRefs: evidence.map((item) => item.sourceId),
+        verifyRequired: false,
+      }],
       limitations: [
         "This adapter produces governed defensive proposals only; it does not invoke Python orchestrator actions.",
         "Honeypot deployment remains limited to owned or explicitly authorized environments.",

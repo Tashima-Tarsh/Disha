@@ -148,3 +148,21 @@ create table if not exists claim_provenance (
 );
 
 create index if not exists claim_provenance_source_idx on claim_provenance (source_id, status);
+
+create table if not exists extension_memory_records (
+  record_id text primary key,
+  mission_id text not null,
+  extension_id text not null check (extension_id = 'memory-graph'),
+  analysis_event_id text not null references evidence_events(event_id),
+  claim_id text not null,
+  claim text not null,
+  confidence numeric not null check (confidence >= 0 and confidence <= 1),
+  source_hashes text[] not null default array[]::text[],
+  source_refs text[] not null default array[]::text[],
+  verify_required boolean not null default true,
+  record_hash text not null,
+  recorded_at timestamptz not null
+);
+
+create index if not exists extension_memory_records_mission_idx
+  on extension_memory_records (mission_id, recorded_at asc);

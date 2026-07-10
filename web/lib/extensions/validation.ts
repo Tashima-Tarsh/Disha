@@ -35,6 +35,18 @@ export function validateExtensionAnalysis(extension: GovernedExtension, analysis
   if (analysis.defensivePosture !== extension.manifest.defensivePosture) {
     errors.push(`analysis posture ${analysis.defensivePosture} does not match manifest posture ${extension.manifest.defensivePosture}`);
   }
+  const claimIds = new Set<string>();
+  for (const claim of analysis.claims ?? []) {
+    if (!claim.claimId.trim() || claimIds.has(claim.claimId)) errors.push(`claim ${claim.claimId || "[empty]"} is missing or duplicated`);
+    claimIds.add(claim.claimId);
+    if (!claim.text.trim()) errors.push(`claim ${claim.claimId} must include text`);
+    if (!Number.isFinite(claim.confidence) || claim.confidence < 0 || claim.confidence > 1) errors.push(`claim ${claim.claimId} has invalid confidence`);
+    if (claim.sourceHashes.some((hash) => hash.length < 8)) errors.push(`claim ${claim.claimId} has an invalid source hash`);
+    if (claim.sourceRefs.length === 0 || claim.sourceRefs.some((sourceRef) => !sourceRef.trim())) {
+      errors.push(`claim ${claim.claimId} must include source references`);
+    }
+    if (claim.verifyRequired && claim.sourceHashes.length > 0) errors.push(`claim ${claim.claimId} cannot be verify-required with source hashes`);
+  }
 
   if (errors.length) {
     throw new Error(`Invalid governed extension analysis for ${extension.id}: ${errors.join("; ")}`);

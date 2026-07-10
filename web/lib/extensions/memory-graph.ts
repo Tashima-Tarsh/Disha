@@ -8,6 +8,7 @@ import type {
   GovernedExtensionRequest,
 } from "./contracts";
 import { queryGovernedResearchRuntime } from "./research-runtime";
+import { persistMemoryGraphAnalysis } from "./memory-graph-store";
 
 const MEMORY_GRAPH_SOURCE_PATH = "disha/brain/memory";
 
@@ -26,8 +27,8 @@ export const memoryGraphExtension: GovernedExtension = {
     defensivePosture: "read_only",
     requiredControls: ["retention policy", "redaction", "source-hash binding", "controlled-data block"],
     currentLimitations: [
-      "Durable governed memory store is not yet connected to Evidence Ledger v2.",
-      "Read-only runtime graph claims still require source-hash binding and claim-level provenance before publication.",
+      "Production deployments must apply the extension_memory_records schema before enabling durable graph persistence.",
+      "Read-only runtime graph claims without source hashes are preserved but marked [VERIFY REQUIRED].",
     ],
   },
   id: "memory-graph",
@@ -87,6 +88,24 @@ export const memoryGraphExtension: GovernedExtension = {
       ],
       policyRequired: true,
     };
+    const claims = [
+      {
+        claimId: `memory-claim-${lensResult.findings[0]?.id ?? hashValue({ missionId: mission.missionId, sourceHashes }).slice(0, 16)}`,
+        text: lensResult.findings[0]?.description ?? lensResult.summary,
+        confidence: lensResult.confidence,
+        sourceHashes: evidence.map((item) => item.provenanceHash),
+        sourceRefs: evidence.map((item) => item.sourceId),
+        verifyRequired: false,
+      },
+      ...runtime.observations.map((observation) => ({
+        claimId: `memory-claim-${hashValue({ missionId: mission.missionId, observation }).slice(0, 16)}`,
+        text: observation.description,
+        confidence: observation.confidence,
+        sourceHashes: observation.sourceHashes,
+        sourceRefs: ["disha/brain/memory", "disha/brain/graph"],
+        verifyRequired: observation.sourceHashes.length === 0,
+      })),
+    ];
 
     return {
       extensionId: "memory-graph",
@@ -95,12 +114,17 @@ export const memoryGraphExtension: GovernedExtension = {
       defensivePosture: "read_only",
       lensResult,
       proposedActions: [memorySourceBindingAction()],
+      claims,
       limitations: [
         "No memory value is treated as a source of fact without source-hash binding.",
         "Controlled or personal data cannot be recalled through this adapter.",
         ...runtime.limitations,
       ],
     };
+  },
+
+  async persist({ mission, actor }, { analysisEventId, analysis }) {
+    await persistMemoryGraphAnalysis({ mission, actor }, analysisEventId, analysis.claims ?? []);
   },
 };
 

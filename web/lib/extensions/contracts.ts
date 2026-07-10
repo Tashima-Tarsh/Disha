@@ -42,7 +42,17 @@ export type GovernedExtensionAnalysis = {
   defensivePosture: "defensive_only" | "read_only" | "evidence_preservation" | "bounded_simulation";
   lensResult: DishaLensResult;
   proposedActions: GovernedExtensionAction[];
+  claims?: GovernedExtensionClaim[];
   limitations: string[];
+};
+
+export type GovernedExtensionClaim = {
+  claimId: string;
+  text: string;
+  confidence: number;
+  sourceHashes: string[];
+  sourceRefs: string[];
+  verifyRequired: boolean;
 };
 
 export type GovernedExtensionResult = GovernedExtensionAnalysis & {
@@ -65,7 +75,7 @@ export type GovernedExtensionPolicyEvaluation = {
 
 export type GovernedExtensionFailure = {
   extensionId: string;
-  stage: "analysis" | "validation";
+  stage: "analysis" | "validation" | "persistence";
   reason: string;
   evidenceEventIds: string[];
 };
@@ -83,6 +93,15 @@ export interface ExtensionContract {
   sourcePath: string;
   shouldRun(mission: MissionResult): boolean;
   analyze(request: GovernedExtensionRequest): Promise<GovernedExtensionAnalysis>;
+  persist?(
+    request: GovernedExtensionRequest,
+    context: {
+      analysisEventId: string;
+      policyEventId: string;
+      analysis: GovernedExtensionAnalysis;
+      policyEvaluation: GovernedExtensionPolicyEvaluation;
+    },
+  ): Promise<void>;
 }
 
 export interface GovernedExtension extends ExtensionContract {}

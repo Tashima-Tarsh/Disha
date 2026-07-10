@@ -51,6 +51,14 @@ export const cognitiveEngineExtension: GovernedExtension = {
         ? [repoEvidence(signal, "disha/ai/core/runtime", `Governed cognitive runtime response admitted with ${runtime.sourceHashes.length} source hash reference(s).`)]
         : []),
     ];
+    const claims = runtime.observations.map((observation) => ({
+      claimId: `cognitive-claim-${hashValue({ missionId: mission.missionId, observation }).slice(0, 16)}`,
+      text: observation.description,
+      confidence: observation.confidence,
+      sourceHashes: observation.sourceHashes,
+      sourceRefs: [COGNITIVE_SOURCE_PATH],
+      verifyRequired: observation.sourceHashes.length === 0,
+    }));
     const phasePlan = buildPhasePlan(mission);
     const riskScore = Math.min(0.74, Math.max(0.34, mission.riskScore + 0.08));
     const lensResult: DishaLensResult = {
@@ -95,6 +103,7 @@ export const cognitiveEngineExtension: GovernedExtension = {
       defensivePosture: "read_only",
       lensResult,
       proposedActions: cognitivePhaseActions(),
+      claims,
       limitations: [
         "This adapter does not execute agents or tools.",
         "Read-only runtime observations require source hashes; action phase remains disabled until governed execution controls are implemented.",

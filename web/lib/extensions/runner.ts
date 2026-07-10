@@ -87,6 +87,7 @@ export async function runGovernedExtensions(mission: MissionResult, actor = "gov
         summary: analysis.summary,
         limitations: analysis.limitations,
         proposedActionIds: analysis.proposedActions.map((action) => action.id),
+        claims: analysis.claims ?? [],
       },
       policyDecision: mission.policyDecision,
       lensResults: [analysis.lensResult.lens],
@@ -114,6 +115,27 @@ export async function runGovernedExtensions(mission: MissionResult, actor = "gov
       parentEventId: requestedEventId,
     });
     evidenceEventIds.push(policyEventId);
+
+    if (extension.persist && policyDecision.decision !== "DENY") {
+      try {
+        await extension.persist({ mission, actor }, { analysisEventId, policyEventId, analysis, policyEvaluation });
+      } catch (error) {
+        const reason = sanitizeExtensionError(error);
+        const failureEventId = await emitter.emit({
+          extensionId: extension.id, phase: "failure", missionId: mission.missionId, actor,
+          action: "extension_persistence_failed", input: { extensionId: extension.id, analysisEventId, policyEventId },
+          output: { status: "failed", reason }, policyDecision, parentEventId: policyEventId,
+        });
+        evidenceEventIds.push(failureEventId);
+        failures.push({
+          extensionId: extension.id,
+          stage: "persistence",
+          reason,
+          evidenceEventIds: [requestedEventId, analysisEventId, policyEventId, failureEventId],
+        });
+        continue;
+      }
+    }
 
     const result: GovernedExtensionResult = {
       ...analysis,
