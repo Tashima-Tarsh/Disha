@@ -111,6 +111,7 @@ Responsibilities:
 
 - Define `ExtensionContract` / `GovernedExtension` contracts.
 - Define `EvidenceEmitter` lifecycle emission.
+- Define an optional governed research runtime JSON contract for Brain, Cognitive Loop, and Memory/Graph services.
 - Convert advanced capability output into typed proposals and evidence-backed analysis.
 - Re-run Policy Gate evaluation for extension outputs.
 - Append extension request, policy, and result events to Evidence Ledger v2.
@@ -154,6 +155,16 @@ Extension validation:
 - Proposed actions must be mirrored as `DishaLensResult.recommendedActions`.
 - Defensive posture must match the manifest.
 - The runner records a lifecycle trace: `request`, `policy_evaluation`, and `result_record`.
+
+Optional research runtime:
+
+- Environment: `DISHA_RESEARCH_RUNTIME_URL`.
+- Health endpoint: `GET /api/v1/extensions/runtime/health`.
+- Runtime contract endpoint expected by DISHA: `POST /governed/analyze`.
+- Contract version: `disha.research-runtime.v1`.
+- Mode: `read_only`.
+- Required constraints: no external actions, no state mutation, source hashes required, bounded runtime.
+- If unavailable, adapters continue with repository-bound evidence and report the runtime limitation. They do not fail open.
 
 The extension catalog is exposed at:
 

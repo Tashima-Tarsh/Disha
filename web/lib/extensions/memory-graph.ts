@@ -2,6 +2,7 @@ import type { DishaLensResult } from "../unified/contracts";
 import { repoEvidence, severityForRisk } from "../unified/adapters/shared";
 import { hashValue } from "../unified/hash";
 import type { GovernedExtension, GovernedExtensionAnalysis, GovernedExtensionRequest } from "./contracts";
+import { queryGovernedResearchRuntime } from "./research-runtime";
 
 const MEMORY_GRAPH_SOURCE_PATH = "disha/brain/memory";
 
@@ -36,12 +37,16 @@ export const memoryGraphExtension: GovernedExtension = {
 
   async analyze({ mission }: GovernedExtensionRequest): Promise<GovernedExtensionAnalysis> {
     const signal = mission.signal;
+    const runtime = await queryGovernedResearchRuntime(mission, "memory-graph");
     const evidence = [
       repoEvidence(signal, "disha/brain/memory", "Brain memory can provide context only when bound to source hashes."),
       repoEvidence(signal, "disha/brain/graph", "Graph edges are treated as navigational context, not unverified truth."),
       repoEvidence(signal, "disha/ai/core/graph_reasoner.py", "Graph reasoning output must preserve provenance and uncertainty."),
+      ...(runtime.status === "ok"
+        ? [repoEvidence(signal, "disha/brain/memory/runtime", `Governed memory/graph runtime response admitted with ${runtime.sourceHashes.length} source hash reference(s).`)]
+        : []),
     ];
-    const sourceHashes = evidence.map((item) => item.provenanceHash);
+    const sourceHashes = [...evidence.map((item) => item.provenanceHash), ...runtime.sourceHashes];
     const riskScore = Math.min(0.7, Math.max(0.28, mission.riskScore + (signal.context.memoryRefs.length ? 0.1 : 0)));
     const lensResult: DishaLensResult = {
       lens: "strategy",
@@ -55,6 +60,13 @@ export const memoryGraphExtension: GovernedExtension = {
             `Memory/graph enrichment is admitted as context with ${sourceHashes.length} source hash binding(s). Claims without matching evidence remain [VERIFY REQUIRED].`,
           evidenceIds: evidence.map((item) => item.id),
         },
+        ...runtime.observations.map((observation) => ({
+          id: `memory-runtime-${hashValue({ missionId: mission.missionId, observation }).slice(0, 10)}`,
+          title: observation.title,
+          severity: severityForRisk(1 - observation.confidence),
+          description: `${observation.description} Source hashes: ${observation.sourceHashes.join(", ") || "[VERIFY REQUIRED]"}.`,
+          evidenceIds: evidence.map((item) => item.id),
+        })),
       ],
       confidence: 0.64,
       riskScore,
@@ -81,6 +93,7 @@ export const memoryGraphExtension: GovernedExtension = {
       limitations: [
         "No memory value is treated as a source of fact without source-hash binding.",
         "Controlled or personal data cannot be recalled through this adapter.",
+        ...runtime.limitations,
       ],
     };
   },

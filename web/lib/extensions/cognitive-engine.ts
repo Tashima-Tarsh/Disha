@@ -2,6 +2,7 @@ import type { DishaLensResult } from "../unified/contracts";
 import { repoEvidence, severityForRisk } from "../unified/adapters/shared";
 import { hashValue } from "../unified/hash";
 import type { GovernedExtension, GovernedExtensionAnalysis, GovernedExtensionRequest } from "./contracts";
+import { queryGovernedResearchRuntime } from "./research-runtime";
 
 const COGNITIVE_SOURCE_PATH = "disha/ai/core";
 
@@ -36,10 +37,14 @@ export const cognitiveEngineExtension: GovernedExtension = {
 
   async analyze({ mission }: GovernedExtensionRequest): Promise<GovernedExtensionAnalysis> {
     const signal = mission.signal;
+    const runtime = await queryGovernedResearchRuntime(mission, "cognitive-engine");
     const evidence = [
       repoEvidence(signal, "disha/ai/core/cognitive_loop.py", "Cognitive loop phases are modeled as observable analysis stages."),
       repoEvidence(signal, "disha/ai/core/agents", "Agent capability must be reduced to bounded proposals before policy review."),
       repoEvidence(signal, "disha/ai/agents", "Research agents remain non-executing unless routed through governed contracts."),
+      ...(runtime.status === "ok"
+        ? [repoEvidence(signal, "disha/ai/core/runtime", `Governed cognitive runtime response admitted with ${runtime.sourceHashes.length} source hash reference(s).`)]
+        : []),
     ];
     const riskScore = Math.min(0.74, Math.max(0.34, mission.riskScore + 0.08));
     const lensResult: DishaLensResult = {
@@ -54,6 +59,13 @@ export const cognitiveEngineExtension: GovernedExtension = {
             "Perception and deliberation may structure analysis, but decision and action phases must remain proposals until policy approval and evidence ledger recording are complete.",
           evidenceIds: evidence.map((item) => item.id),
         },
+        ...runtime.observations.map((observation) => ({
+          id: `cognitive-runtime-${hashValue({ missionId: mission.missionId, observation }).slice(0, 10)}`,
+          title: observation.title,
+          severity: severityForRisk(1 - observation.confidence),
+          description: `${observation.description} Source hashes: ${observation.sourceHashes.join(", ") || "[VERIFY REQUIRED]"}.`,
+          evidenceIds: evidence.map((item) => item.id),
+        })),
       ],
       confidence: 0.66,
       riskScore,
@@ -80,6 +92,7 @@ export const cognitiveEngineExtension: GovernedExtension = {
       limitations: [
         "This adapter does not execute agents or tools.",
         "Action phase remains disabled until governed execution controls are implemented.",
+        ...runtime.limitations,
       ],
     };
   },

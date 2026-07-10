@@ -6,3 +6,4 @@ export * from "./registry";
 export * from "./runner";
 export * from "./honeypot-evidence";
 export * from "./physics-simulation";
+export * from "./research-runtime";

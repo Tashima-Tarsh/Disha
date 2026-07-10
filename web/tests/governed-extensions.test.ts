@@ -1,20 +1,34 @@
-import { beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import {
   boundedSimulationRequestSchema,
+  buildResearchRuntimeRequest,
+  checkGovernedResearchRuntimeHealth,
   getGovernedExtensionArchitecture,
   ingestOwnedHoneypotEvent,
   listGovernedExtensionManifests,
+  queryGovernedResearchRuntime,
   runGovernedExtensions,
 } from "../lib/extensions";
 import { clearEvidenceLedgerForTests, getEvidenceEvents, verifyEvidenceChain } from "../lib/unified/evidence-ledger";
 import { clearMissionsForTests, runMission } from "../lib/unified/orchestrator";
 import { runAgenticMission } from "../lib/unified/agentic-executor";
+import { resetEnvForTests } from "../lib/server/env";
 
 describe("DISHA governed extension layer", () => {
   beforeEach(async () => {
+    delete process.env.DISHA_RESEARCH_RUNTIME_URL;
+    delete process.env.DISHA_RESEARCH_RUNTIME_TOKEN;
+    resetEnvForTests();
     await clearEvidenceLedgerForTests();
     clearMissionsForTests();
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+    delete process.env.DISHA_RESEARCH_RUNTIME_URL;
+    delete process.env.DISHA_RESEARCH_RUNTIME_TOKEN;
+    resetEnvForTests();
   });
 
   it("catalogs all major intelligence components behind explicit governance contracts", () => {
@@ -160,6 +174,67 @@ describe("DISHA governed extension layer", () => {
         maxRuntimeMs: 60_000,
       }),
     ).toThrow();
+  });
+
+  it("keeps research runtime requests read-only and unavailable by default", async () => {
+    const mission = await runMission({
+      rawText: "Use DISHA Brain and cognitive memory graph context.",
+      userId: "u1",
+      userRole: "admin",
+    });
+    const request = buildResearchRuntimeRequest(mission, "disha-brain");
+    const runtime = await queryGovernedResearchRuntime(mission, "disha-brain");
+    const health = await checkGovernedResearchRuntimeHealth();
+
+    expect(request.mode).toBe("read_only");
+    expect(request.constraints).toMatchObject({
+      noExternalActions: true,
+      noStateMutation: true,
+      requireSourceHashes: true,
+    });
+    expect(runtime.status).toBe("unavailable");
+    expect(health.configured).toBe(false);
+  });
+
+  it("admits only validated governed research runtime responses", async () => {
+    process.env.DISHA_RESEARCH_RUNTIME_URL = "http://127.0.0.1:8711";
+    process.env.DISHA_RESEARCH_RUNTIME_TOKEN = "runtime-token";
+    resetEnvForTests();
+    const fetchMock = vi.spyOn(globalThis, "fetch").mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        contractVersion: "disha.research-runtime.v1",
+        component: "memory-graph",
+        status: "ok",
+        summary: "Runtime returned source-bound context.",
+        observations: [{
+          title: "Graph context found",
+          description: "A source-bound memory graph relation was identified.",
+          confidence: 0.71,
+          sourceHashes: ["source-hash-1"],
+        }],
+        sourceHashes: ["source-hash-1"],
+        limitations: ["Read-only runtime response."],
+      }),
+    } as Response);
+    const mission = await runMission({
+      rawText: "Use memory graph context.",
+      userId: "u1",
+      userRole: "admin",
+    });
+
+    const runtime = await queryGovernedResearchRuntime(mission, "memory-graph");
+    const [, init] = fetchMock.mock.calls[0];
+
+    expect(runtime.status).toBe("ok");
+    expect(runtime.observations[0]?.sourceHashes).toEqual(["source-hash-1"]);
+    expect(init?.headers).toMatchObject({ Authorization: "Bearer runtime-token" });
+    expect(JSON.parse(String(init?.body))).toMatchObject({
+      contractVersion: "disha.research-runtime.v1",
+      component: "memory-graph",
+      mode: "read_only",
+      constraints: { noExternalActions: true, noStateMutation: true, requireSourceHashes: true },
+    });
   });
 
   it("returns governed extensions as part of the unified agentic mission result", async () => {

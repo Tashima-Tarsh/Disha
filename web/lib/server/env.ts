@@ -13,6 +13,9 @@ const envSchema = z.object({
   DISHA_ALLOWED_ORIGINS: z.string().optional(),
   DISHA_BACKEND_URL: z.string().url().default("http://localhost:3001"),
   DISHA_BRAIN_URL: z.string().url().optional(),
+  DISHA_RESEARCH_RUNTIME_URL: z.string().url().optional(),
+  DISHA_RESEARCH_RUNTIME_TOKEN: z.string().optional(),
+  DISHA_RESEARCH_RUNTIME_TIMEOUT_MS: z.coerce.number().int().positive().default(2500),
   // Public base URL for generating stable production share links, callbacks, etc.
   // Set this in production (e.g. https://app.example.com). Falls back to request origin in dev.
   NEXT_PUBLIC_APP_URL: z.string().url().optional(),
@@ -75,6 +78,9 @@ export function getEnv(): RuntimeEnv {
       DISHA_ALLOWED_ORIGINS: "http://localhost:3000",
       DISHA_BACKEND_URL: "http://localhost:3001",
       DISHA_BRAIN_URL: "http://localhost:8080",
+      DISHA_RESEARCH_RUNTIME_URL: undefined,
+      DISHA_RESEARCH_RUNTIME_TOKEN: undefined,
+      DISHA_RESEARCH_RUNTIME_TIMEOUT_MS: 2500,
       NEXT_PUBLIC_APP_URL: "https://disha.your-production-domain.com",
       DISHA_WEB_RATE_LIMIT: 120,
       DISHA_WEB_API_TOKEN: undefined,

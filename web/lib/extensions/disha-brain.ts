@@ -2,6 +2,7 @@ import type { DishaLensResult } from "../unified/contracts";
 import { repoEvidence, severityForRisk } from "../unified/adapters/shared";
 import { hashValue } from "../unified/hash";
 import type { GovernedExtension, GovernedExtensionAnalysis, GovernedExtensionRequest } from "./contracts";
+import { queryGovernedResearchRuntime } from "./research-runtime";
 
 const BRAIN_SOURCE_PATH = "disha/brain";
 
@@ -36,10 +37,14 @@ export const dishaBrainExtension: GovernedExtension = {
 
   async analyze({ mission }: GovernedExtensionRequest): Promise<GovernedExtensionAnalysis> {
     const signal = mission.signal;
+    const runtime = await queryGovernedResearchRuntime(mission, "disha-brain");
     const evidence = [
       repoEvidence(signal, "disha/brain/graph", "Brain graph modules are treated as routing context, not authoritative fact."),
       repoEvidence(signal, "disha/brain/evidence", "Brain evidence utilities must map observations into auditable source records."),
       repoEvidence(signal, "disha/brain/policy/no_first_use.py", "No-First-Use posture keeps cognitive output advisory and non-executing."),
+      ...(runtime.status === "ok"
+        ? [repoEvidence(signal, "disha/brain/runtime", `Governed Brain runtime response admitted with ${runtime.sourceHashes.length} source hash reference(s).`)]
+        : []),
     ];
     const riskScore = Math.max(0.31, mission.riskScore * 0.72);
     const lensResult: DishaLensResult = {
@@ -54,6 +59,13 @@ export const dishaBrainExtension: GovernedExtension = {
             "The Brain adapter is enabled only as a governed interpretation layer. Any claim not tied to admitted evidence remains [VERIFY REQUIRED].",
           evidenceIds: evidence.map((item) => item.id),
         },
+        ...runtime.observations.map((observation) => ({
+          id: `brain-runtime-${hashValue({ missionId: mission.missionId, observation }).slice(0, 10)}`,
+          title: observation.title,
+          severity: severityForRisk(1 - observation.confidence),
+          description: `${observation.description} Source hashes: ${observation.sourceHashes.join(", ") || "[VERIFY REQUIRED]"}.`,
+          evidenceIds: evidence.map((item) => item.id),
+        })),
       ],
       confidence: 0.69,
       riskScore,
@@ -80,6 +92,7 @@ export const dishaBrainExtension: GovernedExtension = {
       limitations: [
         "Read-only adapter only; it does not start the Brain runtime.",
         "All cognitive claims require source-hash binding before external publication.",
+        ...runtime.limitations,
       ],
     };
   },
