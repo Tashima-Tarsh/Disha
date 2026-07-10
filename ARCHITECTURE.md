@@ -36,14 +36,23 @@ flowchart LR
     D --> E["Evidence Ledger v2"]
     D --> F["Governed Extension Layer"]
     F --> G["Vyuha Defense Extension"]
-    F --> H["DISHA Brain Adapter (future)"]
-    F --> I["Honeypot Adapter (future)"]
+    F --> H["DISHA Brain Adapter"]
+    F --> I["Honeypot Evidence Adapter"]
+    F --> K["Cognitive Loop Adapter"]
+    F --> L["Memory / Graph Adapter"]
+    F --> M["Bounded Simulation Adapter"]
     G --> D
     H --> D
     I --> D
+    K --> D
+    L --> D
+    M --> D
     G --> E
     H --> E
     I --> E
+    K --> E
+    L --> E
+    M --> E
     E --> J["Unified Report"]
 ```
 
@@ -100,27 +109,51 @@ Status:
 
 Responsibilities:
 
-- Define `GovernedExtension` contracts.
+- Define `ExtensionContract` / `GovernedExtension` contracts.
+- Define `EvidenceEmitter` lifecycle emission.
 - Convert advanced capability output into typed proposals and evidence-backed analysis.
 - Re-run Policy Gate evaluation for extension outputs.
 - Append extension request, policy, and result events to Evidence Ledger v2.
 - Return extension results as part of the unified mission response.
 
-Current first-class extension:
+Lifecycle:
+
+```mermaid
+sequenceDiagram
+    participant W as Workbench/API
+    participant O as Orchestrator
+    participant X as ExtensionContract
+    participant P as Policy Gate
+    participant L as Evidence Ledger v2
+    W->>O: submit mission
+    O->>L: command + signal + lens evidence
+    O->>X: request governed analysis
+    X->>L: extension_requested
+    X-->>O: GovernedExtensionAnalysis
+    O->>P: base lens results + extension lens result
+    P->>L: extension_policy_evaluated
+    O->>L: extension_result_recorded
+    O-->>W: MissionResult + GovernedExtensionRun
+```
+
+Active first-class extensions:
 
 | Extension | Source | Status |
 | --- | --- | --- |
 | Vyuha Defense Engine | `skills/vyuha-defense-engine/` | Defensive proposal adapter active in `web/lib/extensions/vyuha-defense.ts` |
+| DISHA Brain | `disha/brain/` | Read-only graph/orchestration adapter active in `web/lib/extensions/disha-brain.ts` |
+| Cognitive Engine and Loop | `disha/ai/core/cognitive_loop.py`, `disha/ai/agents/` | Read-only phase adapter active in `web/lib/extensions/cognitive-engine.ts` |
+| Memory and Graph Knowledge | `disha/brain/memory/`, `disha/brain/graph/`, `disha/ai/core/memory/` | Source-hash-bound context adapter active in `web/lib/extensions/memory-graph.ts` |
+| Honeypot Evidence Intake | `disha/services/cyber/honeypot/`, Vyuha honeypot proposals | Owned telemetry intake adapter active in `web/lib/extensions/honeypot-evidence.ts` |
+| Quantum and Physics Simulation | `disha/ai/physics/`, `disha/ai/models/physics_engine/`, `disha/ai/models/simulation/` | Bounded simulation request adapter active in `web/lib/extensions/physics-simulation.ts` |
 
-Planned governed extensions:
+Extension validation:
 
-| Extension | Source | Admission Rule |
-| --- | --- | --- |
-| DISHA Brain | `disha/brain/` | Read-only graph/orchestration summaries only until a stable JSON adapter contract exists |
-| Cognitive Engine and Loop | `disha/ai/core/cognitive_loop.py`, `disha/ai/agents/` | Perception, deliberation, and decision phases become proposals; actions remain policy-denied by default |
-| Memory and Graph Knowledge | `disha/brain/memory/`, `disha/brain/graph/`, `disha/ai/core/memory/` | Context enrichment only; memory cannot become fact without evidence hashes |
-| Honeypot Evidence Intake | `disha/services/cyber/honeypot/`, Vyuha honeypot proposals | Owned/authorized telemetry only, with sensor identity and raw-event hash |
-| Quantum and Physics Simulation | `disha/ai/physics/`, `disha/ai/models/physics_engine/`, `disha/ai/models/simulation/` | Bounded advisory simulation only; no factual prediction without calibration evidence |
+- Extension output must match its registered contract ID and title.
+- Extension output must include at least one finding and one evidence item.
+- Proposed actions must be mirrored as `DishaLensResult.recommendedActions`.
+- Defensive posture must match the manifest.
+- The runner records a lifecycle trace: `request`, `policy_evaluation`, and `result_record`.
 
 The extension catalog is exposed at:
 

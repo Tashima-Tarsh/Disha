@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it } from "vitest";
 
 import {
   boundedSimulationRequestSchema,
+  getGovernedExtensionArchitecture,
   ingestOwnedHoneypotEvent,
   listGovernedExtensionManifests,
   runGovernedExtensions,
@@ -92,7 +93,27 @@ describe("DISHA governed extension layer", () => {
     ]));
     expect(run.results.every((result) => result.policyDecision.decision !== "DENY")).toBe(true);
     expect(run.evidenceEventIds.length).toBe(run.results.length * 3);
+    expect(run.lifecycle.map((event) => event.phase)).toEqual(expect.arrayContaining(["request", "policy_evaluation", "result_record"]));
+    for (const result of run.results) {
+      const lifecycleEvents = run.lifecycle.filter((event) => event.extensionId === result.extensionId);
+      expect(lifecycleEvents.map((event) => event.evidenceEventId)).toEqual(result.evidenceEventIds);
+    }
     expect(verifyEvidenceChain(await getEvidenceEvents(mission.missionId)).ok).toBe(true);
+  });
+
+  it("exposes the governed extension architecture from active contracts", () => {
+    const architecture = getGovernedExtensionArchitecture();
+    expect(architecture.activeExtensionIds).toEqual(expect.arrayContaining([
+      "vyuha-defense-engine",
+      "disha-brain",
+      "cognitive-engine",
+      "memory-graph",
+      "honeypot-evidence",
+      "quantum-physics-simulation",
+    ]));
+    expect(architecture.invariant).toContain("Policy Gate");
+    expect(architecture.systemDiagram).toContain("flowchart LR");
+    expect(architecture.decisionFlowDiagram).toContain("sequenceDiagram");
   });
 
   it("converts owned honeypot telemetry into EvidenceAppendInput and ledger evidence", async () => {

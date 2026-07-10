@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
-import { listGovernedExtensionManifests } from "@/lib/extensions";
+import { getGovernedExtensionArchitecture, listGovernedExtensionManifests } from "@/lib/extensions";
 import { withContext } from "@/lib/unified/api";
 
 export async function GET(req: NextRequest) {
@@ -9,6 +9,7 @@ export async function GET(req: NextRequest) {
       {
         architecture: "governed-extension-layer",
         rule: "extension source -> adapter contract -> policy gate -> evidence ledger -> unified mission result",
+        architectureDetail: getGovernedExtensionArchitecture(),
         activeExtensions: listGovernedExtensionManifests().filter((extension) => extension.maturity === "active"),
         plannedExtensions: listGovernedExtensionManifests().filter((extension) => extension.maturity !== "active"),
       },

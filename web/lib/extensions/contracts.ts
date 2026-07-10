@@ -1,9 +1,11 @@
 import type { DishaLensResult, PolicyDecision } from "../unified/contracts";
+import type { EvidenceAppendInput } from "../unified/evidence-ledger";
 import type { MissionResult } from "../unified/orchestrator";
 
 export type GovernedExtensionStatus = "ready" | "not_applicable" | "policy_blocked" | "completed";
 export type GovernedExtensionMaturity = "active" | "planned" | "blocked";
 export type GovernedExtensionKind = "defense" | "cognitive" | "memory_graph" | "honeypot" | "simulation";
+export type GovernedExtensionPhase = "request" | "analysis" | "policy_evaluation" | "result_record";
 
 export type GovernedExtensionManifest = {
   id: string;
@@ -68,4 +70,18 @@ export type GovernedExtensionRun = {
   results: GovernedExtensionResult[];
   evidenceEventIds: string[];
   skipped: Array<{ extensionId: string; reason: string }>;
+  lifecycle: GovernedExtensionLifecycleEvent[];
 };
+
+export type ExtensionContract = GovernedExtension;
+
+export type GovernedExtensionLifecycleEvent = {
+  extensionId: string;
+  phase: GovernedExtensionPhase;
+  evidenceEventId: string;
+};
+
+export interface EvidenceEmitter {
+  emit(input: EvidenceAppendInput): Promise<string>;
+  lifecycle(): GovernedExtensionLifecycleEvent[];
+}

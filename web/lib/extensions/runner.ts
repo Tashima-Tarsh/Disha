@@ -1,20 +1,23 @@
-import { appendEvidenceEvent } from "../unified/evidence-ledger";
 import { evaluatePolicy } from "../unified/policy-gate";
 import type { MissionResult } from "../unified/orchestrator";
 import type { GovernedExtensionResult, GovernedExtensionRun } from "./contracts";
+import { createLedgerEvidenceEmitter } from "./evidence-emitter";
 import { listGovernedExtensions } from "./registry";
+import { validateExtensionAnalysis } from "./validation";
 
 export async function runGovernedExtensions(mission: MissionResult, actor = "governed-extension-layer"): Promise<GovernedExtensionRun> {
   const results: GovernedExtensionResult[] = [];
   const evidenceEventIds: string[] = [];
   const skipped: GovernedExtensionRun["skipped"] = [];
   const extensions = listGovernedExtensions();
+  const emitter = createLedgerEvidenceEmitter();
 
   if (mission.policyDecision.decision === "DENY") {
     return {
       results,
       evidenceEventIds,
       skipped: extensions.map((extension) => ({ extensionId: extension.id, reason: "mission_policy_denied" })),
+      lifecycle: [],
     };
   }
 
@@ -24,7 +27,9 @@ export async function runGovernedExtensions(mission: MissionResult, actor = "gov
       continue;
     }
 
-    const requested = await appendEvidenceEvent({
+    const requestedEventId = await emitter.emit({
+      extensionId: extension.id,
+      phase: "request",
       missionId: mission.missionId,
       actor,
       action: "extension_requested",
@@ -35,11 +40,14 @@ export async function runGovernedExtensions(mission: MissionResult, actor = "gov
       },
       policyDecision: mission.policyDecision,
     });
-    evidenceEventIds.push(requested.eventId);
+    evidenceEventIds.push(requestedEventId);
 
     const analysis = await extension.analyze({ mission, actor });
+    validateExtensionAnalysis(extension, analysis);
     const policyDecision = evaluatePolicy(mission.signal, [...mission.lensResults, analysis.lensResult]);
-    const policyEvent = await appendEvidenceEvent({
+    const policyEventId = await emitter.emit({
+      extensionId: extension.id,
+      phase: "policy_evaluation",
       missionId: mission.missionId,
       actor: "policy-gate",
       action: "extension_policy_evaluated",
@@ -51,22 +59,24 @@ export async function runGovernedExtensions(mission: MissionResult, actor = "gov
       output: policyDecision,
       policyDecision,
       lensResults: [analysis.lensResult.lens],
-      parentEventId: requested.eventId,
+      parentEventId: requestedEventId,
     });
-    evidenceEventIds.push(policyEvent.eventId);
+    evidenceEventIds.push(policyEventId);
 
     const result: GovernedExtensionResult = {
       ...analysis,
       status: policyDecision.decision === "DENY" ? "policy_blocked" : "completed",
-      policyDecision: { ...policyDecision, evidenceEventId: policyEvent.eventId },
-      evidenceEventIds: [requested.eventId, policyEvent.eventId],
+      policyDecision: { ...policyDecision, evidenceEventId: policyEventId },
+      evidenceEventIds: [requestedEventId, policyEventId],
     };
 
-    const recorded = await appendEvidenceEvent({
+    const recordedEventId = await emitter.emit({
+      extensionId: extension.id,
+      phase: "result_record",
       missionId: mission.missionId,
       actor,
       action: "extension_result_recorded",
-      input: { extensionId: extension.id, policyEventId: policyEvent.eventId },
+      input: { extensionId: extension.id, policyEventId },
       output: {
         extensionId: result.extensionId,
         status: result.status,
@@ -79,12 +89,12 @@ export async function runGovernedExtensions(mission: MissionResult, actor = "gov
         })),
       },
       policyDecision: result.policyDecision,
-      parentEventId: policyEvent.eventId,
+      parentEventId: policyEventId,
     });
-    result.evidenceEventIds.push(recorded.eventId);
-    evidenceEventIds.push(recorded.eventId);
+    result.evidenceEventIds.push(recordedEventId);
+    evidenceEventIds.push(recordedEventId);
     results.push(result);
   }
 
-  return { results, evidenceEventIds, skipped };
+  return { results, evidenceEventIds, skipped, lifecycle: emitter.lifecycle() };
 }
