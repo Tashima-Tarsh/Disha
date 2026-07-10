@@ -2,488 +2,429 @@
 
 import {
   AlertTriangle,
+  Archive,
   CheckCircle2,
-  ChevronDown,
   Clipboard,
   Database,
-  Download,
   FileText,
   GitBranch,
   Landmark,
-  Layers3,
   Loader2,
   LockKeyhole,
+  Network,
   Play,
   ShieldCheck,
-  Sparkles,
 } from "lucide-react";
 import { useMemo, useState } from "react";
 
-import {
-  buildEvidenceChain,
-  evaluatePolicy,
-  EXAMPLE_MISSIONS,
-  executeLens,
-  fuseLensResults,
-  normalizeMission,
-  previewGovernedExtensions,
-  recommendLenses,
-  type EvidenceNode,
-  type FusionResult,
-  type GovernedExtensionPreview,
-  type LensExecution,
-  type LensId,
-  type LensRecommendation,
-  type PolicyResult,
-  type StageStatus,
-  type WorkbenchSignal,
-} from "./demo-engine";
 import styles from "./workbench.module.css";
 
-type FlowStageId = "mission" | "signal" | "routing" | "execution" | "fusion" | "policy" | "extensions" | "ledger" | "report";
+type Sensitivity = "public" | "internal" | "controlled" | "classified";
 
-type FlowStage = {
-  id: FlowStageId;
-  label: string;
-  status: StageStatus;
+type PolicyDecision = {
+  decision: string;
+  reasons: string[];
+  riskScore: number;
+  safeFallback: string;
+  requiredApprovals?: string[];
+  evidenceEventId?: string;
 };
 
-type LiveAgenticMissionResult = {
-  mission: {
-    missionId: string;
-    policyDecision: { decision: string; riskScore: number; evidenceEventId?: string };
-    selectedLenses: string[];
-    evidenceEventIds: string[];
+type EvidenceItem = {
+  id: string;
+  sourceId: string;
+  sourceName: string;
+  evidenceClass: string;
+  summary: string;
+  provenanceHash: string;
+  retrievedAt: string;
+  url?: string;
+};
+
+type LensResult = {
+  lens: string;
+  summary: string;
+  findings: Array<{
+    id: string;
+    title: string;
+    severity: "info" | "low" | "medium" | "high" | "critical";
+    description: string;
+    evidenceIds: string[];
+  }>;
+  confidence: number;
+  riskScore: number;
+  evidence: EvidenceItem[];
+  recommendedActions: Array<{ id: string; label: string; action: string; risk: number; requiresApproval: boolean }>;
+  policyRequired: boolean;
+};
+
+type MissionResult = {
+  missionId: string;
+  signal: {
+    id: string;
+    timestamp: string;
+    input: { rawText: string; requestedAction?: string; indicators: Array<{ type: string; value: string; source?: string }> };
+    context: { intent: string; sensitivity: Sensitivity; entities: Array<{ type: string; value: string }>; dataSources: Array<{ sourceId: string; name: string }> };
+    riskContext: { userRole: string; actionRisk: number; dataSensitivityRisk: number; telemetryRisk?: number };
   };
+  selectedLenses: string[];
+  lensResults: LensResult[];
+  fusedIntelligence: {
+    executiveSummary: string;
+    topFindings: string[];
+    riskDrivers: string[];
+    confidence: number;
+    uncertainty: string[];
+    requiredApprovals: string[];
+    recommendedSafeActions: string[];
+    verifyRequiredItems: string[];
+  };
+  fusedSummary: string;
+  riskScore: number;
+  policyDecision: PolicyDecision;
+  approvalRequired: boolean;
+  safeExecution: string;
+  evidenceEventIds: string[];
+};
+
+type GovernedExtensionResult = {
+  extensionId: string;
+  title: string;
+  summary: string;
+  status: string;
+  defensivePosture: string;
+  lensResult: LensResult;
+  policyDecision: PolicyDecision;
+  actionPolicyDecisions: Array<{ actionId: string; policyActionId: string; decision: PolicyDecision }>;
+  evidenceEventIds: string[];
+  proposedActions: Array<{
+    id: string;
+    label: string;
+    policyActionId: string;
+    description: string;
+    risk: number;
+    requiresApproval: boolean;
+    scope: string;
+  }>;
+  claims?: Array<{
+    claimId: string;
+    text: string;
+    confidence: number;
+    sourceHashes: string[];
+    sourceRefs: string[];
+    verifyRequired: boolean;
+  }>;
+  limitations: string[];
+};
+
+type AgenticMissionResult = {
+  mission: MissionResult;
   governedExtensions: {
-    results: Array<{
-      extensionId: string;
-      title: string;
-      summary: string;
-      status: string;
-      defensivePosture: string;
-      policyDecision: { decision: string; riskScore: number; evidenceEventId?: string };
-      evidenceEventIds: string[];
-      proposedActions: Array<{ label: string; policyActionId: string; requiresApproval: boolean }>;
-    }>;
+    results: GovernedExtensionResult[];
+    failures: Array<{ extensionId: string; stage: string; reason: string; evidenceEventIds: string[] }>;
     skipped: Array<{ extensionId: string; reason: string }>;
-    evidenceEventIds: string[];
     lifecycle: Array<{ extensionId: string; phase: string; evidenceEventId: string }>;
+    evidenceEventIds: string[];
   };
+  modelIntelligence: {
+    status: string;
+    provider: string;
+    model: string;
+    summary: string;
+    confidence: number;
+    verifyRequired: string[];
+    recommendedNextSteps: string[];
+  };
+  learning: { memoryId: string; sourceEventIds: string[]; evidenceHashes: string[]; redacted: boolean } | null;
+  evidenceEventIds: string[];
 };
 
-type LiveEvidenceEvent = {
+type EvidenceEvent = {
   eventId: string;
   missionId: string;
   chainIndex: number;
+  timestamp: string;
   actor: string;
   action: string;
-  policyDecision?: { decision?: string; riskScore?: number } | null;
+  inputHash: string;
+  outputHash?: string;
+  policyDecision?: PolicyDecision;
   lensResults?: string[];
-  previousHash?: string | null;
+  parentEventId?: string;
+  previousHash?: string;
   eventHash: string;
-  eventTimestamp: string;
 };
 
 const DEFAULT_MISSION =
-  "Assess a public-interest governance concern involving district infrastructure claims, CAG audit references, citizen complaints, and possible cyber-enabled fraud patterns. Produce a read-only evidence plan with policy gates and [VERIFY REQUIRED] markers.";
+  "Assess a public-interest governance concern involving district infrastructure claims, CAG audit references, citizen complaints, and cyber-enabled fraud patterns. Produce a read-only evidence plan with policy gates and [VERIFY REQUIRED] markers.";
 
-const DOMAINS = ["Constitutional accountability", "Public finance", "Cyber harm", "Disaster preparedness", "Administrative geography"];
-const TAGS = ["Article 12", "CAG", "District", "Cyber", "NDMA", "Budget", "Citizen protection"];
-const ALL_LENSES: LensId[] = ["governance", "strategy", "cyber", "geospatial", "yudh_view", "quantum"];
+const EXAMPLES = [
+  {
+    title: "CAG + District Accountability",
+    text: "Review CAG audit references, district road procurement claims, citizen complaints, and Article 12 accountability. Produce a source-first evidence brief without asserting unverified facts.",
+  },
+  {
+    title: "Cyber Harm + Citizen Protection",
+    text: "Assess digital arrest and loan-app fraud complaints as public-interest cyber harm. Identify lawful defensive evidence steps, policy gates, and missing official sources.",
+  },
+  {
+    title: "Disaster Preparedness Review",
+    text: "Review flood preparedness claims, NDMA references, district response capacity, river basin context, and public finance evidence gaps for a read-only governance report.",
+  },
+];
+
+const SENSITIVITIES: Sensitivity[] = ["public", "internal", "controlled", "classified"];
 
 export function DishaWorkbench() {
-  const [mission, setMission] = useState(DEFAULT_MISSION);
-  const [domain, setDomain] = useState(DOMAINS[0]);
-  const [tags, setTags] = useState<string[]>(["Article 12", "CAG", "District"]);
-  const [signal, setSignal] = useState<WorkbenchSignal | null>(null);
-  const [recommendations, setRecommendations] = useState<LensRecommendation[]>([]);
-  const [selectedLenses, setSelectedLenses] = useState<LensId[]>([]);
-  const [executions, setExecutions] = useState<LensExecution[]>([]);
-  const [fusion, setFusion] = useState<FusionResult | null>(null);
-  const [policy, setPolicy] = useState<PolicyResult | null>(null);
-  const [extensions, setExtensions] = useState<GovernedExtensionPreview[]>([]);
-  const [ledger, setLedger] = useState<EvidenceNode[]>([]);
-  const [confirmed, setConfirmed] = useState(false);
-  const [reportReady, setReportReady] = useState(false);
-  const [saved, setSaved] = useState(false);
-  const [running, setRunning] = useState(false);
-  const [liveMode, setLiveMode] = useState(false);
-  const [liveResult, setLiveResult] = useState<LiveAgenticMissionResult | null>(null);
-  const [liveEvidence, setLiveEvidence] = useState<LiveEvidenceEvent[]>([]);
-  const [liveError, setLiveError] = useState<string | null>(null);
-  const [expanded, setExpanded] = useState<Record<string, boolean>>({});
-  const [stages, setStages] = useState<FlowStage[]>(createInitialStages());
+  const [missionText, setMissionText] = useState(DEFAULT_MISSION);
+  const [sensitivity, setSensitivity] = useState<Sensitivity>("public");
+  const [indicatorType, setIndicatorType] = useState("domain");
+  const [indicatorValue, setIndicatorValue] = useState("");
+  const [requestedAction, setRequestedAction] = useState("read-only governed workbench analysis");
+  const [result, setResult] = useState<AgenticMissionResult | null>(null);
+  const [evidence, setEvidence] = useState<EvidenceEvent[]>([]);
+  const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
+  const [status, setStatus] = useState<"idle" | "running" | "complete" | "error">("idle");
+  const [error, setError] = useState<string | null>(null);
 
-  const previewSignal = useMemo(() => normalizeMission(mission, domain, tags), [mission, domain, tags]);
-  const activeRecommendations = recommendations.length ? recommendations : recommendLenses(previewSignal);
-  const selectedRecommendationObjects = activeRecommendations.filter((item) => selectedLenses.includes(item.id));
-  const finalReport = useMemo(
-    () => buildReport(signal, executions, fusion, policy, extensions, ledger, liveResult),
-    [signal, executions, fusion, policy, extensions, ledger, liveResult],
+  const mission = result?.mission ?? null;
+  const selectedEvent = evidence.find((event) => event.eventId === selectedEventId) ?? evidence[0] ?? null;
+  const memoryGraph = result?.governedExtensions.results.find((extension) => extension.extensionId === "memory-graph") ?? null;
+  const coreEvidenceCount = useMemo(() => mission?.lensResults.reduce((sum, lens) => sum + lens.evidence.length, 0) ?? 0, [mission]);
+  const extensionClaimCount = useMemo(
+    () => result?.governedExtensions.results.reduce((sum, extension) => sum + (extension.claims?.length ?? 0), 0) ?? 0,
+    [result],
   );
 
-  function setStage(id: FlowStageId, status: StageStatus) {
-    setStages((current) => current.map((stage) => (stage.id === id ? { ...stage, status } : stage)));
-  }
+  async function runWorkbenchMission() {
+    setStatus("running");
+    setError(null);
+    setResult(null);
+    setEvidence([]);
+    setSelectedEventId(null);
 
-  function toggleTag(tag: string) {
-    setTags((current) => (current.includes(tag) ? current.filter((item) => item !== tag) : [...current, tag]));
-  }
+    try {
+      const indicators = indicatorValue.trim()
+        ? [{ type: indicatorType, value: indicatorValue.trim(), source: "workbench-input" }]
+        : [];
+      const response = await fetch("/api/v1/agentic/mission", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          rawText: missionText,
+          requestedAction,
+          sensitivity,
+          indicators,
+          operatorInstruction: "Workbench run: return governed, evidence-first analysis only. Do not execute external actions.",
+        }),
+      });
+      const payload = await response.json();
+      if (!response.ok) throw new Error(readApiError(payload, response.status));
 
-  function toggleLens(lens: LensId) {
-    setSelectedLenses((current) => (current.includes(lens) ? current.filter((item) => item !== lens) : [...current, lens]));
-  }
+      const agenticResult = payload as AgenticMissionResult;
+      setResult(agenticResult);
 
-  async function runMission() {
-    setRunning(true);
-    setConfirmed(false);
-    setReportReady(false);
-    setSaved(false);
-    setStages(createInitialStages());
-    setExecutions([]);
-    setFusion(null);
-    setPolicy(null);
-    setExtensions([]);
-    setLedger([]);
-    setLiveResult(null);
-    setLiveEvidence([]);
-    setLiveError(null);
-
-    setStage("mission", "complete");
-    setStage("signal", "active");
-    await wait(450);
-    const normalized = normalizeMission(mission, domain, tags);
-    setSignal(normalized);
-    setStage("signal", "complete");
-
-    setStage("routing", "active");
-    await wait(450);
-    const routed = recommendLenses(normalized);
-    setRecommendations(routed);
-    const defaults = selectedLenses.length ? selectedLenses : routed.filter((item) => item.selectedByDefault).map((item) => item.id);
-    setSelectedLenses(defaults);
-    setStage("routing", "complete");
-
-    setStage("execution", "active");
-    const runnable = routed.filter((item) => defaults.includes(item.id));
-    const partial: LensExecution[] = [];
-    for (const lens of runnable) {
-      partial.push({ ...lens, status: "active", findings: [] });
-      setExecutions([...partial]);
-      await wait(420);
-      partial[partial.length - 1] = executeLens(normalized, lens);
-      setExecutions([...partial]);
+      const evidenceResponse = await fetch(`/api/v1/evidence/${encodeURIComponent(agenticResult.mission.missionId)}`);
+      const evidencePayload = await evidenceResponse.json();
+      if (!evidenceResponse.ok) throw new Error(readApiError(evidencePayload, evidenceResponse.status));
+      setEvidence(evidencePayload.events as EvidenceEvent[]);
+      setSelectedEventId((evidencePayload.events as EvidenceEvent[])[0]?.eventId ?? null);
+      setStatus("complete");
+    } catch (caught) {
+      setError(caught instanceof Error ? caught.message : "Workbench mission failed.");
+      setStatus("error");
     }
-    setStage("execution", "complete");
-
-    setStage("fusion", "active");
-    await wait(400);
-    const fused = fuseLensResults(partial);
-    setFusion(fused);
-    setStage("fusion", "complete");
-
-    setStage("policy", "active");
-    await wait(360);
-    const policyResult = evaluatePolicy(normalized, partial);
-    setPolicy(policyResult);
-    setStage("policy", "complete");
-
-    setStage("extensions", "active");
-    await wait(330);
-    const extensionResults = previewGovernedExtensions(normalized, partial);
-    setExtensions(extensionResults);
-    if (liveMode) {
-      const live = await runLiveMission(mission, normalized.sensitivity);
-      if (live.result) {
-        setLiveResult(live.result);
-        const evidence = await fetchLiveEvidence(live.result.mission.missionId);
-        if (evidence.events) setLiveEvidence(evidence.events);
-        if (evidence.error) setLiveError(evidence.error);
-      }
-      if (live.error) setLiveError(live.error);
-    }
-    setStage("extensions", "complete");
-
-    setStage("ledger", "active");
-    await wait(350);
-    setLedger(buildEvidenceChain(normalized, partial, policyResult, extensionResults));
-    setStage("ledger", "complete");
-
-    setStage("report", "active");
-    await wait(250);
-    setReportReady(true);
-    setStage("report", "complete");
-    setRunning(false);
   }
 
   async function copyReport() {
-    await navigator.clipboard.writeText(finalReport);
+    await navigator.clipboard.writeText(buildReport(result, evidence));
   }
 
   function downloadJson() {
-    const payload = JSON.stringify({ signal, executions, fusion, policy, extensions, ledger, liveResult, liveEvidence, generatedAt: new Date().toISOString() }, null, 2);
-    const url = URL.createObjectURL(new Blob([payload], { type: "application/json" }));
+    const blob = new Blob([JSON.stringify({ result, evidence, exportedAt: new Date().toISOString() }, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
-    link.download = `${signal?.missionId ?? "disha-mission"}-demo-ledger.json`;
+    link.download = `${mission?.missionId ?? "disha-workbench"}-evidence.json`;
     link.click();
     URL.revokeObjectURL(url);
   }
 
-  function saveToLedger() {
-    setSaved(true);
-  }
-
   return (
     <main className={styles.shell}>
-      <section className={styles.hero}>
+      <section className={styles.topbar}>
         <div>
-          <p className={styles.eyebrow}>DISHA 6.6 Agentic Workbench</p>
-          <h1>Run a constitutional intelligence mission and see every decision path.</h1>
-          <p className={styles.heroText}>
-            Demo mode turns a mission into a structured signal, routes lenses, fuses findings, evaluates policy, and builds a visible evidence
-            chain. It is designed for later backend connection without hiding the reasoning from the analyst.
+          <p className={styles.eyebrow}>DISHA 6.6 Workbench</p>
+          <h1>Constitutional Evidence Workbench</h1>
+          <p>
+            Run a governed mission, inspect the real policy decision, review lens evidence, and walk the ledger event by event.
           </p>
         </div>
-        <div className={styles.heroPanel} aria-label="Workbench status">
-          <span>Mode</span>
-          <strong>{liveMode ? "Live governed API" : "Safe read-only demo"}</strong>
-          <small>{liveMode ? "Runs through /api/v1/agentic/mission with policy and ledger events." : "No live claim is asserted without source evidence."}</small>
+        <div className={styles.statusPanel}>
+          <span>Runtime status</span>
+          <strong>{statusLabel(status)}</strong>
+          <small>{mission ? `Mission ${mission.missionId}` : "No mission has been run in this session."}</small>
         </div>
       </section>
 
-      <section className={styles.layout}>
-        <aside className={styles.stepper} aria-label="Mission flow stages">
-          {stages.map((stage, index) => (
-            <div className={styles.step} data-status={stage.status} key={stage.id}>
-              <span className={styles.stepIndex}>{index + 1}</span>
-              <span>{stage.label}</span>
-            </div>
-          ))}
+      <section className={styles.grid}>
+        <aside className={styles.sidebar} aria-label="Workbench navigation">
+          <NavItem label="Mission Input" active />
+          <NavItem label="Analysis Results" active={Boolean(mission)} />
+          <NavItem label="Policy Decision" active={Boolean(mission?.policyDecision)} />
+          <NavItem label="Evidence Chain" active={evidence.length > 0} />
+          <NavItem label="Memory / Graph" active={Boolean(memoryGraph)} />
         </aside>
 
         <div className={styles.workspace}>
           <section className={styles.panel}>
-            <PanelTitle icon={<Landmark size={18} />} title="1. Mission Input" subtitle="Write the mission as a human analyst would frame it." />
+            <PanelTitle icon={<Landmark size={18} />} title="Mission Input" label="Dynamic form" />
             <textarea
               className={styles.textarea}
-              value={mission}
-              onChange={(event) => setMission(event.target.value)}
-              placeholder="Describe the mission, scope, public sources, constitutional concern, and intended read-only output."
+              value={missionText}
+              onChange={(event) => setMissionText(event.target.value)}
+              placeholder="Describe the public-interest mission, source context, intended output, and boundaries."
             />
-            <div className={styles.controls}>
+            <div className={styles.formGrid}>
               <label>
-                Domain
-                <select value={domain} onChange={(event) => setDomain(event.target.value)}>
-                  {DOMAINS.map((item) => (
-                    <option key={item}>{item}</option>
-                  ))}
+                Sensitivity
+                <select value={sensitivity} onChange={(event) => setSensitivity(event.target.value as Sensitivity)}>
+                  {SENSITIVITIES.map((item) => <option key={item}>{item}</option>)}
                 </select>
               </label>
-              <div className={styles.tagCloud} aria-label="Mission tags">
-                {TAGS.map((tag) => (
-                  <button className={styles.tag} data-selected={tags.includes(tag)} key={tag} onClick={() => toggleTag(tag)} type="button">
-                    {tag}
-                  </button>
-                ))}
-              </div>
+              <label>
+                Indicator type
+                <select value={indicatorType} onChange={(event) => setIndicatorType(event.target.value)}>
+                  {["domain", "ip", "url", "hash", "cve", "email", "other"].map((item) => <option key={item}>{item}</option>)}
+                </select>
+              </label>
+              <label>
+                Optional indicator
+                <input value={indicatorValue} onChange={(event) => setIndicatorValue(event.target.value)} placeholder="example.gov or 203.0.113.42" />
+              </label>
             </div>
-            <div className={styles.examples}>
-              {EXAMPLE_MISSIONS.map((example) => (
-                <button key={example.title} onClick={() => setMission(example.text)} type="button">
+            <label className={styles.fullLabel}>
+              Requested action
+              <input value={requestedAction} onChange={(event) => setRequestedAction(event.target.value)} />
+            </label>
+            <div className={styles.exampleRow}>
+              {EXAMPLES.map((example) => (
+                <button key={example.title} type="button" onClick={() => setMissionText(example.text)}>
                   {example.title}
                 </button>
               ))}
             </div>
-            <label className={styles.modeSwitch}>
-              <input checked={liveMode} onChange={(event) => setLiveMode(event.target.checked)} type="checkbox" />
-              <span>
-                <strong>Use live governed API</strong>
-                <small>Calls the production mission route and renders real extension, policy, and evidence results when backend access is available.</small>
-              </span>
-            </label>
-            <button className={styles.primaryButton} disabled={running || mission.trim().length < 20} onClick={runMission} type="button">
-              {running ? <Loader2 className={styles.spin} size={17} /> : <Play size={17} />}
-              Run DISHA mission
+            {error ? <div className={styles.errorBox}><AlertTriangle size={18} />{error}</div> : null}
+            <button className={styles.primaryButton} type="button" onClick={runWorkbenchMission} disabled={status === "running" || missionText.trim().length < 20}>
+              {status === "running" ? <Loader2 className={styles.spin} size={17} /> : <Play size={17} />}
+              Run governed mission
             </button>
           </section>
 
-          <section className={styles.panel}>
-            <PanelTitle icon={<Sparkles size={18} />} title="2. Signal Normalization" subtitle="Raw mission text becomes a structured DishaSignal." />
-            <div className={styles.transform}>
-              <div>
-                <span>Raw mission</span>
-                <p>{mission.slice(0, 190)}{mission.length > 190 ? "..." : ""}</p>
-              </div>
-              <div className={styles.arrow}>→</div>
-              <div>
-                <span>Structured signal</span>
-                <code>{(signal ?? previewSignal).id}</code>
-                <p>{(signal ?? previewSignal).intent}</p>
-              </div>
-            </div>
-            <div className={styles.kpiGrid}>
-              <Metric label="Sensitivity" value={(signal ?? previewSignal).sensitivity} score={(signal ?? previewSignal).sensitivityScore} />
-              <Metric label="Risk" value={(signal ?? previewSignal).riskLevel} score={(signal ?? previewSignal).riskScore} />
-              <Metric label="Entities" value={`${(signal ?? previewSignal).entities.length}`} detail={(signal ?? previewSignal).entities.join(", ")} />
-            </div>
+          <section className={styles.summaryGrid}>
+            <Metric label="Core lenses" value={mission ? String(mission.selectedLenses.length) : "-"} detail={mission?.selectedLenses.join(", ") ?? "Awaiting mission"} />
+            <Metric label="Evidence events" value={String(evidence.length || "-")} detail={evidence.length ? "Ledger chain loaded" : "Run mission to load"} />
+            <Metric label="Extension claims" value={String(extensionClaimCount || "-")} detail="Governed extension provenance" />
+            <Metric label="Risk score" value={mission ? `${Math.round(mission.riskScore * 100)}%` : "-"} detail={mission?.safeExecution ?? "Not evaluated"} />
           </section>
 
           <section className={styles.panel}>
-            <PanelTitle icon={<Layers3 size={18} />} title="3. Lens Selection & Routing" subtitle="Recommended lenses stay under analyst control." />
-            <div className={styles.lensGrid}>
-              {ALL_LENSES.map((lens) => {
-                const item = activeRecommendations.find((candidate) => candidate.id === lens) ?? fallbackLens(lens);
-                const selected = selectedLenses.length ? selectedLenses.includes(lens) : item.selectedByDefault;
-                return (
-                  <button className={styles.lensCard} data-selected={selected} key={lens} onClick={() => toggleLens(lens)} type="button">
-                    <strong>{item.label}</strong>
-                    <span>{Math.round(item.confidence * 100)}% route confidence</span>
-                    <p>{item.reason}</p>
-                  </button>
-                );
-              })}
-            </div>
-          </section>
-
-          <section className={styles.panel}>
-            <PanelTitle icon={<ShieldCheck size={18} />} title="4. Lens Execution" subtitle="Each lens exposes findings, uncertainty, evidence, and safe actions." />
-            <div className={styles.resultStack}>
-              {(executions.length ? executions : selectedRecommendationObjects).map((item) => {
-                const execution = executions.find((result) => result.id === item.id) ?? null;
-                const isOpen = expanded[item.id] ?? true;
-                return (
-                  <article className={styles.resultCard} key={item.id}>
-                    <button
-                      className={styles.resultHeader}
-                      onClick={() => setExpanded((current) => ({ ...current, [item.id]: !isOpen }))}
-                      type="button"
-                    >
-                      <span>
-                        <strong>{item.label}</strong>
-                        <small>{execution?.status === "active" ? "Running" : execution ? "Complete" : "Queued"}</small>
-                      </span>
-                      {execution?.status === "active" ? <Loader2 className={styles.spin} size={18} /> : <ChevronDown size={18} />}
-                    </button>
-                    {isOpen && (
-                      <div className={styles.resultBody}>
-                        {execution?.findings.length ? (
-                          execution.findings.map((finding) => (
-                            <div className={styles.finding} key={finding.id}>
-                              <strong>{finding.title}</strong>
-                              <p>{finding.description}</p>
-                              <div className={styles.metaRow}>
-                                <span>Confidence {Math.round(finding.confidence * 100)}%</span>
-                                <span>{finding.uncertainty}</span>
-                              </div>
-                              <ul>
-                                {finding.evidence.map((evidence) => (
-                                  <li key={evidence}>{evidence}</li>
-                                ))}
-                              </ul>
-                            </div>
-                          ))
-                        ) : (
-                          <p className={styles.empty}>Run the mission to execute this lens.</p>
-                        )}
-                      </div>
-                    )}
-                  </article>
-                );
-              })}
-            </div>
+            <PanelTitle icon={<FileText size={18} />} title="Analysis Results" label="Core governed lenses" />
+            {mission ? (
+              <div className={styles.resultLayout}>
+                {mission.lensResults.map((lens) => <LensCard key={lens.lens} lens={lens} />)}
+              </div>
+            ) : (
+              <EmptyState text="Run a mission to fetch real lens results from the DISHA API." />
+            )}
           </section>
 
           <section className={styles.twoColumn}>
-            <div className={styles.panel}>
-              <PanelTitle icon={<GitBranch size={18} />} title="5. Fusion Stage" subtitle="Agreements, conflicts, and synthesized insight." />
-              {fusion ? <FusionView fusion={fusion} /> : <EmptyState text="Fusion appears after lens execution completes." />}
-            </div>
-            <div className={styles.panel}>
-              <PanelTitle icon={<LockKeyhole size={18} />} title="6. Policy Gate" subtitle="Allowed output is explicit and reviewable." />
-              {policy ? (
-                <div className={styles.policyBox} data-decision={policy.decision}>
-                  <strong>{policy.decision}</strong>
-                  {policy.reasons.map((reason) => (
-                    <p key={reason}>{reason}</p>
-                  ))}
-                  <label className={styles.confirm}>
-                    <input checked={confirmed} onChange={(event) => setConfirmed(event.target.checked)} type="checkbox" />
-                    {policy.requiredHumanStep}
-                  </label>
+            <section className={styles.panel}>
+              <PanelTitle icon={<GitBranch size={18} />} title="Fusion Summary" label="Governed synthesis" />
+              {mission ? (
+                <div className={styles.fusionGrid}>
+                  <InfoList title="Top findings" items={mission.fusedIntelligence.topFindings} />
+                  <InfoList title="Risk drivers" items={mission.fusedIntelligence.riskDrivers} />
+                  <InfoList title="Uncertainty" items={mission.fusedIntelligence.uncertainty} />
+                  <InfoList title="Safe actions" items={mission.fusedIntelligence.recommendedSafeActions} />
                 </div>
               ) : (
-                <EmptyState text="Policy evaluation waits for fused findings." />
+                <EmptyState text="Fusion is produced after core lenses complete." />
               )}
-            </div>
+            </section>
+
+            <section className={styles.panel}>
+              <PanelTitle icon={<LockKeyhole size={18} />} title="Policy Decision" label="Policy evaluated" />
+              {mission ? <PolicyPanel policy={mission.policyDecision} approvalRequired={mission.approvalRequired} /> : <EmptyState text="Policy output will appear here." />}
+            </section>
           </section>
 
           <section className={styles.panel}>
-            <PanelTitle icon={<ShieldCheck size={18} />} title="7. Governed Extensions" subtitle="Advanced capabilities appear only as policy-gated, evidence-recorded proposals." />
-            {extensions.length ? (
-              <>
-                <div className={styles.extensionGrid}>
-                  {extensions.map((extension) => (
-                    <article className={styles.extensionCard} key={extension.id} data-status={extension.status}>
-                      <span>{extension.status === "policy_gated" ? "Policy gated" : "Not applicable"}</span>
-                      <strong>{extension.title}</strong>
-                      <p>{extension.summary}</p>
-                      {extension.proposedActions.length ? (
-                        <ul>
-                          {extension.proposedActions.map((action) => (
-                            <li key={`${action.policyActionId}-${action.label}`}>
-                              {action.label} <code>{action.policyActionId}</code>{action.requiresApproval ? " approval required" : ""}
-                            </li>
-                          ))}
-                        </ul>
-                      ) : null}
-                    </article>
-                  ))}
-                </div>
-                <LiveExtensionResult result={liveResult} evidence={liveEvidence} error={liveError} />
-              </>
-            ) : (
-              <EmptyState text="Governed extensions are evaluated after policy." />
-            )}
-          </section>
-
-          <section className={styles.panel}>
-            <PanelTitle icon={<Database size={18} />} title="8. Evidence Ledger" subtitle="A visible demo hash chain for provenance review." />
-            {liveEvidence.length ? (
-              <LiveEvidenceChain events={liveEvidence} />
-            ) : ledger.length ? (
-              <div className={styles.ledger}>
-                {ledger.map((node) => (
-                  <div className={styles.ledgerNode} key={node.id}>
-                    <span>{node.id}</span>
-                    <strong>{node.action}</strong>
-                    <small>{node.label}</small>
-                    <code>{node.hash}</code>
-                  </div>
+            <PanelTitle icon={<ShieldCheck size={18} />} title="Governed Extension Results" label="Extended system outputs" />
+            {result ? (
+              <div className={styles.extensionGrid}>
+                {result.governedExtensions.results.map((extension) => <ExtensionCard key={extension.extensionId} extension={extension} />)}
+                {result.governedExtensions.failures.map((failure) => (
+                  <article className={styles.failureCard} key={`${failure.extensionId}-${failure.stage}`}>
+                    <span>Extension failure</span>
+                    <strong>{failure.extensionId}</strong>
+                    <p>{failure.stage}: {failure.reason}</p>
+                  </article>
                 ))}
+                {!result.governedExtensions.results.length && !result.governedExtensions.failures.length ? <EmptyState text="No governed extensions were applicable to this mission." /> : null}
               </div>
             ) : (
-              <EmptyState text="Ledger nodes are created as the mission progresses." />
+              <EmptyState text="Extension results load from the governed extension runner." />
             )}
           </section>
 
+          <section className={styles.twoColumn}>
+            <section className={styles.panel}>
+              <PanelTitle icon={<Database size={18} />} title="Evidence Chain Viewer" label="Evidence Ledger v2" />
+              {evidence.length ? (
+                <div className={styles.ledgerLayout}>
+                  <div className={styles.eventList}>
+                    {evidence.map((event) => (
+                      <button
+                        key={event.eventId}
+                        className={styles.eventButton}
+                        data-selected={event.eventId === selectedEvent?.eventId}
+                        type="button"
+                        onClick={() => setSelectedEventId(event.eventId)}
+                      >
+                        <span>{event.chainIndex}</span>
+                        <strong>{event.action}</strong>
+                        <small>{event.actor}</small>
+                      </button>
+                    ))}
+                  </div>
+                  {selectedEvent ? <EvidenceDetail event={selectedEvent} /> : null}
+                </div>
+              ) : (
+                <EmptyState text="Ledger events will load after mission execution." />
+              )}
+            </section>
+
+            <section className={styles.panel}>
+              <PanelTitle icon={<Network size={18} />} title="Memory / Graph Insights" label="When available" />
+              {memoryGraph ? <MemoryGraphPanel extension={memoryGraph} /> : <EmptyState text="Memory/Graph runs when the mission asks for context, provenance, source hashes, or graph reasoning." />}
+            </section>
+          </section>
+
           <section className={styles.panel}>
-            <PanelTitle icon={<FileText size={18} />} title="9. Final Report + Export" subtitle="Readable output with explicit demo/source limits." />
-            {reportReady ? (
+            <PanelTitle icon={<Archive size={18} />} title="Report Export" label="Evidence-bound output" />
+            {result ? (
               <>
-                <pre className={styles.report}>{finalReport}</pre>
+                <pre className={styles.report}>{buildReport(result, evidence)}</pre>
                 <div className={styles.exportRow}>
-                  <button onClick={copyReport} type="button"><Clipboard size={16} /> Copy</button>
-                  <button onClick={downloadJson} type="button"><Download size={16} /> JSON</button>
-                  <button onClick={() => window.print()} type="button"><FileText size={16} /> PDF / Print</button>
-                  <button disabled={!confirmed || saved} onClick={saveToLedger} type="button">
-                    <CheckCircle2 size={16} /> {saved ? "Saved to demo ledger" : "Save to Ledger"}
-                  </button>
+                  <button type="button" onClick={copyReport}><Clipboard size={16} /> Copy report</button>
+                  <button type="button" onClick={downloadJson}><Database size={16} /> Export JSON</button>
+                  <button type="button" onClick={() => window.print()}><FileText size={16} /> Print / PDF</button>
                 </div>
               </>
             ) : (
-              <EmptyState text="The final report is generated after policy and ledger stages complete." />
+              <EmptyState text="Export appears after a governed mission completes." />
             )}
           </section>
         </div>
@@ -492,48 +433,135 @@ export function DishaWorkbench() {
   );
 }
 
-function PanelTitle({ icon, title, subtitle }: { icon: React.ReactNode; title: string; subtitle: string }) {
+function PanelTitle({ icon, title, label }: { icon: React.ReactNode; title: string; label: string }) {
   return (
     <header className={styles.panelTitle}>
       <span>{icon}</span>
       <div>
+        <p>{label}</p>
         <h2>{title}</h2>
-        <p>{subtitle}</p>
       </div>
     </header>
   );
 }
 
-function Metric({ label, value, score, detail }: { label: string; value: string; score?: number; detail?: string }) {
+function NavItem({ label, active }: { label: string; active: boolean }) {
   return (
-    <div className={styles.metric}>
+    <div className={styles.navItem} data-active={active}>
+      <span />
+      {label}
+    </div>
+  );
+}
+
+function Metric({ label, value, detail }: { label: string; value: string; detail: string }) {
+  return (
+    <article className={styles.metric}>
       <span>{label}</span>
       <strong>{value}</strong>
-      {typeof score === "number" ? <div className={styles.bar}><i style={{ width: `${Math.round(score * 100)}%` }} /></div> : null}
-      {detail ? <small>{detail}</small> : null}
-    </div>
+      <p>{detail}</p>
+    </article>
   );
 }
 
-function FusionView({ fusion }: { fusion: FusionResult }) {
+function LensCard({ lens }: { lens: LensResult }) {
   return (
-    <div className={styles.fusion}>
-      <ListBlock title="Agreements" items={fusion.agreements} icon={<CheckCircle2 size={15} />} />
-      <ListBlock title="Conflicts" items={fusion.conflicts} icon={<AlertTriangle size={15} />} />
-      <ListBlock title="Synthesis" items={fusion.synthesis} icon={<GitBranch size={15} />} />
-    </div>
-  );
-}
-
-function ListBlock({ title, items, icon }: { title: string; items: string[]; icon: React.ReactNode }) {
-  return (
-    <div>
-      <h3>{icon}{title}</h3>
-      <ul>
-        {items.map((item) => (
-          <li key={item}>{item}</li>
+    <article className={styles.lensCard}>
+      <header>
+        <span>Governed Result</span>
+        <strong>{formatName(lens.lens)}</strong>
+      </header>
+      <p>{lens.summary}</p>
+      <div className={styles.scoreRow}>
+        <span>Confidence {Math.round(lens.confidence * 100)}%</span>
+        <span>Risk {Math.round(lens.riskScore * 100)}%</span>
+        <span>{lens.policyRequired ? "Policy required" : "Policy noted"}</span>
+      </div>
+      <div className={styles.findings}>
+        {lens.findings.map((finding) => (
+          <div key={finding.id} className={styles.finding} data-severity={finding.severity}>
+            <span>{finding.severity}</span>
+            <strong>{finding.title}</strong>
+            <p>{finding.description}</p>
+          </div>
         ))}
-      </ul>
+      </div>
+      <InfoList title={`Evidence (${lens.evidence.length})`} items={lens.evidence.map((item) => `${item.sourceName}: ${item.summary}`)} />
+    </article>
+  );
+}
+
+function PolicyPanel({ policy, approvalRequired }: { policy: PolicyDecision; approvalRequired: boolean }) {
+  return (
+    <article className={styles.policyPanel} data-decision={policy.decision}>
+      <span>Policy Evaluated</span>
+      <strong>{policy.decision}</strong>
+      <p>{policy.safeFallback}</p>
+      <div className={styles.scoreBar}><i style={{ width: `${Math.round(policy.riskScore * 100)}%` }} /></div>
+      <InfoList title="Reasons" items={policy.reasons} />
+      {approvalRequired ? <div className={styles.approval}>Human approval required before any next step.</div> : null}
+    </article>
+  );
+}
+
+function ExtensionCard({ extension }: { extension: GovernedExtensionResult }) {
+  return (
+    <article className={styles.extensionCard}>
+      <header>
+        <span>{extension.status}</span>
+        <strong>{extension.title}</strong>
+      </header>
+      <p>{extension.summary}</p>
+      <div className={styles.scoreRow}>
+        <span>{extension.defensivePosture}</span>
+        <span>Policy {extension.policyDecision.decision}</span>
+        <span>Evidence {extension.evidenceEventIds.length}</span>
+      </div>
+      <InfoList title="Proposed safe actions" items={extension.proposedActions.map((action) => `${action.label} (${action.policyActionId})`)} />
+      {extension.claims?.length ? <InfoList title="Claims" items={extension.claims.map((claim) => `${claim.verifyRequired ? "[VERIFY REQUIRED] " : ""}${claim.text}`)} /> : null}
+    </article>
+  );
+}
+
+function EvidenceDetail({ event }: { event: EvidenceEvent }) {
+  return (
+    <article className={styles.eventDetail}>
+      <span>Ledger event #{event.chainIndex}</span>
+      <h3>{event.action}</h3>
+      <dl>
+        <div><dt>Actor</dt><dd>{event.actor}</dd></div>
+        <div><dt>Policy</dt><dd>{event.policyDecision?.decision ?? "recorded"}</dd></div>
+        <div><dt>Timestamp</dt><dd>{new Date(event.timestamp).toLocaleString()}</dd></div>
+        <div><dt>Input hash</dt><dd><code>{event.inputHash}</code></dd></div>
+        <div><dt>Output hash</dt><dd><code>{event.outputHash ?? "none"}</code></dd></div>
+        <div><dt>Event hash</dt><dd><code>{event.eventHash}</code></dd></div>
+        <div><dt>Previous hash</dt><dd><code>{event.previousHash ?? "GENESIS"}</code></dd></div>
+      </dl>
+    </article>
+  );
+}
+
+function MemoryGraphPanel({ extension }: { extension: GovernedExtensionResult }) {
+  return (
+    <div className={styles.memoryPanel}>
+      <p>{extension.summary}</p>
+      <InfoList title="Source-bound claims" items={(extension.claims ?? []).map((claim) => `${Math.round(claim.confidence * 100)}%: ${claim.text}`)} />
+      <InfoList title="Limitations" items={extension.limitations} />
+    </div>
+  );
+}
+
+function InfoList({ title, items }: { title: string; items: string[] }) {
+  return (
+    <div className={styles.infoList}>
+      <h3>{title}</h3>
+      {items.length ? (
+        <ul>
+          {items.map((item) => <li key={item}>{item}</li>)}
+        </ul>
+      ) : (
+        <p>No records returned.</p>
+      )}
     </div>
   );
 }
@@ -542,208 +570,50 @@ function EmptyState({ text }: { text: string }) {
   return <p className={styles.empty}>{text}</p>;
 }
 
-function LiveExtensionResult({
-  result,
-  evidence,
-  error,
-}: {
-  result: LiveAgenticMissionResult | null;
-  evidence: LiveEvidenceEvent[];
-  error: string | null;
-}) {
-  if (error) {
-    return (
-      <div className={styles.liveResult} data-status="error">
-        <strong>Live API unavailable</strong>
-        <p>{error}</p>
-      </div>
-    );
+function statusLabel(status: "idle" | "running" | "complete" | "error") {
+  if (status === "running") return "Running";
+  if (status === "complete") return "Complete";
+  if (status === "error") return "Needs review";
+  return "Ready";
+}
+
+function formatName(value: string) {
+  return value.replace(/_/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase());
+}
+
+function readApiError(payload: unknown, status: number) {
+  if (payload && typeof payload === "object" && "error" in payload) {
+    const error = (payload as { error?: { message?: string } }).error;
+    if (error?.message) return error.message;
   }
-
-  if (!result) {
-    return <p className={styles.liveHint}>Enable live governed API before running the mission to fetch production extension results.</p>;
+  if (payload && typeof payload === "object" && "message" in payload) {
+    const message = (payload as { message?: string }).message;
+    if (message) return message;
   }
-
-  return (
-    <div className={styles.liveResult} data-status="ok">
-      <div>
-        <span>Live mission</span>
-        <strong>{result.mission.missionId}</strong>
-        <small>
-          Policy {result.mission.policyDecision.decision} · Evidence events {evidence.length || result.mission.evidenceEventIds.length}
-        </small>
-      </div>
-      <div className={styles.lifecycleStrip}>
-        {result.governedExtensions.lifecycle.map((event) => (
-          <span key={`${event.extensionId}-${event.phase}-${event.evidenceEventId}`}>
-            {event.extensionId} / {event.phase}
-          </span>
-        ))}
-        {result.governedExtensions.lifecycle.length === 0 ? <span>No extension lifecycle events recorded.</span> : null}
-      </div>
-      <div className={styles.liveExtensions}>
-        {result.governedExtensions.results.map((extension) => (
-          <article key={extension.extensionId}>
-            <span>{extension.status}</span>
-            <strong>{extension.title}</strong>
-            <p>{extension.summary}</p>
-            <small>
-              {extension.defensivePosture} · policy {extension.policyDecision.decision} · evidence {extension.evidenceEventIds.length}
-            </small>
-          </article>
-        ))}
-        {result.governedExtensions.results.length === 0 ? (
-          <article>
-            <span>No active extension</span>
-            <strong>Skipped by contract</strong>
-            <p>{result.governedExtensions.skipped.map((item) => `${item.extensionId}: ${item.reason}`).join("; ")}</p>
-          </article>
-        ) : null}
-      </div>
-    </div>
-  );
+  return `Request failed with status ${status}`;
 }
 
-function LiveEvidenceChain({ events }: { events: LiveEvidenceEvent[] }) {
-  return (
-    <div className={styles.liveEvidenceTable}>
-      <div className={styles.liveEvidenceHeader}>
-        <span>#</span>
-        <span>Action</span>
-        <span>Actor</span>
-        <span>Policy</span>
-        <span>Hash</span>
-      </div>
-      {events.map((event) => (
-        <div className={styles.liveEvidenceRow} key={event.eventId}>
-          <span>{event.chainIndex}</span>
-          <strong>{event.action}</strong>
-          <span>{event.actor}</span>
-          <span>{event.policyDecision?.decision ?? "record"}</span>
-          <code title={event.eventHash}>{event.eventHash.slice(0, 16)}</code>
-        </div>
-      ))}
-    </div>
-  );
-}
-
-function createInitialStages(): FlowStage[] {
+function buildReport(result: AgenticMissionResult | null, evidence: EvidenceEvent[]) {
+  if (!result) return "No mission result available.";
+  const { mission } = result;
   return [
-    { id: "mission", label: "Mission Input", status: "active" },
-    { id: "signal", label: "Signal Normalization", status: "waiting" },
-    { id: "routing", label: "Lens Routing", status: "waiting" },
-    { id: "execution", label: "Lens Execution", status: "waiting" },
-    { id: "fusion", label: "Fusion", status: "waiting" },
-    { id: "policy", label: "Policy Gate", status: "waiting" },
-    { id: "extensions", label: "Extensions", status: "waiting" },
-    { id: "ledger", label: "Evidence Ledger", status: "waiting" },
-    { id: "report", label: "Final Report", status: "waiting" },
-  ];
-}
-
-function fallbackLens(id: LensId): LensRecommendation {
-  const labels: Record<LensId, string> = {
-    governance: "Governance Lens",
-    strategy: "Strategy Lens",
-    cyber: "Cyber Lens",
-    geospatial: "Geospatial Lens",
-    yudh_view: "Yudh View",
-    quantum: "Simulation Lens",
-  };
-  return {
-    id,
-    label: labels[id],
-    reason: "Available for analyst selection when the mission scope requires it.",
-    confidence: 0.52,
-    selectedByDefault: false,
-  };
-}
-
-function buildReport(
-  signal: WorkbenchSignal | null,
-  executions: LensExecution[],
-  fusion: FusionResult | null,
-  policy: PolicyResult | null,
-  extensions: GovernedExtensionPreview[],
-  ledger: EvidenceNode[],
-  liveResult: LiveAgenticMissionResult | null,
-): string {
-  if (!signal || !fusion || !policy) return "Report not ready.";
-  return [
-    `DISHA 6.6 Mission Report (${liveResult ? "Live Governed API + Demo View" : "Demo Mode"})`,
-    `Mission: ${signal.missionId}`,
-    `Intent: ${signal.intent}`,
-    `Sensitivity: ${signal.sensitivity} (${Math.round(signal.sensitivityScore * 100)}%)`,
-    `Risk: ${signal.riskLevel} (${Math.round(signal.riskScore * 100)}%)`,
-    `Entities: ${signal.entities.join(", ")}`,
+    "DISHA 6.6 Workbench Report",
+    `Mission: ${mission.missionId}`,
+    `Intent: ${mission.signal.context.intent}`,
+    `Sensitivity: ${mission.signal.context.sensitivity}`,
+    `Policy: ${mission.policyDecision.decision}`,
+    `Risk: ${Math.round(mission.riskScore * 100)}%`,
     "",
-    "Lens Findings:",
-    ...executions.flatMap((execution) => execution.findings.map((finding) => `- ${execution.label}: ${finding.title}. ${finding.description}`)),
+    "Core lens results:",
+    ...mission.lensResults.map((lens) => `- ${formatName(lens.lens)}: ${lens.summary}`),
     "",
-    "Fusion:",
-    ...fusion.synthesis.map((item) => `- ${item}`),
+    "Governed extensions:",
+    ...result.governedExtensions.results.map((extension) => `- ${extension.title}: ${extension.summary}`),
     "",
-    `Policy Decision: ${policy.decision}`,
-    ...policy.reasons.map((reason) => `- ${reason}`),
+    "Model intelligence:",
+    `- ${result.modelIntelligence.provider}/${result.modelIntelligence.model}: ${result.modelIntelligence.summary}`,
     "",
-    "Governed Extensions:",
-    ...extensions.map((extension) => `- ${extension.title}: ${extension.summary}`),
-    ...extensions.flatMap((extension) => extension.proposedActions.map((action) => `  - ${action.label} (${action.policyActionId})`)),
-    ...(liveResult
-      ? [
-          "",
-          "Live API Result:",
-          `- Mission: ${liveResult.mission.missionId}`,
-          `- Policy: ${liveResult.mission.policyDecision.decision}`,
-          `- Evidence events: ${liveResult.mission.evidenceEventIds.length}`,
-          ...liveResult.governedExtensions.results.map(
-            (extension) => `- ${extension.title}: ${extension.status}, policy=${extension.policyDecision.decision}, evidence=${extension.evidenceEventIds.length}`,
-          ),
-        ]
-      : []),
-    "",
-    "Evidence Chain:",
-    ...ledger.map((node) => `- ${node.id} ${node.action} hash=${node.hash} previous=${node.previousHash}`),
-    "",
-    "Source notice: demo mode uses generated, non-factual evidence markers. Live mode must attach verified source records before publishing claims.",
+    "Evidence chain:",
+    ...evidence.map((event) => `- #${event.chainIndex} ${event.action} hash=${event.eventHash}`),
   ].join("\n");
-}
-
-function wait(ms: number) {
-  return new Promise((resolve) => window.setTimeout(resolve, ms));
-}
-
-async function runLiveMission(rawText: string, sensitivity: WorkbenchSignal["sensitivity"]): Promise<{ result: LiveAgenticMissionResult | null; error: string | null }> {
-  try {
-    const response = await fetch("/api/v1/agentic/mission", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        rawText,
-        sensitivity,
-        requestedAction: "read-only governed workbench analysis",
-        operatorInstruction: "Return a governed extension result for the Workbench. Do not execute actions.",
-      }),
-    });
-    const payload = await response.json();
-    if (!response.ok) {
-      return { result: null, error: payload?.error?.message ?? payload?.message ?? `Live API failed with ${response.status}` };
-    }
-    return { result: payload as LiveAgenticMissionResult, error: null };
-  } catch (error) {
-    return { result: null, error: error instanceof Error ? error.message : "Live API request failed." };
-  }
-}
-
-async function fetchLiveEvidence(missionId: string): Promise<{ events: LiveEvidenceEvent[] | null; error: string | null }> {
-  try {
-    const response = await fetch(`/api/v1/evidence/${encodeURIComponent(missionId)}`);
-    const payload = await response.json();
-    if (!response.ok) {
-      return { events: null, error: payload?.error?.message ?? payload?.message ?? `Evidence API failed with ${response.status}` };
-    }
-    return { events: payload.events as LiveEvidenceEvent[], error: null };
-  } catch (error) {
-    return { events: null, error: error instanceof Error ? error.message : "Live evidence request failed." };
-  }
 }
