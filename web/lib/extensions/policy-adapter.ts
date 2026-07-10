@@ -3,6 +3,7 @@ import { evaluatePolicy } from "../unified/policy-gate";
 import type {
   GovernedExtensionActionPolicyDecision,
   GovernedExtensionAnalysis,
+  GovernedExtensionPolicyEvaluation,
   PolicyAdapter,
 } from "./contracts";
 
@@ -15,10 +16,7 @@ const decisionPriority: Record<PolicyDecision["decision"], number> = {
   DENY: 5,
 };
 
-export type ExtensionPolicyEvaluation = {
-  decision: PolicyDecision;
-  actionDecisions: GovernedExtensionActionPolicyDecision[];
-};
+export type ExtensionPolicyEvaluation = GovernedExtensionPolicyEvaluation;
 
 export class CorePolicyAdapter implements PolicyAdapter {
   evaluate(
@@ -30,7 +28,7 @@ export class CorePolicyAdapter implements PolicyAdapter {
   }
 }
 
-/** Evaluates analysis and every proposed action through the core Policy Gate. */
+/** Evaluates the analysis and every proposed action through the core Policy Gate. */
 export function evaluateExtensionPolicy(
   signal: DishaSignal,
   analysis: GovernedExtensionAnalysis,

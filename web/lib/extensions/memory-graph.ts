@@ -1,7 +1,12 @@
 import type { DishaLensResult } from "../unified/contracts";
 import { repoEvidence, severityForRisk } from "../unified/adapters/shared";
 import { hashValue } from "../unified/hash";
-import type { GovernedExtension, GovernedExtensionAnalysis, GovernedExtensionRequest } from "./contracts";
+import type {
+  GovernedExtension,
+  GovernedExtensionAction,
+  GovernedExtensionAnalysis,
+  GovernedExtensionRequest,
+} from "./contracts";
 import { queryGovernedResearchRuntime } from "./research-runtime";
 
 const MEMORY_GRAPH_SOURCE_PATH = "disha/brain/memory";
@@ -89,7 +94,7 @@ export const memoryGraphExtension: GovernedExtension = {
       summary: lensResult.summary,
       defensivePosture: "read_only",
       lensResult,
-      proposedActions: [],
+      proposedActions: [memorySourceBindingAction()],
       limitations: [
         "No memory value is treated as a source of fact without source-hash binding.",
         "Controlled or personal data cannot be recalled through this adapter.",
@@ -98,3 +103,17 @@ export const memoryGraphExtension: GovernedExtension = {
     };
   },
 };
+
+function memorySourceBindingAction(): GovernedExtensionAction {
+  return {
+    id: "memory-source-bind",
+    label: "Bind memory references to evidence hashes",
+    policyActionId: "memory.bind_sources",
+    description: "Attach memory and graph context to admitted evidence hashes without treating recalled content as fact.",
+    risk: 0.25,
+    requiresApproval: false,
+    scope: "public_analysis",
+    params: { requireSourceHashes: true, readOnly: true },
+    reason: "Memory enrichment must remain traceable before it can influence a governed report.",
+  };
+}

@@ -1,16 +1,16 @@
-import { appendEvidenceEvent, type EvidenceAppendInput } from "../unified/evidence-ledger";
-import type { GovernedExtensionLifecycleEvent, GovernedExtensionPhase, EvidenceEmitter } from "./contracts";
+import { appendEvidenceEvent } from "../unified/evidence-ledger";
+import type { GovernedExtensionLifecycleEvent, EvidenceEmitter, ExtensionEvidenceInput } from "./contracts";
 
 export class LedgerEvidenceEmitter implements EvidenceEmitter {
   private readonly events: GovernedExtensionLifecycleEvent[] = [];
 
-  async emit(input: EvidenceAppendInput & { extensionId?: string; phase?: GovernedExtensionPhase }): Promise<string> {
+  /** Appends to the core ledger before exposing the event in the lifecycle trace. */
+  async emit(input: ExtensionEvidenceInput): Promise<string> {
     const { extensionId, phase, ...appendInput } = input;
+    if (!extensionId.trim()) throw new Error("Extension evidence requires a non-empty extensionId");
     const event = await appendEvidenceEvent(appendInput);
 
-    if (extensionId && phase) {
-      this.events.push({ extensionId, phase, evidenceEventId: event.eventId });
-    }
+    this.events.push({ extensionId, phase, evidenceEventId: event.eventId });
 
     return event.eventId;
   }

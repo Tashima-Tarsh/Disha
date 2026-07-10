@@ -58,6 +58,11 @@ export type GovernedExtensionActionPolicyDecision = {
   decision: PolicyDecision;
 };
 
+export type GovernedExtensionPolicyEvaluation = {
+  decision: PolicyDecision;
+  actionDecisions: GovernedExtensionActionPolicyDecision[];
+};
+
 export type GovernedExtensionFailure = {
   extensionId: string;
   stage: "analysis" | "validation";
@@ -97,20 +102,20 @@ export type GovernedExtensionLifecycleEvent = {
 };
 
 export interface EvidenceEmitter {
-  emit(input: EvidenceAppendInput): Promise<string>;
+  emit(input: ExtensionEvidenceInput): Promise<string>;
   lifecycle(): GovernedExtensionLifecycleEvent[];
 }
 
+export type ExtensionEvidenceInput = EvidenceAppendInput & {
+  extensionId: string;
+  phase: GovernedExtensionPhase;
+};
+
+/** Policy boundary used by the runner; implementations must be fail-closed. */
 export interface PolicyAdapter {
   evaluate(
     signal: DishaSignal,
     analysis: GovernedExtensionAnalysis,
     contextualLensResults?: DishaLensResult[],
-  ): PromiseLike<{
-    decision: PolicyDecision;
-    actionDecisions: GovernedExtensionActionPolicyDecision[];
-  }> | {
-    decision: PolicyDecision;
-    actionDecisions: GovernedExtensionActionPolicyDecision[];
-  };
+  ): GovernedExtensionPolicyEvaluation;
 }
