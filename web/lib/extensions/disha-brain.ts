@@ -64,6 +64,13 @@ export const dishaBrainExtension: GovernedExtension = {
             "The Brain adapter is enabled only as a governed interpretation layer. Any claim not tied to admitted evidence remains [VERIFY REQUIRED].",
           evidenceIds: evidence.map((item) => item.id),
         },
+        {
+          id: `brain-context-${hashValue({ missionId: mission.missionId, lenses: mission.selectedLenses }).slice(0, 10)}`,
+          title: "Governed context routing",
+          severity: "info",
+          description: `Brain routes ${mission.selectedLenses.length} selected lens(es) with ${signal.context.memoryRefs.length} memory reference(s); this context does not authorize an action or establish a fact.`,
+          evidenceIds: evidence.map((item) => item.id),
+        },
         ...runtime.observations.map((observation) => ({
           id: `brain-runtime-${hashValue({ missionId: mission.missionId, observation }).slice(0, 10)}`,
           title: observation.title,

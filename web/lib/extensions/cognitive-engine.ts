@@ -51,6 +51,7 @@ export const cognitiveEngineExtension: GovernedExtension = {
         ? [repoEvidence(signal, "disha/ai/core/runtime", `Governed cognitive runtime response admitted with ${runtime.sourceHashes.length} source hash reference(s).`)]
         : []),
     ];
+    const phasePlan = buildPhasePlan(mission);
     const riskScore = Math.min(0.74, Math.max(0.34, mission.riskScore + 0.08));
     const lensResult: DishaLensResult = {
       lens: "strategy",
@@ -61,7 +62,7 @@ export const cognitiveEngineExtension: GovernedExtension = {
           title: "Cognitive phases require audit boundaries",
           severity: severityForRisk(riskScore),
           description:
-            "Perception and deliberation may structure analysis, but decision and action phases must remain proposals until policy approval and evidence ledger recording are complete.",
+            `Bounded phase plan: ${phasePlan.join(" -> ")}. Decision and action phases remain proposals until policy approval and evidence ledger recording are complete.`,
           evidenceIds: evidence.map((item) => item.id),
         },
         ...runtime.observations.map((observation) => ({
@@ -115,4 +116,14 @@ function cognitivePhaseActions(): GovernedExtensionAction[] {
     params: { phases: ["perception", "deliberation", "decision", "audit"] },
     reason: "Reasoning transparency is required before a cognitive output can influence a governed report.",
   }];
+}
+
+function buildPhasePlan(mission: GovernedExtensionRequest["mission"]): string[] {
+  return [
+    `perception(${mission.signal.context.entities.length} entities, ${mission.signal.input.indicators.length} indicators)`,
+    `deliberation(${mission.selectedLenses.join(",") || "none"})`,
+    `decision(${mission.policyDecision.decision})`,
+    `action(${mission.policyDecision.safeFallback})`,
+    "audit(evidence-ledger)",
+  ];
 }
