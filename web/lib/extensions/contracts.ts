@@ -1,4 +1,4 @@
-import type { DishaLensResult, PolicyDecision } from "../unified/contracts";
+import type { DishaLensResult, DishaSignal, PolicyDecision } from "../unified/contracts";
 import type { EvidenceAppendInput } from "../unified/evidence-ledger";
 import type { MissionResult } from "../unified/orchestrator";
 
@@ -70,7 +70,7 @@ export type GovernedExtensionRequest = {
   actor: string;
 };
 
-export interface GovernedExtension {
+export interface ExtensionContract {
   manifest: GovernedExtensionManifest;
   id: string;
   title: string;
@@ -80,6 +80,8 @@ export interface GovernedExtension {
   analyze(request: GovernedExtensionRequest): Promise<GovernedExtensionAnalysis>;
 }
 
+export interface GovernedExtension extends ExtensionContract {}
+
 export type GovernedExtensionRun = {
   results: GovernedExtensionResult[];
   failures: GovernedExtensionFailure[];
@@ -87,8 +89,6 @@ export type GovernedExtensionRun = {
   skipped: Array<{ extensionId: string; reason: string }>;
   lifecycle: GovernedExtensionLifecycleEvent[];
 };
-
-export type ExtensionContract = GovernedExtension;
 
 export type GovernedExtensionLifecycleEvent = {
   extensionId: string;
@@ -99,4 +99,18 @@ export type GovernedExtensionLifecycleEvent = {
 export interface EvidenceEmitter {
   emit(input: EvidenceAppendInput): Promise<string>;
   lifecycle(): GovernedExtensionLifecycleEvent[];
+}
+
+export interface PolicyAdapter {
+  evaluate(
+    signal: DishaSignal,
+    analysis: GovernedExtensionAnalysis,
+    contextualLensResults?: DishaLensResult[],
+  ): PromiseLike<{
+    decision: PolicyDecision;
+    actionDecisions: GovernedExtensionActionPolicyDecision[];
+  }> | {
+    decision: PolicyDecision;
+    actionDecisions: GovernedExtensionActionPolicyDecision[];
+  };
 }

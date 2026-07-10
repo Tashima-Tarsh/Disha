@@ -1,7 +1,7 @@
 import type { MissionResult } from "../unified/orchestrator";
 import type { GovernedExtensionAnalysis, GovernedExtensionResult, GovernedExtensionRun } from "./contracts";
 import { createLedgerEvidenceEmitter } from "./evidence-emitter";
-import { evaluateExtensionPolicy } from "./policy-adapter";
+import { CorePolicyAdapter } from "./policy-adapter";
 import { listGovernedExtensions } from "./registry";
 import { validateExtensionAnalysis } from "./validation";
 
@@ -12,6 +12,7 @@ export async function runGovernedExtensions(mission: MissionResult, actor = "gov
   const skipped: GovernedExtensionRun["skipped"] = [];
   const extensions = listGovernedExtensions();
   const emitter = createLedgerEvidenceEmitter();
+  const policyAdapter = new CorePolicyAdapter();
 
   if (mission.policyDecision.decision === "DENY") {
     return {
@@ -71,7 +72,7 @@ export async function runGovernedExtensions(mission: MissionResult, actor = "gov
       continue;
     }
 
-    const policyEvaluation = evaluateExtensionPolicy(mission.signal, analysis, mission.lensResults);
+    const policyEvaluation = policyAdapter.evaluate(mission.signal, analysis, mission.lensResults);
     const policyDecision = policyEvaluation.decision;
     const policyEventId = await emitter.emit({
       extensionId: extension.id,

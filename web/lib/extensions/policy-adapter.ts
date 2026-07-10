@@ -3,6 +3,7 @@ import { evaluatePolicy } from "../unified/policy-gate";
 import type {
   GovernedExtensionActionPolicyDecision,
   GovernedExtensionAnalysis,
+  PolicyAdapter,
 } from "./contracts";
 
 const decisionPriority: Record<PolicyDecision["decision"], number> = {
@@ -18,6 +19,16 @@ export type ExtensionPolicyEvaluation = {
   decision: PolicyDecision;
   actionDecisions: GovernedExtensionActionPolicyDecision[];
 };
+
+export class CorePolicyAdapter implements PolicyAdapter {
+  evaluate(
+    signal: DishaSignal,
+    analysis: GovernedExtensionAnalysis,
+    contextualLensResults: DishaLensResult[] = [],
+  ): ExtensionPolicyEvaluation {
+    return evaluateExtensionPolicy(signal, analysis, contextualLensResults);
+  }
+}
 
 /** Evaluates analysis and every proposed action through the core Policy Gate. */
 export function evaluateExtensionPolicy(
