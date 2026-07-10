@@ -6,6 +6,7 @@ import {
   checkGovernedResearchRuntimeHealth,
   getGovernedExtensionControlPlane,
   getGovernedExtensionArchitecture,
+  governedExtensionRegistry,
   ingestOwnedHoneypotEvent,
   listGovernedExtensionManifests,
   queryGovernedResearchRuntime,
@@ -67,12 +68,44 @@ describe("DISHA governed extension layer", () => {
       expect.arrayContaining(["evidence.preserve", "traffic.rate_limit", "honeypot.deploy_owned", "alert.emit"]),
     );
     expect(vyuha?.policyDecision.decision).not.toBe("DENY");
+    expect(vyuha?.actionPolicyDecisions.map((item) => item.policyActionId)).toEqual(
+      expect.arrayContaining(["evidence.preserve", "traffic.rate_limit", "honeypot.deploy_owned", "alert.emit"]),
+    );
+    expect(vyuha?.actionPolicyDecisions.every((item) => item.decision.reasons.length > 0)).toBe(true);
     expect(run.evidenceEventIds).toHaveLength(run.results.length * 3);
 
     const evidence = await getEvidenceEvents(mission.missionId);
     expect(evidence.map((event) => event.action)).toEqual(
       expect.arrayContaining(["extension_requested", "extension_policy_evaluated", "extension_result_recorded"]),
     );
+    expect(verifyEvidenceChain(evidence).ok).toBe(true);
+  });
+
+  it("records a terminal failure and continues independent governed extensions", async () => {
+    const mission = await runMission({
+      rawText: "Assess cyber telemetry with Vyuha and owned honeypot evidence.",
+      userId: "u1",
+      userRole: "admin",
+    });
+    const analyzeSpy = vi.spyOn(governedExtensionRegistry["vyuha-defense-engine"], "analyze")
+      .mockRejectedValueOnce(new Error("adapter timeout\nprivate detail omitted"));
+
+    const run = await runGovernedExtensions(mission);
+
+    expect(analyzeSpy).toHaveBeenCalledOnce();
+    expect(run.failures).toContainEqual(expect.objectContaining({
+      extensionId: "vyuha-defense-engine",
+      stage: "analysis",
+      reason: "adapter timeout private detail omitted",
+    }));
+    expect(run.results.map((result) => result.extensionId)).toContain("honeypot-evidence");
+    expect(run.lifecycle).toContainEqual(expect.objectContaining({
+      extensionId: "vyuha-defense-engine",
+      phase: "failure",
+    }));
+
+    const evidence = await getEvidenceEvents(mission.missionId);
+    expect(evidence.map((event) => event.action)).toContain("extension_failed");
     expect(verifyEvidenceChain(evidence).ok).toBe(true);
   });
 

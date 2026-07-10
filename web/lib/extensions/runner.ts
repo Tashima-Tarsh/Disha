@@ -1,12 +1,13 @@
-import { evaluatePolicy } from "../unified/policy-gate";
 import type { MissionResult } from "../unified/orchestrator";
-import type { GovernedExtensionResult, GovernedExtensionRun } from "./contracts";
+import type { GovernedExtensionAnalysis, GovernedExtensionResult, GovernedExtensionRun } from "./contracts";
 import { createLedgerEvidenceEmitter } from "./evidence-emitter";
+import { evaluateExtensionPolicy } from "./policy-adapter";
 import { listGovernedExtensions } from "./registry";
 import { validateExtensionAnalysis } from "./validation";
 
 export async function runGovernedExtensions(mission: MissionResult, actor = "governed-extension-layer"): Promise<GovernedExtensionRun> {
   const results: GovernedExtensionResult[] = [];
+  const failures: GovernedExtensionRun["failures"] = [];
   const evidenceEventIds: string[] = [];
   const skipped: GovernedExtensionRun["skipped"] = [];
   const extensions = listGovernedExtensions();
@@ -15,6 +16,7 @@ export async function runGovernedExtensions(mission: MissionResult, actor = "gov
   if (mission.policyDecision.decision === "DENY") {
     return {
       results,
+      failures,
       evidenceEventIds,
       skipped: extensions.map((extension) => ({ extensionId: extension.id, reason: "mission_policy_denied" })),
       lifecycle: [],
@@ -42,9 +44,35 @@ export async function runGovernedExtensions(mission: MissionResult, actor = "gov
     });
     evidenceEventIds.push(requestedEventId);
 
-    const analysis = await extension.analyze({ mission, actor });
-    validateExtensionAnalysis(extension, analysis);
-    const policyDecision = evaluatePolicy(mission.signal, [...mission.lensResults, analysis.lensResult]);
+    let analysis: GovernedExtensionAnalysis;
+    try {
+      analysis = await extension.analyze({ mission, actor });
+      validateExtensionAnalysis(extension, analysis);
+    } catch (error) {
+      const reason = sanitizeExtensionError(error);
+      const failureEventId = await emitter.emit({
+        extensionId: extension.id,
+        phase: "failure",
+        missionId: mission.missionId,
+        actor,
+        action: "extension_failed",
+        input: { extensionId: extension.id, requestedEventId },
+        output: { status: "failed", reason },
+        policyDecision: mission.policyDecision,
+        parentEventId: requestedEventId,
+      });
+      evidenceEventIds.push(failureEventId);
+      failures.push({
+        extensionId: extension.id,
+        stage: error instanceof Error && error.message.startsWith("Invalid governed extension analysis") ? "validation" : "analysis",
+        reason,
+        evidenceEventIds: [requestedEventId, failureEventId],
+      });
+      continue;
+    }
+
+    const policyEvaluation = evaluateExtensionPolicy(mission.signal, analysis, mission.lensResults);
+    const policyDecision = policyEvaluation.decision;
     const policyEventId = await emitter.emit({
       extensionId: extension.id,
       phase: "policy_evaluation",
@@ -54,6 +82,7 @@ export async function runGovernedExtensions(mission: MissionResult, actor = "gov
       input: {
         extensionId: extension.id,
         proposedActions: analysis.proposedActions,
+        actionPolicyDecisions: policyEvaluation.actionDecisions,
         lensResult: analysis.lensResult,
       },
       output: policyDecision,
@@ -67,6 +96,7 @@ export async function runGovernedExtensions(mission: MissionResult, actor = "gov
       ...analysis,
       status: policyDecision.decision === "DENY" ? "policy_blocked" : "completed",
       policyDecision: { ...policyDecision, evidenceEventId: policyEventId },
+      actionPolicyDecisions: policyEvaluation.actionDecisions,
       evidenceEventIds: [requestedEventId, policyEventId],
     };
 
@@ -96,5 +126,10 @@ export async function runGovernedExtensions(mission: MissionResult, actor = "gov
     results.push(result);
   }
 
-  return { results, evidenceEventIds, skipped, lifecycle: emitter.lifecycle() };
+  return { results, failures, evidenceEventIds, skipped, lifecycle: emitter.lifecycle() };
+}
+
+function sanitizeExtensionError(error: unknown): string {
+  const message = error instanceof Error ? error.message : "Unknown governed extension failure";
+  return message.replace(/[\r\n\t]+/g, " ").slice(0, 500);
 }

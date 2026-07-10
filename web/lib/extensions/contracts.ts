@@ -5,7 +5,7 @@ import type { MissionResult } from "../unified/orchestrator";
 export type GovernedExtensionStatus = "ready" | "not_applicable" | "policy_blocked" | "completed";
 export type GovernedExtensionMaturity = "active" | "planned" | "blocked";
 export type GovernedExtensionKind = "defense" | "cognitive" | "memory_graph" | "honeypot" | "simulation";
-export type GovernedExtensionPhase = "request" | "analysis" | "policy_evaluation" | "result_record";
+export type GovernedExtensionPhase = "request" | "analysis" | "policy_evaluation" | "result_record" | "failure";
 
 export type GovernedExtensionManifest = {
   id: string;
@@ -48,6 +48,20 @@ export type GovernedExtensionAnalysis = {
 export type GovernedExtensionResult = GovernedExtensionAnalysis & {
   status: GovernedExtensionStatus;
   policyDecision: PolicyDecision;
+  actionPolicyDecisions: GovernedExtensionActionPolicyDecision[];
+  evidenceEventIds: string[];
+};
+
+export type GovernedExtensionActionPolicyDecision = {
+  actionId: string;
+  policyActionId: string;
+  decision: PolicyDecision;
+};
+
+export type GovernedExtensionFailure = {
+  extensionId: string;
+  stage: "analysis" | "validation";
+  reason: string;
   evidenceEventIds: string[];
 };
 
@@ -68,6 +82,7 @@ export interface GovernedExtension {
 
 export type GovernedExtensionRun = {
   results: GovernedExtensionResult[];
+  failures: GovernedExtensionFailure[];
   evidenceEventIds: string[];
   skipped: Array<{ extensionId: string; reason: string }>;
   lifecycle: GovernedExtensionLifecycleEvent[];

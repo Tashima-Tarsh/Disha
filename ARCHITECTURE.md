@@ -133,7 +133,9 @@ Responsibilities:
 - Define an optional governed research runtime JSON contract for Brain, Cognitive Loop, and Memory/Graph services.
 - Convert advanced capability output into typed proposals and evidence-backed analysis.
 - Re-run Policy Gate evaluation for extension outputs.
+- Evaluate every proposed extension action independently through the Policy Gate and apply the most restrictive decision to the extension result.
 - Append extension request, policy, and result events to Evidence Ledger v2.
+- Record adapter or contract-validation failures as terminal ledger events while allowing independent extensions to continue.
 - Return extension results as part of the unified mission response.
 
 Lifecycle:
@@ -151,6 +153,7 @@ sequenceDiagram
     X->>L: extension_requested
     X-->>O: GovernedExtensionAnalysis
     O->>P: base lens results + extension lens result
+    O->>P: each proposed action
     P->>L: extension_policy_evaluated
     O->>L: extension_result_recorded
     O-->>W: MissionResult + GovernedExtensionRun
@@ -174,6 +177,7 @@ Extension validation:
 - Proposed actions must be mirrored as `DishaLensResult.recommendedActions`.
 - Defensive posture must match the manifest.
 - The runner records a lifecycle trace: `request`, `policy_evaluation`, and `result_record`.
+- Failed analysis or validation records `extension_failed`; it never silently disappears and does not erase independent extension results.
 
 Extension quality gate:
 

@@ -3,6 +3,7 @@ export * from "./architecture";
 export * from "./catalog";
 export * from "./control-plane";
 export * from "./evidence-emitter";
+export * from "./policy-adapter";
 export * from "./registry";
 export * from "./runner";
 export * from "./honeypot-evidence";
