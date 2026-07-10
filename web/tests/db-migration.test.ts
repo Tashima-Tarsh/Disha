@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { execFileSync } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
 
@@ -6,6 +7,10 @@ const repoRoot = path.resolve(__dirname, "../..");
 const webRoot = path.resolve(__dirname, "..");
 
 describe("DISHA database migration contract", () => {
+  it("keeps the migration runner valid JavaScript", () => {
+    expect(() => execFileSync(process.execPath, ["--check", path.join(webRoot, "scripts/apply-schema.mjs")])).not.toThrow();
+  });
+
   it("keeps the production schema aligned with evidence, mission, and extension persistence", () => {
     const schema = fs.readFileSync(path.join(webRoot, "database/schema.sql"), "utf8");
 

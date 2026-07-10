@@ -89,7 +89,7 @@ async function rollbackLatest() {
 
   await withMigrationClient(async (client) => {
     await ensureMigrationTable(client);
-    const applied = await client.query<{ version: string }>(
+    const applied = await client.query(
       "select version from schema_migrations where direction = 'up' order by applied_at desc limit 1",
     );
     const latest = applied.rows[0]?.version;
@@ -128,7 +128,7 @@ async function verifySchema() {
   const missingIndexes = requiredIndexes.filter((index) => !presentIndexes.has(index));
   if (missingIndexes.length) throw new Error(`Missing required index(es): ${missingIndexes.join(", ")}`);
 
-  const applied = await pool.query<{ version: string }>(
+  const applied = await pool.query(
     "select version from schema_migrations where direction = 'up'",
   );
   const appliedVersions = new Set(applied.rows.map((row) => row.version));
