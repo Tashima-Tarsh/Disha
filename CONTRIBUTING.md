@@ -2,12 +2,25 @@
 
 DISHA is an evidence-first governance and intelligence project. Contributions should strengthen public-interest accountability, not add spectacle.
 
+Before contributing, read [ARCHITECTURE.md](ARCHITECTURE.md). It is the repository's single source of truth.
+
+## Product Boundary
+
+DISHA v6.6 has two layers:
+
+| Layer | Path | Rule |
+| --- | --- | --- |
+| Governed Intelligence Core | `web/`, `web/lib/unified/` | Active production spine |
+| Sovereign Cognitive Extensions | `disha/` | Research only unless promoted through Layer 1 |
+
+Do not wire `disha/` research code directly into production output. Promotion requires a Layer 1 contract, policy rule, evidence logging, tests, and documentation.
+
 ## Contribution Standard
 
-Every meaningful change must preserve the product rule:
+Every meaningful product change must preserve:
 
 ```text
-source -> signal -> lens -> policy -> evidence -> reviewable output
+contract -> policy -> evidence -> test
 ```
 
 Do not add claims, statistics, legal conclusions, government references, incident names, or data-source assertions unless the repository contains a verifiable source path. If verification is incomplete, mark the claim as `[VERIFY REQUIRED]`.
@@ -28,35 +41,58 @@ Do not add claims, statistics, legal conclusions, government references, inciden
 - Model output promoted as fact.
 - Decorative dashboards that do not improve evidence review.
 - Generic AI branding, exaggerated marketing, or unsupported authority claims.
+- New architecture documents that compete with root `ARCHITECTURE.md`.
+
+## Documentation Rules
+
+- Root `ARCHITECTURE.md` is authoritative.
+- `docs/public/` contains only material intended for GitHub Pages publication.
+- `docs/internal/` contains maintainer notes, release checklists, baselines, and internal planning.
+- `docs/archive/` contains historical or outdated material only.
+
+If a document conflicts with current architecture, archive it instead of editing it into a second source of truth.
 
 ## Development Workflow
 
 Create a focused branch:
 
 ```bash
-git checkout -b feat/evidence-ledger-migration
+git checkout -b codex/evidence-ledger-migration
 ```
 
-Run the product-spine checks from `web/`:
+Run product-spine checks:
 
 ```bash
-npm.cmd run type-check:full
-npm.cmd test
+npm.cmd --prefix web run type-check:full
+npm.cmd --prefix web test
+npm.cmd --prefix web run build
 ```
 
-For repository-wide verification, use the root scripts when available:
+For repository-wide verification:
 
 ```bash
 npm.cmd run verify
 ```
 
+Docker defaults to the product spine:
+
+```bash
+docker compose up --build web
+```
+
+Research extensions require the full profile:
+
+```bash
+docker compose --profile full up --build
+```
+
 ## Pull Request Checklist
 
-- The change is scoped and does not rewrite unrelated legacy surfaces.
+- The change is scoped and does not rewrite unrelated legacy or research surfaces.
 - Public claims are sourced or marked `[VERIFY REQUIRED]`.
 - Any new data source includes license/status, retrieval path, and provenance notes.
 - Any new API route has authentication, rate limiting, validation, and error handling.
-- Any model/agent path remains policy-gated and evidence-logged.
+- Any model or agent path remains policy-gated and evidence-logged.
 - Tests cover the new behavior.
 - No secrets, local databases, private evidence, or credentials are committed.
 

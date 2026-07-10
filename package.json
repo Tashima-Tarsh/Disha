@@ -16,7 +16,10 @@
     "external:status": "node scripts/sync-external-intelligence.mjs --status",
     "external:runtime": "node scripts/external-runtime.mjs --status",
     "external:up": "node scripts/external-runtime.mjs --up pentagi-ui",
-    "verify": "npm --prefix web run type-check && npm --prefix web run test && npm --prefix web run build"
+    "docker:dev": "docker compose up --build web",
+    "docker:full": "docker compose --profile full up --build",
+    "docker:prod": "docker compose -f docker-compose.prod.yml up",
+    "verify": "npm --prefix web run type-check:full && npm --prefix web run test && npm --prefix web run build"
   },
   "engines": {
     "node": ">=20.0.0"

@@ -360,7 +360,7 @@ Business sections:
 Evidence required:
 
 - `web/database/schema.sql`
-- `docs/architecture/PREMIUM_REARCHITECTURE_2026.md`
+- `docs/archive/architecture/PREMIUM_REARCHITECTURE_2026.md`
 
 ### Chapter 13: Security And Governance
 

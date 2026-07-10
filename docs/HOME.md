@@ -1,6 +1,6 @@
 # DISHA Wiki
 
-This wiki documents the repository as it exists today and defines the target production structure.
+This wiki is a maintained documentation index. Root `ARCHITECTURE.md` is the source of truth for current architecture.
 
 ## Start Here
 
@@ -19,8 +19,7 @@ This wiki documents the repository as it exists today and defines the target pro
 
 - [Repository Analysis](repository-analysis.md)
 - [Project Structure](project-structure.md)
-- [Architecture Diagrams](architecture-diagrams.md)
+- [Architecture](../ARCHITECTURE.md)
 - [Technical Design Document](TDD.md)
 - [Design System](design-system.md)
-- [DISHA Brain Architecture](disha-brain-architecture.md)
-- [DISHA Brain Enterprise Architecture](disha-brain-enterprise-architecture.md)
+- [Archived Architecture Material](archive/)

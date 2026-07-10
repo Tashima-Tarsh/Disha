@@ -17,8 +17,7 @@ DISHA is intentionally separated into active product code, public documentation,
 | Path | Purpose |
 | --- | --- |
 | `README.md` | GitHub front door |
-| `docs/index.html` | GitHub Pages entry point |
-| `docs/public/` | Portable public landing page source |
+| `docs/public/` | GitHub Pages public documentation source |
 | `docs/api/API_REFERENCE.md` | API v1 reference |
 | `docs/product/WHY_DISHA.md` | Product vision and constitutional thesis |
 | `docs/product/EVIDENCE_CHAIN_EXPLORER.md` | Signature feature specification |

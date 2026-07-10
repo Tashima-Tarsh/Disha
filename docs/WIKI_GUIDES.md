@@ -19,6 +19,6 @@ This file now serves as a lightweight index for the maintained documentation set
 
 - [Repository Analysis](repository-analysis.md)
 - [Project Structure](project-structure.md)
-- [Architecture Diagrams](architecture-diagrams.md)
+- [Architecture](../ARCHITECTURE.md)
 - [Technical Design Document](TDD.md)
 - [Design System](design-system.md)
