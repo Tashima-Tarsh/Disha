@@ -4,79 +4,136 @@
 
 **The Constitutional Evidence Operating System**
 
-Where every conclusion must show its evidence chain, and every system must remain accountable to the citizen.
+Turn public records, mission requests, policy gates, and model assistance into intelligence that can show its evidence chain.
 
-![Version](https://img.shields.io/badge/version-6.6.0-151515?style=for-the-badge)
-![Runtime](https://img.shields.io/badge/runtime-Next.js%20API%20v1-1f4f8f?style=for-the-badge)
-![Ledger](https://img.shields.io/badge/evidence-ledger%20v2-1e6b4a?style=for-the-badge)
-![Policy](https://img.shields.io/badge/policy-deny%20by%20default-d39b1e?style=for-the-badge)
-![Claims](https://img.shields.io/badge/claims-source%20required-9d2f27?style=for-the-badge)
+[![Product CI](https://github.com/Tashima-Tarsh/Disha/actions/workflows/ci.yml/badge.svg)](https://github.com/Tashima-Tarsh/Disha/actions/workflows/ci.yml)
+[![CodeQL](https://github.com/Tashima-Tarsh/Disha/actions/workflows/codeql.yml/badge.svg)](https://github.com/Tashima-Tarsh/Disha/actions/workflows/codeql.yml)
+![Evidence Ledger](https://img.shields.io/badge/evidence-ledger%20v2-1e6b4a?style=flat-square)
+![Policy](https://img.shields.io/badge/policy-deny%20by%20default-d39b1e?style=flat-square)
+![Claims](https://img.shields.io/badge/claims-source%20required-9d2f27?style=flat-square)
+
+![DISHA 6.6 social preview](docs/assets/social-preview.svg)
+
+```bash
+npm install --prefix web && npm.cmd --prefix web run dev
+```
+
+Open `http://127.0.0.1:3000/workbench`.
 
 </div>
 
 ---
 
-DISHA is an open-source governance and intelligence architecture for evidence-led public-interest analysis. It is built around a simple discipline: no conclusion should outrun its sources, policy boundary, uncertainty, or audit trail.
+## Why This Matters
 
-It is not a chatbot skin, a decorative dashboard, or a pile of imported experiments. The active product spine is a governed runtime where missions become typed signals, signals pass through lenses, actions pass through policy, and outputs are written into a tamper-evident evidence chain.
+AI systems can now summarize, classify, and route information quickly. The harder problem is whether anyone can inspect the evidence behind the answer.
 
-## Why DISHA Exists
+DISHA is built for public-interest intelligence where unsupported confidence is dangerous: governance audits, source-backed civic research, cyber harm assessment, legal-public record review, open-data triage, and citizen-state accountability.
 
-Public institutions, researchers, journalists, civil-society teams, and technical auditors often work with scattered records: public notices, audit reports, geospatial records, budgets, source registries, incident claims, and human testimony. The hard problem is not only retrieval. The hard problem is trust.
-
-DISHA treats trust as an engineering contract:
+The rule is simple:
 
 ```text
-mission -> DishaSignal -> lenses -> PolicyGate -> EvidenceLedger -> reviewable output
+no claim without source
+no action before policy
+no output without evidence
 ```
 
-If a claim is not verified, DISHA must say so. If a model assists, the model remains advisory. If a request crosses a policy boundary, the system must restrict, escalate, or deny it.
+DISHA is not a chatbot skin, a speculative dashboard, or a collection of imported experiments. The active product spine is a governed runtime where missions become typed signals, signals pass through lenses, actions pass through policy, and outputs are written into a tamper-evident evidence chain.
 
-## What Makes It Different
+## How It Works
 
-| Principle | Meaning |
+```mermaid
+flowchart LR
+    A["Mission Input"] --> B["DishaSignal"]
+    B --> C["Lens Routing"]
+    C --> D["Lens Results"]
+    D --> E["Fusion"]
+    E --> F["Policy Gate"]
+    F --> G["Evidence Ledger v2"]
+    G --> H["Reviewable Output"]
+    F -. "deny / read-only / escalate" .-> I["Safe Fallback"]
+```
+
+Every mission is evaluated through the same discipline:
+
+1. Normalize the request into a structured `DishaSignal`.
+2. Route through domain lenses such as governance, cyber, geospatial, strategy, Yudh View, and simulation.
+3. Fuse agreements, conflicts, uncertainty, and recommended non-executable actions.
+4. Evaluate policy before output.
+5. Write mission events into the ledger with ordered hashes.
+6. Export a reviewable report that marks unsupported claims as `[VERIFY REQUIRED]`.
+
+## Key Features
+
+- **Evidence Ledger v2:** PostgreSQL-backed, ordered mission chains with payload hashes, previous hashes, and event hashes.
+- **Policy Gate:** deny-by-default control for unsafe actions, controlled data, unsupported claims, and offensive cyber requests.
+- **Agentic Workbench:** interactive `/workbench` flow showing mission input, signal normalization, lens routing, fusion, policy, ledger, and export.
+- **Governed Model Adapter:** model output is advisory, logged, policy-filtered, and never treated as a source of fact.
+- **Source Registry:** official/public source manifests for law, gazette, finance, audit, cybercrime, vulnerability intelligence, geospatial, water, disaster, and open-data references.
+- **Security Source Admission:** official public feeds can be admitted; leaked, credential, token, private-key, hacked, or exfiltrated material is blocked.
+- **Production Checks:** CI, tests, type-checking, build, CodeQL, Dependabot, and npm audit are part of the product hygiene loop.
+
+## Getting Started
+
+Install and run:
+
+```bash
+npm install --prefix web
+npm.cmd --prefix web run dev
+```
+
+Open:
+
+```text
+http://127.0.0.1:3000/workbench
+```
+
+Verify locally:
+
+```bash
+npm.cmd --prefix web run type-check:full
+npm.cmd --prefix web test
+npm.cmd --prefix web run build
+```
+
+Query the API health endpoint:
+
+```bash
+curl http://127.0.0.1:3000/api/v1/health
+```
+
+Preview the public documentation page:
+
+```bash
+python -m http.server 8099 -d docs
+```
+
+Open `http://127.0.0.1:8099/`.
+
+## Who It Is For
+
+| Persona | What DISHA Helps With |
 | --- | --- |
-| Constitutional technology | Public authority, citizen visibility, and accountability are first-class product concerns. |
-| Evidence over speed | The system prefers a slower verified answer over a confident unsupported one. |
-| Deny by default | Controlled data and unsafe actions are blocked unless a lawful, logged path exists. |
-| Full provenance | Mission events, policy decisions, and model advisories are attached to a verifiable chain. |
-| Governed models | OpenAI or other model providers may summarize evidence, but may not create facts or bypass policy. |
-| Promotion firewall | Legacy research code becomes product only through contracts, policy, evidence, and tests. |
+| Civic researchers | Turn scattered public records into source-linked evidence trails. |
+| Journalists | Separate verified documents, open questions, and claims requiring review. |
+| Security teams | Use official public advisories for defensive triage without enabling offensive activity. |
+| Policy analysts | Inspect how a conclusion moved through source, lens, policy, and evidence. |
+| Open-source builders | Study an evidence-first pattern for governed agentic systems. |
+| Public-interest technologists | Build tools that preserve restraint, provenance, and citizen accountability. |
 
-## Active Product Spine
+## Technical Highlights
 
 | Layer | Path | Responsibility |
 | --- | --- | --- |
 | API runtime | `web/app/api/v1/` | Mission, lens, policy, evidence, source, agentic, and readiness endpoints |
+| Agentic workbench | `web/app/workbench/` | Interactive demo of the full DISHA mission flow |
 | Contracts | `web/lib/unified/contracts.ts` | `DishaSignal`, `DishaLensResult`, `PolicyDecision`, `EvidenceEvent` |
-| Orchestration | `web/lib/unified/orchestrator.ts` | Mission normalization, lens routing, fusion, policy evaluation |
+| Orchestration | `web/lib/unified/orchestrator.ts` | Signal normalization, lens routing, fusion, policy evaluation |
 | Policy gate | `web/lib/unified/policy-gate.ts` | Deny, read-only, sandbox, escalation, and approval decisions |
-| Evidence Ledger v2 | `web/lib/unified/evidence-ledger.ts` | PostgreSQL-backed ordered hash chains in production |
-| Model governance | `web/lib/unified/model-provider.ts` | Advisory model adapter with unsafe-output filtering |
+| Evidence ledger | `web/lib/unified/evidence-ledger.ts` | PostgreSQL-backed ordered hash chains in production |
+| Source registry | `web/lib/unified/source-registry.ts` | Official/public source definitions, probes, and source admission |
 | Verification | `web/tests/` | Product-spine regression tests |
-| Public page | `docs/public/` and `docs/index.html` | GitHub Pages-safe public landing/demo surface |
-
-## Evidence Ledger v2
-
-Production evidence is designed for restart safety and tamper detection.
-
-```text
-mission_id + chain_index + payload_hash + previous_hash -> event_hash
-```
-
-Each event records:
-
-- mission id
-- chain index
-- actor
-- action
-- input and output hashes
-- policy decision, when present
-- previous event hash
-- payload hash
-- final event hash
-
-Production deployments must set `DATABASE_URL`. A memory ledger is allowed only for tests and explicit local development.
+| Public page | `docs/public/` and `docs/index.html` | GitHub Pages-safe public doctrine surface |
 
 ## API Surface
 
@@ -97,45 +154,12 @@ Important endpoints:
 - `POST /api/v1/evidence/export`
 - `GET /api/v1/sources/registry`
 - `POST /api/v1/sources/probe`
+- `GET /api/v1/sources/admit`
+- `POST /api/v1/sources/admit`
 - `GET /api/v1/architecture`
 - `GET /api/v1/production/readiness`
 
 See [docs/api/API_REFERENCE.md](docs/api/API_REFERENCE.md).
-
-## Quick Start
-
-Install and verify:
-
-```bash
-npm install --prefix web
-npm.cmd --prefix web run type-check:full
-npm.cmd --prefix web test
-npm.cmd --prefix web run build
-```
-
-Run locally:
-
-```bash
-npm.cmd --prefix web run dev
-```
-
-Open:
-
-```text
-http://127.0.0.1:3000
-```
-
-Preview the public landing page:
-
-```bash
-python -m http.server 8099 -d docs
-```
-
-Open:
-
-```text
-http://127.0.0.1:8099/
-```
 
 ## Production Configuration
 
@@ -158,6 +182,18 @@ OPENAI_MODEL=<model>
 
 Model output is never a source of fact. It is logged, policy-filtered, and treated as advisory.
 
+## Current Status
+
+DISHA 6.6 is an MVP-grade product spine with a working Next.js API/runtime, evidence ledger hardening, policy gate, source registry, source admission, agentic workbench, docs, and CI.
+
+Still intentionally marked as roadmap:
+
+- Durable mission-result storage beyond the evidence ledger.
+- More source-specific parsers with claim-level provenance.
+- Production OIDC deployment guide with a reference provider.
+- Visual Evidence Chain Explorer beyond the current workbench view.
+- Real community issue backlog after public launch.
+
 ## Repository Boundary
 
 | Zone | Status |
@@ -174,13 +210,35 @@ Nothing enters the active product spine unless it passes:
 contract -> policy -> evidence -> test
 ```
 
-## Public Claims Rule
+## Contributing
 
-DISHA must not invent facts. Statistics, legal claims, government references, incident counts, source assertions, and dates require source material. If the repository does not verify a claim, mark it:
+Good first contributions:
 
-```text
-[VERIFY REQUIRED]
+- Add a source parser fixture for one registered public source.
+- Improve `/workbench` accessibility and keyboard navigation.
+- Add evidence-chain visual tests.
+- Extend source admission tests for new official public feeds.
+- Improve docs for a specific persona: journalist, researcher, policymaker, or developer.
+
+Read [CONTRIBUTING.md](CONTRIBUTING.md) before opening a PR. Public claims must be sourced or marked `[VERIFY REQUIRED]`.
+
+## Citation
+
+If you reference DISHA in research, writing, or presentations:
+
+```bibtex
+@software{disha66,
+  title = {DISHA 6.6: The Constitutional Evidence Operating System},
+  author = {Tashima-Tarsh},
+  year = {2026},
+  url = {https://github.com/Tashima-Tarsh/Disha},
+  note = {Evidence-first governance intelligence with policy gates and provenance}
+}
 ```
+
+## License
+
+The repository currently contains a placeholder license file and is detected by GitHub as `Other`. Before a major open-source launch, the maintainer should replace it with a standard license such as Apache-2.0 or MIT. Until then, do not assume reuse rights beyond what the owner explicitly grants.
 
 ## Key Documents
 
@@ -189,16 +247,13 @@ DISHA must not invent facts. Statistics, legal claims, government references, in
 - [Architecture](docs/ARCHITECTURE.md)
 - [Evidence Model](docs/EVIDENCE_MODEL.md)
 - [Evidence Chain Explorer](docs/product/EVIDENCE_CHAIN_EXPLORER.md)
+- [Policy Gate](docs/security/POLICY_GATE.md)
 - [API Reference](docs/api/API_REFERENCE.md)
 - [Repository Guide](docs/REPOSITORY_GUIDE.md)
 - [Roadmap](docs/ROADMAP.md)
-- [Contributing](CONTRIBUTING.md)
+- [Launch Plan](docs/launch/TRENDING_LAUNCH_PLAN.md)
 - [Changelog](CHANGELOG.md)
 
-## License Note
+## Star
 
-The repository contains a `LICENSE` file, but the final public open-source license should be confirmed by the repository owner before external distribution claims are made. Until then, contributors should not assume reuse rights beyond what the owner explicitly grants.
-
-## Project Position
-
-DISHA is built for evidence, restraint, and accountability. Its goal is not to make intelligence look impressive. Its goal is to make intelligence reviewable.
+If DISHA helps you think more clearly about evidence-led AI, policy-gated agents, or constitutional technology, star the repo so more builders can find it.

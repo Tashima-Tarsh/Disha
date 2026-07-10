@@ -1,41 +1,34 @@
 # Pull Request
 
 ## Summary
-<!-- Describe what this PR does and why -->
 
-## Type of Change
-<!-- Check all that apply -->
-- [ ] 🐛 Bug fix (non-breaking change that fixes an issue)
-- [ ] ✨ New feature (non-breaking change that adds functionality)
-- [ ] 💥 Breaking change (fix or feature that would cause existing functionality to change)
-- [ ] 🧹 Refactor / cleanup (no functional changes)
-- [ ] 📝 Documentation update
-- [ ] 🧪 Tests only
+Describe the change and why it belongs in the active product spine.
 
-## Component(s) Affected
-<!-- Check all that apply -->
-- [ ] Core CLI Engine (`src/`)
-- [ ] AI Intelligence Platform (`ai-platform/`)
-- [ ] Cyber Defense System (`cyber-defense/`)
-- [ ] Historical Strategy Intelligence (`historical-strategy/`)
-- [ ] Quantum Physics Module (`quantum-physics/`)
-- [ ] Integrations (`integrations/`)
-- [ ] MCP Server (`mcp-server/`)
-- [ ] Docker / Deployment
+## Area
+
+- [ ] Web API / runtime
+- [ ] Agentic workbench
+- [ ] Evidence ledger
+- [ ] Policy gate
+- [ ] Source registry / source admission
 - [ ] Documentation
+- [ ] CI / deployment
+- [ ] Other
 
-## Testing
-<!-- Describe the tests you ran or added -->
-- [ ] Ran existing unit/integration tests locally
-- [ ] Added new tests for this change
-- [ ] Manually tested the affected functionality
+## Evidence And Policy
 
-## Checklist
-- [ ] Code follows the project's style guidelines (`bun run lint` / `flake8` passes)
-- [ ] Type annotations added for new Python/TypeScript code
-- [ ] Documentation updated (README, WIKI, docstrings) if needed
-- [ ] No new security vulnerabilities introduced
-- [ ] PR scope is focused (one feature/fix per PR)
+- [ ] Public claims are sourced or marked `[VERIFY REQUIRED]`.
+- [ ] No private, leaked, credential, token, private-key, hacked, or controlled material is introduced.
+- [ ] Any new source includes owner, URL, license/terms, update mode, and limitations.
+- [ ] Any new model or agent path remains policy-gated and evidence-logged.
 
-## Related Issues
-<!-- Link any related issues: Closes #123 -->
+## Verification
+
+- [ ] `npm.cmd --prefix web run type-check:full`
+- [ ] `npm.cmd --prefix web test`
+- [ ] `npm.cmd --prefix web run build`
+- [ ] Documentation updated where needed
+
+## Notes For Reviewers
+
+Call out risks, migration steps, or areas where review should be especially strict.

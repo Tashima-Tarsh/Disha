@@ -12,6 +12,7 @@ All notable project changes should be recorded here.
 - Evidence Chain Explorer product specification.
 - Agentic Workbench route at `/workbench` with mission input, signal normalization, lens routing, policy gate, evidence chain, and export-ready demo flow.
 - Security source admission for official/public cyber sources, with leak/credential/private-key/exfiltrated material blocked before operation.
+- Launch-ready README, cleaned issue/PR/security templates, and a GitHub Trending optimization plan.
 - Public landing page sections for constitutional accountability, differentiators, and safe read-only demo.
 - Updated API reference, roadmap, contribution guide, and project vision.
 

@@ -1,27 +1,56 @@
 # Security Policy
 
-## Supported Versions
+DISHA is an evidence-first governance and intelligence project. Security reports should be handled privately, carefully, and without publishing exploit details in public issues.
 
-The following versions of DishaOS are currently being supported with security updates.
+## Supported Version
 
-| Version | Supported          | Notes |
-| ------- | ------------------ | ----- |
-| 6.0.x   | :white_check_mark: | Current Mainline |
-| < 6.0   | :x:                | Deprecated. Upgrade to v6 immediately. |
+| Version | Supported | Notes |
+| --- | --- | --- |
+| 6.6.x | Yes | Current product spine |
+| Older versions | No | Archived or legacy surfaces |
 
-## Reporting a Vulnerability
+## Reporting A Vulnerability
 
-**Do NOT open a public GitHub issue for security vulnerabilities.**
+Do not open a public issue for security vulnerabilities.
 
-We take the security of DishaOS very seriously, especially given its capabilities as an autonomous agentic framework and its integration with sovereign intelligence layers. 
+Use GitHub Security Advisories:
 
-To report a security vulnerability:
-1. Contact the maintainer directly via GitHub Security Advisories.
-2. Go to the [Security Advisories](https://github.com/Tashima-Tarsh/Disha/security/advisories) tab and click **"Report a vulnerability"**.
-3. Provide a detailed description of the exploit, proof-of-concept code, and the potential impact.
+```text
+https://github.com/Tashima-Tarsh/Disha/security/advisories
+```
 
-You can expect an acknowledgment within 24 hours. A patch will be prioritized and rolled out synchronously with a public CVE disclosure (if applicable).
+Please include:
 
-### Bug Bounty
+- affected commit or version,
+- affected component,
+- reproduction steps,
+- impact,
+- suggested fix if known,
+- whether any secret, credential, private data, or controlled material may be involved.
 
-At this time, DishaOS does not run a formal bug bounty program, but we offer massive respect, public credit in our Hall of Fame, and deep gratitude to researchers who ethically report vulnerabilities.
+## Scope
+
+In scope:
+
+- authentication and authorization bypasses,
+- evidence ledger integrity issues,
+- policy-gate bypasses,
+- source-admission bypasses,
+- unsafe handling of secrets or private data,
+- injection, SSRF, path traversal, or rate-limit weaknesses in active `web/` runtime code.
+
+Out of scope:
+
+- requests for offensive capability,
+- reports based on leaked or exfiltrated third-party material,
+- social engineering,
+- denial-of-service tests without prior written permission,
+- issues only affecting archived `legacy/` code unless they are reachable from the active product runtime.
+
+## Security Principles
+
+- No offensive cyber capability.
+- No leaked, credential, token, private-key, hacked, or exfiltrated material is ingested as an operational source.
+- Controlled-data connectors deny by default.
+- Model output is advisory and cannot bypass policy.
+- Evidence and policy decisions must be logged for high-impact flows.

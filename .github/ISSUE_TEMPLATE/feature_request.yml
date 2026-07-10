@@ -1,61 +1,52 @@
-name: ✨ Feature Request
-description: Suggest a new feature or improvement
-labels: ["enhancement"]
+name: Feature request
+description: Propose a focused improvement to DISHA.
+labels: ["enhancement", "triage"]
 body:
   - type: markdown
     attributes:
       value: |
-        Have an idea to improve Disha? We'd love to hear it!
-
+        DISHA prefers small, evidence-preserving changes over broad rewrites. Please explain the public-interest value of the feature.
   - type: dropdown
-    id: component
+    id: area
     attributes:
-      label: Component
-      description: Which part of Disha would this feature improve?
+      label: Area
       options:
-        - Core CLI Engine (TypeScript/Bun)
-        - AI Intelligence Platform (FastAPI/PyTorch)
-        - Cyber Defense System (Honeypot/ML)
-        - Historical Strategy Intelligence
-        - Quantum Physics Module
-        - Integrations (Cyber Intel / OSINT)
-        - MCP Server
-        - Docker / Deployment
+        - Evidence ledger
+        - Policy gate
+        - Agentic workbench
+        - Source registry / parser
+        - Governed model adapter
         - Documentation
-        - New Component
+        - Developer experience
+        - Other
     validations:
       required: true
-
   - type: textarea
     id: problem
     attributes:
-      label: Problem Statement
-      description: What problem does this feature solve? Is your feature request related to an existing limitation?
-      placeholder: I'm frustrated when… / Currently there is no way to…
+      label: Problem
+      description: What limitation does this solve?
     validations:
       required: true
-
   - type: textarea
-    id: solution
+    id: proposal
     attributes:
-      label: Proposed Solution
-      description: Describe the feature you'd like to see.
-      placeholder: I'd like Disha to be able to…
+      label: Proposed solution
+      description: Describe the smallest useful implementation.
     validations:
       required: true
-
   - type: textarea
-    id: alternatives
+    id: evidence
     attributes:
-      label: Alternatives Considered
-      description: Have you considered any alternative approaches or workarounds?
+      label: Evidence and policy impact
+      description: What sources, policy rules, or evidence events would be affected?
     validations:
       required: false
-
-  - type: textarea
-    id: additional
+  - type: checkboxes
+    id: checklist
     attributes:
-      label: Additional Context
-      description: Add any other context, mockups, or references here.
-    validations:
-      required: false
+      label: Contribution boundary
+      options:
+        - label: This does not add unsupported factual claims.
+        - label: This does not ingest private, leaked, credential, token, or controlled material.
+        - label: This can be tested or documented clearly.
