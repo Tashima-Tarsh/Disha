@@ -227,8 +227,12 @@ export function DishaWorkbench() {
       const evidenceResponse = await fetch(`/api/v1/evidence/${encodeURIComponent(agenticResult.mission.missionId)}`);
       const evidencePayload = await evidenceResponse.json();
       if (!evidenceResponse.ok) throw new Error(readApiError(evidencePayload, evidenceResponse.status));
-      setEvidence(evidencePayload.events as EvidenceEvent[]);
-      setSelectedEventId((evidencePayload.events as EvidenceEvent[])[0]?.eventId ?? null);
+      const ledgerEvents = evidencePayload.events as EvidenceEvent[];
+      const events = ledgerEvents.length
+        ? ledgerEvents
+        : buildEvidenceReferenceChain(agenticResult.mission.missionId, agenticResult.evidenceEventIds);
+      setEvidence(events);
+      setSelectedEventId(events[0]?.eventId ?? null);
       setStatus("complete");
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : "Workbench mission failed.");
@@ -597,6 +601,24 @@ function readApiError(payload: unknown, status: number) {
     if (message) return message;
   }
   return `Request failed with status ${status}`;
+}
+
+function buildEvidenceReferenceChain(missionId: string, evidenceEventIds: string[]): EvidenceEvent[] {
+  const uniqueIds = Array.from(new Set(evidenceEventIds));
+  const timestamp = new Date().toISOString();
+  return uniqueIds.map((eventId, index) => ({
+    eventId,
+    missionId,
+    chainIndex: index,
+    timestamp,
+    actor: "evidence-ledger",
+    action: "evidence_event_reference",
+    inputHash: eventId,
+    outputHash: undefined,
+    parentEventId: undefined,
+    previousHash: index === 0 ? undefined : uniqueIds[index - 1],
+    eventHash: eventId,
+  }));
 }
 
 function buildReport(result: AgenticMissionResult | null, evidence: EvidenceEvent[]) {

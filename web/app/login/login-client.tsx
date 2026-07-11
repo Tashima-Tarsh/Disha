@@ -9,14 +9,14 @@ import styles from "./login.module.css";
 type LoginState = "idle" | "submitting" | "success" | "error";
 type LoginMode = "mobile" | "meri-pehchan" | "intra-id" | "password";
 
-export function LoginClient({ returnUrl }: { returnUrl: string }) {
+export function LoginClient({ initialMode, returnUrl }: { initialMode: "mobile" | "password"; returnUrl: string }) {
   const router = useRouter();
   const [email, setEmail] = useState("nitish@thenitishkr.in");
   const [password, setPassword] = useState("");
   const [mobile, setMobile] = useState("");
   const [otp, setOtp] = useState("");
   const [devOtp, setDevOtp] = useState<string | null>(null);
-  const [mode, setMode] = useState<LoginMode>("mobile");
+  const [mode, setMode] = useState<LoginMode>(initialMode);
   const [state, setState] = useState<LoginState>("idle");
   const [error, setError] = useState<string | null>(null);
 
@@ -199,7 +199,8 @@ export function LoginClient({ returnUrl }: { returnUrl: string }) {
           ) : null}
 
           {mode === "password" ? (
-            <form className={styles.form} onSubmit={onSubmit}>
+            <form action="/api/auth/login/form" className={styles.form} method="post">
+              <input name="returnUrl" type="hidden" value={returnUrl} />
               <label>
                 Email
                 <input
