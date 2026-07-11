@@ -5,6 +5,8 @@ import { describe, expect, it } from "vitest";
 const dashboardClient = path.resolve(__dirname, "../app/dashboard/dashboard-client.tsx");
 const dashboardPage = path.resolve(__dirname, "../app/dashboard/page.tsx");
 const commandRoute = path.resolve(__dirname, "../app/api/dashboard/command/route.ts");
+const claimChain = path.resolve(__dirname, "../lib/dashboard-claim-chain.ts");
+const geospatialLayer = path.resolve(__dirname, "../lib/india-geospatial-layer.ts");
 const legacyRoute = path.resolve(__dirname, "../app/dashboard/route.ts");
 const legacyHtml = path.resolve(__dirname, "../app/dashboard/disha66-command-centre-v3.html");
 
@@ -23,6 +25,8 @@ describe("DISHA command dashboard", () => {
 
     expect(source).toContain("/api/dashboard/command");
     expect(source).toContain("CommandFeed");
+    expect(source).toContain("Constitutional Chain Explorer");
+    expect(source).toContain("Geospatial Import Layer");
     expect(source).not.toContain("Interactive demo runtime");
   });
 
@@ -34,5 +38,21 @@ describe("DISHA command dashboard", () => {
     expect(route).toContain("getProductionSpineReport");
     expect(route).toContain("getGovernedExtensionControlPlane");
     expect(route).toContain("requirePrincipal");
+    expect(route).toContain("buildIndiaGeospatialLayer");
+    expect(route).toContain("claimChains");
+  });
+
+  it("keeps geospatial and claim-chain work provenance-first", () => {
+    const geo = fs.readFileSync(geospatialLayer, "utf8");
+    const claims = fs.readFileSync(claimChain, "utf8");
+
+    expect(geo).toContain("datameet-maps");
+    expect(geo).toContain("bhuvan");
+    expect(geo).toContain("source_registered_requires_import");
+    expect(geo).toContain("attributionRequired: true");
+    expect(claims).toContain("buildCagClaimChains");
+    expect(claims).toContain("buildFinanceClaimChains");
+    expect(claims).toContain("sourceRecordHash");
+    expect(claims).toContain("chainHash");
   });
 });

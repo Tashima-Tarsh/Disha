@@ -19,7 +19,7 @@ npm install --prefix web
 npm.cmd --prefix web run dev
 ```
 
-Open `http://127.0.0.1:3000/workbench`.
+Open `http://127.0.0.1:3000/workbench` for missions or `http://127.0.0.1:3000/dashboard` for the command dashboard.
 
 </div>
 
@@ -62,6 +62,7 @@ Read [ARCHITECTURE.md](ARCHITECTURE.md) before changing core behavior.
 - **Evidence Ledger v2:** ordered evidence chains with payload hashes, previous hashes, and event hashes.
 - **Policy Gate:** deny-by-default control for unsafe actions, controlled data, unsupported claims, and offensive cyber requests.
 - **Agentic Workbench:** interactive `/workbench` flow for mission input, signal normalization, lens routing, fusion, policy, ledger, and export.
+- **Command Dashboard:** authenticated `/dashboard` view backed by one governed command feed with CAG, finance, geospatial import readiness, source registry, and claim-chain explorer.
 - **Governed Model Adapter:** model output is advisory, logged, policy-filtered, and never treated as a source of fact.
 - **Source Registry:** official/public source manifests for law, gazette, finance, audit, cybercrime, vulnerability intelligence, geospatial, water, disaster, and open-data references.
 - **Security Source Admission:** official public feeds can be admitted; leaked, credential, token, private-key, hacked, or exfiltrated material is blocked.
@@ -72,6 +73,8 @@ Read [ARCHITECTURE.md](ARCHITECTURE.md) before changing core behavior.
 | --- | --- |
 | `web/app/api/v1/` | Versioned API routes |
 | `web/app/workbench/` | Constitutional intelligence workbench |
+| `web/app/dashboard/` | Command dashboard and constitutional claim-chain explorer |
+| `web/app/api/dashboard/command/` | Single backend command feed for dashboard evidence, source, and readiness data |
 | `web/lib/unified/contracts.ts` | `DishaSignal`, lens, policy, evidence, and source contracts |
 | `web/lib/unified/orchestrator.ts` | Signal normalization, routing, fusion, and mission orchestration |
 | `web/lib/unified/policy-gate.ts` | Deny, read-only, sandbox, escalation, and approval decisions |
@@ -145,6 +148,7 @@ Important endpoints:
 - `GET /api/v1/architecture`
 - `GET /api/v1/production/readiness`
 - `GET /api/v1/extensions`
+- `GET /api/dashboard/command`
 
 See [docs/internal/api/API_REFERENCE.md](docs/internal/api/API_REFERENCE.md).
 

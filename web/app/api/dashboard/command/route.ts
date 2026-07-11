@@ -1,8 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 
+import { buildCagClaimChains, buildFinanceClaimChains, buildGeospatialClaimChain } from "@/lib/dashboard-claim-chain";
 import { fetchCagAuditRecords, type CagAuditFetchResult } from "@/lib/cag-audit-connector";
 import { fetchFinanceBudgetRecords, type FinanceBudgetResult } from "@/lib/finance-budget-connector";
 import { getGovernedExtensionControlPlane } from "@/lib/extensions";
+import { buildIndiaGeospatialLayer } from "@/lib/india-geospatial-layer";
 import { territories, type Territory } from "@/lib/india-dashboard-data";
 import { nationalConnectors } from "@/lib/national-connectors";
 import { nationalDataCoverage, nationalDataSources } from "@/lib/national-data-registry";
@@ -41,8 +43,18 @@ export async function GET(req: NextRequest) {
     const production = getProductionSpineReport();
     const extensions = getGovernedExtensionControlPlane();
     const sourceRegistry = listSourceRegistry();
-    const india = buildIndiaCommandLayer(territories);
+    const geospatial = buildIndiaGeospatialLayer(territories);
+    const india = buildIndiaCommandLayer(territories, geospatial);
     const lanes = buildCommandLanes();
+    const claimChains = [
+      buildGeospatialClaimChain({
+        sourceHash: geospatial.sourceHash,
+        sourceCount: geospatial.sources.length,
+        territoryCount: geospatial.stateUtFeatures.length,
+      }),
+      ...buildCagClaimChains(cag.records),
+      ...buildFinanceClaimChains(finance.records),
+    ];
 
     return NextResponse.json({
       generatedAt,
@@ -71,6 +83,8 @@ export async function GET(req: NextRequest) {
       },
       lanes,
       india,
+      geospatial,
+      claimChains,
       audit: {
         generatedAt: cag.generatedAt,
         authority: cag.source.authority,
@@ -177,7 +191,7 @@ function buildCommandLanes(): CommandLane[] {
   });
 }
 
-function buildIndiaCommandLayer(items: Territory[]) {
+function buildIndiaCommandLayer(items: Territory[], geospatial: ReturnType<typeof buildIndiaGeospatialLayer>) {
   const regionSummary = items.reduce<Record<string, { total: number; states: number; uts: number }>>((acc, item) => {
     const current = acc[item.region] ?? { total: 0, states: 0, uts: 0 };
     current.total += 1;
@@ -191,16 +205,17 @@ function buildIndiaCommandLayer(items: Territory[]) {
     totalTerritories: items.length,
     states: items.filter((item) => item.kind === "State").length,
     unionTerritories: items.filter((item) => item.kind === "Union Territory").length,
-    mapMode: "administrative-source-readiness",
-    geometryStatus: "official_geojson_not_yet_committed",
+    mapMode: geospatial.mapMode,
+    geometryStatus: geospatial.geometryStatus,
     regionSummary,
-    territories: items.map((item) => ({
-      name: item.name,
-      kind: item.kind,
-      region: item.region,
+    territories: geospatial.stateUtFeatures.map((feature) => ({
+      id: feature.id,
+      name: feature.name,
+      kind: feature.kind,
+      region: feature.region,
       posture: "watch",
-      evidenceCoverage: item.evidence,
-      commandTask: "Bind official LGD/state source rows and map geometry before incident heat-map publication.",
+      evidenceCoverage: feature.evidenceCoverage,
+      commandTask: feature.commandTask,
     })),
   };
 }

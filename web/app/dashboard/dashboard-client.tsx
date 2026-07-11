@@ -67,6 +67,7 @@ type CommandFeed = {
     geometryStatus: string;
     regionSummary: Record<string, { total: number; states: number; uts: number }>;
     territories: Array<{
+      id: string;
       name: string;
       kind: "State" | "Union Territory";
       region: string;
@@ -75,6 +76,50 @@ type CommandFeed = {
       commandTask: string;
     }>;
   };
+  geospatial: {
+    layerId: string;
+    geometryStatus: string;
+    mapMode: string;
+    attributionRequired: boolean;
+    boundaryImportRule: string;
+    sourceHash: string;
+    sources: Array<{
+      sourceId: string;
+      sourceName: string;
+      owner: string;
+      url: string;
+      geographyLevel: string[];
+      updateMode: string;
+      status: "registered" | "requires_import" | "requires_license_review";
+      limitation: string;
+    }>;
+  };
+  claimChains: Array<{
+    claimId: string;
+    title: string;
+    domain: "audit" | "finance" | "geospatial" | "source-registry";
+    claim: string;
+    status: "publishable_metadata" | "verify_required" | "import_required";
+    source: {
+      authority: string;
+      url: string;
+      recordId: string;
+    };
+    policy: {
+      decision: "ALLOW_METADATA" | "REQUIRE_PARSER" | "REQUIRE_IMPORT";
+      reason: string;
+    };
+    evidence: {
+      sourceRecordHash: string;
+      chainHash: string;
+      ledgerAction: string;
+    };
+    chain: Array<{
+      step: "source" | "claim" | "policy" | "evidence";
+      label: string;
+      detail: string;
+    }>;
+  }>;
   audit: {
     authority: string;
     sourceNotice: string;
@@ -146,8 +191,9 @@ type CommandFeed = {
     sourceId: string;
     sourceName: string;
     owner: string;
+    domain: string;
     sourceType: string;
-    classification: string;
+    updateMode: string;
     endpoints: number;
     limitations: string[];
   }>;
@@ -182,6 +228,7 @@ export function DashboardClient({ principal }: { principal: PrincipalView }) {
   const [loadState, setLoadState] = useState<LoadState>({ status: "loading" });
   const [selectedRegion, setSelectedRegion] = useState("All");
   const [selectedLane, setSelectedLane] = useState("All");
+  const [selectedClaimId, setSelectedClaimId] = useState<string | null>(null);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -208,6 +255,7 @@ export function DashboardClient({ principal }: { principal: PrincipalView }) {
   const lanes = ["All", ...data.lanes.map((lane) => lane.title).sort()];
   const territories = data.india.territories.filter((territory) => selectedRegion === "All" || territory.region === selectedRegion);
   const connectors = data.connectors.filter((connector) => selectedLane === "All" || connector.layer === selectedLane);
+  const selectedClaim = data.claimChains.find((claim) => claim.claimId === selectedClaimId) ?? data.claimChains[0];
 
   return (
     <DashboardShell
@@ -272,6 +320,75 @@ export function DashboardClient({ principal }: { principal: PrincipalView }) {
                 </div>
               </Panel>
             </aside>
+          </section>
+
+          <section className={styles.evidenceGrid} id="evidence">
+            <Panel title="Constitutional Chain Explorer" icon={<Fingerprint size={18} />}>
+              <div className={styles.chainExplorer}>
+                <div className={styles.claimList}>
+                  {data.claimChains.slice(0, 12).map((claim) => (
+                    <button
+                      className={claim.claimId === selectedClaim.claimId ? styles.claimButtonActive : styles.claimButton}
+                      key={claim.claimId}
+                      type="button"
+                      onClick={() => setSelectedClaimId(claim.claimId)}
+                    >
+                      <span>{claim.domain}</span>
+                      <strong>{claim.title}</strong>
+                      <small>{humanize(claim.status)}</small>
+                    </button>
+                  ))}
+                </div>
+                <div className={styles.chainDetail}>
+                  <div className={styles.chainDetailHead}>
+                    <div>
+                      <p className={styles.eyebrow}>Claim-level provenance</p>
+                      <h3>{selectedClaim.title}</h3>
+                    </div>
+                    <Badge tone={selectedClaim.status === "publishable_metadata" ? "operational" : "watch"}>{humanize(selectedClaim.status)}</Badge>
+                  </div>
+                  <p>{selectedClaim.claim}</p>
+                  <div className={styles.chainSteps}>
+                    {selectedClaim.chain.map((step) => (
+                      <article className={styles.chainStep} key={`${selectedClaim.claimId}-${step.step}`}>
+                        <BadgeCheck size={16} />
+                        <div>
+                          <span>{step.step}</span>
+                          <strong>{step.label}</strong>
+                          <small>{step.detail}</small>
+                        </div>
+                      </article>
+                    ))}
+                  </div>
+                  <div className={styles.hashBlock}>
+                    <span>source hash</span>
+                    <code>{selectedClaim.evidence.sourceRecordHash}</code>
+                    <span>chain hash</span>
+                    <code>{selectedClaim.evidence.chainHash}</code>
+                  </div>
+                </div>
+              </div>
+            </Panel>
+
+            <Panel title="Geospatial Import Layer" icon={<MapPinned size={18} />}>
+              <p className={styles.notice}>{data.geospatial.boundaryImportRule}</p>
+              <div className={styles.geoSourceGrid}>
+                {data.geospatial.sources.map((source) => (
+                  <article className={styles.geoSource} key={source.sourceId}>
+                    <div>
+                      <strong>{source.sourceName}</strong>
+                      <span>{source.owner}</span>
+                    </div>
+                    <Badge tone={source.status === "requires_license_review" ? "watch" : "partial"}>{humanize(source.status)}</Badge>
+                    <small>{source.geographyLevel.join(", ")}</small>
+                  </article>
+                ))}
+              </div>
+              <div className={styles.hashBlock}>
+                <span>geometry source hash</span>
+                <code>{data.geospatial.sourceHash}</code>
+              </div>
+            </Panel>
           </section>
 
           <section className={styles.intelGrid}>
