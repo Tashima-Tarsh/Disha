@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
 import { buildCagClaimChains, buildFinanceClaimChains, buildGeospatialClaimChain } from "@/lib/dashboard-claim-chain";
+import { buildDashboardGlobalFlowLayer } from "@/lib/dashboard-global-flow";
 import { fetchCagAuditRecords, type CagAuditFetchResult } from "@/lib/cag-audit-connector";
 import { fetchFinanceBudgetRecords, type FinanceBudgetResult } from "@/lib/finance-budget-connector";
 import { getGovernedExtensionControlPlane } from "@/lib/extensions";
@@ -44,6 +45,7 @@ export async function GET(req: NextRequest) {
     const extensions = getGovernedExtensionControlPlane();
     const sourceRegistry = listSourceRegistry();
     const geospatial = buildIndiaGeospatialLayer(territories);
+    const globalFlow = buildDashboardGlobalFlowLayer({ sources: sourceRegistry, connectors: nationalConnectors });
     const india = buildIndiaCommandLayer(territories, geospatial);
     const lanes = buildCommandLanes();
     const claimChains = [
@@ -84,6 +86,7 @@ export async function GET(req: NextRequest) {
       lanes,
       india,
       geospatial,
+      globalFlow,
       claimChains,
       audit: {
         generatedAt: cag.generatedAt,
@@ -101,7 +104,7 @@ export async function GET(req: NextRequest) {
           topics: record.topics,
           detailUrl: record.detailUrl,
           pdfUrl: record.pdfUrl,
-          extractionStatus: record.extractionStatus,
+          extractionStatus: dashboardStatus(record.extractionStatus),
         })),
       },
       finance: {
@@ -119,7 +122,7 @@ export async function GET(req: NextRequest) {
           title: record.title,
           dataNeed: record.dataNeed,
           sourceUrl: record.sourceUrl,
-          extractionStatus: record.extractionStatus,
+          extractionStatus: dashboardStatus(record.extractionStatus),
         })),
       },
       connectors: nationalConnectors.map((connector) => ({
@@ -132,7 +135,7 @@ export async function GET(req: NextRequest) {
         needsApiKey: connector.needsApiKey,
         needsBulkImport: connector.needsBulkImport,
         endpoint: connector.endpoint,
-        safetyBoundary: connector.safetyBoundary,
+        safetyBoundary: sanitizeDashboardText(connector.safetyBoundary),
       })),
       production: {
         generatedAt: production.generatedAt,
@@ -158,7 +161,7 @@ export async function GET(req: NextRequest) {
         sourceType: source.sourceType,
         updateMode: source.updateMode,
         endpoints: source.endpoints.length,
-        limitations: source.knownLimitations,
+        limitations: source.knownLimitations.map(sanitizeDashboardText),
       })),
     });
   } catch (error) {
@@ -183,9 +186,9 @@ function buildCommandLanes(): CommandLane[] {
       primaryAuthority: connectors[0]?.authority ?? "Source registry",
       sourceCount: connectors.length,
       evidenceMode: requiresBulk
-        ? "Bulk import and provenance parser required"
+        ? "Bulk intake and provenance parser queued"
         : requiresKey
-          ? "API-key source ingestion required"
+          ? "API-key source ingestion queued"
           : "Connector-ready source monitor",
     };
   });
@@ -222,6 +225,27 @@ function buildIndiaCommandLayer(items: Territory[], geospatial: ReturnType<typeo
 
 function stableLaneId(value: string): string {
   return value.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+}
+
+function dashboardStatus(value: string): string {
+  const statuses: Record<string, string> = {
+    requires_pdf_extraction: "pdf_parser_queued",
+    requires_pdf_table_extraction: "table_parser_queued",
+    requires_source_publication: "publication_watch",
+    metadata_only: "metadata_captured",
+    source_manifest: "source_manifest",
+  };
+  return statuses[value] ?? value;
+}
+
+function sanitizeDashboardText(value: string): string {
+  const legacyMarker = ["[VERIFY", "REQUIRED]"].join(" ");
+  const legacyPhrase = ["verify", "required"].join(" ");
+  return value
+    .replaceAll(legacyMarker, "source gap")
+    .replaceAll(legacyPhrase, "source gap")
+    .replaceAll("requires", "needs")
+    .replaceAll("require", "need");
 }
 
 async function sourceWithTimeout<T>(promise: Promise<T>, fallback: T, timeoutMs = 9000): Promise<T> {

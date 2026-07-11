@@ -7,6 +7,8 @@ const dashboardPage = path.resolve(__dirname, "../app/dashboard/page.tsx");
 const commandRoute = path.resolve(__dirname, "../app/api/dashboard/command/route.ts");
 const claimChain = path.resolve(__dirname, "../lib/dashboard-claim-chain.ts");
 const geospatialLayer = path.resolve(__dirname, "../lib/india-geospatial-layer.ts");
+const globalFlow = path.resolve(__dirname, "../lib/dashboard-global-flow.ts");
+const worldMap = path.resolve(__dirname, "../public/data/world-countries.geojson");
 const legacyRoute = path.resolve(__dirname, "../app/dashboard/route.ts");
 const legacyHtml = path.resolve(__dirname, "../app/dashboard/disha66-command-centre-v3.html");
 
@@ -27,6 +29,8 @@ describe("DISHA command dashboard", () => {
     expect(source).toContain("CommandFeed");
     expect(source).toContain("Constitutional Chain Explorer");
     expect(source).toContain("Geospatial Import Layer");
+    expect(source).toContain("WorldFlowMap");
+    expect(source).toContain("/data/world-countries.geojson");
     expect(source).not.toContain("Interactive demo runtime");
   });
 
@@ -48,11 +52,23 @@ describe("DISHA command dashboard", () => {
 
     expect(geo).toContain("datameet-maps");
     expect(geo).toContain("bhuvan");
-    expect(geo).toContain("source_registered_requires_import");
+    expect(geo).toContain("source_registered_intake_queued");
     expect(geo).toContain("attributionRequired: true");
     expect(claims).toContain("buildCagClaimChains");
     expect(claims).toContain("buildFinanceClaimChains");
     expect(claims).toContain("sourceRecordHash");
     expect(claims).toContain("chainHash");
+  });
+
+  it("ships a real local world map and backend source-flow model", () => {
+    const flow = fs.readFileSync(globalFlow, "utf8");
+    const map = JSON.parse(fs.readFileSync(worldMap, "utf8")) as { type: string; features: unknown[] };
+
+    expect(map.type).toBe("FeatureCollection");
+    expect(map.features.length).toBeGreaterThan(100);
+    expect(flow).toContain("buildDashboardGlobalFlowLayer");
+    expect(flow).toContain("world-countries.geojson");
+    expect(flow).toContain("CISA KEV catalog");
+    expect(flow).toContain("Evidence Ledger v2");
   });
 });

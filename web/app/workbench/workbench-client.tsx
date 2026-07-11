@@ -156,7 +156,7 @@ type EvidenceEvent = {
 };
 
 const DEFAULT_MISSION =
-  "Assess a public-interest governance concern involving district infrastructure claims, CAG audit references, citizen complaints, and cyber-enabled fraud patterns. Produce a read-only evidence plan with policy gates and [VERIFY REQUIRED] markers.";
+  "Assess a public-interest governance concern involving district infrastructure claims, CAG audit references, citizen complaints, and cyber-enabled fraud patterns. Produce a read-only evidence plan with policy gates and source-gap markers.";
 
 const EXAMPLES = [
   {
@@ -485,7 +485,7 @@ function LensCard({ lens }: { lens: LensResult }) {
       <div className={styles.scoreRow}>
         <span>Confidence {Math.round(lens.confidence * 100)}%</span>
         <span>Risk {Math.round(lens.riskScore * 100)}%</span>
-        <span>{lens.policyRequired ? "Policy required" : "Policy noted"}</span>
+        <span>{lens.policyRequired ? "Policy gated" : "Policy noted"}</span>
       </div>
       <div className={styles.findings}>
         {lens.findings.map((finding) => (
@@ -509,7 +509,7 @@ function PolicyPanel({ policy, approvalRequired }: { policy: PolicyDecision; app
       <p>{policy.safeFallback}</p>
       <div className={styles.scoreBar}><i style={{ width: `${Math.round(policy.riskScore * 100)}%` }} /></div>
       <InfoList title="Reasons" items={policy.reasons} />
-      {approvalRequired ? <div className={styles.approval}>Human approval required before any next step.</div> : null}
+      {approvalRequired ? <div className={styles.approval}>Human confirmation is needed before any next step.</div> : null}
     </article>
   );
 }
@@ -528,7 +528,7 @@ function ExtensionCard({ extension }: { extension: GovernedExtensionResult }) {
         <span>Evidence {extension.evidenceEventIds.length}</span>
       </div>
       <InfoList title="Proposed safe actions" items={extension.proposedActions.map((action) => `${action.label} (${action.policyActionId})`)} />
-      {extension.claims?.length ? <InfoList title="Claims" items={extension.claims.map((claim) => `${claim.verifyRequired ? "[VERIFY REQUIRED] " : ""}${claim.text}`)} /> : null}
+      {extension.claims?.length ? <InfoList title="Claims" items={extension.claims.map((claim) => `${claim.verifyRequired ? "[SOURCE GAP] " : ""}${claim.text}`)} /> : null}
     </article>
   );
 }

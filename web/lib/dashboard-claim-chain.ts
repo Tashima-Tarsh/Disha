@@ -7,7 +7,7 @@ export type DashboardClaimChain = {
   title: string;
   domain: "audit" | "finance" | "geospatial" | "source-registry";
   claim: string;
-  status: "publishable_metadata" | "verify_required" | "import_required";
+  status: "publishable_metadata" | "source_gap" | "intake_queued";
   source: {
     authority: string;
     url: string;
@@ -38,7 +38,7 @@ export function buildCagClaimChains(records: CagAuditRecord[]): DashboardClaimCh
       title: record.title,
       domain: "audit",
       claim,
-      status: record.extractionStatus === "metadata_only" ? "verify_required" : "publishable_metadata",
+      status: record.extractionStatus === "metadata_only" ? "source_gap" : "publishable_metadata",
       authority: record.source.authority,
       url,
       recordId: record.id,
@@ -57,7 +57,7 @@ export function buildFinanceClaimChains(records: FinanceDocumentRecord[]): Dashb
       title: record.title,
       domain: "finance",
       claim,
-      status: record.extractionStatus === "source_manifest" ? "publishable_metadata" : "verify_required",
+      status: record.extractionStatus === "source_manifest" ? "publishable_metadata" : "source_gap",
       authority: record.authority,
       url: record.sourceUrl,
       recordId: record.id,
@@ -82,7 +82,7 @@ export function buildGeospatialClaimChain({
     title: "India administrative geometry layer",
     domain: "geospatial",
     claim: `${sourceCount} geospatial sources are registered for ${territoryCount} state/UT features; boundary import remains pending.`,
-    status: "import_required",
+    status: "intake_queued",
     authority: "DISHA source registry",
     url: "https://github.com/datameet/maps",
     recordId: sourceHash,

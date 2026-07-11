@@ -10,6 +10,7 @@ import {
   FileSearch,
   Fingerprint,
   GitBranch,
+  Globe2,
   Landmark,
   LockKeyhole,
   MapPinned,
@@ -90,8 +91,31 @@ type CommandFeed = {
       url: string;
       geographyLevel: string[];
       updateMode: string;
-      status: "registered" | "requires_import" | "requires_license_review";
+      status: "registered" | "intake_queued" | "license_review";
       limitation: string;
+    }>;
+  };
+  globalFlow: {
+    mapAsset: string;
+    attribution: string;
+    generatedFrom: string;
+    nodes: Array<{
+      id: string;
+      label: string;
+      country: string;
+      lon: number;
+      lat: number;
+      kind: "command_hub" | "national_source" | "global_source" | "evidence_store";
+    }>;
+    flows: Array<{
+      id: string;
+      from: string;
+      to: string;
+      label: string;
+      authority: string;
+      status: "live_source" | "registered_source" | "parser_queued";
+      cadence: string;
+      hash: string;
     }>;
   };
   claimChains: Array<{
@@ -99,7 +123,7 @@ type CommandFeed = {
     title: string;
     domain: "audit" | "finance" | "geospatial" | "source-registry";
     claim: string;
-    status: "publishable_metadata" | "verify_required" | "import_required";
+    status: "publishable_metadata" | "source_gap" | "intake_queued";
     source: {
       authority: string;
       url: string;
@@ -204,6 +228,19 @@ type LoadState =
   | { status: "ready"; data: CommandFeed }
   | { status: "error"; message: string };
 
+type WorldFeatureCollection = {
+  type: "FeatureCollection";
+  features: Array<{
+    type: "Feature";
+    id?: string;
+    properties?: { name?: string };
+    geometry: {
+      type: "Polygon" | "MultiPolygon";
+      coordinates: number[][][] | number[][][][];
+    };
+  }>;
+};
+
 const regionCoordinates: Record<string, { x: number; y: number }> = {
   North: { x: 46, y: 22 },
   "North East": { x: 75, y: 35 },
@@ -226,6 +263,7 @@ const toneClass: Record<string, string> = {
 
 export function DashboardClient({ principal }: { principal: PrincipalView }) {
   const [loadState, setLoadState] = useState<LoadState>({ status: "loading" });
+  const [worldMap, setWorldMap] = useState<WorldFeatureCollection | null>(null);
   const [selectedRegion, setSelectedRegion] = useState("All");
   const [selectedLane, setSelectedLane] = useState("All");
   const [selectedClaimId, setSelectedClaimId] = useState<string | null>(null);
@@ -238,6 +276,17 @@ export function DashboardClient({ principal }: { principal: PrincipalView }) {
         if (!controller.signal.aborted) {
           setLoadState({ status: "error", message: error instanceof Error ? error.message : "Command feed unavailable" });
         }
+      });
+    return () => controller.abort();
+  }, []);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    void fetch("/data/world-countries.geojson", { cache: "force-cache", signal: controller.signal })
+      .then((response) => response.ok ? response.json() : null)
+      .then((payload) => setWorldMap(payload as WorldFeatureCollection | null))
+      .catch(() => {
+        if (!controller.signal.aborted) setWorldMap(null);
       });
     return () => controller.abort();
   }, []);
@@ -282,12 +331,21 @@ export function DashboardClient({ principal }: { principal: PrincipalView }) {
             <KpiCard icon={<Brain size={20} />} label="Extensions" value={formatNumber(data.extensions.activeExtensions)} detail={`${data.commandReadiness.extensionScore}% governance score`} tone={data.governance.extensionStatus === "pass" ? "good" : "warn"} />
           </section>
 
+          <section className={styles.worldBoard}>
+            <PanelTitle
+              icon={<Globe2 size={18} />}
+              title="Global Source Flow Map"
+              subtitle="Real world geometry with animated source-to-evidence movement. Flows represent DISHA registered source and connector movement, not invented threat events."
+            />
+            <WorldFlowMap worldMap={worldMap} flow={data.globalFlow} />
+          </section>
+
           <section className={styles.opsBoard}>
             <section className={styles.mapPanel}>
               <PanelTitle
                 icon={<MapPinned size={18} />}
                 title="India Command Map"
-                subtitle={`${data.india.states} states, ${data.india.unionTerritories} union territories. Geometry status: ${humanize(data.india.geometryStatus)}.`}
+                subtitle={`${data.india.states} states, ${data.india.unionTerritories} union territories. Geometry status: ${displayState(data.india.geometryStatus)}.`}
               />
               <div className={styles.filterRow}>
                 <SelectFilter label="Region" value={selectedRegion} options={regions} onChange={setSelectedRegion} />
@@ -335,7 +393,7 @@ export function DashboardClient({ principal }: { principal: PrincipalView }) {
                     >
                       <span>{claim.domain}</span>
                       <strong>{claim.title}</strong>
-                      <small>{humanize(claim.status)}</small>
+                      <small>{displayState(claim.status)}</small>
                     </button>
                   ))}
                 </div>
@@ -345,7 +403,7 @@ export function DashboardClient({ principal }: { principal: PrincipalView }) {
                       <p className={styles.eyebrow}>Claim-level provenance</p>
                       <h3>{selectedClaim.title}</h3>
                     </div>
-                    <Badge tone={selectedClaim.status === "publishable_metadata" ? "operational" : "watch"}>{humanize(selectedClaim.status)}</Badge>
+                    <Badge tone={selectedClaim.status === "publishable_metadata" ? "operational" : "watch"}>{displayState(selectedClaim.status)}</Badge>
                   </div>
                   <p>{selectedClaim.claim}</p>
                   <div className={styles.chainSteps}>
@@ -379,7 +437,7 @@ export function DashboardClient({ principal }: { principal: PrincipalView }) {
                       <strong>{source.sourceName}</strong>
                       <span>{source.owner}</span>
                     </div>
-                    <Badge tone={source.status === "requires_license_review" ? "watch" : "partial"}>{humanize(source.status)}</Badge>
+                    <Badge tone={source.status === "license_review" ? "watch" : "partial"}>{displayState(source.status)}</Badge>
                     <small>{source.geographyLevel.join(", ")}</small>
                   </article>
                 ))}
@@ -406,7 +464,7 @@ export function DashboardClient({ principal }: { principal: PrincipalView }) {
                       <strong>{record.title}</strong>
                       <span>{record.government ?? "Government not parsed"} / {record.reportYear ?? "year pending"}</span>
                     </div>
-                    <Badge tone={record.extractionStatus === "metadata_only" ? "warn" : "operational"}>{humanize(record.extractionStatus)}</Badge>
+                    <Badge tone={record.extractionStatus === "metadata_only" ? "warn" : "operational"}>{displayState(record.extractionStatus)}</Badge>
                   </article>
                 ))}
               </div>
@@ -424,9 +482,9 @@ export function DashboardClient({ principal }: { principal: PrincipalView }) {
                   <article className={styles.recordItem} key={record.id}>
                     <div>
                       <strong>{record.title}</strong>
-                      <span>{record.fiscalYear} / {humanize(record.dataNeed)}</span>
+                      <span>{record.fiscalYear} / {displayState(record.dataNeed)}</span>
                     </div>
-                    <Badge tone={record.extractionStatus === "source_manifest" ? "operational" : "watch"}>{humanize(record.extractionStatus)}</Badge>
+                    <Badge tone={record.extractionStatus === "source_manifest" ? "operational" : "watch"}>{displayState(record.extractionStatus)}</Badge>
                   </article>
                 ))}
               </div>
@@ -667,6 +725,65 @@ function Badge({ tone, children }: { tone: string; children: ReactNode }) {
   return <span className={`${styles.badge} ${toneClass[tone] ?? styles.toneWarn}`}>{children}</span>;
 }
 
+function WorldFlowMap({ worldMap, flow }: { worldMap: WorldFeatureCollection | null; flow: CommandFeed["globalFlow"] }) {
+  const nodeById = useMemo(() => new Map(flow.nodes.map((node) => [node.id, node])), [flow.nodes]);
+
+  return (
+    <div className={styles.worldMapShell}>
+      <svg viewBox="0 0 1000 520" role="img" aria-label="Global DISHA source flow map">
+        <defs>
+          <marker id="flowArrow" markerHeight="8" markerWidth="8" orient="auto" refX="8" refY="4">
+            <path d="M0,0 L8,4 L0,8 Z" />
+          </marker>
+        </defs>
+        <rect className={styles.worldOcean} x="0" y="0" width="1000" height="520" rx="18" />
+        <g>
+          {worldMap?.features.map((feature, index) => (
+            <path className={styles.worldCountry} d={featureToPath(feature)} key={feature.id ?? feature.properties?.name ?? index}>
+              <title>{feature.properties?.name ?? "Country"}</title>
+            </path>
+          ))}
+        </g>
+        <g>
+          {flow.flows.map((item, index) => {
+            const from = nodeById.get(item.from);
+            const to = nodeById.get(item.to);
+            if (!from || !to) return null;
+            const start = projectWorld(from.lon, from.lat);
+            const end = projectWorld(to.lon, to.lat);
+            const curve = `M ${start.x} ${start.y} Q ${(start.x + end.x) / 2} ${Math.min(start.y, end.y) - 42 - (index % 4) * 10} ${end.x} ${end.y}`;
+            return (
+              <g key={item.id}>
+                <path className={item.status === "live_source" ? styles.worldFlowStrong : styles.worldFlow} d={curve} markerEnd="url(#flowArrow)">
+                  <title>{`${item.label} / ${displayState(item.status)} / ${item.authority}`}</title>
+                </path>
+                <circle className={styles.flowPulse} r="4">
+                  <animateMotion dur={`${5 + (index % 5)}s`} repeatCount="indefinite" path={curve} />
+                </circle>
+              </g>
+            );
+          })}
+        </g>
+        <g>
+          {flow.nodes.map((node) => {
+            const point = projectWorld(node.lon, node.lat);
+            return (
+              <g className={styles.worldNode} key={node.id} transform={`translate(${point.x} ${point.y})`}>
+                <circle r={node.kind === "command_hub" ? 8 : node.kind === "evidence_store" ? 6 : 4} />
+                <text x="10" y="-8">{node.label}</text>
+              </g>
+            );
+          })}
+        </g>
+      </svg>
+      <div className={styles.worldMapFooter}>
+        <span>{flow.generatedFrom}</span>
+        <span>{flow.attribution}</span>
+      </div>
+    </div>
+  );
+}
+
 function Metric({ label, value }: { label: string; value: number }) {
   return (
     <div className={styles.metric}>
@@ -701,4 +818,50 @@ function formatDateTime(value: string): string {
 
 function humanize(value: string): string {
   return value.replace(/_/g, " ");
+}
+
+function displayState(value: string): string {
+  const label: Record<string, string> = {
+    source_gap: "source gap",
+    parser_queued: "parser queued",
+    intake_queued: "intake queued",
+    source_registered_intake_queued: "source registered, intake queued",
+    license_review: "license review",
+    publishable_metadata: "evidence-ready metadata",
+    metadata_only: "metadata captured",
+    metadata_captured: "metadata captured",
+    pdf_parser_queued: "PDF parser queued",
+    table_parser_queued: "table parser queued",
+    publication_watch: "publication watch",
+    requires_pdf_extraction: "PDF parser queued",
+    requires_pdf_table_extraction: "table parser queued",
+    requires_source_publication: "publication watch",
+    source_manifest: "source manifest",
+    tax_collected: "tax collection",
+    state_devolution: "state devolution",
+    department_finance_audit: "department finance audit",
+    transfer_to_states: "transfer to states",
+  };
+  return label[value] ?? humanize(value);
+}
+
+function featureToPath(feature: WorldFeatureCollection["features"][number]): string {
+  if (feature.geometry.type === "Polygon") {
+    return polygonToPath(feature.geometry.coordinates as number[][][]);
+  }
+  return (feature.geometry.coordinates as number[][][][]).map((polygon) => polygonToPath(polygon)).join(" ");
+}
+
+function polygonToPath(polygon: number[][][]): string {
+  return polygon.map((ring) => ring.map(([lon, lat], index) => {
+    const point = projectWorld(lon, lat);
+    return `${index === 0 ? "M" : "L"} ${point.x.toFixed(2)} ${point.y.toFixed(2)}`;
+  }).join(" ") + " Z").join(" ");
+}
+
+function projectWorld(lon: number, lat: number): { x: number; y: number } {
+  return {
+    x: ((lon + 180) / 360) * 1000,
+    y: ((90 - lat) / 180) * 520,
+  };
 }

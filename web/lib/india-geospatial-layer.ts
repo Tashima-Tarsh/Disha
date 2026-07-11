@@ -9,13 +9,13 @@ export type GeospatialSourceLayer = {
   url: string;
   geographyLevel: string[];
   updateMode: string;
-  status: "registered" | "requires_import" | "requires_license_review";
+  status: "registered" | "intake_queued" | "license_review";
   limitation: string;
 };
 
 export type IndiaGeospatialLayer = {
   layerId: "india-administrative-geometry";
-  geometryStatus: "source_registered_requires_import";
+  geometryStatus: "source_registered_intake_queued";
   mapMode: "state_ut_source_readiness";
   attributionRequired: boolean;
   boundaryImportRule: string;
@@ -44,17 +44,17 @@ export function buildIndiaGeospatialLayer(items: Territory[] = territories): Ind
       url: source.url,
       geographyLevel: source.geographyLevel,
       updateMode: source.updateMode,
-      status: source.sourceId === "bhuvan-api" ? "requires_license_review" : "requires_import",
-      limitation: source.knownLimitations[0] ?? "Dataset-specific import and attribution review required.",
+      status: source.sourceId === "bhuvan-api" ? "license_review" : "intake_queued",
+      limitation: source.knownLimitations[0] ?? "Dataset-specific intake and attribution review queued.",
     }));
 
   return {
     layerId: "india-administrative-geometry",
-    geometryStatus: "source_registered_requires_import",
+    geometryStatus: "source_registered_intake_queued",
     mapMode: "state_ut_source_readiness",
     attributionRequired: true,
     boundaryImportRule:
-      "Only official or attribution-compliant public geometry may be imported. District and village layers require source hash, license note, and LGD/code mapping before dashboard publication.",
+      "Only official or attribution-compliant public geometry enters DISHA. District and village layers move through source hash, license note, and LGD/code mapping before dashboard publication.",
     sourceHash: hashValue({
       sources: sources.map((source) => source.sourceId),
       territories: items.map((item) => item.name),

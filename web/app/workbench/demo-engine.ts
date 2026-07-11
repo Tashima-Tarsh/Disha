@@ -174,7 +174,7 @@ export function executeLens(signal: WorkbenchSignal, lens: LensRecommendation): 
       finding(
         lens.id,
         "Authority boundary must stay visible",
-        "The mission involves public authority or public-interest accountability. Outputs should separate verified public records, analyst interpretation, and [VERIFY REQUIRED] claims.",
+        "The mission involves public authority or public-interest accountability. Outputs should separate source-bound public records, analyst interpretation, and source-gap claims.",
         [...evidenceBase, "Governance routing selected by constitutional accountability terms"],
         0.88,
         "Exact statutory and departmental references require source ingestion.",
@@ -211,7 +211,7 @@ export function executeLens(signal: WorkbenchSignal, lens: LensRecommendation): 
         [...evidenceBase, "Geospatial phrase match in mission text"],
         0.8,
         "Boundary and administrative data must be source-versioned.",
-        ["Attach official boundary/source references.", "Mark unmapped claims as [VERIFY REQUIRED]."],
+        ["Attach official boundary/source references.", "Mark unmapped claims as source gaps."],
       ),
     ],
     yudh_view: [
@@ -255,7 +255,7 @@ export function fuseLensResults(results: LensExecution[]): FusionResult {
     synthesis: [
       "Proceed with a bounded constitutional intelligence review.",
       "Create ledger events for normalization, routing, lens output, fusion, policy decision, and export.",
-      "Mark unsupported legal, financial, incident, or government assertions as [VERIFY REQUIRED].",
+      "Mark unsupported legal, financial, incident, or government assertions as source gaps.",
     ],
   };
 }
