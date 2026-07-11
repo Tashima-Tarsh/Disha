@@ -314,7 +314,13 @@ export function DishaWorkbench() {
                 </button>
               ))}
             </div>
-            {error ? <div className={styles.errorBox}><AlertTriangle size={18} />{error}</div> : null}
+            {error ? (
+              <div className={styles.errorBox}>
+                <AlertTriangle size={18} />
+                <span>{error}</span>
+                {error.toLowerCase().includes("unauthorized") ? <a href="/login?returnUrl=/workbench">Sign in</a> : null}
+              </div>
+            ) : null}
             <button className={styles.primaryButton} type="button" onClick={runWorkbenchMission} disabled={status === "running" || missionText.trim().length < 20}>
               {status === "running" ? <Loader2 className={styles.spin} size={17} /> : <Play size={17} />}
               Run governed mission

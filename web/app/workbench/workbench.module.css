@@ -286,6 +286,18 @@
   padding: 12px;
 }
 
+.errorBox a {
+  background: #b85c38;
+  border-radius: 6px;
+  color: #fffdf9;
+  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 13px;
+  font-weight: 850;
+  margin-left: auto;
+  padding: 7px 10px;
+  text-decoration: none;
+}
+
 .summaryGrid {
   display: grid;
   gap: 14px;
