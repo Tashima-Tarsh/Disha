@@ -19,7 +19,7 @@ interface TokenPayload {
   exp: number;
 }
 
-function jwtSecret(): string {
+export function authSigningSecret(): string {
   return getEnv().DISHA_JWT_SECRET ?? "development-only-secret-change-me-32bytes";
 }
 
@@ -67,7 +67,7 @@ function createToken(base: Omit<TokenPayload, "typ" | "jti" | "exp">, typ: "acce
     jti: randomToken(),
     exp: Math.floor(Date.now() / 1000) + ttl,
   };
-  return { payload, token: signJson({ ...payload }, jwtSecret()) };
+  return { payload, token: signJson({ ...payload }, authSigningSecret()) };
 }
 
 export async function createSession(email: string, roles: Role[] = ["analyst"]) {
@@ -81,7 +81,7 @@ export async function createSession(email: string, roles: Role[] = ["analyst"]) 
 }
 
 export async function rotateSession(refreshToken: string) {
-  const payload = verifySignedJson(refreshToken, jwtSecret()) as unknown as TokenPayload;
+  const payload = verifySignedJson(refreshToken, authSigningSecret()) as unknown as TokenPayload;
   if (payload.typ !== "refresh") throw Object.assign(new Error("Refresh token required"), { status: 401 });
   await ensureRefreshUsable(payload);
   await revokeRefreshToken(payload.jti);
@@ -105,7 +105,7 @@ export function getRefreshToken(req: NextRequest): string | null {
 export function requirePrincipal(req: NextRequest): Principal {
   const token = req.cookies.get(ACCESS_COOKIE)?.value ?? req.headers.get("authorization")?.replace(/^Bearer\s+/i, "");
   if (!token) throw Object.assign(new Error("Unauthorized"), { status: 401 });
-  const payload = verifySignedJson(token, jwtSecret()) as unknown as TokenPayload;
+  const payload = verifySignedJson(token, authSigningSecret()) as unknown as TokenPayload;
   if (payload.typ !== "access") throw Object.assign(new Error("Access token required"), { status: 401 });
   return {
     userId: payload.sub,

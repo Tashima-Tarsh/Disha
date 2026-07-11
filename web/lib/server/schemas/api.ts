@@ -42,6 +42,19 @@ export const loginSchema = z.object({
   password: z.string().min(12).max(256),
 });
 
+export const otpRequestSchema = z.object({
+  mobile: z.string().regex(/^\+?[1-9]\d{9,14}$/, "Mobile number must include 10 to 15 digits"),
+});
+
+export const otpVerifySchema = otpRequestSchema.extend({
+  code: z.string().regex(/^\d{6}$/, "OTP must be 6 digits"),
+});
+
+export const oidcStartSchema = z.object({
+  provider: z.enum(["meri-pehchan", "intra-id"]),
+  returnUrl: z.string().optional(),
+});
+
 export const chatRequestSchema = z.record(z.string(), z.unknown()).refine(
   (value) => JSON.stringify(value).length <= 100_000,
   "Request body too large",
