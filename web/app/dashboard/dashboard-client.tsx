@@ -1,21 +1,23 @@
 "use client";
 
 import {
-  Activity,
   AlertTriangle,
   ArrowUpRight,
+  BadgeCheck,
+  Banknote,
   Brain,
-  Database,
+  DatabaseZap,
   FileSearch,
+  Fingerprint,
   GitBranch,
-  Layers3,
+  Landmark,
   LockKeyhole,
   MapPinned,
   Network,
-  Radar,
+  RadioTower,
   Scale,
-  Server,
   Shield,
+  Siren,
 } from "lucide-react";
 import Link from "next/link";
 import type { ReactNode } from "react";
@@ -28,207 +30,168 @@ type PrincipalView = {
   roles: string[];
 };
 
-type HealthResponse = {
-  status?: string;
-  product?: string;
-  lenses?: string[];
-  agenticSkills?: string[];
-  openDataSources?: string[];
-  policyGate?: string;
-  evidenceLedger?: string;
-  modelProvider?: string;
-  sourceRegistry?: string;
-  noDemoDataPolicy?: string;
-};
-
-type NationalCoverage = {
-  total?: number;
-  readyForConnector?: number;
-  needsBulkImport?: number;
-  officialOnly?: number;
-};
-
-type NationalSource = {
-  id: string;
-  title?: string;
-  label?: string;
-  category?: string;
-  authority?: string;
-  status?: string;
-  url?: string;
-  sourceUrl?: string;
-  layer?: string;
-};
-
-type NationalResponse = {
+type CommandFeed = {
   generatedAt: string;
-  notice: string;
-  coverage: NationalCoverage;
-  sources: NationalSource[];
-};
-
-type TerritoryScan = {
-  name: string;
-  kind: "State" | "Union Territory";
-  region: string;
-  priority: "Critical" | "High" | "Watch" | "Stable";
-  cases: number;
-  evidence: number;
-  approval: number;
-  closure: number;
-  note: string;
-  agenticScan?: {
-    posture: string;
-    nextAction: string;
-    confidenceBand: string;
-  };
-};
-
-type IndiaResponse = {
-  generatedAt: string;
-  scanId: string;
-  sourceNotice: string;
-  sources: Array<{
-    id: string;
-    authority: string;
-    url: string;
-    ok: boolean;
-    checkedAt: string;
-    status?: number;
-  }>;
-  nationalAdministrativeSummary?: {
-    authority: string;
-    sourceUrl: string;
-    reachable: boolean;
-    extractionStatus: string;
-  };
-  scan: TerritoryScan[];
-};
-
-type Connector = {
-  id: string;
-  label: string;
-  layer: string;
-  authority: string;
-  kind: string;
-  cadence: string;
-  needsApiKey: boolean;
-  needsBulkImport: boolean;
-  endpoint: string;
-  safetyBoundary: string;
-};
-
-type ConnectorsResponse = {
-  generatedAt: string;
-  notice: string;
-  connectors: Connector[];
-};
-
-type Capability = {
-  id: string;
   title: string;
-  status: "working" | "partial" | "blocked";
-  evidenceRule: string;
-  nextHardening: string[];
-};
-
-type ProductionResponse = {
-  product: string;
-  generatedAt: string;
-  capabilityScore: number;
-  noSyntheticDataRule: string;
-  capabilities: Capability[];
-};
-
-type ControlPlaneResponse = {
-  productLayer: string;
   invariant: string;
-  generatedAt: string;
-  score: number;
-  status: "pass" | "warn" | "fail";
-  activeExtensions: number;
-  blockers: string[];
-  warnings: string[];
-  gates: Array<{
+  commandReadiness: {
+    score: number;
+    productionScore: number;
+    extensionScore: number;
+    sourceRegistry: number;
+    nationalSources: number;
+    connectorManifest: number;
+  };
+  governance: {
+    policyGate: string;
+    evidenceLedger: string;
+    noSyntheticData: boolean;
+    extensionStatus: "pass" | "warn" | "fail";
+    extensionBlockers: string[];
+    extensionWarnings: string[];
+  };
+  lanes: Array<{
     id: string;
     title: string;
-    kind: string;
-    status: "pass" | "warn" | "fail";
-    score: number;
+    posture: "operational" | "watch" | "blocked";
+    scope: string;
+    primaryAuthority: string;
+    sourceCount: number;
+    evidenceMode: string;
   }>;
-};
-
-type DashboardData = {
-  health: HealthResponse;
-  national: NationalResponse;
-  india: IndiaResponse;
-  connectors: ConnectorsResponse;
-  production: ProductionResponse;
-  controlPlane: ControlPlaneResponse;
+  india: {
+    totalTerritories: number;
+    states: number;
+    unionTerritories: number;
+    mapMode: string;
+    geometryStatus: string;
+    regionSummary: Record<string, { total: number; states: number; uts: number }>;
+    territories: Array<{
+      name: string;
+      kind: "State" | "Union Territory";
+      region: string;
+      posture: string;
+      evidenceCoverage: number;
+      commandTask: string;
+    }>;
+  };
+  audit: {
+    authority: string;
+    sourceNotice: string;
+    fetchedRecords: number;
+    matchedRecords: number;
+    pdfLinks: number;
+    findingExtraction: string;
+    records: Array<{
+      id: string;
+      title: string;
+      government: string | null;
+      reportYear: number | null;
+      topics: string[];
+      detailUrl: string | null;
+      pdfUrl: string | null;
+      extractionStatus: string;
+    }>;
+  };
+  finance: {
+    sourceNotice: string;
+    fiscalYears: number;
+    documentRecords: number;
+    taxCollectionDocuments: number;
+    stateDevolutionDocuments: number;
+    departmentDocuments: number;
+    extraction: string;
+    records: Array<{
+      id: string;
+      fiscalYear: string;
+      title: string;
+      dataNeed: string;
+      sourceUrl: string;
+      extractionStatus: string;
+    }>;
+  };
+  connectors: Array<{
+    id: string;
+    label: string;
+    layer: string;
+    authority: string;
+    cadence: string;
+    kind: string;
+    needsApiKey: boolean;
+    needsBulkImport: boolean;
+    endpoint: string;
+    safetyBoundary: string;
+  }>;
+  production: {
+    noSyntheticDataRule: string;
+    capabilities: Array<{
+      id: string;
+      title: string;
+      status: "working" | "partial" | "blocked";
+      evidenceRule: string;
+      nextHardening: string[];
+    }>;
+  };
+  extensions: {
+    activeExtensions: number;
+    gates: Array<{
+      id: string;
+      title: string;
+      kind: string;
+      status: "pass" | "warn" | "fail";
+      score: number;
+    }>;
+  };
+  sourceRegistry: Array<{
+    sourceId: string;
+    sourceName: string;
+    owner: string;
+    sourceType: string;
+    classification: string;
+    endpoints: number;
+    limitations: string[];
+  }>;
 };
 
 type LoadState =
   | { status: "loading" }
-  | { status: "ready"; data: DashboardData }
+  | { status: "ready"; data: CommandFeed }
   | { status: "error"; message: string };
 
 const regionCoordinates: Record<string, { x: number; y: number }> = {
-  North: { x: 47, y: 23 },
-  "North East": { x: 73, y: 34 },
-  East: { x: 63, y: 50 },
-  Central: { x: 48, y: 51 },
-  West: { x: 31, y: 52 },
-  South: { x: 49, y: 75 },
+  North: { x: 46, y: 22 },
+  "North East": { x: 75, y: 35 },
+  East: { x: 64, y: 52 },
+  Central: { x: 48, y: 50 },
+  West: { x: 30, y: 53 },
+  South: { x: 50, y: 76 },
 };
 
-const priorityClass: Record<TerritoryScan["priority"], string> = {
-  Critical: styles.priorityCritical,
-  High: styles.priorityHigh,
-  Watch: styles.priorityWatch,
-  Stable: styles.priorityStable,
-};
-
-const statusTone: Record<string, string> = {
+const toneClass: Record<string, string> = {
+  operational: styles.toneGood,
   working: styles.toneGood,
   pass: styles.toneGood,
-  Stable: styles.toneGood,
+  watch: styles.toneWarn,
   partial: styles.toneWarn,
   warn: styles.toneWarn,
-  Watch: styles.toneWarn,
   blocked: styles.toneBad,
   fail: styles.toneBad,
-  Critical: styles.toneBad,
-  High: styles.toneBad,
 };
 
 export function DashboardClient({ principal }: { principal: PrincipalView }) {
   const [loadState, setLoadState] = useState<LoadState>({ status: "loading" });
   const [selectedRegion, setSelectedRegion] = useState("All");
-  const [selectedLayer, setSelectedLayer] = useState("All");
+  const [selectedLane, setSelectedLane] = useState("All");
 
   useEffect(() => {
     const controller = new AbortController();
-
-    async function loadDashboard() {
-      try {
-        const [health, national, india, connectors, production, controlPlane] = await Promise.all([
-          fetchJson<HealthResponse>("/api/v1/health", controller.signal),
-          fetchJson<NationalResponse>("/api/dashboard/national", controller.signal),
-          fetchJson<IndiaResponse>("/api/dashboard/india", controller.signal),
-          fetchJson<ConnectorsResponse>("/api/dashboard/connectors", controller.signal),
-          fetchJson<ProductionResponse>("/api/v1/production/readiness", controller.signal),
-          fetchJson<ControlPlaneResponse>("/api/v1/extensions/control-plane", controller.signal),
-        ]);
-
-        setLoadState({ status: "ready", data: { health, national, india, connectors, production, controlPlane } });
-      } catch (error) {
+    void fetchJson<CommandFeed>("/api/dashboard/command", controller.signal)
+      .then((data) => setLoadState({ status: "ready", data }))
+      .catch((error) => {
         if (!controller.signal.aborted) {
-          setLoadState({ status: "error", message: error instanceof Error ? error.message : "Dashboard feed unavailable" });
+          setLoadState({ status: "error", message: error instanceof Error ? error.message : "Command feed unavailable" });
         }
-      }
-    }
-
-    void loadDashboard();
+      });
     return () => controller.abort();
   }, []);
 
@@ -241,144 +204,153 @@ export function DashboardClient({ principal }: { principal: PrincipalView }) {
   }
 
   const { data } = loadState;
-  const regions = ["All", ...Array.from(new Set(data.india.scan.map((item) => item.region))).sort()];
-  const layers = ["All", ...Array.from(new Set(data.connectors.connectors.map((item) => item.layer))).sort()];
-  const filteredScan = data.india.scan.filter((item) => selectedRegion === "All" || item.region === selectedRegion);
-  const filteredConnectors = data.connectors.connectors.filter((item) => selectedLayer === "All" || item.layer === selectedLayer);
+  const regions = ["All", ...Object.keys(data.india.regionSummary).sort()];
+  const lanes = ["All", ...data.lanes.map((lane) => lane.title).sort()];
+  const territories = data.india.territories.filter((territory) => selectedRegion === "All" || territory.region === selectedRegion);
+  const connectors = data.connectors.filter((connector) => selectedLane === "All" || connector.layer === selectedLane);
 
   return (
     <DashboardShell
       principal={principal}
       body={
         <div className={styles.contentGrid}>
-          <section className={styles.commandHeader}>
-            <div>
-              <p className={styles.eyebrow}>DISHA 6.6 / Constitutional Evidence Operating System</p>
-              <h1>National Evidence Operations Dashboard</h1>
-              <p className={styles.headerCopy}>
-                Live operational view of source readiness, governed extension status, policy boundaries, and India-wide administrative coverage.
-              </p>
+          <section className={styles.commandHero}>
+            <div className={styles.heroText}>
+              <p className={styles.eyebrow}>DISHA 6.6 / National Command Feed</p>
+              <h1>Constitutional Evidence Command Centre</h1>
+              <p>{data.invariant}</p>
             </div>
-            <div className={styles.headerActions}>
-              <span className={styles.livePill}>
-                <span aria-hidden="true" /> Connected runtime
-              </span>
-              <Link className={styles.primaryButton} href="/workbench">
-                Open Workbench <ArrowUpRight size={16} />
-              </Link>
+            <div className={styles.readinessDial} aria-label="Command readiness">
+              <span>{data.commandReadiness.score}</span>
+              <strong>readiness</strong>
+              <small>{formatDateTime(data.generatedAt)}</small>
             </div>
           </section>
 
-          <section className={styles.kpiGrid} aria-label="Operational KPIs">
-            <KpiCard
-              icon={<Database size={20} />}
-              label="Official sources"
-              value={formatNumber(data.national.coverage.total ?? data.national.sources.length)}
-              detail={`${formatNumber(data.national.coverage.readyForConnector ?? 0)} connector-ready`}
-              tone="good"
-            />
-            <KpiCard
-              icon={<MapPinned size={20} />}
-              label="State and UT coverage"
-              value={formatNumber(data.india.scan.length)}
-              detail={`${formatNumber(data.india.scan.filter((item) => item.priority === "Stable").length)} source-linked`}
-              tone="good"
-            />
-            <KpiCard
-              icon={<Network size={20} />}
-              label="Governed extensions"
-              value={formatNumber(data.controlPlane.activeExtensions)}
-              detail={`${data.controlPlane.status.toUpperCase()} control-plane gate`}
-              tone={data.controlPlane.status === "pass" ? "good" : data.controlPlane.status === "warn" ? "warn" : "bad"}
-            />
-            <KpiCard
-              icon={<Shield size={20} />}
-              label="Production spine"
-              value={`${Math.round((data.production.capabilityScore ?? 0) * 100)}%`}
-              detail="Capability readiness"
-              tone={data.production.capabilityScore >= 0.75 ? "good" : "warn"}
-            />
+          <section className={styles.kpiGrid} aria-label="Command KPIs">
+            <KpiCard icon={<RadioTower size={20} />} label="Command feed" value="LIVE" detail="Single backend contract" tone="good" />
+            <KpiCard icon={<DatabaseZap size={20} />} label="Source registry" value={formatNumber(data.commandReadiness.sourceRegistry)} detail={`${data.commandReadiness.nationalSources} national sources`} tone="good" />
+            <KpiCard icon={<Network size={20} />} label="Connectors" value={formatNumber(data.commandReadiness.connectorManifest)} detail="Official-source manifest" tone="warn" />
+            <KpiCard icon={<Brain size={20} />} label="Extensions" value={formatNumber(data.extensions.activeExtensions)} detail={`${data.commandReadiness.extensionScore}% governance score`} tone={data.governance.extensionStatus === "pass" ? "good" : "warn"} />
           </section>
 
-          <section className={styles.mainPanel}>
-            <div className={styles.mapPanel}>
-              <PanelTitle icon={<Radar size={18} />} title="India Operational Coverage Map" subtitle={data.india.sourceNotice} />
+          <section className={styles.opsBoard}>
+            <section className={styles.mapPanel}>
+              <PanelTitle
+                icon={<MapPinned size={18} />}
+                title="India Command Map"
+                subtitle={`${data.india.states} states, ${data.india.unionTerritories} union territories. Geometry status: ${humanize(data.india.geometryStatus)}.`}
+              />
               <div className={styles.filterRow}>
                 <SelectFilter label="Region" value={selectedRegion} options={regions} onChange={setSelectedRegion} />
-                <SelectFilter label="Source layer" value={selectedLayer} options={layers} onChange={setSelectedLayer} />
+                <SelectFilter label="Operational lane" value={selectedLane} options={lanes} onChange={setSelectedLane} />
               </div>
-              <IndiaOperationsMap territories={filteredScan} />
-            </div>
+              <IndiaCommandMap territories={territories} regionSummary={data.india.regionSummary} />
+            </section>
 
-            <aside className={styles.rightStack}>
-              <Panel title="Governance State" icon={<Scale size={18} />}>
+            <aside className={styles.commandStack}>
+              <Panel title="Rules of Engagement" icon={<LockKeyhole size={18} />}>
                 <div className={styles.statusList}>
-                  <StatusRow label="Policy gate" value={data.health.policyGate ?? "enabled"} tone="good" />
-                  <StatusRow label="Evidence ledger" value={data.health.evidenceLedger ?? "available"} tone="good" />
-                  <StatusRow label="No synthetic data" value={data.health.noDemoDataPolicy ?? data.production.noSyntheticDataRule} tone="good" />
-                  <StatusRow label="Model provider" value={data.health.modelProvider ?? "not configured"} tone="warn" />
+                  <StatusRow label="Policy Gate" value={data.governance.policyGate} tone="good" />
+                  <StatusRow label="Evidence Ledger" value={data.governance.evidenceLedger} tone="good" />
+                  <StatusRow label="Synthetic data" value={data.governance.noSyntheticData ? "denied" : "review"} tone="good" />
+                  <StatusRow label="Extension gate" value={data.governance.extensionStatus} tone={data.governance.extensionStatus === "pass" ? "good" : "warn"} />
                 </div>
               </Panel>
 
-              <Panel title="Extension Command Plane" icon={<Brain size={18} />}>
-                <div className={styles.extensionScore}>
-                  <strong>{Math.round(data.controlPlane.score * 100)}%</strong>
-                  <span>{data.controlPlane.status.toUpperCase()}</span>
-                </div>
-                <p className={styles.muted}>{data.controlPlane.invariant}</p>
-                <div className={styles.compactList}>
-                  {data.controlPlane.gates.slice(0, 4).map((gate) => (
-                    <div className={styles.compactItem} key={gate.id}>
-                      <span>{gate.title}</span>
-                      <Badge tone={gate.status}>{Math.round(gate.score * 100)}%</Badge>
-                    </div>
+              <Panel title="Active Command Lanes" icon={<Siren size={18} />}>
+                <div className={styles.laneList}>
+                  {data.lanes.slice(0, 7).map((lane) => (
+                    <article className={styles.laneItem} key={lane.id}>
+                      <div>
+                        <strong>{lane.title}</strong>
+                        <span>{lane.primaryAuthority}</span>
+                      </div>
+                      <Badge tone={lane.posture}>{lane.sourceCount} src</Badge>
+                    </article>
                   ))}
                 </div>
               </Panel>
             </aside>
           </section>
 
-          <section className={styles.lowerGrid}>
-            <Panel title="National Source Connector Mesh" icon={<Server size={18} />}>
-              <div className={styles.connectorToolbar}>
-                <span>{formatNumber(filteredConnectors.length)} connectors in view</span>
-                <span>{data.connectors.notice}</span>
+          <section className={styles.intelGrid}>
+            <Panel title="CAG Audit Intelligence Lane" icon={<FileSearch size={18} />}>
+              <div className={styles.metricStrip}>
+                <Metric label="Fetched" value={data.audit.fetchedRecords} />
+                <Metric label="Matched" value={data.audit.matchedRecords} />
+                <Metric label="PDF links" value={data.audit.pdfLinks} />
               </div>
+              <p className={styles.notice}>{data.audit.sourceNotice}</p>
+              <div className={styles.recordList}>
+                {data.audit.records.map((record) => (
+                  <article className={styles.recordItem} key={record.id}>
+                    <div>
+                      <strong>{record.title}</strong>
+                      <span>{record.government ?? "Government not parsed"} / {record.reportYear ?? "year pending"}</span>
+                    </div>
+                    <Badge tone={record.extractionStatus === "metadata_only" ? "warn" : "operational"}>{humanize(record.extractionStatus)}</Badge>
+                  </article>
+                ))}
+              </div>
+            </Panel>
+
+            <Panel title="Finance and Tax Evidence Lane" icon={<Banknote size={18} />}>
+              <div className={styles.metricStrip}>
+                <Metric label="Fiscal years" value={data.finance.fiscalYears} />
+                <Metric label="Documents" value={data.finance.documentRecords} />
+                <Metric label="State devolution" value={data.finance.stateDevolutionDocuments} />
+              </div>
+              <p className={styles.notice}>{data.finance.sourceNotice}</p>
+              <div className={styles.recordList}>
+                {data.finance.records.slice(0, 7).map((record) => (
+                  <article className={styles.recordItem} key={record.id}>
+                    <div>
+                      <strong>{record.title}</strong>
+                      <span>{record.fiscalYear} / {humanize(record.dataNeed)}</span>
+                    </div>
+                    <Badge tone={record.extractionStatus === "source_manifest" ? "operational" : "watch"}>{humanize(record.extractionStatus)}</Badge>
+                  </article>
+                ))}
+              </div>
+            </Panel>
+          </section>
+
+          <section className={styles.lowerGrid}>
+            <Panel title="Connector Mesh" icon={<GitBranch size={18} />}>
               <div className={styles.connectorTable}>
-                {filteredConnectors.slice(0, 10).map((connector) => (
+                {connectors.slice(0, 12).map((connector) => (
                   <article className={styles.connectorRow} key={connector.id}>
                     <div>
                       <strong>{connector.label}</strong>
                       <span>{connector.authority}</span>
                     </div>
-                    <Badge tone={connector.needsBulkImport ? "warn" : "pass"}>{connector.needsBulkImport ? "bulk import" : connector.cadence}</Badge>
+                    <Badge tone={connector.needsBulkImport || connector.needsApiKey ? "watch" : "operational"}>
+                      {connector.needsBulkImport ? "bulk" : connector.needsApiKey ? "key" : connector.cadence}
+                    </Badge>
                     <span className={styles.connectorKind}>{connector.kind}</span>
                   </article>
                 ))}
               </div>
             </Panel>
 
-            <Panel title="Administrative Coverage Watch" icon={<Layers3 size={18} />}>
+            <Panel title="State and UT Task Queue" icon={<Landmark size={18} />}>
               <div className={styles.coverageList}>
-                {filteredScan
-                  .slice()
-                  .sort((a, b) => a.evidence - b.evidence || a.name.localeCompare(b.name))
-                  .slice(0, 8)
-                  .map((territory) => (
-                    <article className={styles.coverageItem} key={territory.name}>
-                      <div>
-                        <strong>{territory.name}</strong>
-                        <span>{territory.agenticScan?.nextAction ?? territory.note}</span>
-                      </div>
-                      <ProgressBar value={territory.evidence} label={`${territory.evidence}%`} />
-                    </article>
-                  ))}
+                {territories.slice(0, 10).map((territory) => (
+                  <article className={styles.coverageItem} key={territory.name}>
+                    <div>
+                      <strong>{territory.name}</strong>
+                      <span>{territory.commandTask}</span>
+                    </div>
+                    <ProgressBar value={territory.evidenceCoverage} label={`${territory.evidenceCoverage}%`} />
+                  </article>
+                ))}
               </div>
             </Panel>
           </section>
 
           <section className={styles.capabilityBand}>
-            <PanelTitle icon={<GitBranch size={18} />} title="Production Capability Track" subtitle="Only source-backed capabilities are marked working." />
+            <PanelTitle icon={<Scale size={18} />} title="Production Hardening Track" subtitle={data.production.noSyntheticDataRule} />
             <div className={styles.capabilityGrid}>
               {data.production.capabilities.map((capability) => (
                 <article className={styles.capabilityCard} key={capability.id}>
@@ -410,25 +382,24 @@ function DashboardShell({ principal, body }: { principal: PrincipalView; body: R
           </div>
         </div>
         <nav className={styles.railNav} aria-label="Dashboard sections">
-          <a href="#operations"><Activity size={18} /> Ops</a>
-          <a href="#map"><MapPinned size={18} /> Map</a>
-          <a href="#evidence"><FileSearch size={18} /> Evidence</a>
-          <a href="#policy"><LockKeyhole size={18} /> Policy</a>
+          <a href="#command"><RadioTower size={18} /> Command</a>
+          <a href="#map"><MapPinned size={18} /> India Map</a>
+          <a href="#audit"><FileSearch size={18} /> Audit</a>
+          <a href="#evidence"><Fingerprint size={18} /> Evidence</a>
         </nav>
         <div className={styles.railFooter}>
-          <span>Signed in</span>
+          <span>Mission owner</span>
           <strong>{principal.email}</strong>
           <small>{principal.roles.join(", ")}</small>
         </div>
       </aside>
 
-      <section className={styles.workspace} id="operations">
+      <section className={styles.workspace} id="command">
         <div className={styles.topBar}>
+          <div><span className={styles.systemDot} /> DISHA governed command runtime</div>
           <div>
-            <span className={styles.systemDot} />
-            DISHA command runtime
+            <Link href="/workbench">Workbench <ArrowUpRight size={14} /></Link>
           </div>
-          <div>Policy-gated / Evidence-first / Citizen accountable</div>
         </div>
         {body}
       </section>
@@ -439,9 +410,9 @@ function DashboardShell({ principal, body }: { principal: PrincipalView; body: R
 function LoadingState() {
   return (
     <div className={styles.statePanel}>
-      <Radar size={28} />
-      <h1>Connecting DISHA 6.6 command dashboard</h1>
-      <p>Loading governed runtime, national source registry, India administrative scan, and extension control-plane.</p>
+      <RadioTower size={30} />
+      <h1>Building command feed</h1>
+      <p>Authenticating, pulling official-source connectors, and assembling the governed DISHA 6.6 command model.</p>
     </div>
   );
 }
@@ -449,10 +420,10 @@ function LoadingState() {
 function ErrorState({ message }: { message: string }) {
   return (
     <div className={styles.statePanel}>
-      <AlertTriangle size={28} />
-      <h1>Dashboard feed unavailable</h1>
+      <AlertTriangle size={30} />
+      <h1>Command feed unavailable</h1>
       <p>{message}</p>
-      <Link className={styles.primaryButton} href="/workbench">Open Workbench</Link>
+      <Link className={styles.primaryButton} href="/login?mode=password&returnUrl=%2Fdashboard">Login again</Link>
     </div>
   );
 }
@@ -480,17 +451,23 @@ function KpiCard({
   );
 }
 
-function IndiaOperationsMap({ territories }: { territories: TerritoryScan[] }) {
+function IndiaCommandMap({
+  territories,
+  regionSummary,
+}: {
+  territories: CommandFeed["india"]["territories"];
+  regionSummary: CommandFeed["india"]["regionSummary"];
+}) {
   const plotted = useMemo(
     () =>
       territories.map((territory, index) => {
         const base = regionCoordinates[territory.region] ?? { x: 50, y: 50 };
-        const angle = (index % 9) * 0.7;
-        const radius = 3 + (index % 5) * 2;
+        const angle = (index % 10) * 0.63;
+        const radius = 3 + (index % 6) * 1.8;
         return {
           ...territory,
-          x: Math.max(9, Math.min(91, base.x + Math.cos(angle) * radius)),
-          y: Math.max(9, Math.min(91, base.y + Math.sin(angle) * radius)),
+          x: Math.max(8, Math.min(92, base.x + Math.cos(angle) * radius)),
+          y: Math.max(8, Math.min(92, base.y + Math.sin(angle) * radius)),
         };
       }),
     [territories],
@@ -498,28 +475,31 @@ function IndiaOperationsMap({ territories }: { territories: TerritoryScan[] }) {
 
   return (
     <div className={styles.mapWrap} id="map">
-      <svg viewBox="0 0 100 100" role="img" aria-label="India administrative source coverage map">
+      <svg viewBox="0 0 100 100" role="img" aria-label="DISHA India command map">
         <path
           className={styles.indiaShape}
-          d="M43 9 L56 11 L67 18 L73 31 L70 44 L62 52 L59 67 L51 90 L43 76 L35 66 L26 62 L29 48 L22 38 L31 26 Z"
+          d="M43 8 L55 10 L67 18 L73 31 L70 43 L63 51 L59 66 L52 91 L43 76 L35 66 L25 62 L29 48 L22 38 L31 26 Z"
         />
-        <path className={styles.routeLine} d="M47 16 C39 27 34 42 38 55 C41 68 50 76 55 86" />
-        <path className={styles.routeLineAlt} d="M31 52 C43 47 55 47 69 34" />
+        <path className={styles.routeLine} d="M47 15 C39 27 35 42 38 56 C42 69 50 77 55 87" />
+        <path className={styles.routeLineAlt} d="M29 53 C42 47 55 47 70 34" />
+        <path className={styles.routeLine} d="M45 24 C55 30 63 39 65 53" />
         {plotted.map((territory) => (
           <g key={territory.name}>
-            <circle className={`${styles.mapPoint} ${priorityClass[territory.priority]}`} cx={territory.x} cy={territory.y} r="1.8" />
-            <title>{`${territory.name}: ${territory.evidence}% evidence coverage, ${territory.agenticScan?.confidenceBand ?? territory.priority}`}</title>
+            <circle className={styles.mapPoint} cx={territory.x} cy={territory.y} r={territory.kind === "State" ? "1.9" : "1.35"} />
+            <title>{`${territory.name}: ${territory.commandTask}`}</title>
           </g>
         ))}
       </svg>
       <div className={styles.mapLegend}>
-        <span><i className={styles.priorityStable} /> Stable source-linked</span>
-        <span><i className={styles.priorityWatch} /> Verification watch</span>
-        <span><i className={styles.priorityHigh} /> High attention</span>
+        {Object.entries(regionSummary).map(([region, summary]) => (
+          <span key={region}>
+            <i /> {region}: {summary.total}
+          </span>
+        ))}
       </div>
       <div className={styles.mapMetrics}>
         <strong>{territories.length}</strong>
-        <span>states and UTs in current filter</span>
+        <span>administrative units in view</span>
       </div>
     </div>
   );
@@ -527,7 +507,7 @@ function IndiaOperationsMap({ territories }: { territories: TerritoryScan[] }) {
 
 function Panel({ title, icon, children }: { title: string; icon: ReactNode; children: ReactNode }) {
   return (
-    <section className={styles.panel}>
+    <section className={styles.panel} id={title.includes("CAG") ? "audit" : undefined}>
       <PanelTitle icon={icon} title={title} />
       {children}
     </section>
@@ -546,24 +526,12 @@ function PanelTitle({ icon, title, subtitle }: { icon: ReactNode; title: string;
   );
 }
 
-function SelectFilter({
-  label,
-  value,
-  options,
-  onChange,
-}: {
-  label: string;
-  value: string;
-  options: string[];
-  onChange: (next: string) => void;
-}) {
+function SelectFilter({ label, value, options, onChange }: { label: string; value: string; options: string[]; onChange: (next: string) => void }) {
   return (
     <label className={styles.selectFilter}>
       <span>{label}</span>
       <select value={value} onChange={(event) => onChange(event.target.value)}>
-        {options.map((option) => (
-          <option key={option} value={option}>{option}</option>
-        ))}
+        {options.map((option) => <option key={option} value={option}>{option}</option>)}
       </select>
     </label>
   );
@@ -579,15 +547,22 @@ function StatusRow({ label, value, tone }: { label: string; value: string; tone:
 }
 
 function Badge({ tone, children }: { tone: string; children: ReactNode }) {
-  return <span className={`${styles.badge} ${statusTone[tone] ?? styles.toneWarn}`}>{children}</span>;
+  return <span className={`${styles.badge} ${toneClass[tone] ?? styles.toneWarn}`}>{children}</span>;
+}
+
+function Metric({ label, value }: { label: string; value: number }) {
+  return (
+    <div className={styles.metric}>
+      <strong>{formatNumber(value)}</strong>
+      <span>{label}</span>
+    </div>
+  );
 }
 
 function ProgressBar({ value, label }: { value: number; label: string }) {
   return (
     <div className={styles.progressWrap}>
-      <div className={styles.progressTrack}>
-        <span style={{ width: `${Math.max(0, Math.min(100, value))}%` }} />
-      </div>
+      <div className={styles.progressTrack}><span style={{ width: `${Math.max(0, Math.min(100, value))}%` }} /></div>
       <small>{label}</small>
     </div>
   );
@@ -595,12 +570,18 @@ function ProgressBar({ value, label }: { value: number; label: string }) {
 
 async function fetchJson<T>(url: string, signal: AbortSignal): Promise<T> {
   const response = await fetch(url, { cache: "no-store", signal });
-  if (!response.ok) {
-    throw new Error(`${url} returned ${response.status}`);
-  }
+  if (!response.ok) throw new Error(`${url} returned ${response.status}`);
   return response.json() as Promise<T>;
 }
 
 function formatNumber(value: number): string {
   return new Intl.NumberFormat("en-IN").format(value);
+}
+
+function formatDateTime(value: string): string {
+  return new Intl.DateTimeFormat("en-IN", { dateStyle: "medium", timeStyle: "short" }).format(new Date(value));
+}
+
+function humanize(value: string): string {
+  return value.replace(/_/g, " ");
 }
