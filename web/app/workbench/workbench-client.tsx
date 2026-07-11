@@ -8,6 +8,7 @@ import {
   Database,
   FileText,
   GitBranch,
+  Globe2,
   Landmark,
   Loader2,
   LockKeyhole,
@@ -16,6 +17,7 @@ import {
   ShieldCheck,
 } from "lucide-react";
 import { useMemo, useState } from "react";
+import { useEffect } from "react";
 
 import styles from "./workbench.module.css";
 
@@ -155,6 +157,25 @@ type EvidenceEvent = {
   eventHash: string;
 };
 
+type PrincipalView = {
+  email: string;
+  roles: string[];
+};
+
+type CommandFeedSummary = {
+  generatedAt: string;
+  commandReadiness: {
+    score: number;
+    sourceRegistry: number;
+    connectorManifest: number;
+  };
+  globalFlow: {
+    nodes: Array<{ id: string; label: string; kind: string }>;
+    flows: Array<{ id: string; label: string; status: string; cadence: string }>;
+  };
+  claimChains: Array<{ claimId: string; title: string; domain: string; status: string }>;
+};
+
 const DEFAULT_MISSION =
   "Assess a public-interest governance concern involving district infrastructure claims, CAG audit references, citizen complaints, and cyber-enabled fraud patterns. Produce a read-only evidence plan with policy gates and source-gap markers.";
 
@@ -175,7 +196,7 @@ const EXAMPLES = [
 
 const SENSITIVITIES: Sensitivity[] = ["public", "internal", "controlled", "classified"];
 
-export function DishaWorkbench() {
+export function DishaWorkbench({ principal }: { principal: PrincipalView }) {
   const [missionText, setMissionText] = useState(DEFAULT_MISSION);
   const [sensitivity, setSensitivity] = useState<Sensitivity>("public");
   const [indicatorType, setIndicatorType] = useState("domain");
@@ -186,6 +207,8 @@ export function DishaWorkbench() {
   const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
   const [status, setStatus] = useState<"idle" | "running" | "complete" | "error">("idle");
   const [error, setError] = useState<string | null>(null);
+  const [commandFeed, setCommandFeed] = useState<CommandFeedSummary | null>(null);
+  const [commandError, setCommandError] = useState<string | null>(null);
 
   const mission = result?.mission ?? null;
   const selectedEvent = evidence.find((event) => event.eventId === selectedEventId) ?? evidence[0] ?? null;
@@ -195,6 +218,23 @@ export function DishaWorkbench() {
     () => result?.governedExtensions.results.reduce((sum, extension) => sum + (extension.claims?.length ?? 0), 0) ?? 0,
     [result],
   );
+
+  useEffect(() => {
+    const controller = new AbortController();
+    void fetch("/api/dashboard/command", { cache: "no-store", signal: controller.signal })
+      .then(async (response) => {
+        const payload = await response.json();
+        if (!response.ok) throw new Error(readApiError(payload, response.status));
+        setCommandFeed(payload as CommandFeedSummary);
+        setCommandError(null);
+      })
+      .catch((caught) => {
+        if (!controller.signal.aborted) {
+          setCommandError(caught instanceof Error ? caught.message : "Command feed unavailable.");
+        }
+      });
+    return () => controller.abort();
+  }, []);
 
   async function runWorkbenchMission() {
     setStatus("running");
@@ -210,6 +250,7 @@ export function DishaWorkbench() {
       const response = await fetch("/api/v1/agentic/mission", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "same-origin",
         body: JSON.stringify({
           rawText: missionText,
           requestedAction,
@@ -224,7 +265,9 @@ export function DishaWorkbench() {
       const agenticResult = payload as AgenticMissionResult;
       setResult(agenticResult);
 
-      const evidenceResponse = await fetch(`/api/v1/evidence/${encodeURIComponent(agenticResult.mission.missionId)}`);
+      const evidenceResponse = await fetch(`/api/v1/evidence/${encodeURIComponent(agenticResult.mission.missionId)}`, {
+        credentials: "same-origin",
+      });
       const evidencePayload = await evidenceResponse.json();
       if (!evidenceResponse.ok) throw new Error(readApiError(evidencePayload, evidenceResponse.status));
       const ledgerEvents = evidencePayload.events as EvidenceEvent[];
@@ -241,7 +284,19 @@ export function DishaWorkbench() {
   }
 
   async function copyReport() {
-    await navigator.clipboard.writeText(buildReport(result, evidence));
+    const report = buildReport(result, evidence);
+    try {
+      await navigator.clipboard.writeText(report);
+    } catch {
+      const textarea = document.createElement("textarea");
+      textarea.value = report;
+      textarea.style.position = "fixed";
+      textarea.style.opacity = "0";
+      document.body.appendChild(textarea);
+      textarea.select();
+      document.execCommand("copy");
+      document.body.removeChild(textarea);
+    }
   }
 
   function downloadJson() {
@@ -261,13 +316,13 @@ export function DishaWorkbench() {
           <p className={styles.eyebrow}>DISHA 6.6 Workbench</p>
           <h1>Constitutional Evidence Workbench</h1>
           <p>
-            Run a governed mission, inspect the real policy decision, review lens evidence, and walk the ledger event by event.
+            Run a governed mission, inspect the real policy decision, review live source flow context, and walk the ledger event by event.
           </p>
         </div>
         <div className={styles.statusPanel}>
           <span>Runtime status</span>
           <strong>{statusLabel(status)}</strong>
-          <small>{mission ? `Mission ${mission.missionId}` : "No mission has been run in this session."}</small>
+          <small>{mission ? `Mission ${mission.missionId}` : `${principal.email} / ${principal.roles.join(", ")}`}</small>
         </div>
       </section>
 
@@ -281,8 +336,36 @@ export function DishaWorkbench() {
         </aside>
 
         <div className={styles.workspace}>
+          <section className={styles.liveStrip}>
+            <div>
+              <Globe2 size={18} />
+              <span>Global source flow</span>
+              <strong>{commandFeed ? `${commandFeed.globalFlow.flows.length} moving flows` : commandError ? "Feed needs attention" : "Loading"}</strong>
+            </div>
+            <div>
+              <Database size={18} />
+              <span>Source registry</span>
+              <strong>{commandFeed ? commandFeed.commandReadiness.sourceRegistry : "-"}</strong>
+            </div>
+            <div>
+              <GitBranch size={18} />
+              <span>Connectors</span>
+              <strong>{commandFeed ? commandFeed.commandReadiness.connectorManifest : "-"}</strong>
+            </div>
+            <div>
+              <ShieldCheck size={18} />
+              <span>Claim chains</span>
+              <strong>{commandFeed ? commandFeed.claimChains.length : "-"}</strong>
+            </div>
+          </section>
+
           <section className={styles.panel}>
             <PanelTitle icon={<Landmark size={18} />} title="Mission Input" label="Dynamic form" />
+            <div className={styles.dynamicBanner}>
+              <span>Live backend</span>
+              <strong>{commandFeed ? `Readiness ${commandFeed.commandReadiness.score}%` : commandError ?? "Connecting to command feed"}</strong>
+              <p>{commandFeed ? `Latest feed: ${new Date(commandFeed.generatedAt).toLocaleString()}` : "Workbench will run only after backend session and command context are available."}</p>
+            </div>
             <textarea
               className={styles.textarea}
               value={missionText}
