@@ -4,7 +4,8 @@ import { hashSecret, randomToken, signJson, verifySignedJson } from "./crypto";
 import { getDbPool } from "./db";
 import type { Principal, Role } from "./types";
 
-const ACCESS_COOKIE = "disha_access";
+export const ACCESS_COOKIE_NAME = "disha_access";
+const ACCESS_COOKIE = ACCESS_COOKIE_NAME;
 const REFRESH_COOKIE = "disha_refresh";
 const ACCESS_TTL_SECONDS = 15 * 60;
 const REFRESH_TTL_SECONDS = 14 * 24 * 60 * 60;
@@ -102,9 +103,7 @@ export function getRefreshToken(req: NextRequest): string | null {
   return req.cookies.get(REFRESH_COOKIE)?.value ?? null;
 }
 
-export function requirePrincipal(req: NextRequest): Principal {
-  const token = req.cookies.get(ACCESS_COOKIE)?.value ?? req.headers.get("authorization")?.replace(/^Bearer\s+/i, "");
-  if (!token) throw Object.assign(new Error("Unauthorized"), { status: 401 });
+export function principalFromAccessToken(token: string): Principal {
   const payload = verifySignedJson(token, authSigningSecret()) as unknown as TokenPayload;
   if (payload.typ !== "access") throw Object.assign(new Error("Access token required"), { status: 401 });
   return {
@@ -113,6 +112,12 @@ export function requirePrincipal(req: NextRequest): Principal {
     roles: payload.roles,
     sessionId: payload.sessionId,
   };
+}
+
+export function requirePrincipal(req: NextRequest): Principal {
+  const token = req.cookies.get(ACCESS_COOKIE)?.value ?? req.headers.get("authorization")?.replace(/^Bearer\s+/i, "");
+  if (!token) throw Object.assign(new Error("Unauthorized"), { status: 401 });
+  return principalFromAccessToken(token);
 }
 
 export async function devLogin(email: string, password: string) {
