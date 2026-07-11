@@ -19,6 +19,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
 }
 
 function sanitizeReturnUrl(requested?: string) {
-  if (!requested || !requested.startsWith("/") || requested.startsWith("//")) return "/workbench";
+  if (!requested || !requested.startsWith("/") || requested.startsWith("//")) return "/dashboard";
+  if (requested === "/workbench") return "/dashboard";
   return requested;
 }

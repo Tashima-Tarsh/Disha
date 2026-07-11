@@ -322,7 +322,7 @@ export function DishaWorkbench() {
               <div className={styles.errorBox}>
                 <AlertTriangle size={18} />
                 <span>{error}</span>
-                {error.toLowerCase().includes("unauthorized") ? <a href="/login?returnUrl=/workbench">Sign in</a> : null}
+                {error.toLowerCase().includes("unauthorized") ? <a href="/login?mode=password&returnUrl=/dashboard">Sign in</a> : null}
               </div>
             ) : null}
             <button className={styles.primaryButton} type="button" onClick={runWorkbenchMission} disabled={status === "running" || missionText.trim().length < 20}>

@@ -10,7 +10,8 @@ import { oidcStartSchema } from "@/lib/server/schemas/api";
 import { requestId } from "@/lib/server/security";
 
 function safeReturnUrl(value?: string) {
-  if (!value || !value.startsWith("/") || value.startsWith("//")) return "/workbench";
+  if (!value || !value.startsWith("/") || value.startsWith("//")) return "/dashboard";
+  if (value === "/workbench") return "/dashboard";
   return value;
 }
 
