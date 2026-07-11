@@ -122,6 +122,9 @@ export async function devLogin(email: string, password: string) {
   }
   const expected = env.DISHA_DEV_PASSWORD ?? "change-me-in-env";
   if (password !== expected) throw Object.assign(new Error("Invalid credentials"), { status: 401 });
-  const roles: Role[] = email.endsWith("@admin.local") ? ["admin"] : ["analyst"];
+  const normalizedEmail = email.toLowerCase();
+  const roles: Role[] = normalizedEmail === "nitish@thenitishkr.in" || normalizedEmail.endsWith("@admin.local")
+    ? ["admin"]
+    : ["analyst"];
   return createSession(email, roles);
 }
