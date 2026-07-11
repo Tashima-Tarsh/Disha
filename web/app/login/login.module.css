@@ -1,3 +1,9 @@
+.shell *,
+.shell *::before,
+.shell *::after {
+  box-sizing: border-box;
+}
+
 .shell {
   align-items: center;
   background:
@@ -32,9 +38,9 @@
   border-radius: 28px;
   box-shadow: 0 34px 90px rgba(17, 45, 78, 0.18);
   display: grid;
-  grid-template-columns: minmax(360px, 0.95fr) minmax(420px, 0.85fr);
-  max-width: 1120px;
-  min-height: 690px;
+  grid-template-columns: minmax(360px, 0.92fr) minmax(400px, 0.78fr);
+  max-width: 1040px;
+  min-height: 560px;
   overflow: hidden;
   position: relative;
   width: min(100%, 1120px);
@@ -45,11 +51,11 @@
     linear-gradient(135deg, rgba(255, 153, 51, 0.98), rgba(255, 198, 93, 0.9) 24%, rgba(255, 255, 255, 0.9) 48%, rgba(19, 136, 8, 0.88) 100%);
   color: #081a2a;
   display: grid;
-  grid-template-rows: auto 1fr auto auto;
+  grid-template-rows: auto minmax(210px, 1fr) auto auto;
   isolation: isolate;
   min-height: 100%;
   overflow: hidden;
-  padding: 36px;
+  padding: 28px;
   position: relative;
 }
 
@@ -109,10 +115,10 @@
 
 .brandTitle h1 {
   color: #081a2a;
-  font-size: clamp(112px, 13vw, 188px);
+  font-size: clamp(92px, 10vw, 148px);
   letter-spacing: -0.07em;
   line-height: 0.78;
-  margin: 18px 0;
+  margin: 12px 0;
 }
 
 .brandTitle span {
@@ -128,7 +134,7 @@
 .motionPanel {
   display: grid;
   gap: 10px;
-  margin-bottom: 26px;
+  margin: 0 0 18px;
 }
 
 .motionPanel i {
@@ -178,8 +184,8 @@
     linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(247, 251, 255, 0.96)),
     #ffffff;
   display: grid;
-  gap: 22px;
-  padding: clamp(28px, 5vw, 54px);
+  gap: 18px;
+  padding: clamp(26px, 4vw, 40px);
 }
 
 .identity {
@@ -189,7 +195,7 @@
 
 .identity h2 {
   color: #17212b;
-  font-size: clamp(30px, 4vw, 46px);
+  font-size: clamp(28px, 3.5vw, 40px);
   letter-spacing: -0.03em;
   line-height: 1;
   margin: 0;
@@ -219,8 +225,8 @@
   border: 1px solid #dce4ea;
   box-shadow: 0 12px 24px rgba(17, 45, 78, 0.07);
   color: #17212b;
-  min-height: 88px;
-  padding: 16px;
+  min-height: 76px;
+  padding: 14px;
   text-align: left;
 }
 
@@ -311,7 +317,11 @@
   align-items: end;
   display: grid;
   gap: 12px;
-  grid-template-columns: 1fr auto;
+  grid-template-columns: minmax(0, 1fr) 86px;
+}
+
+.otpRow label {
+  min-width: 0;
 }
 
 .secondaryButton {
@@ -320,6 +330,7 @@
   color: #8b4a08;
   min-height: 54px;
   padding: 10px 16px;
+  width: 86px;
 }
 
 .form > button {
