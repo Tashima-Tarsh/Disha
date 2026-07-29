@@ -1,7 +1,15 @@
 .page {
+  --mg-ground: #0b0f14;
+  --mg-text: #e6edf3;
+  --mg-edge: #2b3a4d;
+  --mg-edge-rel: #3a5a44;
+  --mg-user: #d39b1e;
+  --mg-entity: #2f9e6b;
+  --mg-topic: #2f6f9d;
+
   min-height: 100vh;
-  background: #0b0f14;
-  color: #e6edf3;
+  background: var(--mg-ground);
+  color: var(--mg-text);
   padding: 2rem clamp(1rem, 4vw, 3rem);
   font-family: ui-sans-serif, system-ui, -apple-system, sans-serif;
 }
@@ -128,7 +136,8 @@
   overflow: hidden;
 }
 
-.svg {
+.svg,
+.canvas {
   width: 100%;
   height: auto;
   display: block;
