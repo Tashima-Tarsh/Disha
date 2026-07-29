@@ -3,14 +3,19 @@ import type { RequestContext } from "../types";
 import { applyTokenEconomy, getCachedResponse, setCachedResponse } from "./tokenEconomy";
 import { callOpenAiResponses } from "../openai";
 
-export type WorkflowNodeType = "chat" | "http" | "sleep" | "set";
+export type WorkflowNodeType = "chat" | "http" | "sleep" | "set" | "loop";
 
 export interface WorkflowNode {
   id: string;
   type: WorkflowNodeType;
   timeoutMs?: number;
   input?: Record<string, unknown>;
+  /** Child nodes executed once per iteration. Only used by `loop` nodes. */
+  body?: WorkflowNode[];
 }
+
+/** Hard cap on how deeply loops may nest, independent of any per-node setting. */
+const MAX_LOOP_DEPTH = 3;
 
 export interface WorkflowSpec {
   id?: string;
@@ -118,20 +123,66 @@ async function httpNode(input: AnyRecord, timeoutMs: number): Promise<unknown> {
   return { status: response.status, contentType, body: text };
 }
 
-export async function runWorkflow(ctx: RequestContext, spec: WorkflowSpec): Promise<WorkflowRunResult> {
-  const env = getEnv();
-  const startedAt = Date.now();
-  const totalTimeoutMs = spec.timeoutMs ?? env.DISHA_WORKFLOW_TOTAL_TIMEOUT_MS;
-  const outputs: Record<string, unknown> = {};
-  const logs: WorkflowNodeLog[] = [];
+type ExecStatus = "success" | "failure" | "timeout";
 
-  for (const node of spec.nodes) {
-    const now = Date.now();
-    if (now - startedAt > totalTimeoutMs) {
-      return { requestId: ctx.requestId, status: "timeout", logs, outputs };
+interface ExecBase {
+  ctx: RequestContext;
+  env: ReturnType<typeof getEnv>;
+  startedAt: number;
+  totalTimeoutMs: number;
+}
+
+/** Signals a timeout distinctly from a generic failure so callers can classify it. */
+class TimeoutError extends Error {
+  constructor() {
+    super("timeout");
+  }
+}
+
+async function runLoop(base: ExecBase, node: WorkflowNode, depth: number): Promise<unknown> {
+  if (depth >= MAX_LOOP_DEPTH) throw new Error("loop nesting exceeds maximum depth");
+  const body = node.body ?? [];
+  const input = node.input ?? {};
+
+  const forEach = Array.isArray(input.forEach) ? input.forEach : null;
+  const requested = forEach ? forEach.length : Math.max(0, Math.floor(Number(input.times ?? 1)));
+  const nodeCap = Number.isFinite(Number(input.maxIterations)) ? Math.max(0, Math.floor(Number(input.maxIterations))) : Number.POSITIVE_INFINITY;
+  const hardCap = base.env.DISHA_WORKFLOW_MAX_LOOP_ITERATIONS;
+  const cap = Math.min(requested, nodeCap, hardCap);
+
+  const results: AnyRecord[] = [];
+  for (let index = 0; index < cap; index += 1) {
+    if (Date.now() - base.startedAt > base.totalTimeoutMs) throw new TimeoutError();
+
+    const scope: AnyRecord = {};
+    const iterationLogs: WorkflowNodeLog[] = [];
+    const status = await executeNodes(base, body, scope, iterationLogs, depth + 1);
+
+    const record: AnyRecord = { index, outputs: scope, logs: iterationLogs };
+    if (forEach) record.item = forEach[index];
+    results.push(record);
+
+    if (status !== "success") {
+      const err = status === "timeout" ? new TimeoutError() : new Error(`loop body failed at iteration ${index}`);
+      Object.assign(err, { partialResults: results });
+      throw err;
     }
+  }
 
-    const nodeTimeout = node.timeoutMs ?? env.DISHA_WORKFLOW_NODE_TIMEOUT_MS;
+  return { iterations: results.length, requested, capped: requested > cap, results };
+}
+
+async function executeNodes(
+  base: ExecBase,
+  nodes: WorkflowNode[],
+  outputs: AnyRecord,
+  logs: WorkflowNodeLog[],
+  depth: number,
+): Promise<ExecStatus> {
+  for (const node of nodes) {
+    if (Date.now() - base.startedAt > base.totalTimeoutMs) return "timeout";
+
+    const nodeTimeout = node.timeoutMs ?? base.env.DISHA_WORKFLOW_NODE_TIMEOUT_MS;
     const log: WorkflowNodeLog = {
       nodeId: node.id,
       type: node.type,
@@ -151,7 +202,9 @@ export async function runWorkflow(ctx: RequestContext, spec: WorkflowSpec): Prom
       } else if (node.type === "http") {
         out = await httpNode(node.input ?? {}, nodeTimeout);
       } else if (node.type === "chat") {
-        out = await chatNode(ctx, node.input ?? {}, nodeTimeout);
+        out = await chatNode(base.ctx, node.input ?? {}, nodeTimeout);
+      } else if (node.type === "loop") {
+        out = await runLoop(base, node, depth);
       } else {
         throw new Error("Unknown workflow node type");
       }
@@ -161,14 +214,29 @@ export async function runWorkflow(ctx: RequestContext, spec: WorkflowSpec): Prom
       log.finishedAt = Date.now();
       logs.push(log);
     } catch (error) {
-      const message = error instanceof Error ? error.message : "unknown_error";
-      log.status = message === "timeout" ? "timeout" : "failure";
-      log.reason = message;
+      const timedOut = error instanceof TimeoutError || (error instanceof Error && error.message === "timeout");
+      log.status = timedOut ? "timeout" : "failure";
+      log.reason = error instanceof Error ? error.message : "unknown_error";
       log.finishedAt = Date.now();
       logs.push(log);
-      return { requestId: ctx.requestId, status: log.status === "timeout" ? "timeout" : "failure", logs, outputs };
+      return timedOut ? "timeout" : "failure";
     }
   }
 
-  return { requestId: ctx.requestId, status: "success", logs, outputs };
+  return "success";
+}
+
+export async function runWorkflow(ctx: RequestContext, spec: WorkflowSpec): Promise<WorkflowRunResult> {
+  const env = getEnv();
+  const base: ExecBase = {
+    ctx,
+    env,
+    startedAt: Date.now(),
+    totalTimeoutMs: spec.timeoutMs ?? env.DISHA_WORKFLOW_TOTAL_TIMEOUT_MS,
+  };
+  const outputs: Record<string, unknown> = {};
+  const logs: WorkflowNodeLog[] = [];
+
+  const status = await executeNodes(base, spec.nodes, outputs, logs, 0);
+  return { requestId: ctx.requestId, status, logs, outputs };
 }

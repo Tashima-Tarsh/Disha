@@ -1,0 +1,204 @@
+.page {
+  min-height: 100vh;
+  background: #0b0f14;
+  color: #e6edf3;
+  padding: 2rem clamp(1rem, 4vw, 3rem);
+  font-family: ui-sans-serif, system-ui, -apple-system, sans-serif;
+}
+
+.header {
+  max-width: 1100px;
+  margin: 0 auto 1.5rem;
+}
+
+.title {
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.subtitle {
+  color: #9fb0c0;
+  margin: 0.35rem 0 0;
+  font-size: 0.95rem;
+}
+
+.badge {
+  display: inline-block;
+  font-size: 0.7rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #7fd8a6;
+  border: 1px solid #1e6b4a;
+  border-radius: 999px;
+  padding: 0.15rem 0.6rem;
+  margin-left: 0.5rem;
+  vertical-align: middle;
+}
+
+.layout {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: minmax(280px, 360px) 1fr;
+  gap: 1.25rem;
+}
+
+@media (max-width: 860px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.panel {
+  background: #11161d;
+  border: 1px solid #1c2530;
+  border-radius: 12px;
+  padding: 1rem;
+}
+
+.panelTitle {
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #9fb0c0;
+  margin: 0 0 0.75rem;
+}
+
+.textarea {
+  width: 100%;
+  min-height: 130px;
+  resize: vertical;
+  background: #0b0f14;
+  color: #e6edf3;
+  border: 1px solid #263241;
+  border-radius: 8px;
+  padding: 0.6rem;
+  font-size: 0.9rem;
+  font-family: inherit;
+  box-sizing: border-box;
+}
+
+.row {
+  display: flex;
+  gap: 0.6rem;
+  align-items: center;
+  margin-top: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.button {
+  background: #1e6b4a;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 0.55rem 1rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.secondary {
+  background: transparent;
+  border: 1px solid #263241;
+  color: #9fb0c0;
+}
+
+.error {
+  color: #f2a1a1;
+  font-size: 0.85rem;
+  margin-top: 0.6rem;
+}
+
+.status {
+  font-size: 0.8rem;
+  color: #9fb0c0;
+  margin-top: 0.6rem;
+}
+
+.graphWrap {
+  background: #0b0f14;
+  border: 1px solid #1c2530;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.edge {
+  stroke: #2b3a4d;
+  stroke-width: 1;
+}
+
+.edgeRelates {
+  stroke: #3a5a44;
+  stroke-dasharray: 4 3;
+}
+
+.nodeLabel {
+  fill: #cdd9e5;
+  font-size: 10px;
+  pointer-events: none;
+}
+
+.steps {
+  margin-top: 1rem;
+  max-height: 320px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.step {
+  border: 1px solid #1c2530;
+  border-radius: 8px;
+  padding: 0.55rem 0.7rem;
+  background: #0e131a;
+}
+
+.stepHead {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  color: #7fd8a6;
+  margin-bottom: 0.25rem;
+}
+
+.stepPercept {
+  font-size: 0.85rem;
+  color: #e6edf3;
+}
+
+.stepMeta {
+  font-size: 0.75rem;
+  color: #9fb0c0;
+  margin-top: 0.25rem;
+}
+
+.legend {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  font-size: 0.75rem;
+  color: #9fb0c0;
+  padding: 0.6rem 1rem;
+}
+
+.dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin-right: 0.35rem;
+  vertical-align: middle;
+}

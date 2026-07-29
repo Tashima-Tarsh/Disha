@@ -20,7 +20,7 @@ export interface MemoryGraph {
   edges: GraphEdge[];
 }
 
-function extractEntities(text: string): string[] {
+export function extractEntities(text: string): string[] {
   const out = new Set<string>();
   const normalized = text.replace(/\s+/g, " ").trim();
   if (!normalized) return [];

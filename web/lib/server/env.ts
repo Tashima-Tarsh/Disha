@@ -33,6 +33,7 @@ const envSchema = z.object({
   DISHA_AGENT_MAX_CACHE_BYTES: z.coerce.number().int().positive().default(250_000),
   DISHA_WORKFLOW_NODE_TIMEOUT_MS: z.coerce.number().int().positive().default(15_000),
   DISHA_WORKFLOW_TOTAL_TIMEOUT_MS: z.coerce.number().int().positive().default(60_000),
+  DISHA_WORKFLOW_MAX_LOOP_ITERATIONS: z.coerce.number().int().positive().max(10_000).default(25),
   // Comma-separated allowlist of hosts for workflow HTTP nodes. Empty => deny all.
   DISHA_WORKFLOW_ALLOWED_HOSTS: z.string().optional(),
 
@@ -97,6 +98,7 @@ export function getEnv(): RuntimeEnv {
       DISHA_AGENT_MAX_CACHE_BYTES: 250000,
       DISHA_WORKFLOW_NODE_TIMEOUT_MS: 15000,
       DISHA_WORKFLOW_TOTAL_TIMEOUT_MS: 60000,
+      DISHA_WORKFLOW_MAX_LOOP_ITERATIONS: 25,
       DISHA_WORKFLOW_ALLOWED_HOSTS: undefined,
       DISHA_MODEL_PROVIDER: "disabled",
       DISHA_MODEL_TIMEOUT_MS: 20000,
