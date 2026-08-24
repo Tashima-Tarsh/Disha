@@ -376,11 +376,11 @@ export function DishaWorkbench({ principal }: { principal: PrincipalView }) {
 
       <section className={styles.grid}>
         <aside className={styles.sidebar} aria-label="Workbench navigation">
-          <NavItem label="Mission Input" active />
-          <NavItem label="Analysis Results" active={Boolean(mission)} />
-          <NavItem label="Policy Decision" active={Boolean(mission?.policyDecision)} />
-          <NavItem label="Evidence Chain" active={evidence.length > 0} />
-          <NavItem label="Memory / Graph" active={Boolean(memoryGraph)} />
+          <NavItem label="Mission Input" target="mission-input" active />
+          <NavItem label="Analysis Results" target="analysis-results" active={Boolean(mission)} />
+          <NavItem label="Policy Decision" target="policy-decision" active={Boolean(mission?.policyDecision)} />
+          <NavItem label="Evidence Chain" target="evidence-chain" active={evidence.length > 0} />
+          <NavItem label="Memory / Graph" target="memory-graph" active={Boolean(memoryGraph)} />
         </aside>
 
         <div className={styles.workspace}>
@@ -451,7 +451,7 @@ export function DishaWorkbench({ principal }: { principal: PrincipalView }) {
             </div>
           </section>
 
-          <section className={styles.panel}>
+          <section id="mission-input" className={styles.panel}>
             <PanelTitle icon={<Landmark size={18} />} title="Mission Input" label="Dynamic form" />
             <div className={styles.dynamicBanner}>
               <span>Live backend</span>
@@ -513,7 +513,7 @@ export function DishaWorkbench({ principal }: { principal: PrincipalView }) {
             <Metric label="Risk score" value={mission ? `${Math.round(mission.riskScore * 100)}%` : "-"} detail={mission?.safeExecution ?? "Not evaluated"} />
           </section>
 
-          <section className={styles.panel}>
+          <section id="analysis-results" className={styles.panel}>
             <PanelTitle icon={<FileText size={18} />} title="Analysis Results" label="Core governed lenses" />
             {mission ? (
               <div className={styles.resultLayout}>
@@ -539,7 +539,7 @@ export function DishaWorkbench({ principal }: { principal: PrincipalView }) {
               )}
             </section>
 
-            <section className={styles.panel}>
+            <section id="policy-decision" className={styles.panel}>
               <PanelTitle icon={<LockKeyhole size={18} />} title="Policy Decision" label="Policy evaluated" />
               {mission ? <PolicyPanel policy={mission.policyDecision} approvalRequired={mission.approvalRequired} /> : <EmptyState text="Policy output will appear here." />}
             </section>
@@ -565,7 +565,7 @@ export function DishaWorkbench({ principal }: { principal: PrincipalView }) {
           </section>
 
           <section className={styles.twoColumn}>
-            <section className={styles.panel}>
+            <section id="evidence-chain" className={styles.panel}>
               <PanelTitle icon={<Database size={18} />} title="Evidence Chain Viewer" label="Evidence Ledger v2" />
               {evidence.length ? (
                 <div className={styles.ledgerLayout}>
@@ -591,7 +591,7 @@ export function DishaWorkbench({ principal }: { principal: PrincipalView }) {
               )}
             </section>
 
-            <section className={styles.panel}>
+            <section id="memory-graph" className={styles.panel}>
               <PanelTitle icon={<Network size={18} />} title="Memory / Graph Insights" label="When available" />
               {memoryGraph ? <MemoryGraphPanel extension={memoryGraph} /> : <EmptyState text="Memory/Graph runs when the mission asks for context, provenance, source hashes, or graph reasoning." />}
             </section>
@@ -630,12 +630,17 @@ function PanelTitle({ icon, title, label }: { icon: React.ReactNode; title: stri
   );
 }
 
-function NavItem({ label, active }: { label: string; active: boolean }) {
+function NavItem({ label, target, active }: { label: string; target: string; active: boolean }) {
   return (
-    <div className={styles.navItem} data-active={active}>
+    <button
+      className={styles.navItem}
+      data-active={active}
+      type="button"
+      onClick={() => document.getElementById(target)?.scrollIntoView({ behavior: "smooth", block: "start" })}
+    >
       <span />
       {label}
-    </div>
+    </button>
   );
 }
 
