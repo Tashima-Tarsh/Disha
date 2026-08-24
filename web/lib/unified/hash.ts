@@ -1,7 +1,7 @@
 import crypto from "node:crypto";
 
 export function canonicalJson(value: unknown): string {
-  return JSON.stringify(sortValue(value));
+  return JSON.stringify(sortValue(value)) ?? "null";
 }
 
 export function hashValue(value: unknown): string {
