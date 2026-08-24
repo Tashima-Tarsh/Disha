@@ -83,7 +83,7 @@ export async function createConversationShare(
   return entry;
 }
 
-export async function getConversationShare(ctx: RequestContext, id: string, password?: string | null) {
+export async function getConversationShare(ctx: RequestContext | null, id: string, password?: string | null) {
   const pool = getDbPool();
   let entry: StoredShare | null = null;
   if (pool) {
@@ -112,8 +112,8 @@ export async function getConversationShare(ctx: RequestContext, id: string, pass
     throw Object.assign(new Error("Password required"), { status: 401, requiresPassword: true });
   }
   await audit({
-    requestId: ctx.requestId,
-    userId: ctx.principal.userId,
+    requestId: ctx?.requestId ?? `share-${id}`,
+    userId: ctx?.principal.userId,
     action: "share.read",
     resource: id,
     outcome: "success",
