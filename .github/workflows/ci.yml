@@ -20,6 +20,7 @@ jobs:
     timeout-minutes: 10
     env:
       BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+      EVENT_NAME: ${{ github.event_name }}
     steps:
       - uses: actions/checkout@v5
         with:
