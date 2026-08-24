@@ -12,6 +12,7 @@
     "test": "npm --prefix web run test",
     "type-check": "npm --prefix web run type-check",
     "audit": "npm --prefix web audit --audit-level=moderate",
+    "governance": "node scripts/governance-check.mjs",
     "external:sync": "node scripts/sync-external-intelligence.mjs",
     "external:status": "node scripts/sync-external-intelligence.mjs --status",
     "external:runtime": "node scripts/external-runtime.mjs --status",
