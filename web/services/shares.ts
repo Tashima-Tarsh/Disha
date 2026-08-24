@@ -10,6 +10,7 @@ export type ShareExpiry = "1h" | "24h" | "7d" | "30d" | "never";
 
 export interface StoredShare {
   id: string;
+  ownerUserId: string;
   conversationId: string;
   conversation: Conversation;
   visibility: ShareVisibility;
@@ -42,6 +43,7 @@ export async function createConversationShare(
   const now = Date.now();
   const entry: StoredShare = {
     id,
+    ownerUserId: ctx.principal.userId,
     conversationId: params.conversation.id,
     conversation: params.conversation,
     visibility: params.visibility,
@@ -90,6 +92,7 @@ export async function getConversationShare(ctx: RequestContext, id: string, pass
       const row = result.rows[0];
       entry = {
         id: row.id,
+        ownerUserId: row.owner_user_id,
         conversationId: row.conversation_id,
         conversation: row.conversation,
         visibility: row.visibility,
@@ -121,11 +124,18 @@ export async function getConversationShare(ctx: RequestContext, id: string, pass
 export async function revokeConversationShare(ctx: RequestContext, id: string) {
   const pool = getDbPool();
   let deleted = false;
+  const canDeleteAnyShare = ctx.principal.roles.includes("admin");
   if (pool) {
-    const result = await pool.query("update shares set revoked_at = now() where id = $1 and revoked_at is null", [id]);
+    const result = await pool.query(
+      "update shares set revoked_at = now() where id = $1 and revoked_at is null and (owner_user_id = $2 or $3::boolean)",
+      [id, ctx.principal.userId, canDeleteAnyShare],
+    );
     deleted = (result.rowCount ?? 0) > 0;
   } else {
-    deleted = memory.delete(id);
+    const entry = memory.get(id);
+    if (entry && (entry.ownerUserId === ctx.principal.userId || canDeleteAnyShare)) {
+      deleted = memory.delete(id);
+    }
   }
   await audit({
     requestId: ctx.requestId,
