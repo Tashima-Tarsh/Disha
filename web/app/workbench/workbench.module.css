@@ -682,9 +682,209 @@
   }
 }
 
+.spinePanel {
+  background:
+    radial-gradient(circle at 86% 10%, rgba(181, 201, 117, 0.2), transparent 28%),
+    linear-gradient(135deg, #202a31, #28363d 58%, #1c242b);
+  border: 1px solid #44545f;
+  border-radius: 12px;
+  box-shadow: 0 20px 38px rgba(23, 30, 35, 0.18);
+  color: #f7f2e8;
+  overflow: hidden;
+  padding: 24px;
+  position: relative;
+}
+
+.spinePanel::after {
+  background-image: linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+  background-size: 28px 28px;
+  content: "";
+  inset: 0;
+  pointer-events: none;
+  position: absolute;
+}
+
+.spineHeader,
+.spineTrack,
+.spineFooter {
+  position: relative;
+  z-index: 1;
+}
+
+.spineHeader {
+  align-items: end;
+  display: grid;
+  gap: 22px;
+  grid-template-columns: minmax(0, 1fr) 230px;
+}
+
+.spineKicker {
+  color: #d7e6a4;
+  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  margin: 0 0 8px;
+  text-transform: uppercase;
+}
+
+.spineHeader h2 {
+  color: #fffaf0;
+  font-size: clamp(28px, 4vw, 46px);
+  letter-spacing: -0.03em;
+  line-height: 1;
+  margin: 0 0 10px;
+}
+
+.spineHeader p:not(.spineKicker) {
+  color: #c9d1cf;
+  font-size: 16px;
+  line-height: 1.55;
+  margin: 0;
+  max-width: 720px;
+}
+
+.spineReadout {
+  background: rgba(11, 17, 21, 0.32);
+  border: 1px solid #52636c;
+  border-radius: 10px;
+  display: grid;
+  gap: 6px;
+  padding: 14px;
+}
+
+.spineReadout span,
+.spineReadout small {
+  color: #aab7b5;
+  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.spineReadout strong {
+  color: #f4d19b;
+  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 22px;
+}
+
+.spineReadout small {
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  text-transform: none;
+}
+
+.spineTrack {
+  align-items: stretch;
+  display: flex;
+  gap: 8px;
+  margin: 26px 0 18px;
+  overflow-x: auto;
+  padding: 6px 2px 12px;
+  scrollbar-color: #73848b transparent;
+}
+
+.spineStageWrap {
+  align-items: center;
+  display: flex;
+  flex: 1 0 145px;
+  gap: 8px;
+}
+
+.spineStage {
+  background: rgba(11, 17, 21, 0.3);
+  border: 1px solid #44545f;
+  border-radius: 10px;
+  display: grid;
+  gap: 12px;
+  min-height: 158px;
+  padding: 14px;
+  transition: border-color 180ms ease, background 180ms ease, transform 180ms ease;
+  width: 100%;
+}
+
+.spineStage[data-current="true"] {
+  background: rgba(181, 201, 117, 0.14);
+  border-color: #d7e6a4;
+  box-shadow: 0 0 0 3px rgba(215, 230, 164, 0.1);
+  transform: translateY(-4px);
+}
+
+.spineStage[data-complete="true"] {
+  border-color: #829c63;
+}
+
+.spineNode {
+  align-items: center;
+  background: #35454d;
+  border: 1px solid #64777e;
+  border-radius: 50%;
+  color: #f4d19b;
+  display: inline-flex;
+  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 12px;
+  font-weight: 900;
+  height: 34px;
+  justify-content: center;
+  width: 34px;
+}
+
+.spineStage[data-complete="true"] .spineNode {
+  background: #81995e;
+  border-color: #b9cc85;
+  color: #182117;
+}
+
+.spineStageCopy {
+  display: grid;
+  gap: 5px;
+}
+
+.spineStageCopy > span {
+  color: #d7e6a4;
+  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+}
+
+.spineStageCopy strong {
+  color: #fffaf0;
+  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 15px;
+}
+
+.spineStageCopy small {
+  color: #b9c3c2;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+
+.spineArrow {
+  color: #809197;
+  flex: 0 0 auto;
+}
+
+.spineFooter {
+  border-top: 1px solid #44545f;
+  color: #d0d8d3;
+  display: flex;
+  flex-wrap: wrap;
+  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 11px;
+  font-weight: 800;
+  gap: 16px 28px;
+  letter-spacing: 0.05em;
+  padding-top: 14px;
+  text-transform: uppercase;
+}
+
 @media (max-width: 1180px) {
   .topbar,
   .grid,
+  .spineHeader,
   .twoColumn,
   .liveStrip,
   .formGrid {
@@ -718,6 +918,10 @@
   .extensionGrid,
   .ledgerLayout {
     grid-template-columns: 1fr;
+  }
+
+  .spinePanel {
+    padding: 16px;
   }
 
   .topbar {
