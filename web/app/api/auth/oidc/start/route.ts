@@ -5,7 +5,7 @@ import { audit } from "@/lib/server/audit";
 import { authSigningSecret } from "@/lib/server/auth";
 import { signJson } from "@/lib/server/crypto";
 import { getEnv } from "@/lib/server/env";
-import { errorResponse } from "@/lib/server/http";
+import { assertPublicRequestGuards, errorResponse } from "@/lib/server/http";
 import { oidcStartSchema } from "@/lib/server/schemas/api";
 import { requestId } from "@/lib/server/security";
 
@@ -17,6 +17,7 @@ function safeReturnUrl(value?: string) {
 
 export async function GET(req: NextRequest) {
   try {
+    await assertPublicRequestGuards(req);
     const query = oidcStartSchema.parse(Object.fromEntries(req.nextUrl.searchParams.entries()));
     const env = getEnv();
     const authUrl = query.provider === "meri-pehchan" ? env.DISHA_MERI_PEHCHAN_AUTH_URL : env.DISHA_INTRA_ID_AUTH_URL;
