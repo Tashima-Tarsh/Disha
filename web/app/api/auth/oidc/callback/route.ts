@@ -73,6 +73,11 @@ export async function GET(req: NextRequest) {
       throw Object.assign(new Error("Invalid OIDC provider state"), { status: 400 });
     }
 
+    const verifier = req.cookies.get("disha_oidc_verifier")?.value;
+    if (!verifier) {
+      throw Object.assign(new Error("OIDC verifier cookie is missing"), { status: 400 });
+    }
+
     const issuer = env.DISHA_OIDC_ISSUER;
     const clientId = env.DISHA_OIDC_CLIENT_ID;
     const clientSecret = env.DISHA_OIDC_CLIENT_SECRET;
@@ -105,6 +110,7 @@ export async function GET(req: NextRequest) {
         code,
         redirect_uri: redirectUri,
         client_id: clientId,
+        code_verifier: verifier,
       }),
     });
     const accessToken = requiredString(tokenSet, "access_token");
@@ -128,6 +134,13 @@ export async function GET(req: NextRequest) {
       new URL(safeReturnUrl(statePayload.returnUrl), req.nextUrl.origin),
     );
     setSessionCookies(response, session.accessToken, session.refreshToken);
+    response.cookies.set("disha_oidc_verifier", "", {
+      httpOnly: true,
+      secure: env.NODE_ENV === "production",
+      sameSite: "lax",
+      path: "/api/auth/oidc",
+      maxAge: 0,
+    });
     await audit({
       requestId: requestId(req),
       action: "auth.oidc.callback",
