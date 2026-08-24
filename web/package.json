@@ -1,6 +1,6 @@
 {
   "name": "disha-web",
-  "version": "0.1.0",
+  "version": "6.6.0",
   "private": true,
   "scripts": {
     "dev": "next dev --port 3000",
@@ -9,7 +9,7 @@
     "db:migrate": "node scripts/apply-schema.mjs",
     "db:verify-schema": "node scripts/apply-schema.mjs --verify-only",
     "db:rollback": "node scripts/apply-schema.mjs --rollback",
-    "lint": "next lint",
+    "lint": "eslint .",
     "type-check": "tsc --noEmit",
     "type-check:full": "tsc --noEmit -p tsconfig.full.json",
     "test": "vitest run"
