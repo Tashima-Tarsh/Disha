@@ -109,7 +109,7 @@ class PostgresEvidenceLedgerStore implements EvidenceLedgerStore {
       previousHash: row.previous_hash ?? undefined,
       payloadHash: row.payload_hash ?? "",
       hashAlgorithm: row.hash_algorithm ?? "sha256",
-      ledgerVersion: row.ledger_version === 2 ? 2 : 2,
+      ledgerVersion: 2,
       eventHash: row.event_hash,
     }));
   }
