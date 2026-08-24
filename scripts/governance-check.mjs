@@ -9,13 +9,26 @@ const runGit = (args) =>
 
 const baseSha = process.env.BASE_SHA?.trim();
 const usableBase = baseSha && !/^0+$/.test(baseSha) ? baseSha : null;
-const range = usableBase ? `${usableBase}...HEAD` : "HEAD^";
+const range = usableBase ? usableBase + "...HEAD" : "HEAD^";
 
 let diff;
 try {
-  diff = runGit(["diff", "--no-ext-diff", "--unified=0", "--diff-filter=ACMR", range, "--"]);
+  diff = runGit([
+    "diff",
+    "--no-ext-diff",
+    "--unified=0",
+    "--diff-filter=ACMR",
+    range,
+    "--",
+  ]);
 } catch {
-  diff = runGit(["show", "--format=", "--unified=0", "--diff-filter=ACMR", "HEAD"]);
+  diff = runGit([
+    "show",
+    "--format=",
+    "--unified=0",
+    "--diff-filter=ACMR",
+    "HEAD",
+  ]);
 }
 
 const changedFiles = new Set();
@@ -23,7 +36,7 @@ const addedLines = [];
 let currentFile = null;
 
 for (const line of diff.split("\n")) {
-  const fileHeader = line.match(/^diff --git a\\/(.+) b\\/(.+)$/);
+  const fileHeader = line.match(/^diff --git a\/(.+) b\/(.+)$/);
   if (fileHeader) {
     currentFile = fileHeader[2];
     changedFiles.add(currentFile);
@@ -43,33 +56,33 @@ for (const line of diff.split("\n")) {
 
 const violations = [];
 const addViolation = (file, message, text) => {
-  violations.push(`${file}: ${message}${text ? ` — ${text.trim()}` : ""}`);
+  violations.push(file + ": " + message + (text ? " — " + text.trim() : ""));
 };
 
-const codeFile = (file) => /\\.(?:c|m)?[jt]sx?$/.test(file);
+const codeFile = (file) => /\.(?:c|m)?[jt]sx?$/.test(file);
 const workflowFile = (file) => file.startsWith(".github/workflows/");
 const auditableLine = (file) => codeFile(file) || workflowFile(file);
 const governanceFile = "scripts/governance-check.mjs";
 
 const forbiddenPatterns = [
   ["private-key material", /-----BEGIN(?: [A-Z0-9]+)? PRIVATE KEY-----/],
-  ["GitHub access token", /\\b(?:ghp|gho|ghu|ghs|ghr)_[A-Za-z0-9]{20,}\\b/],
-  ["GitHub fine-grained token", /\\bgithub_pat_[A-Za-z0-9_]{20,}\\b/],
-  ["provider API key", /\\bsk-(?:proj|ant)-[A-Za-z0-9_-]{20,}\\b/],
-  ["AWS access key", /\\bAKIA[0-9A-Z]{16}\\b/],
+  ["GitHub access token", /\b(?:ghp|gho|ghu|ghs|ghr)_[A-Za-z0-9]{20,}\b/],
+  ["GitHub fine-grained token", /\bgithub_pat_[A-Za-z0-9_]{20,}\b/],
+  ["provider API key", /\bsk-(?:proj|ant)-[A-Za-z0-9_-]{20,}\b/],
+  ["AWS access key", /\bAKIA[0-9A-Z]{16}\b/],
   [
     "hard-coded credential",
-    /\\b(?:api[_-]?key|access[_-]?token|auth[_-]?token|secret|password)\\b\\s*[:=]\\s*["'`](?!<|process\\.env|env\\.|undefined|null|true|false)[^"'`]{16,}["'`]/i,
+    /\b(?:api[_-]?key|access[_-]?token|auth[_-]?token|secret|password)\b\s*[:=]\s*["'](?!<|process\.env|env\.|undefined|null|true|false)[^"']{16,}["']/i,
   ],
-  ["TypeScript suppression", /@ts-(?:ignore|nocheck)\\b/],
-  ["lint suppression", /\\b(?:eslint-disable|biome-ignore|noqa)\\b/],
-  ["debugger statement", /\\bdebugger\\b/],
-  ["console.log", /\\bconsole\\.log\\s*\\(/],
-  ["workflow failure bypass", /\\bcontinue-on-error\\s*:\\s*true\\b/i],
-  ["workflow failure bypass", /\\ballow_failure\\s*:\\s*true\\b/i],
+  ["TypeScript suppression", /@ts-(?:ignore|nocheck)\b/],
+  ["lint suppression", /\b(?:eslint-disable|biome-ignore|noqa)\b/],
+  ["debugger statement", /\bdebugger\b/],
+  ["console.log", /\bconsole\.log\s*\(/],
+  ["workflow failure bypass", /\bcontinue-on-error\s*:\s*true\b/i],
+  ["workflow failure bypass", /\ballow_failure\s*:\s*true\b/i],
   [
     "new debt marker",
-    /(?:\\/\\/|\\/\\*|#|<!--)\\s*(?:TODO|FIXME|HACK)\\b/i,
+    /(?:\/\/|\/\*|#|<!--)\s*(?:TODO|FIXME|HACK)\b/i,
   ],
 ];
 
@@ -84,12 +97,11 @@ for (const { file, text } of addedLines) {
 const changed = [...changedFiles];
 const regressionTestChanged = changed.some(
   (file) =>
-    /(^|\\/)(?:test|tests|__tests__)\\//.test(file) ||
-    /\\.(?:test|spec)\\.(?:c|m)?[jt]sx?$/.test(file),
+    /(^|\/)(?:test|tests|__tests__)\//.test(file) ||
+    /\.(?:test|spec)\.(?:c|m)?[jt]sx?$/.test(file),
 );
-const governedRuntimeChanged = changed.some(
-  (file) =>
-    /^web\\/(?:app\\/api|lib\\/(?:server|unified)|services)\\//.test(file),
+const governedRuntimeChanged = changed.some((file) =>
+  /^web\/(?:app\/api|lib\/(?:server|unified)|services)\//.test(file),
 );
 
 if (governedRuntimeChanged && !regressionTestChanged) {
@@ -112,10 +124,14 @@ try {
 
 if (violations.length > 0) {
   console.error("Governance line check failed:");
-  for (const violation of violations) console.error(`- ${violation}`);
+  for (const violation of violations) console.error("- " + violation);
   process.exitCode = 1;
 } else {
   console.log(
-    `Governance line check passed: ${addedLines.length} added lines across ${changedFiles.size} changed files.`,
+    "Governance line check passed: " +
+      addedLines.length +
+      " added lines across " +
+      changedFiles.size +
+      " changed files.",
   );
 }
