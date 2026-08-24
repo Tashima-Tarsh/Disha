@@ -2,6 +2,7 @@
 
 import {
   AlertTriangle,
+  ArrowRight,
   Archive,
   CheckCircle2,
   Clipboard,
@@ -219,6 +220,53 @@ export function DishaWorkbench({ principal }: { principal: PrincipalView }) {
     [result],
   );
 
+  const spineStages = [
+    {
+      label: "Mission",
+      caption: mission ? "Intent captured" : "Awaiting input",
+      detail: mission?.signal.context.intent ?? "Start with a public-interest question.",
+      complete: Boolean(mission),
+    },
+    {
+      label: "Signal",
+      caption: mission ? "Normalized" : "Not created",
+      detail: mission?.signal.id ?? "The mission becomes a typed signal.",
+      complete: Boolean(mission?.signal),
+    },
+    {
+      label: "Lenses",
+      caption: mission ? `${mission.selectedLenses.length} routed` : "Not routed",
+      detail: mission?.selectedLenses.join(", ") ?? "Evidence-aware lenses are selected.",
+      complete: Boolean(mission?.lensResults.length),
+    },
+    {
+      label: "Fusion",
+      caption: mission ? "Synthesized" : "Not fused",
+      detail: mission ? `${Math.round(mission.fusedIntelligence.confidence * 100)}% confidence` : "Conflicts and uncertainty stay visible.",
+      complete: Boolean(mission?.fusedSummary),
+    },
+    {
+      label: "Policy",
+      caption: mission?.policyDecision.decision ?? "Not evaluated",
+      detail: mission?.safeExecution ?? "The gate decides what may happen next.",
+      complete: Boolean(mission?.policyDecision),
+    },
+    {
+      label: "Ledger",
+      caption: evidence.length ? `${evidence.length} events` : "No events",
+      detail: evidence.length ? "Chain loaded and inspectable." : "Every stage will leave a trace.",
+      complete: evidence.length > 0,
+    },
+    {
+      label: "Report",
+      caption: result ? "Evidence-bound" : "Pending",
+      detail: result ? "Export is tied to the governed run." : "No conclusion before the chain.",
+      complete: Boolean(result),
+    },
+  ];
+  const firstPendingSpineStage = spineStages.findIndex((stage) => !stage.complete);
+  const activeSpineStage = firstPendingSpineStage === -1 ? spineStages.length - 1 : firstPendingSpineStage;
+
   useEffect(() => {
     const controller = new AbortController();
     void fetch("/api/dashboard/command", { cache: "no-store", signal: controller.signal })
@@ -356,6 +404,50 @@ export function DishaWorkbench({ principal }: { principal: PrincipalView }) {
               <ShieldCheck size={18} />
               <span>Claim chains</span>
               <strong>{commandFeed ? commandFeed.claimChains.length : "-"}</strong>
+            </div>
+          </section>
+
+          <section className={styles.spinePanel} aria-labelledby="constitutional-spine-title">
+            <div className={styles.spineHeader}>
+              <div>
+                <p className={styles.spineKicker}>The DISHA signature</p>
+                <h2 id="constitutional-spine-title">Constitutional Spine</h2>
+                <p>One inspectable view from intent to evidence-bound output. Nothing disappears behind a black box.</p>
+              </div>
+              <div className={styles.spineReadout}>
+                <span>Current boundary</span>
+                <strong>{spineStages[activeSpineStage].label}</strong>
+                <small>{statusLabel(status)} · {evidence.length} ledger events</small>
+              </div>
+            </div>
+
+            <div className={styles.spineTrack} role="list" aria-label="DISHA constitutional evidence flow">
+              {spineStages.map((stage, index) => (
+                <div className={styles.spineStageWrap} key={stage.label}>
+                  <div
+                    className={styles.spineStage}
+                    data-complete={stage.complete}
+                    data-current={index === activeSpineStage}
+                    role="listitem"
+                  >
+                    <div className={styles.spineNode}>
+                      {stage.complete ? <CheckCircle2 size={17} /> : <span>{index + 1}</span>}
+                    </div>
+                    <div className={styles.spineStageCopy}>
+                      <span>{stage.label}</span>
+                      <strong>{stage.caption}</strong>
+                      <small>{stage.detail}</small>
+                    </div>
+                  </div>
+                  {index < spineStages.length - 1 ? <ArrowRight className={styles.spineArrow} size={18} aria-hidden="true" /> : null}
+                </div>
+              ))}
+            </div>
+
+            <div className={styles.spineFooter}>
+              <span>Evidence-first by construction</span>
+              <span>Read-only until policy permits</span>
+              <span>Every output traceable</span>
             </div>
           </section>
 
