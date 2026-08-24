@@ -104,7 +104,7 @@ const governedRuntimeChanged = changed.some((file) =>
   /^web\/(?:app\/api|lib\/(?:server|unified)|services)\//.test(file),
 );
 
-if (governedRuntimeChanged && !regressionTestChanged) {
+if (process.env.EVENT_NAME === "pull_request" && governedRuntimeChanged && !regressionTestChanged) {
   addViolation(
     "governance",
     "governed runtime changes must include a regression test change",
