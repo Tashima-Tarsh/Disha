@@ -23,7 +23,7 @@ const envSchema = z.object({
   // Set this in production (e.g. https://app.example.com). Falls back to request origin in dev.
   NEXT_PUBLIC_APP_URL: z.string().url().optional(),
   DISHA_WEB_RATE_LIMIT: z.coerce.number().int().positive().default(120),
-DISHA_EVIDENCE_LEDGER_MODE: z.enum(["postgres", "memory-dev"]).optional(),
+  DISHA_EVIDENCE_LEDGER_MODE: z.enum(["postgres", "memory-dev"]).optional(),
 
   // Token economy + agent runtime
   DISHA_AGENT_MODE: z.enum(["eco", "balanced", "deep"]).default("balanced"),
@@ -88,7 +88,7 @@ export function getEnv(): RuntimeEnv {
       DISHA_RESEARCH_RUNTIME_TIMEOUT_MS: 2500,
       NEXT_PUBLIC_APP_URL: "https://disha.your-production-domain.com",
       DISHA_WEB_RATE_LIMIT: 120,
-DISHA_EVIDENCE_LEDGER_MODE: "memory-dev",
+  DISHA_EVIDENCE_LEDGER_MODE: "memory-dev",
       DISHA_AGENT_MODE: "balanced",
       DISHA_AGENT_INPUT_BUDGET_TOKENS: 8000,
       DISHA_AGENT_CACHE_TTL_SECONDS: 3600,
@@ -107,7 +107,7 @@ DISHA_EVIDENCE_LEDGER_MODE: "memory-dev",
       OPENAI_BASE_URL: "https://api.openai.com/v1",
       OPENAI_PROJECT: undefined,
       OPENAI_ORGANIZATION: undefined,
-      DISHA_BRAIN_API_TOKEN: "change-me",
+      DISHA_BRAIN_API_TOKEN: undefined,
       NODE_ENV: "development",
     } as RuntimeEnv;
   }
