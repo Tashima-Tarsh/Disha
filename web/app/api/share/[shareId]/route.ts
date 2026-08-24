@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { errorResponse } from "@/lib/server/http";
-import { requireRequestContext } from "@/lib/server/security";
+import { assertPublicRequestGuards } from "@/lib/server/http";
+import { requirePrincipal } from "@/lib/server/auth";
+import { requestId, requireRequestContext } from "@/lib/server/security";
 import { getConversationShare, revokeConversationShare } from "@/services/shares";
 
 interface RouteContext {
@@ -9,8 +11,14 @@ interface RouteContext {
 
 export async function GET(req: NextRequest, { params }: RouteContext) {
   try {
-    const ctx = await requireRequestContext(req, "share:read");
+    await assertPublicRequestGuards(req);
     const { shareId } = await params;
+    let ctx = null;
+    try {
+      ctx = { requestId: requestId(req), principal: requirePrincipal(req) };
+    } catch {
+      // Public and unlisted shares do not require an authenticated viewer.
+    }
     const share = await getConversationShare(ctx, shareId, req.headers.get("x-share-password"));
     return NextResponse.json({
       id: share.id,
@@ -19,7 +27,7 @@ export async function GET(req: NextRequest, { params }: RouteContext) {
       model: share.conversation.model,
       createdAt: share.conversation.createdAt,
       shareCreatedAt: share.createdAt,
-    });
+    }, { headers: { "X-Request-ID": requestId(req) } });
   } catch (error) {
     const status = typeof error === "object" && error !== null && "status" in error ? Number(error.status) : 500;
     if (status === 401) {
