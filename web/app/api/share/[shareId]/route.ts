@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { errorResponse } from "@/lib/server/http";
-import { assertPublicRequestGuards } from "@/lib/server/http";
+import { assertPublicRequestGuards, errorResponse } from "@/lib/server/http";
 import { requirePrincipal } from "@/lib/server/auth";
 import { requestId, requireRequestContext } from "@/lib/server/security";
+import type { RequestContext } from "@/lib/server/types";
 import { getConversationShare, revokeConversationShare } from "@/services/shares";
 
 interface RouteContext {
@@ -13,7 +13,7 @@ export async function GET(req: NextRequest, { params }: RouteContext) {
   try {
     await assertPublicRequestGuards(req);
     const { shareId } = await params;
-    let ctx = null;
+    let ctx: RequestContext | null = null;
     try {
       ctx = { requestId: requestId(req), principal: requirePrincipal(req) };
     } catch {
