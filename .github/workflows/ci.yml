@@ -14,9 +14,29 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  governance:
+    name: Governance line check
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: "22"
+
+      - name: Enforce changed-line policy
+        run: node scripts/governance-check.mjs
+
   web:
     name: Web product verification
+    needs: governance
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     defaults:
       run:
         working-directory: web
