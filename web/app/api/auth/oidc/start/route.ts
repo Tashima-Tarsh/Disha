@@ -33,7 +33,7 @@ export async function GET(req: NextRequest) {
         {
           error: `${query.provider} sign-in is not configured. Add the official OIDC authorization URL and client ID to enable this provider.`,
         },
-        { status: 501 },
+        { status: 503 },
       );
     }
 
