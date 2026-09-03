@@ -1143,6 +1143,9 @@
 }
 
 .worldBoard {
+  min-height: calc(100vh - 104px);
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
   padding: 20px;
   border: 1px solid #dbe4ee;
   border-radius: 18px;
@@ -1151,10 +1154,78 @@
 }
 
 .worldMapShell {
+  min-height: 0;
+  display: grid;
+  grid-template-rows: auto auto minmax(0, 1fr) auto auto;
   overflow: hidden;
   border: 1px solid #d9e4ef;
   border-radius: 18px;
   background: #f8fbff;
+}
+
+.worldMapShell:fullscreen {
+  width: 100vw;
+  height: 100vh;
+  border: 0;
+  border-radius: 0;
+  background: #f8fbff;
+}
+
+.atlasMasthead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 16px 18px;
+  color: #22313d;
+  border-bottom: 1px solid #dbe4ee;
+  background: #ffffff;
+}
+
+.atlasMasthead h3 {
+  margin: 0;
+  color: #172431;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(1.2rem, 2vw, 1.8rem);
+  line-height: 1.1;
+}
+
+.atlasMasthead > div:first-child > span {
+  display: block;
+  margin-top: 5px;
+  color: #697782;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.atlasControls {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 7px;
+}
+
+.atlasControls button {
+  min-height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 0 11px;
+  color: #334653;
+  border: 1px solid #d2dce4;
+  border-radius: 999px;
+  background: #fbfdff;
+  font: inherit;
+  font-size: 0.73rem;
+  font-weight: 850;
+  cursor: pointer;
+}
+
+.atlasControls button[aria-pressed="true"] {
+  color: #174c38;
+  border-color: #a9cbbc;
+  background: #eef7f2;
 }
 
 .atlasWorkspace > svg {
@@ -1221,7 +1292,7 @@
 .atlasWorkspace {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 300px;
-  min-height: 520px;
+  min-height: clamp(480px, 60vh, 760px);
 }
 
 .atlasWorkspace > svg {
@@ -1368,6 +1439,16 @@
   filter: drop-shadow(0 3px 8px rgba(32, 54, 76, 0.18));
 }
 
+.worldNode .worldNodePulse {
+  fill: rgba(184, 92, 56, 0.08);
+  stroke: rgba(184, 92, 56, 0.34);
+  stroke-width: 1;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: atlasNodePulse 2.8s ease-out infinite;
+  filter: none;
+}
+
 .worldNode text {
   fill: #263442;
   font-size: 10px;
@@ -1389,10 +1470,106 @@
   font-weight: 750;
 }
 
+.atlasActivity {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-top: 1px solid #dbe4ee;
+  background: #fffdf8;
+}
+
+.atlasActivity > span {
+  color: #775a29;
+  font-size: 0.68rem;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.atlasActivity > div {
+  display: flex;
+  gap: 7px;
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+
+.activityItem,
+.activityItemActive {
+  min-width: max-content;
+  min-height: 34px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 0 10px;
+  color: #455663;
+  border: 1px solid #dde4e9;
+  border-radius: 8px;
+  background: #ffffff;
+  font: inherit;
+  cursor: pointer;
+}
+
+.activityItem i,
+.activityItemActive i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #b98228;
+}
+
+.activityItem strong,
+.activityItemActive strong {
+  font-size: 0.74rem;
+}
+
+.activityItem small,
+.activityItemActive small {
+  color: #77838d;
+  font-size: 0.66rem;
+  text-transform: uppercase;
+}
+
+.activityItemActive {
+  color: #ffffff;
+  border-color: #234c3e;
+  background: #234c3e;
+}
+
+.activityItemActive i {
+  background: #efc36e;
+  box-shadow: 0 0 0 4px rgba(239, 195, 110, 0.16);
+}
+
+.activityItemActive small {
+  color: rgba(255, 255, 255, 0.72);
+}
+
 @keyframes flowDash {
   to {
     stroke-dashoffset: -36;
   }
+}
+
+@keyframes atlasNodePulse {
+  0% {
+    opacity: 0.9;
+    transform: scale(0.72);
+  }
+  70%,
+  100% {
+    opacity: 0;
+    transform: scale(1.35);
+  }
+}
+
+.motionPaused .worldFlow,
+.motionPaused .worldFlowStrong,
+.motionPaused .worldFlowSelected,
+.motionPaused .worldNodePulse {
+  animation-play-state: paused;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -1402,7 +1579,8 @@
     animation: none;
   }
 
-  .flowPulse {
+  .flowPulse,
+  .worldNodePulse {
     display: none;
   }
 }
@@ -1538,6 +1716,10 @@
     border-left: 0;
   }
 
+  .worldBoard {
+    min-height: 0;
+  }
+
   .overviewCard:nth-child(2) {
     border-right: 0;
   }
@@ -1553,7 +1735,8 @@
   .commandHero,
   .connectorToolbar,
   .overviewHeader,
-  .atlasToolbar {
+  .atlasToolbar,
+  .atlasMasthead {
     flex-direction: column;
   }
 
@@ -1563,6 +1746,22 @@
 
   .atlasFilters {
     justify-content: flex-start;
+  }
+
+  .atlasMasthead {
+    align-items: stretch;
+  }
+
+  .atlasControls {
+    justify-content: flex-start;
+  }
+
+  .atlasControls button {
+    flex: 1 1 auto;
+  }
+
+  .atlasActivity {
+    grid-template-columns: 1fr;
   }
 
   .contentGrid {

@@ -16,7 +16,10 @@ import {
   Landmark,
   LockKeyhole,
   MapPinned,
+  Maximize2,
   Network,
+  Pause,
+  Play,
   RadioTower,
   Scale,
   Shield,
@@ -24,7 +27,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 
 import styles from "./dashboard.module.css";
 
@@ -322,6 +325,15 @@ export function DashboardClient({ principal }: { principal: PrincipalView }) {
       principal={principal}
       body={
         <div className={styles.contentGrid}>
+          <section className={styles.worldBoard} id="atlas">
+            <PanelTitle
+              icon={<Globe2 size={18} />}
+              title="Constitutional Evidence Atlas"
+              subtitle="Explore real-world source-to-evidence movement by operational state. Every line represents a registered DISHA source or connector—not an invented event."
+            />
+            <WorldFlowMap worldMap={worldMap} flow={data.globalFlow} generatedAt={data.generatedAt} />
+          </section>
+
           <section className={styles.commandHero}>
             <div className={styles.heroText}>
               <p className={styles.eyebrow}>DISHA 6.6 / National Command Feed</p>
@@ -383,15 +395,6 @@ export function DashboardClient({ principal }: { principal: PrincipalView }) {
             <KpiCard icon={<DatabaseZap size={20} />} label="Source registry" value={formatNumber(data.commandReadiness.sourceRegistry)} detail={`${data.commandReadiness.nationalSources} national sources`} tone="good" />
             <KpiCard icon={<Network size={20} />} label="Connectors" value={formatNumber(data.commandReadiness.connectorManifest)} detail="Official-source manifest" tone="warn" />
             <KpiCard icon={<Brain size={20} />} label="Extensions" value={formatNumber(data.extensions.activeExtensions)} detail={`${data.commandReadiness.extensionScore}% governance score`} tone={data.governance.extensionStatus === "pass" ? "good" : "warn"} />
-          </section>
-
-          <section className={styles.worldBoard}>
-            <PanelTitle
-              icon={<Globe2 size={18} />}
-              title="Constitutional Evidence Atlas"
-              subtitle="Explore real-world source-to-evidence movement by operational state. Every line represents a registered DISHA source or connector—not an invented event."
-            />
-            <WorldFlowMap worldMap={worldMap} flow={data.globalFlow} />
           </section>
 
           <section className={styles.opsBoard}>
@@ -611,6 +614,7 @@ function DashboardShell({ principal, body }: { principal: PrincipalView; body: R
           </div>
         </div>
         <nav className={styles.railNav} aria-label="Dashboard sections">
+          <a href="#atlas"><Globe2 size={18} /> Evidence Atlas</a>
           <a href="#overview"><Eye size={18} /> Overview</a>
           <a href="#map"><MapPinned size={18} /> India Map</a>
           <a href="#audit"><FileSearch size={18} /> Audit</a>
@@ -802,12 +806,49 @@ function Badge({ tone, children }: { tone: string; children: ReactNode }) {
   return <span className={`${styles.badge} ${toneClass[tone] ?? styles.toneWarn}`}>{children}</span>;
 }
 
-function WorldFlowMap({ worldMap, flow }: { worldMap: WorldFeatureCollection | null; flow: CommandFeed["globalFlow"] }) {
+function WorldFlowMap({
+  worldMap,
+  flow,
+  generatedAt,
+}: {
+  worldMap: WorldFeatureCollection | null;
+  flow: CommandFeed["globalFlow"];
+  generatedAt: string;
+}) {
+  const atlasRef = useRef<HTMLDivElement>(null);
   const nodeById = useMemo(() => new Map(flow.nodes.map((node) => [node.id, node])), [flow.nodes]);
   const [statusFilter, setStatusFilter] = useState<"all" | CommandFeed["globalFlow"]["flows"][number]["status"]>("all");
   const [selectedFlowId, setSelectedFlowId] = useState(flow.flows[0]?.id ?? "");
-  const visibleFlows = flow.flows.filter((item) => statusFilter === "all" || item.status === statusFilter);
+  const [motionEnabled, setMotionEnabled] = useState(true);
+  const [guidedTour, setGuidedTour] = useState(true);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const prefersReducedMotion = useSyncExternalStore(subscribeReducedMotion, getReducedMotion, () => false);
+  const motionActive = motionEnabled && !prefersReducedMotion;
+  const guidedTourActive = guidedTour && !prefersReducedMotion;
+  const visibleFlows = useMemo(
+    () => flow.flows.filter((item) => statusFilter === "all" || item.status === statusFilter),
+    [flow.flows, statusFilter],
+  );
   const selectedFlow = visibleFlows.find((item) => item.id === selectedFlowId) ?? visibleFlows[0];
+
+  useEffect(() => {
+    if (!motionActive || !guidedTourActive || visibleFlows.length < 2) return;
+    const timer = window.setInterval(() => {
+      setSelectedFlowId((current) => {
+        const currentIndex = visibleFlows.findIndex((item) => item.id === current);
+        return visibleFlows[(currentIndex + 1 + visibleFlows.length) % visibleFlows.length]?.id ?? current;
+      });
+    }, 3600);
+    return () => window.clearInterval(timer);
+  }, [guidedTourActive, motionActive, visibleFlows]);
+
+  useEffect(() => {
+    function syncFullscreen() {
+      setIsFullscreen(document.fullscreenElement === atlasRef.current);
+    }
+    document.addEventListener("fullscreenchange", syncFullscreen);
+    return () => document.removeEventListener("fullscreenchange", syncFullscreen);
+  }, []);
 
   function chooseFilter(next: typeof statusFilter) {
     setStatusFilter(next);
@@ -815,8 +856,35 @@ function WorldFlowMap({ worldMap, flow }: { worldMap: WorldFeatureCollection | n
     if (firstMatch) setSelectedFlowId(firstMatch.id);
   }
 
+  async function toggleFullscreen() {
+    if (document.fullscreenElement === atlasRef.current) {
+      await document.exitFullscreen();
+      return;
+    }
+    await atlasRef.current?.requestFullscreen();
+  }
+
   return (
-    <div className={styles.worldMapShell}>
+    <div className={`${styles.worldMapShell} ${motionActive ? "" : styles.motionPaused}`} ref={atlasRef}>
+      <header className={styles.atlasMasthead}>
+        <div>
+          <p className={styles.eyebrow}>Governed spatial intelligence</p>
+          <h3>See the record move from source to evidence.</h3>
+          <span>Command feed captured {formatDateTime(generatedAt)}</span>
+        </div>
+        <div className={styles.atlasControls}>
+          <button aria-pressed={motionActive} onClick={() => setMotionEnabled((current) => !current)} type="button">
+            {motionActive ? <Pause size={15} /> : <Play size={15} />}
+            {motionActive ? "Pause motion" : "Resume motion"}
+          </button>
+          <button aria-pressed={guidedTourActive} onClick={() => setGuidedTour((current) => !current)} type="button">
+            <Eye size={15} /> {guidedTourActive ? "Guided tour on" : "Guided tour off"}
+          </button>
+          <button onClick={() => void toggleFullscreen()} type="button">
+            <Maximize2 size={15} /> {isFullscreen ? "Exit full screen" : "Full screen"}
+          </button>
+        </div>
+      </header>
       <div className={styles.atlasToolbar} aria-label="Evidence Atlas layers">
         <div>
           <span>Evidence layers</span>
@@ -876,9 +944,11 @@ function WorldFlowMap({ worldMap, flow }: { worldMap: WorldFeatureCollection | n
                     <title>{`${item.label} / ${displayState(item.status)} / ${item.authority}`}</title>
                   </path>
                   <path className={styles.flowHitArea} d={curve} />
-                  <circle className={styles.flowPulse} r="4">
-                    <animateMotion dur={`${5 + (index % 5)}s`} repeatCount="indefinite" path={curve} />
-                  </circle>
+                  {motionActive ? (
+                    <circle className={styles.flowPulse} r="4">
+                      <animateMotion dur={`${5 + (index % 5)}s`} repeatCount="indefinite" path={curve} />
+                    </circle>
+                  ) : null}
                 </g>
               );
             })}
@@ -888,6 +958,7 @@ function WorldFlowMap({ worldMap, flow }: { worldMap: WorldFeatureCollection | n
               const point = projectWorld(node.lon, node.lat);
               return (
                 <g className={styles.worldNode} key={node.id} transform={`translate(${point.x} ${point.y})`}>
+                  <circle className={styles.worldNodePulse} r={node.kind === "command_hub" ? 16 : 10} />
                   <circle r={node.kind === "command_hub" ? 8 : node.kind === "evidence_store" ? 6 : 4} />
                   <text x="10" y="-8">{node.label}</text>
                 </g>
@@ -913,6 +984,26 @@ function WorldFlowMap({ worldMap, flow }: { worldMap: WorldFeatureCollection | n
             </>
           ) : <p>No source movement is available for this layer.</p>}
         </aside>
+      </div>
+      <div className={styles.atlasActivity} aria-label="Source movement activity">
+        <span>Source movement</span>
+        <div>
+          {visibleFlows.map((item) => (
+            <button
+              className={item.id === selectedFlow?.id ? styles.activityItemActive : styles.activityItem}
+              key={item.id}
+              onClick={() => {
+                setSelectedFlowId(item.id);
+                setGuidedTour(false);
+              }}
+              type="button"
+            >
+              <i />
+              <strong>{item.label}</strong>
+              <small>{displayState(item.status)}</small>
+            </button>
+          ))}
+        </div>
       </div>
       <div className={styles.worldMapFooter}>
         <span>{flow.generatedFrom}</span>
@@ -944,6 +1035,16 @@ async function fetchJson<T>(url: string, signal: AbortSignal): Promise<T> {
   const response = await fetch(url, { cache: "no-store", signal });
   if (!response.ok) throw new Error(`${url} returned ${response.status}`);
   return response.json() as Promise<T>;
+}
+
+function subscribeReducedMotion(onChange: () => void): () => void {
+  const media = window.matchMedia("(prefers-reduced-motion: reduce)");
+  media.addEventListener("change", onChange);
+  return () => media.removeEventListener("change", onChange);
+}
+
+function getReducedMotion(): boolean {
+  return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 }
 
 function formatNumber(value: number): string {

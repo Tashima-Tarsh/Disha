@@ -35,6 +35,11 @@ describe("DISHA command dashboard", () => {
     expect(source).toContain("Evidence Atlas layers");
     expect(source).toContain("Follow the evidence chain");
     expect(source).toContain("Open mission workbench");
+    expect(source).toContain("Pause motion");
+    expect(source).toContain("Guided tour on");
+    expect(source).toContain("requestFullscreen");
+    expect(source).toContain("prefers-reduced-motion");
+    expect(source).toContain("Source movement activity");
     expect(source).toContain("/data/world-countries.geojson");
     expect(source).not.toContain("Interactive demo runtime");
   });
