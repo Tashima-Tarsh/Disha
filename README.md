@@ -55,6 +55,8 @@ Every production change must pass:
 contract -> policy -> evidence -> test
 ```
 
+Runtime ownership is intentional: TypeScript serves the browser product and policy gateway; Python owns bounded intelligence and research services. DISHA does not pursue a whole-repository Python rewrite because that would replace a clear product boundary with avoidable migration risk. See [ARCHITECTURE.md](ARCHITECTURE.md#runtime-and-language-ownership).
+
 Read [ARCHITECTURE.md](ARCHITECTURE.md) before changing core behavior.
 
 ## Key Capabilities
@@ -133,6 +135,13 @@ Verify:
 npm.cmd --prefix web run type-check:full
 npm.cmd --prefix web test
 npm.cmd --prefix web run build
+```
+
+Python core verification:
+
+```bash
+python -m pip install -r disha/brain/requirements.txt pytest
+python -m pytest tests/test_disha_brain_graph.py skills/vyuha-defense-engine/tests
 ```
 
 Docker development:

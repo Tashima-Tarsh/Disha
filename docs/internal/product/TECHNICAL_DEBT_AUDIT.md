@@ -32,7 +32,7 @@ This register separates the active product spine from historical and research ma
 | P0 | Licensing | `LICENSE` is a placeholder and GitHub detects the repository as “Other” | Repository owner must choose and approve a licence before an open-source release |
 | P0 | Production identity | Production correctly rejects development JWT mode | Configure and integration-test the intended OIDC provider before release |
 | P0 | Persistent evidence | Production requires `DATABASE_URL`; local verification used the development memory ledger | Run migration, restart, and chain-integrity tests against the production PostgreSQL target |
-| P1 | Multi-runtime dependency management | Python source areas contain multiple requirements files without one repository lock | Define supported Python applications, archive abandoned manifests, and lock each deployable runtime |
+| P1 | Multi-runtime dependency management | Python source areas contain multiple requirements files without one repository lock | Runtime ownership is now defined and the active Python core is tested in CI; next, lock the deployable Brain dependency graph |
 | P1 | Runtime integration | The optional DISHA Brain client was not configured during local verification | Run the web-to-Brain audit and persistence contract in the full deployment profile |
 | P1 | Container release | Docker was unavailable in the audit environment | Execute both documented Compose profiles in CI or a release runner |
 | P2 | Repository scale | Most tracked files sit outside the active `web` product spine | Continue classifying active, governed-extension, research, and archive ownership; do not delete source material without review |
