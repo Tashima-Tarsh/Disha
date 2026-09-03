@@ -388,8 +388,8 @@ export function DashboardClient({ principal }: { principal: PrincipalView }) {
           <section className={styles.worldBoard}>
             <PanelTitle
               icon={<Globe2 size={18} />}
-              title="Global Source Flow Map"
-              subtitle="Real world geometry with animated source-to-evidence movement. Flows represent DISHA registered source and connector movement, not invented threat events."
+              title="Constitutional Evidence Atlas"
+              subtitle="Explore real-world source-to-evidence movement by operational state. Every line represents a registered DISHA source or connector—not an invented event."
             />
             <WorldFlowMap worldMap={worldMap} flow={data.globalFlow} />
           </section>
@@ -804,55 +804,116 @@ function Badge({ tone, children }: { tone: string; children: ReactNode }) {
 
 function WorldFlowMap({ worldMap, flow }: { worldMap: WorldFeatureCollection | null; flow: CommandFeed["globalFlow"] }) {
   const nodeById = useMemo(() => new Map(flow.nodes.map((node) => [node.id, node])), [flow.nodes]);
+  const [statusFilter, setStatusFilter] = useState<"all" | CommandFeed["globalFlow"]["flows"][number]["status"]>("all");
+  const [selectedFlowId, setSelectedFlowId] = useState(flow.flows[0]?.id ?? "");
+  const visibleFlows = flow.flows.filter((item) => statusFilter === "all" || item.status === statusFilter);
+  const selectedFlow = visibleFlows.find((item) => item.id === selectedFlowId) ?? visibleFlows[0];
+
+  function chooseFilter(next: typeof statusFilter) {
+    setStatusFilter(next);
+    const firstMatch = flow.flows.find((item) => next === "all" || item.status === next);
+    if (firstMatch) setSelectedFlowId(firstMatch.id);
+  }
 
   return (
     <div className={styles.worldMapShell}>
-      <svg viewBox="0 0 1000 520" role="img" aria-label="Global DISHA source flow map">
-        <defs>
-          <marker id="flowArrow" markerHeight="8" markerWidth="8" orient="auto" refX="8" refY="4">
-            <path d="M0,0 L8,4 L0,8 Z" />
-          </marker>
-        </defs>
-        <rect className={styles.worldOcean} x="0" y="0" width="1000" height="520" rx="18" />
-        <g>
-          {worldMap?.features.map((feature, index) => (
-            <path className={styles.worldCountry} d={featureToPath(feature)} key={feature.id ?? feature.properties?.name ?? index}>
-              <title>{feature.properties?.name ?? "Country"}</title>
-            </path>
+      <div className={styles.atlasToolbar} aria-label="Evidence Atlas layers">
+        <div>
+          <span>Evidence layers</span>
+          <strong>{visibleFlows.length} of {flow.flows.length} flows visible</strong>
+        </div>
+        <div className={styles.atlasFilters}>
+          {(["all", "live_source", "registered_source", "parser_queued"] as const).map((status) => (
+            <button
+              aria-pressed={statusFilter === status}
+              className={statusFilter === status ? styles.atlasFilterActive : styles.atlasFilter}
+              key={status}
+              onClick={() => chooseFilter(status)}
+              type="button"
+            >
+              {status === "all" ? "All sources" : displayState(status)}
+            </button>
           ))}
-        </g>
-        <g>
-          {flow.flows.map((item, index) => {
-            const from = nodeById.get(item.from);
-            const to = nodeById.get(item.to);
-            if (!from || !to) return null;
-            const start = projectWorld(from.lon, from.lat);
-            const end = projectWorld(to.lon, to.lat);
-            const curve = `M ${start.x} ${start.y} Q ${(start.x + end.x) / 2} ${Math.min(start.y, end.y) - 42 - (index % 4) * 10} ${end.x} ${end.y}`;
-            return (
-              <g key={item.id}>
-                <path className={item.status === "live_source" ? styles.worldFlowStrong : styles.worldFlow} d={curve} markerEnd="url(#flowArrow)">
-                  <title>{`${item.label} / ${displayState(item.status)} / ${item.authority}`}</title>
-                </path>
-                <circle className={styles.flowPulse} r="4">
-                  <animateMotion dur={`${5 + (index % 5)}s`} repeatCount="indefinite" path={curve} />
-                </circle>
-              </g>
-            );
-          })}
-        </g>
-        <g>
-          {flow.nodes.map((node) => {
-            const point = projectWorld(node.lon, node.lat);
-            return (
-              <g className={styles.worldNode} key={node.id} transform={`translate(${point.x} ${point.y})`}>
-                <circle r={node.kind === "command_hub" ? 8 : node.kind === "evidence_store" ? 6 : 4} />
-                <text x="10" y="-8">{node.label}</text>
-              </g>
-            );
-          })}
-        </g>
-      </svg>
+        </div>
+      </div>
+      <div className={styles.atlasWorkspace}>
+        <svg viewBox="0 0 1000 520" role="img" aria-label="Interactive Constitutional Evidence Atlas">
+          <defs>
+            <marker id="flowArrow" markerHeight="8" markerWidth="8" orient="auto" refX="8" refY="4">
+              <path d="M0,0 L8,4 L0,8 Z" />
+            </marker>
+          </defs>
+          <rect className={styles.worldOcean} x="0" y="0" width="1000" height="520" rx="18" />
+          <g>
+            {worldMap?.features.map((feature, index) => (
+              <path className={styles.worldCountry} d={featureToPath(feature)} key={feature.id ?? feature.properties?.name ?? index}>
+                <title>{feature.properties?.name ?? "Country"}</title>
+              </path>
+            ))}
+          </g>
+          <g>
+            {visibleFlows.map((item, index) => {
+              const from = nodeById.get(item.from);
+              const to = nodeById.get(item.to);
+              if (!from || !to) return null;
+              const start = projectWorld(from.lon, from.lat);
+              const end = projectWorld(to.lon, to.lat);
+              const curve = `M ${start.x} ${start.y} Q ${(start.x + end.x) / 2} ${Math.min(start.y, end.y) - 42 - (index % 4) * 10} ${end.x} ${end.y}`;
+              const isSelected = item.id === selectedFlow?.id;
+              return (
+                <g
+                  aria-label={`Inspect ${item.label}`}
+                  className={styles.flowTarget}
+                  key={item.id}
+                  onClick={() => setSelectedFlowId(item.id)}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter" || event.key === " ") setSelectedFlowId(item.id);
+                  }}
+                  role="button"
+                  tabIndex={0}
+                >
+                  <path className={isSelected ? styles.worldFlowSelected : item.status === "live_source" ? styles.worldFlowStrong : styles.worldFlow} d={curve} markerEnd="url(#flowArrow)">
+                    <title>{`${item.label} / ${displayState(item.status)} / ${item.authority}`}</title>
+                  </path>
+                  <path className={styles.flowHitArea} d={curve} />
+                  <circle className={styles.flowPulse} r="4">
+                    <animateMotion dur={`${5 + (index % 5)}s`} repeatCount="indefinite" path={curve} />
+                  </circle>
+                </g>
+              );
+            })}
+          </g>
+          <g>
+            {flow.nodes.map((node) => {
+              const point = projectWorld(node.lon, node.lat);
+              return (
+                <g className={styles.worldNode} key={node.id} transform={`translate(${point.x} ${point.y})`}>
+                  <circle r={node.kind === "command_hub" ? 8 : node.kind === "evidence_store" ? 6 : 4} />
+                  <text x="10" y="-8">{node.label}</text>
+                </g>
+              );
+            })}
+          </g>
+        </svg>
+        <aside className={styles.atlasInspector} aria-live="polite">
+          <p className={styles.eyebrow}>Selected source movement</p>
+          {selectedFlow ? (
+            <>
+              <Badge tone={selectedFlow.status === "live_source" ? "operational" : "watch"}>{displayState(selectedFlow.status)}</Badge>
+              <h3>{selectedFlow.label}</h3>
+              <dl>
+                <div><dt>Authority</dt><dd>{selectedFlow.authority}</dd></div>
+                <div><dt>Cadence</dt><dd>{selectedFlow.cadence}</dd></div>
+                <div><dt>From</dt><dd>{nodeById.get(selectedFlow.from)?.label ?? selectedFlow.from}</dd></div>
+                <div><dt>To</dt><dd>{nodeById.get(selectedFlow.to)?.label ?? selectedFlow.to}</dd></div>
+              </dl>
+              <div className={styles.atlasHash}><span>Source hash</span><code>{selectedFlow.hash}</code></div>
+              <a className={styles.secondaryButton} href="#evidence">Follow the evidence chain</a>
+              <Link className={styles.primaryButton} href="/workbench">Open mission workbench <ArrowUpRight size={14} /></Link>
+            </>
+          ) : <p>No source movement is available for this layer.</p>}
+        </aside>
+      </div>
       <div className={styles.worldMapFooter}>
         <span>{flow.generatedFrom}</span>
         <span>{flow.attribution}</span>

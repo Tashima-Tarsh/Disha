@@ -30,6 +30,11 @@ describe("DISHA command dashboard", () => {
     expect(source).toContain("Constitutional Chain Explorer");
     expect(source).toContain("Geospatial Import Layer");
     expect(source).toContain("WorldFlowMap");
+    expect(source).toContain("Interactive Constitutional Evidence Atlas");
+    expect(source).toContain("Constitutional Evidence Atlas");
+    expect(source).toContain("Evidence Atlas layers");
+    expect(source).toContain("Follow the evidence chain");
+    expect(source).toContain("Open mission workbench");
     expect(source).toContain("/data/world-countries.geojson");
     expect(source).not.toContain("Interactive demo runtime");
   });

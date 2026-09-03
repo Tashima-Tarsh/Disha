@@ -1157,10 +1157,146 @@
   background: #f8fbff;
 }
 
-.worldMapShell svg {
+.atlasWorkspace > svg {
   display: block;
   width: 100%;
   min-height: 420px;
+}
+
+.atlasToolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 14px;
+  border-bottom: 1px solid #dbe4ee;
+  background: #fffdf8;
+}
+
+.atlasToolbar > div:first-child {
+  display: grid;
+  gap: 3px;
+}
+
+.atlasToolbar span {
+  color: #775a29;
+  font-size: 0.7rem;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.atlasToolbar strong {
+  color: #263442;
+  font-size: 0.84rem;
+}
+
+.atlasFilters {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 7px;
+}
+
+.atlasFilter,
+.atlasFilterActive {
+  min-height: 34px;
+  padding: 0 11px;
+  color: #435361;
+  border: 1px solid #d5dee6;
+  border-radius: 999px;
+  background: #ffffff;
+  font: inherit;
+  font-size: 0.74rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.atlasFilterActive {
+  color: #ffffff;
+  border-color: #1d4f3d;
+  background: #1d4f3d;
+}
+
+.atlasWorkspace {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 300px;
+  min-height: 520px;
+}
+
+.atlasWorkspace > svg {
+  min-width: 0;
+  height: 100%;
+}
+
+.atlasInspector {
+  display: grid;
+  align-content: start;
+  gap: 12px;
+  padding: 20px;
+  border-left: 1px solid #dbe4ee;
+  background: #ffffff;
+}
+
+.atlasInspector h3 {
+  margin: 0;
+  color: #172431;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.35rem;
+  line-height: 1.15;
+}
+
+.atlasInspector dl {
+  display: grid;
+  gap: 0;
+  margin: 0;
+  border-top: 1px solid #e5e0d6;
+}
+
+.atlasInspector dl div {
+  display: grid;
+  grid-template-columns: 78px minmax(0, 1fr);
+  gap: 8px;
+  padding: 9px 0;
+  border-bottom: 1px solid #e5e0d6;
+}
+
+.atlasInspector dt {
+  color: #6c7882;
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.atlasInspector dd {
+  margin: 0;
+  color: #263442;
+  font-size: 0.8rem;
+  font-weight: 750;
+  overflow-wrap: anywhere;
+}
+
+.atlasHash {
+  display: grid;
+  gap: 5px;
+  padding: 10px;
+  border: 1px dashed #cfc4b1;
+  border-radius: 10px;
+  background: #fbfaf7;
+}
+
+.atlasHash span {
+  color: #775a29;
+  font-size: 0.67rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.atlasHash code {
+  color: #263442;
+  font-size: 0.7rem;
+  overflow-wrap: anywhere;
 }
 
 .worldOcean {
@@ -1174,7 +1310,8 @@
 }
 
 .worldFlow,
-.worldFlowStrong {
+.worldFlowStrong,
+.worldFlowSelected {
   fill: none;
   stroke: #2f7d5b;
   stroke-width: 1.4;
@@ -1188,6 +1325,30 @@
   stroke: #b85c38;
   stroke-width: 1.8;
   opacity: 0.9;
+}
+
+.worldFlowSelected {
+  stroke: #9b2f28;
+  stroke-width: 3;
+  stroke-dasharray: none;
+  opacity: 1;
+}
+
+.flowTarget {
+  cursor: pointer;
+  outline: none;
+}
+
+.flowTarget:focus .worldFlow,
+.flowTarget:focus .worldFlowStrong {
+  stroke: #9b2f28;
+  stroke-width: 3;
+}
+
+.flowHitArea {
+  fill: none;
+  stroke: transparent;
+  stroke-width: 16;
 }
 
 .worldMapShell marker path {
@@ -1231,6 +1392,18 @@
 @keyframes flowDash {
   to {
     stroke-dashoffset: -36;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .worldFlow,
+  .worldFlowStrong,
+  .worldFlowSelected {
+    animation: none;
+  }
+
+  .flowPulse {
+    display: none;
   }
 }
 
@@ -1356,6 +1529,15 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
+  .atlasWorkspace {
+    grid-template-columns: 1fr;
+  }
+
+  .atlasInspector {
+    border-top: 1px solid #dbe4ee;
+    border-left: 0;
+  }
+
   .overviewCard:nth-child(2) {
     border-right: 0;
   }
@@ -1370,8 +1552,17 @@
   .commandHeader,
   .commandHero,
   .connectorToolbar,
-  .overviewHeader {
+  .overviewHeader,
+  .atlasToolbar {
     flex-direction: column;
+  }
+
+  .atlasToolbar {
+    align-items: stretch;
+  }
+
+  .atlasFilters {
+    justify-content: flex-start;
   }
 
   .contentGrid {
