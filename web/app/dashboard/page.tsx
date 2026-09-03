@@ -21,10 +21,12 @@ export default async function DashboardPage() {
     redirect("/login?mode=password&returnUrl=%2Fdashboard");
   }
 
+  let principal;
   try {
-    const principal = principalFromAccessToken(token);
-    return <DashboardClient principal={{ email: principal.email, roles: principal.roles }} />;
+    principal = principalFromAccessToken(token);
   } catch {
     redirect("/login?mode=password&returnUrl=%2Fdashboard");
   }
+
+  return <DashboardClient principal={{ email: principal.email, roles: principal.roles }} />;
 }

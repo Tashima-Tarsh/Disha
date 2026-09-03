@@ -69,6 +69,41 @@ Read [ARCHITECTURE.md](ARCHITECTURE.md) before changing core behavior.
 
 ## Product Spine
 
+### System view
+
+This is the repository-level view of how a mission becomes an inspectable result. It is deliberately narrower than the full research archive: no extension can bypass the policy gate or write an untraceable conclusion.
+
+```mermaid
+flowchart LR
+    A[Mission request] --> B[Typed signal]
+    S[Registered public sources] --> C[Evidence-aware lenses]
+    B --> C
+    C --> D[Fusion with uncertainty]
+    D --> E{Policy gate}
+    E -->|allow or read-only| F[Evidence Ledger v2]
+    E -->|confirm or deny| G[Review queue]
+    F --> H[Inspectable report]
+    X[Governed extensions] --> C
+    X -. cannot bypass .-> E
+```
+
+The authenticated product has two working surfaces:
+
+| Surface | Use it for | Primary action |
+| --- | --- | --- |
+| `/dashboard` | System-wide source, governance, evidence, territory, connector, and hardening posture | Decide what needs review next |
+| `/workbench` | A single governed research mission from input through evidence export | Run and inspect a mission |
+
+### Five-minute product walk-through
+
+1. Set a local `DISHA_JWT_SECRET` of at least 32 characters and a local `DISHA_DEV_PASSWORD` of at least 12 characters.
+2. Run `npm install --prefix web` and `npm.cmd --prefix web run dev`.
+3. Sign in at `http://127.0.0.1:3000/login?mode=password` with an email and the password you set.
+4. Open `/dashboard` for the system overview. Use **Run a governed mission** to enter `/workbench`.
+5. Submit a public-interest question, then inspect the selected lenses, policy decision, evidence events, uncertainty, and export.
+
+Development password login is local-only. Production rejects `dev-jwt` mode.
+
 | Path | Responsibility |
 | --- | --- |
 | `web/app/api/v1/` | Versioned API routes |

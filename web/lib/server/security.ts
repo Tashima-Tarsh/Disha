@@ -6,7 +6,7 @@ import { assertRequestGuards } from "./http";
 import { assertCan } from "./policy";
 import type { PolicyAction, RequestContext } from "./types";
 
-duplicate limiter stateexport function requestId(req: NextRequest): string {
+export function requestId(req: NextRequest): string {
   return req.headers.get("x-request-id") ?? crypto.randomUUID();
 }
 

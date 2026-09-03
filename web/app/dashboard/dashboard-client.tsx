@@ -6,7 +6,9 @@ import {
   BadgeCheck,
   Banknote,
   Brain,
+  ClipboardCheck,
   DatabaseZap,
+  Eye,
   FileSearch,
   Fingerprint,
   GitBranch,
@@ -305,6 +307,15 @@ export function DashboardClient({ principal }: { principal: PrincipalView }) {
   const territories = data.india.territories.filter((territory) => selectedRegion === "All" || territory.region === selectedRegion);
   const connectors = data.connectors.filter((connector) => selectedLane === "All" || connector.layer === selectedLane);
   const selectedClaim = data.claimChains.find((claim) => claim.claimId === selectedClaimId) ?? data.claimChains[0];
+  const blockedCapabilities = data.production.capabilities.filter((capability) => capability.status === "blocked");
+  const partialCapabilities = data.production.capabilities.filter((capability) => capability.status === "partial");
+  const attentionItems = [
+    ...data.governance.extensionBlockers,
+    ...data.governance.extensionWarnings,
+    ...blockedCapabilities.flatMap((capability) => capability.nextHardening),
+    ...partialCapabilities.flatMap((capability) => capability.nextHardening),
+  ];
+  const nextAction = attentionItems[0] ?? "No blocking action is reported by the current command feed.";
 
   return (
     <DashboardShell
@@ -321,6 +332,49 @@ export function DashboardClient({ principal }: { principal: PrincipalView }) {
               <span>{data.commandReadiness.score}</span>
               <strong>readiness</strong>
               <small>{formatDateTime(data.generatedAt)}</small>
+            </div>
+          </section>
+
+          <section className={styles.overviewBoard} id="overview" aria-labelledby="overview-title">
+            <header className={styles.overviewHeader}>
+              <div>
+                <p className={styles.eyebrow}>System overview</p>
+                <h2 id="overview-title">One view from source intake to accountable action</h2>
+                <p>Read the current posture, inspect what needs attention, or move directly into a governed mission.</p>
+              </div>
+              <div className={styles.overviewActions}>
+                <Link className={styles.primaryButton} href="/workbench">Run a governed mission <ArrowUpRight size={15} /></Link>
+                <a className={styles.secondaryButton} href="#evidence">Inspect evidence chains</a>
+              </div>
+            </header>
+
+            <div className={styles.overviewGrid}>
+              <OverviewCard
+                icon={<RadioTower size={18} />}
+                label="Intake"
+                value={`${data.commandReadiness.sourceRegistry} sources`}
+                detail={`${data.lanes.length} operational lanes across ${data.india.totalTerritories} states and union territories.`}
+              />
+              <OverviewCard
+                icon={<Shield size={18} />}
+                label="Governance"
+                value={data.governance.policyGate}
+                detail={`Evidence ledger: ${data.governance.evidenceLedger}. Synthetic data: ${data.governance.noSyntheticData ? "denied" : "under review"}.`}
+              />
+              <OverviewCard
+                icon={<ClipboardCheck size={18} />}
+                label="Review queue"
+                value={`${attentionItems.length} items`}
+                detail={`${blockedCapabilities.length} blocked and ${partialCapabilities.length} partial production capabilities.`}
+                tone={attentionItems.length ? "warn" : "good"}
+              />
+              <OverviewCard
+                icon={<Eye size={18} />}
+                label="Next accountable action"
+                value="Review required"
+                detail={nextAction}
+                tone={attentionItems.length ? "warn" : "good"}
+              />
             </div>
           </section>
 
@@ -524,7 +578,7 @@ export function DashboardClient({ principal }: { principal: PrincipalView }) {
             </Panel>
           </section>
 
-          <section className={styles.capabilityBand}>
+          <section className={styles.capabilityBand} id="hardening">
             <PanelTitle icon={<Scale size={18} />} title="Production Hardening Track" subtitle={data.production.noSyntheticDataRule} />
             <div className={styles.capabilityGrid}>
               {data.production.capabilities.map((capability) => (
@@ -557,10 +611,11 @@ function DashboardShell({ principal, body }: { principal: PrincipalView; body: R
           </div>
         </div>
         <nav className={styles.railNav} aria-label="Dashboard sections">
-          <a href="#command"><RadioTower size={18} /> Command</a>
+          <a href="#overview"><Eye size={18} /> Overview</a>
           <a href="#map"><MapPinned size={18} /> India Map</a>
           <a href="#audit"><FileSearch size={18} /> Audit</a>
           <a href="#evidence"><Fingerprint size={18} /> Evidence</a>
+          <a href="#hardening"><ClipboardCheck size={18} /> Hardening</a>
         </nav>
         <div className={styles.railFooter}>
           <span>Mission owner</span>
@@ -622,6 +677,28 @@ function KpiCard({
       <span>{label}</span>
       <strong>{value}</strong>
       <small>{detail}</small>
+    </article>
+  );
+}
+
+function OverviewCard({
+  icon,
+  label,
+  value,
+  detail,
+  tone = "good",
+}: {
+  icon: ReactNode;
+  label: string;
+  value: string;
+  detail: string;
+  tone?: "good" | "warn";
+}) {
+  return (
+    <article className={`${styles.overviewCard} ${styles[`overview_${tone}`]}`}>
+      <div className={styles.overviewCardLabel}>{icon}<span>{label}</span></div>
+      <strong>{value}</strong>
+      <p>{detail}</p>
     </article>
   );
 }
