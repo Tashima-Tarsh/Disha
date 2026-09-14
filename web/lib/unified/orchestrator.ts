@@ -27,11 +27,19 @@ export type MissionInput = {
   dataSources?: DishaSignal["context"]["dataSources"];
 };
 
+export type MissionComponentFailure = {
+  component: LensName;
+  stage: "lens_analysis";
+  error: string;
+};
+
 export type MissionResult = {
   missionId: string;
   signal: DishaSignal;
   selectedLenses: LensName[];
   lensResults: DishaLensResult[];
+  componentFailures: MissionComponentFailure[];
+  degraded: boolean;
   fusedIntelligence: FusionResult;
   fusedSummary: string;
   riskScore: number;
@@ -80,13 +88,27 @@ export async function runMission(input: MissionInput): Promise<MissionResult> {
     output: selected.map((lens) => lens.name),
   })).eventId);
 
-  const lensResults = await Promise.all(selected.map((lens) => lens.analyze(signal)));
+  const settled = await Promise.allSettled(selected.map((lens) => lens.analyze(signal)));
+  const lensResults: DishaLensResult[] = [];
+  const componentFailures: MissionComponentFailure[] = [];
+  settled.forEach((outcome, index) => {
+    if (outcome.status === "fulfilled") {
+      lensResults.push(outcome.value);
+      return;
+    }
+    componentFailures.push({
+      component: selected[index].name,
+      stage: "lens_analysis",
+      error: outcome.reason instanceof Error ? outcome.reason.message : String(outcome.reason),
+    });
+  });
+
   eventIds.push((await appendEvidenceEvent({
     missionId: signal.missionId ?? signal.id,
     actor: "disha-orchestrator",
-    action: "lens_analysis_completed",
+    action: componentFailures.length ? "lens_analysis_partially_completed" : "lens_analysis_completed",
     input: selected.map((lens) => lens.name),
-    output: lensResults,
+    output: { lensResults, componentFailures },
     lensResults: lensResults.map((result) => result.lens),
   })).eventId);
 
@@ -95,7 +117,7 @@ export async function runMission(input: MissionInput): Promise<MissionResult> {
     missionId: signal.missionId ?? signal.id,
     actor: "policy-gate",
     action: "policy_decision_made",
-    input: { signal, lensResults },
+    input: { signal, lensResults, componentFailures },
     output: policyDecision,
     policyDecision,
     lensResults: lensResults.map((result) => result.lens),
@@ -103,12 +125,14 @@ export async function runMission(input: MissionInput): Promise<MissionResult> {
   eventIds.push(policyEvent.eventId);
   const responsePolicyDecision = { ...policyDecision, evidenceEventId: policyEvent.eventId };
 
-  const fusedIntelligence = fuseLensResults(lensResults);
+  const fusedIntelligence = fuseLensResults(lensResults, componentFailures);
   const result: MissionResult = {
     missionId: signal.missionId ?? signal.id,
     signal,
     selectedLenses: selected.map((lens) => lens.name),
     lensResults,
+    componentFailures,
+    degraded: componentFailures.length > 0,
     fusedIntelligence,
     fusedSummary: renderFusionSummary(fusedIntelligence),
     riskScore: Math.max(signal.riskContext.actionRisk, ...lensResults.map((item) => item.riskScore)),
@@ -194,7 +218,7 @@ function sensitivityRisk(sensitivity: DishaSignal["context"]["sensitivity"]): nu
   return 0.1;
 }
 
-function fuseLensResults(results: DishaLensResult[]): FusionResult {
+function fuseLensResults(results: DishaLensResult[], failures: MissionComponentFailure[] = []): FusionResult {
   const sortedFindings = results
     .flatMap((result) => result.findings.map((finding) => ({ ...finding, lens: result.lens, riskScore: result.riskScore })))
     .sort((a, b) => severityRank(b.severity) - severityRank(a.severity) || b.riskScore - a.riskScore);
@@ -208,6 +232,7 @@ function fuseLensResults(results: DishaLensResult[]): FusionResult {
   const uncertainty = [
     ...results.filter((result) => result.confidence < 0.6).map((result) => `${result.lens}: low confidence ${result.confidence.toFixed(2)}`),
     ...verifyRequiredItems,
+    ...failures.map((failure) => `${failure.component}: unavailable during ${failure.stage}`),
   ];
   const confidence = results.length
     ? Number((results.reduce((sum, result) => sum + result.confidence, 0) / results.length).toFixed(2))
