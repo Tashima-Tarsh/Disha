@@ -1,7 +1,8 @@
 import { hashValue } from "./hash";
+import { hasSourceParser, getSourceParserKey } from "./source-parsers";
 import { getSourceDefinition, listSourceRegistry, type SourceDefinition } from "./source-registry";
 
-export type ParserStatus = "ready_manifest" | "parser_required" | "auth_required" | "blocked";
+export type ParserStatus = "ready_manifest" | "parser_ready" | "parser_required" | "auth_required" | "blocked";
 
 export type SourceParserPlan = {
   sourceId: string;
@@ -11,6 +12,7 @@ export type SourceParserPlan = {
   status: ParserStatus;
   openSource: boolean;
   expectedRecords: string[];
+  parserAvailable: boolean;
   claimLevelProvenance: boolean;
   updateMode: SourceDefinition["updateMode"];
   blockers: string[];
@@ -19,42 +21,52 @@ export type SourceParserPlan = {
 
 const priorityParserSources = [
   "cag-audit-index",
+  "egazette-india",
+  "india-code",
+  "cert-in-annual-reports",
+  "ncrb-crime-in-india",
+  "ndma",
   "india-budget",
   "gst-council-revenue",
-  "ncrb-crime-in-india",
-  "cert-in-annual-reports",
-  "egazette-india",
   "data-gov-in",
+  "api-setu",
   "lgd",
   "india-wris",
-  "ndma",
+  "bhuvan",
 ] as const;
 
 const parserExpectations: Record<string, string[]> = {
   "cag-audit-index": ["audit report metadata", "ministry/state", "report year", "pdf link", "finding references"],
+  "egazette-india": ["gazette id", "publication date", "ministry/department", "part/section", "pdf link"],
+  "india-code": ["act/rule title", "document link", "publication metadata", "status/amendment references"],
+  "cert-in-annual-reports": ["report year", "incident category", "annual count table", "report link"],
+  "ncrb-crime-in-india": ["report year", "state/UT table", "crime head", "official table reference"],
+  ndma: ["guideline/report title", "hazard type", "publication date", "source link"],
   "india-budget": ["budget year", "ministry demand", "receipt/expenditure table", "document link"],
   "gst-council-revenue": ["release month", "gross GST revenue", "state-wise table when published", "PIB/reference link"],
-  "ncrb-crime-in-india": ["report year", "state/UT table", "crime head", "official table reference"],
-  "cert-in-annual-reports": ["report year", "incident category", "annual count table", "report link"],
-  "egazette-india": ["gazette id", "publication date", "ministry/department", "part/section", "pdf link"],
   "data-gov-in": ["resource id", "API endpoint", "license", "dataset owner", "field schema"],
+  "api-setu": ["API title", "provider", "endpoint/reference", "access metadata"],
   lgd: ["state", "district", "local body", "LGD code", "effective status"],
   "india-wris": ["basin/river", "station or reservoir", "time period", "source layer/link"],
-  ndma: ["guideline/report title", "hazard type", "publication date", "source link"],
+  bhuvan: ["layer title", "geospatial layer/reference", "provider", "source link"],
 };
 
 export function listSourceParserPlans(): SourceParserPlan[] {
   return priorityParserSources.map((sourceId) => {
     const source = getSourceDefinition(sourceId);
-    if (!source) {
-      return buildMissingPlan(sourceId);
-    }
+    if (!source) return buildMissingPlan(sourceId);
+
     const openSource = source.endpoints.every((endpoint) => !endpoint.requiresAuth);
-    const status: ParserStatus = source.updateMode === "live_probe"
-      ? "ready_manifest"
-      : openSource
-        ? "parser_required"
-        : "auth_required";
+    const parserAvailable = hasSourceParser(source.sourceId);
+    const parserKey = getSourceParserKey(source.sourceId) ?? source.sourceId.replaceAll("-", "_");
+    const status: ParserStatus = !openSource
+      ? "auth_required"
+      : parserAvailable
+        ? "parser_ready"
+        : source.updateMode === "live_probe"
+          ? "ready_manifest"
+          : "parser_required";
+
     const blockers = [
       ...source.knownLimitations,
       ...(status === "parser_required" ? ["Dataset-specific parser and fixture tests are required before dashboard values can be published."] : []),
@@ -64,11 +76,12 @@ export function listSourceParserPlans(): SourceParserPlan[] {
       sourceId: source.sourceId,
       sourceName: source.sourceName,
       domain: source.domain,
-      parserKey: source.sourceId.replaceAll("-", "_"),
+      parserKey,
       status,
       openSource,
       expectedRecords: parserExpectations[source.sourceId] ?? ["source metadata", "document link", "retrieval timestamp"],
-      claimLevelProvenance: false,
+      parserAvailable,
+      claimLevelProvenance: parserAvailable,
       updateMode: source.updateMode,
       blockers,
     };
@@ -88,11 +101,12 @@ export function summarizeIngestionReadiness() {
     prioritySources: plans.length,
     registryCoverage: plans.filter((plan) => registeredSourceIds.has(plan.sourceId)).length,
     readyManifest: plans.filter((plan) => plan.status === "ready_manifest").length,
+    parserReady: plans.filter((plan) => plan.status === "parser_ready").length,
     parserRequired: plans.filter((plan) => plan.status === "parser_required").length,
     authRequired: plans.filter((plan) => plan.status === "auth_required").length,
     blocked: plans.filter((plan) => plan.status === "blocked").length,
     noSyntheticRows: true,
-    publicationRule: "A dashboard number can be published only after a parser emits claim-level provenance.",
+    publicationRule: "A dashboard number can be published only after a governed parser emits claim-level provenance from a retrieved official source payload.",
     plans,
   };
 }
@@ -106,6 +120,7 @@ function buildMissingPlan(sourceId: string): SourceParserPlan {
     status: "blocked" as const,
     openSource: false,
     expectedRecords: [],
+    parserAvailable: false,
     claimLevelProvenance: false,
     updateMode: "manual_review_required" as const,
     blockers: ["Source is not registered in source-registry.ts."],
