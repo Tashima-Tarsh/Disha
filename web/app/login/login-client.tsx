@@ -1,6 +1,7 @@
 "use client";
 
 import { Fingerprint, HeartPulse, KeyRound, Loader2, ScanEye, ShieldCheck, X } from "lucide-react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
 
@@ -51,18 +52,17 @@ export function LoginClient({ returnUrl }: { returnUrl: string }) {
   return (
     <main className={styles.shell}>
       <section className={styles.stage} aria-label="DISHA 6.6 secure access">
-        <img
+        <Image
           alt="DISHA 6.6 secure access showing iris, fingerprint and heartbeat verification"
           className={styles.hero}
+          height={1024}
+          priority
           src="/disha-login-hero.webp"
+          unoptimized
+          width={1536}
         />
 
-        <button
-          aria-label="Secure Access"
-          className={styles.secureHotspot}
-          onClick={() => open("biometric")}
-          type="button"
-        />
+        <button aria-label="Secure Access" className={styles.secureHotspot} onClick={() => open("biometric")} type="button" />
 
         <button className={styles.godAdminTrigger} onClick={() => open("admin")} type="button">
           <KeyRound size={15} /> God Admin
@@ -76,29 +76,12 @@ export function LoginClient({ returnUrl }: { returnUrl: string }) {
             <p className={styles.eyebrow}>DISHA SECURE ACCESS</p>
             <h1 id="biometric-title">Three-factor biometric verification</h1>
             <p className={styles.summary}>Identity is granted only after the required biometric and trusted-hardware factors are verified by the backend.</p>
-
             <div className={styles.factorGrid}>
-              <article className={styles.factorCard}>
-                <ScanEye size={25} />
-                <div><strong>Iris</strong><span>Windows Hello / WebAuthn authenticator</span></div>
-                <small>Backend verification required</small>
-              </article>
-              <article className={styles.factorCard}>
-                <Fingerprint size={25} />
-                <div><strong>Fingerprint</strong><span>Windows Hello / WebAuthn authenticator</span></div>
-                <small>Backend verification required</small>
-              </article>
-              <article className={styles.factorCard}>
-                <HeartPulse size={25} />
-                <div><strong>Heart Beat</strong><span>Trusted external hardware connector</span></div>
-                <small>Signed connector result required</small>
-              </article>
+              <article className={styles.factorCard}><ScanEye size={25} /><div><strong>Iris</strong><span>Windows Hello / WebAuthn authenticator</span></div><small>Backend verification required</small></article>
+              <article className={styles.factorCard}><Fingerprint size={25} /><div><strong>Fingerprint</strong><span>Windows Hello / WebAuthn authenticator</span></div><small>Backend verification required</small></article>
+              <article className={styles.factorCard}><HeartPulse size={25} /><div><strong>Heart Beat</strong><span>Trusted external hardware connector</span></div><small>Signed connector result required</small></article>
             </div>
-
-            <div className={styles.policyNote}>
-              <ShieldCheck size={18} />
-              <span>DISHA will not mark a factor verified from browser UI alone. The factor must be validated by the corresponding backend verifier.</span>
-            </div>
+            <div className={styles.policyNote}><ShieldCheck size={18} /><span>DISHA will not mark a factor verified from browser UI alone. The factor must be validated by the corresponding backend verifier.</span></div>
           </section>
         ) : null}
 
@@ -109,19 +92,10 @@ export function LoginClient({ returnUrl }: { returnUrl: string }) {
             <h1 id="admin-title">God Admin</h1>
             <p className={styles.summary}>This path is restricted to the designated DISHA administrator account.</p>
             <form className={styles.adminForm} onSubmit={signInAsGodAdmin}>
-              <label>
-                Administrator
-                <input aria-readonly="true" readOnly type="email" value={GOD_ADMIN_EMAIL} />
-              </label>
-              <label>
-                Password
-                <input autoComplete="current-password" minLength={8} onChange={(event) => setPassword(event.target.value)} required type="password" value={password} />
-              </label>
+              <label>Administrator<input aria-readonly="true" readOnly type="email" value={GOD_ADMIN_EMAIL} /></label>
+              <label>Password<input autoComplete="current-password" minLength={8} onChange={(event) => setPassword(event.target.value)} required type="password" value={password} /></label>
               {error ? <p className={styles.error}>{error}</p> : null}
-              <button disabled={state === "submitting"} type="submit">
-                {state === "submitting" ? <Loader2 className={styles.spin} size={18} /> : <KeyRound size={18} />}
-                Enter as God Admin
-              </button>
+              <button disabled={state === "submitting"} type="submit">{state === "submitting" ? <Loader2 className={styles.spin} size={18} /> : <KeyRound size={18} />}Enter as God Admin</button>
             </form>
           </section>
         ) : null}
