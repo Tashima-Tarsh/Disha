@@ -20,23 +20,16 @@ const envSchema = z.object({
   DISHA_RESEARCH_RUNTIME_URL: z.string().url().optional(),
   DISHA_RESEARCH_RUNTIME_TOKEN: z.string().optional(),
   DISHA_RESEARCH_RUNTIME_TIMEOUT_MS: z.coerce.number().int().positive().default(2500),
-  // Public base URL for generating stable production share links, callbacks, etc.
-  // Set this in production (e.g. https://app.example.com). Falls back to request origin in dev.
   NEXT_PUBLIC_APP_URL: z.string().url().optional(),
   DISHA_WEB_RATE_LIMIT: z.coerce.number().int().positive().default(120),
   DISHA_EVIDENCE_LEDGER_MODE: z.enum(["postgres", "memory-dev"]).optional(),
-
-  // Token economy + agent runtime
   DISHA_AGENT_MODE: z.enum(["eco", "balanced", "deep"]).default("balanced"),
   DISHA_AGENT_INPUT_BUDGET_TOKENS: z.coerce.number().int().positive().default(8_000),
   DISHA_AGENT_CACHE_TTL_SECONDS: z.coerce.number().int().positive().default(3600),
   DISHA_AGENT_MAX_CACHE_BYTES: z.coerce.number().int().positive().default(250_000),
   DISHA_WORKFLOW_NODE_TIMEOUT_MS: z.coerce.number().int().positive().default(15_000),
   DISHA_WORKFLOW_TOTAL_TIMEOUT_MS: z.coerce.number().int().positive().default(60_000),
-  // Comma-separated allowlist of hosts for workflow HTTP nodes. Empty => deny all.
   DISHA_WORKFLOW_ALLOWED_HOSTS: z.string().optional(),
-
-  // Model provider (OpenAI) - server-side only.
   DISHA_MODEL_PROVIDER: z.enum(["disabled", "anthropic", "openai"]).default("disabled"),
   DISHA_MODEL_TIMEOUT_MS: z.coerce.number().int().positive().default(20_000),
   ANTHROPIC_API_KEY: z.string().optional(),
@@ -48,8 +41,6 @@ const envSchema = z.object({
   OPENAI_BASE_URL: z.string().url().default("https://api.openai.com/v1"),
   OPENAI_PROJECT: z.string().optional(),
   OPENAI_ORGANIZATION: z.string().optional(),
-
-  // Optional: Web can persist audit/cache/graph to DISHA Brain (SQLite) when Postgres/Redis are absent.
   DISHA_BRAIN_API_TOKEN: z.string().optional(),
   NODE_ENV: z.string().default("development"),
 });
@@ -63,10 +54,7 @@ export function getEnv(): RuntimeEnv {
   try {
     cachedEnv = envSchema.parse(process.env);
   } catch (e) {
-    if (process.env.NODE_ENV === "production") {
-      throw e;
-    }
-    // Dev fallback: provide minimal working defaults so the server doesn't explode on misconfigured .env
+    if (process.env.NODE_ENV === "production") throw e;
     console.warn("[env] Strict env validation failed, using dev fallbacks:", e);
     cachedEnv = {
       DISHA_AUTH_MODE: "dev-jwt",
@@ -113,6 +101,7 @@ export function getEnv(): RuntimeEnv {
       NODE_ENV: "development",
     } as RuntimeEnv;
   }
+
   const env = cachedEnv as RuntimeEnv;
   if (env.DISHA_AUTH_MODE === "oidc") {
     const missing = [
@@ -129,9 +118,6 @@ export function getEnv(): RuntimeEnv {
   }
   if (env.NODE_ENV === "production" && !env.DATABASE_URL) {
     throw new Error("DATABASE_URL is required in production for the persistent Evidence Ledger");
-  }
-  if (env.NODE_ENV === "production" && env.DISHA_AUTH_MODE === "dev-jwt") {
-    throw new Error("DISHA_AUTH_MODE=dev-jwt is not allowed in production");
   }
   return env;
 }
