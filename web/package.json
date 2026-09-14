@@ -25,8 +25,12 @@
     "@radix-ui/react-switch": "^1.2.6",
     "@radix-ui/react-tabs": "^1.1.13",
     "@radix-ui/react-toast": "^1.2.17",
+dependabot/npm_and_yarn/web/radix-ui/react-tooltip-1.2.12
+    "@radix-ui/react-tooltip": "^1.2.12",
+    "@tanstack/react-virtual": "^3.13.23",
     "@radix-ui/react-tooltip": "^1.2.8",
     "@tanstack/react-virtual": "^3.14.5",
+main
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "framer-motion": "^12.38.0",
