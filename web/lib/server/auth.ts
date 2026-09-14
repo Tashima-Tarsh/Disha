@@ -122,8 +122,8 @@ export function requirePrincipal(req: NextRequest): Principal {
 
 export async function devLogin(email: string, password: string) {
   const env = getEnv();
-  if (env.DISHA_AUTH_MODE !== "dev-jwt") {
-    throw Object.assign(new Error("Password login is disabled in OIDC mode"), { status: 403 });
+  if (env.NODE_ENV === "production" || env.DISHA_AUTH_MODE !== "dev-jwt") {
+    throw Object.assign(new Error("Development password login is disabled"), { status: 403 });
   }
   const expected = env.DISHA_DEV_PASSWORD ?? "change-me-in-env";
   if (password !== expected) throw Object.assign(new Error("Invalid credentials"), { status: 401 });

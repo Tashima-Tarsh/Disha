@@ -66,6 +66,22 @@ describe("schemas", () => {
   });
 });
 
+describe("God Admin configuration", () => {
+  it("accepts a dedicated God Admin password only from environment configuration", () => {
+    vi.stubEnv("NODE_ENV", "test");
+    vi.stubEnv("DISHA_GOD_ADMIN_PASSWORD", "admin-secret-123");
+    resetEnvForTests();
+    expect(getEnv().DISHA_GOD_ADMIN_PASSWORD).toBe("admin-secret-123");
+  });
+
+  it("does not invent a God Admin password when none is configured", () => {
+    vi.stubEnv("NODE_ENV", "test");
+    vi.stubEnv("DISHA_GOD_ADMIN_PASSWORD", "");
+    resetEnvForTests();
+    expect(getEnv().DISHA_GOD_ADMIN_PASSWORD).toBeUndefined();
+  });
+});
+
 describe("production environment hardening", () => {
   it("does not use dev fallback configuration in production", () => {
     vi.stubEnv("NODE_ENV", "production");

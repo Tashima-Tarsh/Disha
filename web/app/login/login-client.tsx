@@ -1,248 +1,105 @@
 "use client";
 
-import { ArrowRight, Building2, KeyRound, Landmark, Loader2, MessageSquareText, ShieldCheck, Smartphone } from "lucide-react";
+import { Fingerprint, HeartPulse, KeyRound, Loader2, ScanEye, ShieldCheck, X } from "lucide-react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
 
 import styles from "./login.module.css";
 
-type LoginState = "idle" | "submitting" | "success" | "error";
-type LoginMode = "mobile" | "meri-pehchan" | "intra-id" | "password";
+type Panel = "none" | "biometric" | "admin";
+type SubmitState = "idle" | "submitting" | "error";
 
-export function LoginClient({ initialMode, returnUrl }: { initialMode: "mobile" | "password"; returnUrl: string }) {
+const GOD_ADMIN_EMAIL = "nitish@thenitishkr.in";
+
+export function LoginClient({ returnUrl }: { returnUrl: string }) {
   const router = useRouter();
-  const [email, setEmail] = useState("nitish@thenitishkr.in");
+  const [panel, setPanel] = useState<Panel>("none");
   const [password, setPassword] = useState("");
-  const [mobile, setMobile] = useState("");
-  const [otp, setOtp] = useState("");
-  const [devOtp, setDevOtp] = useState<string | null>(null);
-  const [mode, setMode] = useState<LoginMode>(initialMode);
-  const [state, setState] = useState<LoginState>("idle");
+  const [state, setState] = useState<SubmitState>("idle");
   const [error, setError] = useState<string | null>(null);
 
-  async function onSubmit(event: FormEvent<HTMLFormElement>) {
+  function open(next: Panel) {
+    setPanel(next);
+    setError(null);
+    setState("idle");
+  }
+
+  async function signInAsGodAdmin(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setState("submitting");
     setError(null);
 
     try {
-      const response = await fetch("/api/auth/login", {
+      const response = await fetch("/api/auth/god-admin", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email: GOD_ADMIN_EMAIL, password }),
       });
       const payload = await response.json().catch(() => null);
-      if (!response.ok) throw new Error(readAuthError(payload, response.status));
-      setState("success");
+      if (!response.ok) {
+        const message = payload?.error?.message ?? payload?.error ?? "God Admin authentication failed.";
+        throw new Error(message);
+      }
       router.replace(returnUrl);
       router.refresh();
     } catch (caught) {
       setState("error");
-      setError(caught instanceof Error ? caught.message : "Sign in failed.");
-    }
-  }
-
-  async function requestOtp() {
-    setState("submitting");
-    setError(null);
-    setDevOtp(null);
-    try {
-      const response = await fetch("/api/auth/otp/request", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ mobile }),
-      });
-      const payload = await response.json();
-      if (!response.ok) throw new Error(readAuthError(payload, response.status));
-      setDevOtp(payload.otp?.devCode ?? null);
-      setState("idle");
-    } catch (caught) {
-      setState("error");
-      setError(caught instanceof Error ? caught.message : "OTP request failed.");
-    }
-  }
-
-  async function verifyOtp(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    setState("submitting");
-    setError(null);
-    try {
-      const response = await fetch("/api/auth/otp/verify", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ mobile, code: otp }),
-      });
-      const payload = await response.json().catch(() => null);
-      if (!response.ok) throw new Error(readAuthError(payload, response.status));
-      setState("success");
-      router.replace(returnUrl);
-      router.refresh();
-    } catch (caught) {
-      setState("error");
-      setError(caught instanceof Error ? caught.message : "OTP verification failed.");
-    }
-  }
-
-  async function startProvider(provider: "meri-pehchan" | "intra-id") {
-    setMode(provider);
-    setState("submitting");
-    setError(null);
-    try {
-      const params = new URLSearchParams({ provider, returnUrl });
-      const response = await fetch(`/api/auth/oidc/start?${params.toString()}`, {
-        headers: { Accept: "application/json" },
-      });
-      const payload = await response.json();
-      if (!response.ok) throw new Error(readAuthError(payload, response.status));
-      if (!payload.redirectUrl) throw new Error("Provider did not return a redirect URL.");
-      window.location.assign(payload.redirectUrl);
-    } catch (caught) {
-      setState("error");
-      setError(caught instanceof Error ? caught.message : "Provider sign-in is not configured.");
+      setError(caught instanceof Error ? caught.message : "God Admin authentication failed.");
     }
   }
 
   return (
     <main className={styles.shell}>
-      <section className={styles.accessFrame}>
-        <aside className={styles.brandPanel}>
-          <div className={styles.emblemRow}>
-            <span className={styles.mark}>
-              <Landmark size={25} />
-            </span>
-            <span className={styles.livePill}>LIVE</span>
-          </div>
-          <div className={styles.brandTitle}>
-            <p>DISHA</p>
-            <h1>6.6</h1>
-            <span>Secure Mission Access</span>
-          </div>
-          <div className={styles.motionPanel} aria-hidden="true">
-            <i />
-            <i />
-            <i />
-            <i />
-          </div>
-          <div className={styles.brandStrip}>
-            <span>Meri Pehchan</span>
-            <span>Intra ID</span>
-            <span>OTP</span>
-          </div>
-        </aside>
+      <section className={styles.stage} aria-label="DISHA 6.6 secure access">
+        <Image
+          alt="DISHA 6.6 secure access showing iris, fingerprint and heartbeat verification"
+          className={styles.hero}
+          height={1024}
+          priority
+          src="/disha-login-hero.webp"
+          unoptimized
+          width={1536}
+        />
 
-        <div className={styles.card}>
-          <div className={styles.identity}>
-            <p>Authentication</p>
-            <h2>Choose access mode</h2>
-          </div>
+        <button aria-label="Secure Access" className={styles.secureHotspot} onClick={() => open("biometric")} type="button" />
 
-          <div className={styles.providerGrid}>
-            <button className={styles.providerButton} data-active={mode === "meri-pehchan"} type="button" onClick={() => startProvider("meri-pehchan")}>
-              <Building2 size={19} />
-              <span><strong>Meri Pehchan</strong><small>Gov ID</small></span>
-            </button>
-            <button className={styles.providerButton} data-active={mode === "intra-id"} type="button" onClick={() => startProvider("intra-id")}>
-              <Landmark size={19} />
-              <span><strong>Intra ID</strong><small>Institution</small></span>
-            </button>
-          </div>
+        <button className={styles.godAdminTrigger} onClick={() => open("admin")} type="button">
+          <KeyRound size={15} /> God Admin
+        </button>
 
-          <div className={styles.modeTabs} role="tablist" aria-label="Login methods">
-            <button data-active={mode === "mobile"} type="button" onClick={() => setMode("mobile")}><Smartphone size={16} /> Mobile OTP</button>
-            <button data-active={mode === "password"} type="button" onClick={() => setMode("password")}><KeyRound size={16} /> Access Key</button>
-          </div>
+        {panel !== "none" ? <button aria-label="Close access panel" className={styles.backdrop} onClick={() => open("none")} type="button" /> : null}
 
-          {mode === "mobile" ? (
-            <form className={styles.form} onSubmit={verifyOtp}>
-              <label>
-                Mobile number
-                <input
-                  autoComplete="tel"
-                  inputMode="tel"
-                  name="mobile"
-                  onChange={(event) => setMobile(event.target.value)}
-                  placeholder="+91XXXXXXXXXX"
-                  required
-                  type="tel"
-                  value={mobile}
-                />
-              </label>
-              <div className={styles.otpRow}>
-                <label>
-                  OTP
-                  <input
-                    autoComplete="one-time-code"
-                    inputMode="numeric"
-                    maxLength={6}
-                    minLength={6}
-                    name="otp"
-                    onChange={(event) => setOtp(event.target.value.replace(/\D/g, "").slice(0, 6))}
-                    placeholder="000000"
-                    required
-                    type="text"
-                    value={otp}
-                  />
-                </label>
-                <button className={styles.secondaryButton} disabled={state === "submitting" || mobile.trim().length < 10} type="button" onClick={requestOtp}>
-                  <MessageSquareText size={16} />
-                  Send
-                </button>
-              </div>
-              {devOtp ? <p className={styles.devOtp}>OTP <strong>{devOtp}</strong></p> : null}
+        {panel === "biometric" ? (
+          <section className={styles.accessPanel} aria-labelledby="biometric-title">
+            <button aria-label="Close" className={styles.closeButton} onClick={() => open("none")} type="button"><X size={18} /></button>
+            <p className={styles.eyebrow}>DISHA SECURE ACCESS</p>
+            <h1 id="biometric-title">Three-factor biometric verification</h1>
+            <p className={styles.summary}>Identity is granted only after the required biometric and trusted-hardware factors are verified by the backend.</p>
+            <div className={styles.factorGrid}>
+              <article className={styles.factorCard}><ScanEye size={25} /><div><strong>Iris</strong><span>Windows Hello / WebAuthn authenticator</span></div><small>Backend verification required</small></article>
+              <article className={styles.factorCard}><Fingerprint size={25} /><div><strong>Fingerprint</strong><span>Windows Hello / WebAuthn authenticator</span></div><small>Backend verification required</small></article>
+              <article className={styles.factorCard}><HeartPulse size={25} /><div><strong>Heart Beat</strong><span>Trusted external hardware connector</span></div><small>Signed connector result required</small></article>
+            </div>
+            <div className={styles.policyNote}><ShieldCheck size={18} /><span>DISHA will not mark a factor verified from browser UI alone. The factor must be validated by the corresponding backend verifier.</span></div>
+          </section>
+        ) : null}
+
+        {panel === "admin" ? (
+          <section className={styles.adminPanel} aria-labelledby="admin-title">
+            <button aria-label="Close" className={styles.closeButton} onClick={() => open("none")} type="button"><X size={18} /></button>
+            <p className={styles.eyebrow}>PRIVILEGED ACCESS</p>
+            <h1 id="admin-title">God Admin</h1>
+            <p className={styles.summary}>This path is restricted to the designated DISHA administrator account.</p>
+            <form className={styles.adminForm} onSubmit={signInAsGodAdmin}>
+              <label>Administrator<input aria-readonly="true" readOnly type="email" value={GOD_ADMIN_EMAIL} /></label>
+              <label>Password<input autoComplete="current-password" minLength={8} onChange={(event) => setPassword(event.target.value)} required type="password" value={password} /></label>
               {error ? <p className={styles.error}>{error}</p> : null}
-              <button disabled={state === "submitting" || otp.length !== 6} type="submit">
-                {state === "submitting" ? <Loader2 className={styles.spin} size={17} /> : <ShieldCheck size={17} />}
-                Enter DISHA
-                <ArrowRight size={17} />
-              </button>
+              <button disabled={state === "submitting"} type="submit">{state === "submitting" ? <Loader2 className={styles.spin} size={18} /> : <KeyRound size={18} />}Enter as God Admin</button>
             </form>
-          ) : null}
-
-          {mode === "password" ? (
-            <form action="/api/auth/login/form" className={styles.form} method="post">
-              <input name="returnUrl" type="hidden" value={returnUrl} />
-              <label>
-                Email
-                <input
-                  autoComplete="email"
-                  inputMode="email"
-                  name="email"
-                  onChange={(event) => setEmail(event.target.value)}
-                  required
-                  type="email"
-                  value={email}
-                />
-              </label>
-              <label>
-                Password
-                <input
-                  autoComplete="current-password"
-                  minLength={12}
-                  name="password"
-                  onChange={(event) => setPassword(event.target.value)}
-                  required
-                  type="password"
-                  value={password}
-                />
-              </label>
-              {error ? <p className={styles.error}>{error}</p> : null}
-              <button disabled={state === "submitting"} type="submit">
-                {state === "submitting" ? <Loader2 className={styles.spin} size={17} /> : <ShieldCheck size={17} />}
-                Enter DISHA
-                <ArrowRight size={17} />
-              </button>
-            </form>
-          ) : null}
-        </div>
+          </section>
+        ) : null}
       </section>
     </main>
   );
-}
-
-function readAuthError(payload: unknown, status: number) {
-  if (payload && typeof payload === "object" && "error" in payload) {
-    const error = (payload as { error?: { message?: string } }).error;
-    if (error?.message) return error.message;
-  }
-  return status === 401 ? "Invalid email or password." : `Sign in failed with status ${status}.`;
 }

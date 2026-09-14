@@ -4,6 +4,7 @@ const envSchema = z.object({
   DISHA_AUTH_MODE: z.enum(["dev-jwt", "oidc"]).default("dev-jwt"),
   DISHA_JWT_SECRET: z.string().min(32).optional(),
   DISHA_DEV_PASSWORD: z.string().min(12).optional(),
+  DISHA_GOD_ADMIN_PASSWORD: z.string().min(8).optional(),
   DISHA_OIDC_ISSUER: z.string().url().optional(),
   DISHA_OIDC_CLIENT_ID: z.string().optional(),
   DISHA_OIDC_CLIENT_SECRET: z.string().optional(),
@@ -19,23 +20,16 @@ const envSchema = z.object({
   DISHA_RESEARCH_RUNTIME_URL: z.string().url().optional(),
   DISHA_RESEARCH_RUNTIME_TOKEN: z.string().optional(),
   DISHA_RESEARCH_RUNTIME_TIMEOUT_MS: z.coerce.number().int().positive().default(2500),
-  // Public base URL for generating stable production share links, callbacks, etc.
-  // Set this in production (e.g. https://app.example.com). Falls back to request origin in dev.
   NEXT_PUBLIC_APP_URL: z.string().url().optional(),
   DISHA_WEB_RATE_LIMIT: z.coerce.number().int().positive().default(120),
   DISHA_EVIDENCE_LEDGER_MODE: z.enum(["postgres", "memory-dev"]).optional(),
-
-  // Token economy + agent runtime
   DISHA_AGENT_MODE: z.enum(["eco", "balanced", "deep"]).default("balanced"),
   DISHA_AGENT_INPUT_BUDGET_TOKENS: z.coerce.number().int().positive().default(8_000),
   DISHA_AGENT_CACHE_TTL_SECONDS: z.coerce.number().int().positive().default(3600),
   DISHA_AGENT_MAX_CACHE_BYTES: z.coerce.number().int().positive().default(250_000),
   DISHA_WORKFLOW_NODE_TIMEOUT_MS: z.coerce.number().int().positive().default(15_000),
   DISHA_WORKFLOW_TOTAL_TIMEOUT_MS: z.coerce.number().int().positive().default(60_000),
-  // Comma-separated allowlist of hosts for workflow HTTP nodes. Empty => deny all.
   DISHA_WORKFLOW_ALLOWED_HOSTS: z.string().optional(),
-
-  // Model provider (OpenAI) - server-side only.
   DISHA_MODEL_PROVIDER: z.enum(["disabled", "anthropic", "openai"]).default("disabled"),
   DISHA_MODEL_TIMEOUT_MS: z.coerce.number().int().positive().default(20_000),
   ANTHROPIC_API_KEY: z.string().optional(),
@@ -47,8 +41,6 @@ const envSchema = z.object({
   OPENAI_BASE_URL: z.string().url().default("https://api.openai.com/v1"),
   OPENAI_PROJECT: z.string().optional(),
   OPENAI_ORGANIZATION: z.string().optional(),
-
-  // Optional: Web can persist audit/cache/graph to DISHA Brain (SQLite) when Postgres/Redis are absent.
   DISHA_BRAIN_API_TOKEN: z.string().optional(),
   NODE_ENV: z.string().default("development"),
 });
@@ -62,15 +54,13 @@ export function getEnv(): RuntimeEnv {
   try {
     cachedEnv = envSchema.parse(process.env);
   } catch (e) {
-    if (process.env.NODE_ENV === "production") {
-      throw e;
-    }
-    // Dev fallback: provide minimal working defaults so the server doesn't explode on misconfigured .env
+    if (process.env.NODE_ENV === "production") throw e;
     console.warn("[env] Strict env validation failed, using dev fallbacks:", e);
     cachedEnv = {
       DISHA_AUTH_MODE: "dev-jwt",
       DISHA_JWT_SECRET: "dev-jwt-secret-for-local-testing-32bytes-long-enough",
       DISHA_DEV_PASSWORD: "devpassword1234",
+      DISHA_GOD_ADMIN_PASSWORD: undefined,
       DISHA_OIDC_ISSUER: undefined,
       DISHA_OIDC_CLIENT_ID: undefined,
       DISHA_OIDC_CLIENT_SECRET: undefined,
@@ -88,7 +78,7 @@ export function getEnv(): RuntimeEnv {
       DISHA_RESEARCH_RUNTIME_TIMEOUT_MS: 2500,
       NEXT_PUBLIC_APP_URL: "https://disha.your-production-domain.com",
       DISHA_WEB_RATE_LIMIT: 120,
-  DISHA_EVIDENCE_LEDGER_MODE: "memory-dev",
+      DISHA_EVIDENCE_LEDGER_MODE: "memory-dev",
       DISHA_AGENT_MODE: "balanced",
       DISHA_AGENT_INPUT_BUDGET_TOKENS: 8000,
       DISHA_AGENT_CACHE_TTL_SECONDS: 3600,
@@ -111,6 +101,7 @@ export function getEnv(): RuntimeEnv {
       NODE_ENV: "development",
     } as RuntimeEnv;
   }
+
   const env = cachedEnv as RuntimeEnv;
   if (env.DISHA_AUTH_MODE === "oidc") {
     const missing = [
