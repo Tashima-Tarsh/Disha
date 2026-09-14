@@ -2,7 +2,7 @@ alter table source_ingestion_runs add column if not exists run_id text;
 alter table source_ingestion_runs add column if not exists record_count integer not null default 0;
 
 update source_ingestion_runs
-set run_id = encode(sha256((source_id || ':' || parser_key || ':' || started_at::text)::bytea), 'hex')
+set run_id = md5(source_id || ':' || parser_key || ':' || started_at::text)
 where run_id is null;
 
 alter table source_ingestion_runs alter column run_id set not null;
