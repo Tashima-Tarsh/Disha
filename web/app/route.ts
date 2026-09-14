@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 
-export function GET() {
-  return NextResponse.json({ status: "ok", service: "disha-web", version: "1.0.0" }, { status: 200 });
+export function GET(request: Request) {
+  return NextResponse.redirect(new URL("/login", request.url));
 }
-
