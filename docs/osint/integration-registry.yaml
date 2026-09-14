@@ -1,0 +1,75 @@
+version: 1
+updated_at: 2026-09-15
+integrations:
+  - id: public-dns-google
+    name: Google Public DNS-over-HTTPS
+    upstream: https://dns.google/
+    category: domain_dns
+    license: public_service_terms
+    maturity: production_candidate
+    activity: active_public_service
+    capabilities:
+      - passive_dns_resolution
+      - domain_infrastructure_relationships
+    integration_mode: https_adapter
+    risk: low
+    permissions:
+      - READ_PUBLIC
+    evidence_support: provenance_hash
+    status: implemented
+    notes: Passive public DNS only; no active scanning.
+
+  - id: public-certificate-transparency
+    name: crt.sh Certificate Transparency
+    upstream: https://crt.sh/
+    category: certificate_transparency
+    license: public_service_terms
+    maturity: production_candidate
+    activity: active_public_service
+    capabilities:
+      - public_certificate_discovery
+      - domain_certificate_relationships
+    integration_mode: https_adapter
+    risk: low
+    permissions:
+      - READ_PUBLIC
+    evidence_support: provenance_hash
+    status: implemented
+    notes: Public CT records only; output is deduplicated and bounded.
+
+  - id: official-public-source-probe
+    name: DISHA Official Public Source Probe
+    upstream: internal_allowlist
+    category: government_public_records
+    license: source_specific
+    maturity: production_candidate
+    activity: maintained_in_source_registry
+    capabilities:
+      - official_source_availability
+      - provenance_verification
+    integration_mode: governed_internal_adapter
+    risk: low
+    permissions:
+      - READ_PUBLIC
+    evidence_support: provenance_hash
+    status: implemented
+    notes: Only allowlisted unauthenticated GET endpoints from the DISHA source registry are reachable.
+
+  - id: rdap
+    name: RDAP
+    upstream: https://rdap.org/
+    category: domain_ip_asn
+    license: service_specific
+    maturity: research_required
+    activity: verify_before_enablement
+    capabilities:
+      - domain_registration_metadata
+      - ip_network_metadata
+      - asn_metadata
+    integration_mode: future_https_adapter
+    risk: low
+    permissions:
+      - READ_PUBLIC
+    evidence_support: planned
+    status: research_required
+    notes: Registry routing, terms, rate limits and authoritative-source preference must be verified before production enablement.
