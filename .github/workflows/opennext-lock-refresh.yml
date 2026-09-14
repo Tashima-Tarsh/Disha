@@ -19,13 +19,20 @@ jobs:
         with:
           ref: fix/opennext-dependency-lock
           token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
 
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: 24
-          cache: npm
-          cache-dependency-path: web/package-lock.json
+
+      - name: Match Cloudflare npm version
+        run: npm install --global npm@10.9.2
+
+      - name: Restore package metadata from main
+        run: |
+          git fetch origin main
+          git checkout origin/main -- web/package.json web/package-lock.json
 
       - name: Install OpenNext dependency and refresh lockfile
         working-directory: web
@@ -40,5 +47,5 @@ jobs:
             echo "No package metadata changes to commit."
             exit 0
           fi
-          git commit -m "fix: install OpenNext Cloudflare adapter"
+          git commit -m "fix: install OpenNext Cloudflare adapter with npm 10.9.2"
           git push origin HEAD:fix/opennext-dependency-lock
