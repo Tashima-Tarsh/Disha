@@ -17,6 +17,12 @@ const migrations = [
     upPath: path.join(databaseRoot, "schema.sql"),
     downPath: path.join(databaseRoot, "rollbacks/202607110001_core_schema_v1.down.sql"),
   },
+  {
+    version: "202609150001",
+    name: "ingestion_mission_durability",
+    upPath: path.join(databaseRoot, "202609150001_ingestion_mission_durability.sql"),
+    downPath: path.join(databaseRoot, "rollbacks/202609150001_ingestion_mission_durability.down.sql"),
+  },
 ];
 
 const requiredTables = [
@@ -26,7 +32,12 @@ const requiredTables = [
   "evidence_events",
   "mission_results",
   "source_ingestion_runs",
+  "source_records",
   "claim_provenance",
+  "missions",
+  "mission_analysis_snapshots",
+  "mission_approvals",
+  "model_call_audit",
   "extension_claim_records",
   "extension_memory_records",
 ];
@@ -35,6 +46,14 @@ const requiredIndexes = [
   "evidence_events_mission_chain_idx",
   "mission_results_user_updated_idx",
   "source_ingestion_runs_source_idx",
+  "source_ingestion_runs_run_id_idx",
+  "source_records_source_idx",
+  "source_records_run_idx",
+  "missions_user_updated_idx",
+  "missions_status_idx",
+  "mission_analysis_snapshots_mission_idx",
+  "mission_approvals_mission_idx",
+  "model_call_audit_mission_idx",
   "claim_provenance_source_idx",
   "extension_claim_records_mission_idx",
   "extension_claim_records_extension_idx",
