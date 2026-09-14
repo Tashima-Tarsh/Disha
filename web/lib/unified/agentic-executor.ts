@@ -1,6 +1,7 @@
 import { appendEvidenceEvent } from "./evidence-ledger";
 import { runGovernedExtensions, type GovernedExtensionRun } from "../extensions";
 import { learnFromMission, type LearningMemoryRecord } from "./learning-memory";
+import { persistModelCallAudit } from "./model-call-audit";
 import { runModelIntelligence, type ModelIntelligenceResult } from "./model-provider";
 import { runMission, type MissionInput, type MissionResult } from "./orchestrator";
 
@@ -21,7 +22,9 @@ export async function runAgenticMission(input: AgenticMissionInput): Promise<Age
   const governedExtensions = await runGovernedExtensions(mission);
   mission.evidenceEventIds = [...mission.evidenceEventIds, ...governedExtensions.evidenceEventIds];
 
-  const modelIntelligence = await runModelIntelligence({ mission, operatorInstruction: input.operatorInstruction });
+  const modelRequest = { mission, operatorInstruction: input.operatorInstruction };
+  const modelStartedAt = Date.now();
+  const modelIntelligence = await runModelIntelligence(modelRequest);
   const modelEvent = await appendEvidenceEvent({
     missionId: mission.missionId,
     actor: "model-intelligence-adapter",
@@ -41,6 +44,11 @@ export async function runAgenticMission(input: AgenticMissionInput): Promise<Age
     policyDecision: mission.policyDecision,
   });
   mission.evidenceEventIds = [...mission.evidenceEventIds, modelEvent.eventId];
+  await persistModelCallAudit({
+    request: modelRequest,
+    result: { ...modelIntelligence, evidenceEventIds: mission.evidenceEventIds },
+    startedAt: modelStartedAt,
+  });
 
   const learning = learnFromMission(mission, modelIntelligence);
   const learningEvent = await appendEvidenceEvent({
