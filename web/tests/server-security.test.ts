@@ -39,6 +39,11 @@ describe("crypto", () => {
     const token = signJson({ sub: "u1", exp: Math.floor(Date.now() / 1000) + 60 }, "a".repeat(32));
     expect(verifySignedJson(token, "a".repeat(32))).toMatchObject({ sub: "u1" });
   });
+
+  it("rejects malformed signatures without throwing a length error", () => {
+    const token = signJson({ sub: "u1", exp: Math.floor(Date.now() / 1000) + 60 }, "a".repeat(32));
+    expect(() => verifySignedJson(`${token}x`, "a".repeat(32))).toThrow("Invalid token signature");
+  });
 });
 
 describe("schemas", () => {

@@ -3,6 +3,7 @@ import { z } from "zod";
 
 import { exportEvidenceReport } from "@/lib/unified/evidence-ledger";
 import { withContext } from "@/lib/unified/api";
+import { canReadMission, getMission } from "@/lib/unified/orchestrator";
 
 const exportSchema = z.object({
   missionId: z.string().min(1),
@@ -11,6 +12,10 @@ const exportSchema = z.object({
 export async function POST(req: NextRequest) {
   return withContext(req, "export", async (ctx) => {
     const { missionId } = exportSchema.parse(await req.json());
+    const mission = await getMission(missionId);
+    if (!mission || !canReadMission(mission, ctx.principal)) {
+      return NextResponse.json({ error: "Mission not found" }, { status: 404 });
+    }
     return NextResponse.json(await exportEvidenceReport(missionId), { headers: { "X-Request-ID": ctx.requestId } });
   });
 }

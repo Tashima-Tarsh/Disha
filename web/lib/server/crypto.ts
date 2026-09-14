@@ -28,7 +28,12 @@ export function verifySignedJson(token: string, secret: string): Record<string, 
   const [header, body, signature] = token.split(".");
   if (!header || !body || !signature) throw new Error("Malformed token");
   const expected = crypto.createHmac("sha256", secret).update(`${header}.${body}`).digest("base64url");
-  if (!crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expected))) {
+  const signatureBytes = Buffer.from(signature);
+  const expectedBytes = Buffer.from(expected);
+  if (
+    signatureBytes.length !== expectedBytes.length ||
+    !crypto.timingSafeEqual(signatureBytes, expectedBytes)
+  ) {
     throw new Error("Invalid token signature");
   }
   const parsed = JSON.parse(Buffer.from(body, "base64url").toString("utf8"));

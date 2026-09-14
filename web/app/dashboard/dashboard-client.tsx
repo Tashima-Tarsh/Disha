@@ -6,7 +6,9 @@ import {
   BadgeCheck,
   Banknote,
   Brain,
+  ClipboardCheck,
   DatabaseZap,
+  Eye,
   FileSearch,
   Fingerprint,
   GitBranch,
@@ -14,7 +16,10 @@ import {
   Landmark,
   LockKeyhole,
   MapPinned,
+  Maximize2,
   Network,
+  Pause,
+  Play,
   RadioTower,
   Scale,
   Shield,
@@ -22,7 +27,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 
 import styles from "./dashboard.module.css";
 
@@ -305,12 +310,30 @@ export function DashboardClient({ principal }: { principal: PrincipalView }) {
   const territories = data.india.territories.filter((territory) => selectedRegion === "All" || territory.region === selectedRegion);
   const connectors = data.connectors.filter((connector) => selectedLane === "All" || connector.layer === selectedLane);
   const selectedClaim = data.claimChains.find((claim) => claim.claimId === selectedClaimId) ?? data.claimChains[0];
+  const blockedCapabilities = data.production.capabilities.filter((capability) => capability.status === "blocked");
+  const partialCapabilities = data.production.capabilities.filter((capability) => capability.status === "partial");
+  const attentionItems = [
+    ...data.governance.extensionBlockers,
+    ...data.governance.extensionWarnings,
+    ...blockedCapabilities.flatMap((capability) => capability.nextHardening),
+    ...partialCapabilities.flatMap((capability) => capability.nextHardening),
+  ];
+  const nextAction = attentionItems[0] ?? "No blocking action is reported by the current command feed.";
 
   return (
     <DashboardShell
       principal={principal}
       body={
         <div className={styles.contentGrid}>
+          <section className={styles.worldBoard} id="atlas">
+            <PanelTitle
+              icon={<Globe2 size={18} />}
+              title="Constitutional Evidence Atlas"
+              subtitle="Explore real-world source-to-evidence movement by operational state. Every line represents a registered DISHA source or connector—not an invented event."
+            />
+            <WorldFlowMap worldMap={worldMap} flow={data.globalFlow} generatedAt={data.generatedAt} />
+          </section>
+
           <section className={styles.commandHero}>
             <div className={styles.heroText}>
               <p className={styles.eyebrow}>DISHA 6.6 / National Command Feed</p>
@@ -324,20 +347,54 @@ export function DashboardClient({ principal }: { principal: PrincipalView }) {
             </div>
           </section>
 
+          <section className={styles.overviewBoard} id="overview" aria-labelledby="overview-title">
+            <header className={styles.overviewHeader}>
+              <div>
+                <p className={styles.eyebrow}>System overview</p>
+                <h2 id="overview-title">One view from source intake to accountable action</h2>
+                <p>Read the current posture, inspect what needs attention, or move directly into a governed mission.</p>
+              </div>
+              <div className={styles.overviewActions}>
+                <Link className={styles.primaryButton} href="/workbench">Run a governed mission <ArrowUpRight size={15} /></Link>
+                <a className={styles.secondaryButton} href="#evidence">Inspect evidence chains</a>
+              </div>
+            </header>
+
+            <div className={styles.overviewGrid}>
+              <OverviewCard
+                icon={<RadioTower size={18} />}
+                label="Intake"
+                value={`${data.commandReadiness.sourceRegistry} sources`}
+                detail={`${data.lanes.length} operational lanes across ${data.india.totalTerritories} states and union territories.`}
+              />
+              <OverviewCard
+                icon={<Shield size={18} />}
+                label="Governance"
+                value={data.governance.policyGate}
+                detail={`Evidence ledger: ${data.governance.evidenceLedger}. Synthetic data: ${data.governance.noSyntheticData ? "denied" : "under review"}.`}
+              />
+              <OverviewCard
+                icon={<ClipboardCheck size={18} />}
+                label="Review queue"
+                value={`${attentionItems.length} items`}
+                detail={`${blockedCapabilities.length} blocked and ${partialCapabilities.length} partial production capabilities.`}
+                tone={attentionItems.length ? "warn" : "good"}
+              />
+              <OverviewCard
+                icon={<Eye size={18} />}
+                label="Next accountable action"
+                value="Review required"
+                detail={nextAction}
+                tone={attentionItems.length ? "warn" : "good"}
+              />
+            </div>
+          </section>
+
           <section className={styles.kpiGrid} aria-label="Command KPIs">
             <KpiCard icon={<RadioTower size={20} />} label="Command feed" value="LIVE" detail="Single backend contract" tone="good" />
             <KpiCard icon={<DatabaseZap size={20} />} label="Source registry" value={formatNumber(data.commandReadiness.sourceRegistry)} detail={`${data.commandReadiness.nationalSources} national sources`} tone="good" />
             <KpiCard icon={<Network size={20} />} label="Connectors" value={formatNumber(data.commandReadiness.connectorManifest)} detail="Official-source manifest" tone="warn" />
             <KpiCard icon={<Brain size={20} />} label="Extensions" value={formatNumber(data.extensions.activeExtensions)} detail={`${data.commandReadiness.extensionScore}% governance score`} tone={data.governance.extensionStatus === "pass" ? "good" : "warn"} />
-          </section>
-
-          <section className={styles.worldBoard}>
-            <PanelTitle
-              icon={<Globe2 size={18} />}
-              title="Global Source Flow Map"
-              subtitle="Real world geometry with animated source-to-evidence movement. Flows represent DISHA registered source and connector movement, not invented threat events."
-            />
-            <WorldFlowMap worldMap={worldMap} flow={data.globalFlow} />
           </section>
 
           <section className={styles.opsBoard}>
@@ -524,7 +581,7 @@ export function DashboardClient({ principal }: { principal: PrincipalView }) {
             </Panel>
           </section>
 
-          <section className={styles.capabilityBand}>
+          <section className={styles.capabilityBand} id="hardening">
             <PanelTitle icon={<Scale size={18} />} title="Production Hardening Track" subtitle={data.production.noSyntheticDataRule} />
             <div className={styles.capabilityGrid}>
               {data.production.capabilities.map((capability) => (
@@ -557,10 +614,12 @@ function DashboardShell({ principal, body }: { principal: PrincipalView; body: R
           </div>
         </div>
         <nav className={styles.railNav} aria-label="Dashboard sections">
-          <a href="#command"><RadioTower size={18} /> Command</a>
+          <a href="#atlas"><Globe2 size={18} /> Evidence Atlas</a>
+          <a href="#overview"><Eye size={18} /> Overview</a>
           <a href="#map"><MapPinned size={18} /> India Map</a>
           <a href="#audit"><FileSearch size={18} /> Audit</a>
           <a href="#evidence"><Fingerprint size={18} /> Evidence</a>
+          <a href="#hardening"><ClipboardCheck size={18} /> Hardening</a>
         </nav>
         <div className={styles.railFooter}>
           <span>Mission owner</span>
@@ -622,6 +681,28 @@ function KpiCard({
       <span>{label}</span>
       <strong>{value}</strong>
       <small>{detail}</small>
+    </article>
+  );
+}
+
+function OverviewCard({
+  icon,
+  label,
+  value,
+  detail,
+  tone = "good",
+}: {
+  icon: ReactNode;
+  label: string;
+  value: string;
+  detail: string;
+  tone?: "good" | "warn";
+}) {
+  return (
+    <article className={`${styles.overviewCard} ${styles[`overview_${tone}`]}`}>
+      <div className={styles.overviewCardLabel}>{icon}<span>{label}</span></div>
+      <strong>{value}</strong>
+      <p>{detail}</p>
     </article>
   );
 }
@@ -725,57 +806,205 @@ function Badge({ tone, children }: { tone: string; children: ReactNode }) {
   return <span className={`${styles.badge} ${toneClass[tone] ?? styles.toneWarn}`}>{children}</span>;
 }
 
-function WorldFlowMap({ worldMap, flow }: { worldMap: WorldFeatureCollection | null; flow: CommandFeed["globalFlow"] }) {
+function WorldFlowMap({
+  worldMap,
+  flow,
+  generatedAt,
+}: {
+  worldMap: WorldFeatureCollection | null;
+  flow: CommandFeed["globalFlow"];
+  generatedAt: string;
+}) {
+  const atlasRef = useRef<HTMLDivElement>(null);
   const nodeById = useMemo(() => new Map(flow.nodes.map((node) => [node.id, node])), [flow.nodes]);
+  const [statusFilter, setStatusFilter] = useState<"all" | CommandFeed["globalFlow"]["flows"][number]["status"]>("all");
+  const [selectedFlowId, setSelectedFlowId] = useState(flow.flows[0]?.id ?? "");
+  const [motionEnabled, setMotionEnabled] = useState(true);
+  const [guidedTour, setGuidedTour] = useState(true);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const prefersReducedMotion = useSyncExternalStore(subscribeReducedMotion, getReducedMotion, () => false);
+  const motionActive = motionEnabled && !prefersReducedMotion;
+  const guidedTourActive = guidedTour && !prefersReducedMotion;
+  const visibleFlows = useMemo(
+    () => flow.flows.filter((item) => statusFilter === "all" || item.status === statusFilter),
+    [flow.flows, statusFilter],
+  );
+  const selectedFlow = visibleFlows.find((item) => item.id === selectedFlowId) ?? visibleFlows[0];
+
+  useEffect(() => {
+    if (!motionActive || !guidedTourActive || visibleFlows.length < 2) return;
+    const timer = window.setInterval(() => {
+      setSelectedFlowId((current) => {
+        const currentIndex = visibleFlows.findIndex((item) => item.id === current);
+        return visibleFlows[(currentIndex + 1 + visibleFlows.length) % visibleFlows.length]?.id ?? current;
+      });
+    }, 3600);
+    return () => window.clearInterval(timer);
+  }, [guidedTourActive, motionActive, visibleFlows]);
+
+  useEffect(() => {
+    function syncFullscreen() {
+      setIsFullscreen(document.fullscreenElement === atlasRef.current);
+    }
+    document.addEventListener("fullscreenchange", syncFullscreen);
+    return () => document.removeEventListener("fullscreenchange", syncFullscreen);
+  }, []);
+
+  function chooseFilter(next: typeof statusFilter) {
+    setStatusFilter(next);
+    const firstMatch = flow.flows.find((item) => next === "all" || item.status === next);
+    if (firstMatch) setSelectedFlowId(firstMatch.id);
+  }
+
+  async function toggleFullscreen() {
+    if (document.fullscreenElement === atlasRef.current) {
+      await document.exitFullscreen();
+      return;
+    }
+    await atlasRef.current?.requestFullscreen();
+  }
 
   return (
-    <div className={styles.worldMapShell}>
-      <svg viewBox="0 0 1000 520" role="img" aria-label="Global DISHA source flow map">
-        <defs>
-          <marker id="flowArrow" markerHeight="8" markerWidth="8" orient="auto" refX="8" refY="4">
-            <path d="M0,0 L8,4 L0,8 Z" />
-          </marker>
-        </defs>
-        <rect className={styles.worldOcean} x="0" y="0" width="1000" height="520" rx="18" />
-        <g>
-          {worldMap?.features.map((feature, index) => (
-            <path className={styles.worldCountry} d={featureToPath(feature)} key={feature.id ?? feature.properties?.name ?? index}>
-              <title>{feature.properties?.name ?? "Country"}</title>
-            </path>
+    <div className={`${styles.worldMapShell} ${motionActive ? "" : styles.motionPaused}`} ref={atlasRef}>
+      <header className={styles.atlasMasthead}>
+        <div>
+          <p className={styles.eyebrow}>Governed spatial intelligence</p>
+          <h3>See the record move from source to evidence.</h3>
+          <span>Command feed captured {formatDateTime(generatedAt)}</span>
+        </div>
+        <div className={styles.atlasControls}>
+          <button aria-pressed={motionActive} onClick={() => setMotionEnabled((current) => !current)} type="button">
+            {motionActive ? <Pause size={15} /> : <Play size={15} />}
+            {motionActive ? "Pause motion" : "Resume motion"}
+          </button>
+          <button aria-pressed={guidedTourActive} onClick={() => setGuidedTour((current) => !current)} type="button">
+            <Eye size={15} /> {guidedTourActive ? "Guided tour on" : "Guided tour off"}
+          </button>
+          <button onClick={() => void toggleFullscreen()} type="button">
+            <Maximize2 size={15} /> {isFullscreen ? "Exit full screen" : "Full screen"}
+          </button>
+        </div>
+      </header>
+      <div className={styles.atlasToolbar} aria-label="Evidence Atlas layers">
+        <div>
+          <span>Evidence layers</span>
+          <strong>{visibleFlows.length} of {flow.flows.length} flows visible</strong>
+        </div>
+        <div className={styles.atlasFilters}>
+          {(["all", "live_source", "registered_source", "parser_queued"] as const).map((status) => (
+            <button
+              aria-pressed={statusFilter === status}
+              className={statusFilter === status ? styles.atlasFilterActive : styles.atlasFilter}
+              key={status}
+              onClick={() => chooseFilter(status)}
+              type="button"
+            >
+              {status === "all" ? "All sources" : displayState(status)}
+            </button>
           ))}
-        </g>
-        <g>
-          {flow.flows.map((item, index) => {
-            const from = nodeById.get(item.from);
-            const to = nodeById.get(item.to);
-            if (!from || !to) return null;
-            const start = projectWorld(from.lon, from.lat);
-            const end = projectWorld(to.lon, to.lat);
-            const curve = `M ${start.x} ${start.y} Q ${(start.x + end.x) / 2} ${Math.min(start.y, end.y) - 42 - (index % 4) * 10} ${end.x} ${end.y}`;
-            return (
-              <g key={item.id}>
-                <path className={item.status === "live_source" ? styles.worldFlowStrong : styles.worldFlow} d={curve} markerEnd="url(#flowArrow)">
-                  <title>{`${item.label} / ${displayState(item.status)} / ${item.authority}`}</title>
-                </path>
-                <circle className={styles.flowPulse} r="4">
-                  <animateMotion dur={`${5 + (index % 5)}s`} repeatCount="indefinite" path={curve} />
-                </circle>
-              </g>
-            );
-          })}
-        </g>
-        <g>
-          {flow.nodes.map((node) => {
-            const point = projectWorld(node.lon, node.lat);
-            return (
-              <g className={styles.worldNode} key={node.id} transform={`translate(${point.x} ${point.y})`}>
-                <circle r={node.kind === "command_hub" ? 8 : node.kind === "evidence_store" ? 6 : 4} />
-                <text x="10" y="-8">{node.label}</text>
-              </g>
-            );
-          })}
-        </g>
-      </svg>
+        </div>
+      </div>
+      <div className={styles.atlasWorkspace}>
+        <svg viewBox="0 0 1000 520" role="img" aria-label="Interactive Constitutional Evidence Atlas">
+          <defs>
+            <marker id="flowArrow" markerHeight="8" markerWidth="8" orient="auto" refX="8" refY="4">
+              <path d="M0,0 L8,4 L0,8 Z" />
+            </marker>
+          </defs>
+          <rect className={styles.worldOcean} x="0" y="0" width="1000" height="520" rx="18" />
+          <g>
+            {worldMap?.features.map((feature, index) => (
+              <path className={styles.worldCountry} d={featureToPath(feature)} key={feature.id ?? feature.properties?.name ?? index}>
+                <title>{feature.properties?.name ?? "Country"}</title>
+              </path>
+            ))}
+          </g>
+          <g>
+            {visibleFlows.map((item, index) => {
+              const from = nodeById.get(item.from);
+              const to = nodeById.get(item.to);
+              if (!from || !to) return null;
+              const start = projectWorld(from.lon, from.lat);
+              const end = projectWorld(to.lon, to.lat);
+              const curve = `M ${start.x} ${start.y} Q ${(start.x + end.x) / 2} ${Math.min(start.y, end.y) - 42 - (index % 4) * 10} ${end.x} ${end.y}`;
+              const isSelected = item.id === selectedFlow?.id;
+              return (
+                <g
+                  aria-label={`Inspect ${item.label}`}
+                  className={styles.flowTarget}
+                  key={item.id}
+                  onClick={() => setSelectedFlowId(item.id)}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter" || event.key === " ") setSelectedFlowId(item.id);
+                  }}
+                  role="button"
+                  tabIndex={0}
+                >
+                  <path className={isSelected ? styles.worldFlowSelected : item.status === "live_source" ? styles.worldFlowStrong : styles.worldFlow} d={curve} markerEnd="url(#flowArrow)">
+                    <title>{`${item.label} / ${displayState(item.status)} / ${item.authority}`}</title>
+                  </path>
+                  <path className={styles.flowHitArea} d={curve} />
+                  {motionActive ? (
+                    <circle className={styles.flowPulse} r="4">
+                      <animateMotion dur={`${5 + (index % 5)}s`} repeatCount="indefinite" path={curve} />
+                    </circle>
+                  ) : null}
+                </g>
+              );
+            })}
+          </g>
+          <g>
+            {flow.nodes.map((node) => {
+              const point = projectWorld(node.lon, node.lat);
+              return (
+                <g className={styles.worldNode} key={node.id} transform={`translate(${point.x} ${point.y})`}>
+                  <circle className={styles.worldNodePulse} r={node.kind === "command_hub" ? 16 : 10} />
+                  <circle r={node.kind === "command_hub" ? 8 : node.kind === "evidence_store" ? 6 : 4} />
+                  <text x="10" y="-8">{node.label}</text>
+                </g>
+              );
+            })}
+          </g>
+        </svg>
+        <aside className={styles.atlasInspector} aria-live="polite">
+          <p className={styles.eyebrow}>Selected source movement</p>
+          {selectedFlow ? (
+            <>
+              <Badge tone={selectedFlow.status === "live_source" ? "operational" : "watch"}>{displayState(selectedFlow.status)}</Badge>
+              <h3>{selectedFlow.label}</h3>
+              <dl>
+                <div><dt>Authority</dt><dd>{selectedFlow.authority}</dd></div>
+                <div><dt>Cadence</dt><dd>{selectedFlow.cadence}</dd></div>
+                <div><dt>From</dt><dd>{nodeById.get(selectedFlow.from)?.label ?? selectedFlow.from}</dd></div>
+                <div><dt>To</dt><dd>{nodeById.get(selectedFlow.to)?.label ?? selectedFlow.to}</dd></div>
+              </dl>
+              <div className={styles.atlasHash}><span>Source hash</span><code>{selectedFlow.hash}</code></div>
+              <a className={styles.secondaryButton} href="#evidence">Follow the evidence chain</a>
+              <Link className={styles.primaryButton} href="/workbench">Open mission workbench <ArrowUpRight size={14} /></Link>
+            </>
+          ) : <p>No source movement is available for this layer.</p>}
+        </aside>
+      </div>
+      <div className={styles.atlasActivity} aria-label="Source movement activity">
+        <span>Source movement</span>
+        <div>
+          {visibleFlows.map((item) => (
+            <button
+              className={item.id === selectedFlow?.id ? styles.activityItemActive : styles.activityItem}
+              key={item.id}
+              onClick={() => {
+                setSelectedFlowId(item.id);
+                setGuidedTour(false);
+              }}
+              type="button"
+            >
+              <i />
+              <strong>{item.label}</strong>
+              <small>{displayState(item.status)}</small>
+            </button>
+          ))}
+        </div>
+      </div>
       <div className={styles.worldMapFooter}>
         <span>{flow.generatedFrom}</span>
         <span>{flow.attribution}</span>
@@ -806,6 +1035,16 @@ async function fetchJson<T>(url: string, signal: AbortSignal): Promise<T> {
   const response = await fetch(url, { cache: "no-store", signal });
   if (!response.ok) throw new Error(`${url} returned ${response.status}`);
   return response.json() as Promise<T>;
+}
+
+function subscribeReducedMotion(onChange: () => void): () => void {
+  const media = window.matchMedia("(prefers-reduced-motion: reduce)");
+  media.addEventListener("change", onChange);
+  return () => media.removeEventListener("change", onChange);
+}
+
+function getReducedMotion(): boolean {
+  return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 }
 
 function formatNumber(value: number): string {

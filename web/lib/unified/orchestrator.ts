@@ -11,6 +11,7 @@ import { appendEvidenceEvent, getEvidenceEvents } from "./evidence-ledger";
 import { evaluatePolicy } from "./policy-gate";
 import { lensRegistry, selectLenses } from "./lenses";
 import { clearMissionStoreForTests, getMissionResult, saveMissionResult } from "./mission-store";
+import type { Principal } from "../server/types";
 
 export type MissionInput = {
   rawText: string;
@@ -136,6 +137,10 @@ export async function analyzeLens(name: LensName, signal: DishaSignal): Promise<
 
 export function getMission(missionId: string): Promise<MissionResult | null> {
   return getMissionResult(missionId);
+}
+
+export function canReadMission(mission: MissionResult, principal: Pick<Principal, "userId" | "roles">): boolean {
+  return mission.signal.userId === principal.userId || principal.roles.includes("admin");
 }
 
 export function getMissionEvidence(missionId: string) {

@@ -21,10 +21,12 @@ export default async function WorkbenchPage() {
     redirect("/login?mode=password&returnUrl=%2Fworkbench");
   }
 
+  let principal;
   try {
-    const principal = principalFromAccessToken(token);
-    return <DishaWorkbench principal={{ email: principal.email, roles: principal.roles }} />;
+    principal = principalFromAccessToken(token);
   } catch {
     redirect("/login?mode=password&returnUrl=%2Fworkbench");
   }
+
+  return <DishaWorkbench principal={{ email: principal.email, roles: principal.roles }} />;
 }

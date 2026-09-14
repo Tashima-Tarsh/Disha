@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { audit } from "@/lib/server/audit";
 import { devLogin, setSessionCookies } from "@/lib/server/auth";
 import { setCsrfCookie } from "@/lib/server/csrf";
-import { errorResponse } from "@/lib/server/http";
+import { assertPublicRequestGuards, errorResponse } from "@/lib/server/http";
 import { requestId } from "@/lib/server/security";
 
 function safeReturnUrl(value: FormDataEntryValue | null) {
@@ -15,6 +15,7 @@ function safeReturnUrl(value: FormDataEntryValue | null) {
 
 export async function POST(req: NextRequest) {
   try {
+    await assertPublicRequestGuards(req);
     const form = await req.formData();
     const email = String(form.get("email") ?? "");
     const password = String(form.get("password") ?? "");

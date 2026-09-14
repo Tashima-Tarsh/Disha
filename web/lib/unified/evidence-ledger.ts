@@ -109,7 +109,7 @@ class PostgresEvidenceLedgerStore implements EvidenceLedgerStore {
       previousHash: row.previous_hash ?? undefined,
       payloadHash: row.payload_hash ?? "",
       hashAlgorithm: row.hash_algorithm ?? "sha256",
-      ledgerVersion: row.ledger_version === 2 ? 2 : 2,
+      ledgerVersion: 2,
       eventHash: row.event_hash,
     }));
   }
@@ -146,8 +146,12 @@ export async function exportEvidenceReport(missionId: string) {
 export function verifyEvidenceChain(events: EvidenceEvent[]): { ok: boolean; errors: string[] } {
   const errors: string[] = [];
   let previousHash: string | undefined;
+  const missionId = events[0]?.missionId;
 
   events.forEach((event, index) => {
+    if (event.missionId !== missionId) {
+      errors.push(`event ${index} missionId mismatch`);
+    }
     if (event.chainIndex !== index) {
       errors.push(`event ${index} chainIndex mismatch`);
     }

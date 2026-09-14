@@ -24,9 +24,13 @@ export function errorResponse(error: unknown, req: NextRequest, principal?: Prin
   return NextResponse.json({ error: publicMessage, requestId: requestId(req) }, { status });
 }
 
-export async function assertRequestGuards(req: NextRequest): Promise<void> {
+export async function assertPublicRequestGuards(req: NextRequest): Promise<void> {
   if (!(await checkRateLimit(req))) {
     throw Object.assign(new Error("Rate limit exceeded"), { status: 429 });
   }
+}
+
+export async function assertRequestGuards(req: NextRequest): Promise<void> {
+  await assertPublicRequestGuards(req);
   assertCsrf(req);
 }

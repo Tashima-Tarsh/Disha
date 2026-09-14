@@ -55,6 +55,8 @@ Every production change must pass:
 contract -> policy -> evidence -> test
 ```
 
+Runtime ownership is intentional: TypeScript serves the browser product and policy gateway; Python owns bounded intelligence and research services. DISHA does not pursue a whole-repository Python rewrite because that would replace a clear product boundary with avoidable migration risk. See [ARCHITECTURE.md](ARCHITECTURE.md#runtime-and-language-ownership).
+
 Read [ARCHITECTURE.md](ARCHITECTURE.md) before changing core behavior.
 
 ## Key Capabilities
@@ -62,12 +64,48 @@ Read [ARCHITECTURE.md](ARCHITECTURE.md) before changing core behavior.
 - **Evidence Ledger v2:** ordered evidence chains with payload hashes, previous hashes, and event hashes.
 - **Policy Gate:** deny-by-default control for unsafe actions, controlled data, unsupported claims, and offensive cyber requests.
 - **Agentic Workbench:** interactive `/workbench` flow for mission input, signal normalization, lens routing, fusion, policy, ledger, and export.
-- **Command Dashboard:** authenticated `/dashboard` view backed by one governed command feed with CAG, finance, geospatial import readiness, source registry, and claim-chain explorer.
+- **Constitutional Evidence Atlas:** interactive real-geometry view of registered source movement, operational state, authority, cadence, and source hash, with direct paths into evidence chains and governed missions.
+- **Command Dashboard:** authenticated `/dashboard` view backed by one governed command feed with the Evidence Atlas, CAG, finance, geospatial import readiness, source registry, and claim-chain explorer.
 - **Governed Model Adapter:** model output is advisory, logged, policy-filtered, and never treated as a source of fact.
 - **Source Registry:** official/public source manifests for law, gazette, finance, audit, cybercrime, vulnerability intelligence, geospatial, water, disaster, and open-data references.
 - **Security Source Admission:** official public feeds can be admitted; leaked, credential, token, private-key, hacked, or exfiltrated material is blocked.
 
 ## Product Spine
+
+### System view
+
+This is the repository-level view of how a mission becomes an inspectable result. It is deliberately narrower than the full research archive: no extension can bypass the policy gate or write an untraceable conclusion.
+
+```mermaid
+flowchart LR
+    A[Mission request] --> B[Typed signal]
+    S[Registered public sources] --> C[Evidence-aware lenses]
+    B --> C
+    C --> D[Fusion with uncertainty]
+    D --> E{Policy gate}
+    E -->|allow or read-only| F[Evidence Ledger v2]
+    E -->|confirm or deny| G[Review queue]
+    F --> H[Inspectable report]
+    X[Governed extensions] --> C
+    X -. cannot bypass .-> E
+```
+
+The authenticated product has two working surfaces:
+
+| Surface | Use it for | Primary action |
+| --- | --- | --- |
+| `/dashboard` | System-wide source, governance, evidence, territory, connector, and hardening posture | Decide what needs review next |
+| `/workbench` | A single governed research mission from input through evidence export | Run and inspect a mission |
+
+### Five-minute product walk-through
+
+1. Set a local `DISHA_JWT_SECRET` of at least 32 characters and a local `DISHA_DEV_PASSWORD` of at least 12 characters.
+2. Run `npm install --prefix web` and `npm.cmd --prefix web run dev`.
+3. Sign in at `http://127.0.0.1:3000/login?mode=password` with an email and the password you set.
+4. Open `/dashboard` for the system overview. Use **Run a governed mission** to enter `/workbench`.
+5. Submit a public-interest question, then inspect the selected lenses, policy decision, evidence events, uncertainty, and export.
+
+Development password login is local-only. Production rejects `dev-jwt` mode.
 
 | Path | Responsibility |
 | --- | --- |
@@ -98,6 +136,13 @@ Verify:
 npm.cmd --prefix web run type-check:full
 npm.cmd --prefix web test
 npm.cmd --prefix web run build
+```
+
+Python core verification:
+
+```bash
+python -m pip install -r disha/brain/requirements.txt pytest
+python -m pytest tests/test_disha_brain_graph.py skills/vyuha-defense-engine/tests
 ```
 
 Docker development:

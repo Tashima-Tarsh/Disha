@@ -2,12 +2,13 @@ import { NextRequest, NextResponse } from "next/server";
 import { audit } from "@/lib/server/audit";
 import { devLogin, setSessionCookies } from "@/lib/server/auth";
 import { setCsrfCookie } from "@/lib/server/csrf";
-import { errorResponse } from "@/lib/server/http";
+import { assertPublicRequestGuards, errorResponse } from "@/lib/server/http";
 import { loginSchema } from "@/lib/server/schemas/api";
 import { requestId } from "@/lib/server/security";
 
 export async function POST(req: NextRequest) {
   try {
+    await assertPublicRequestGuards(req);
     const body = loginSchema.parse(await req.json());
     const session = await devLogin(body.email, body.password);
     const response = NextResponse.json({ user: session.principal });
@@ -21,7 +22,6 @@ export async function POST(req: NextRequest) {
     });
     return response;
   } catch (error) {
-    console.error("LOGIN ERROR", error);
     return errorResponse(error, req);
   }
 }

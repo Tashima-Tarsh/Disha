@@ -2,6 +2,7 @@
 
 import {
   AlertTriangle,
+  ArrowRight,
   Archive,
   CheckCircle2,
   Clipboard,
@@ -219,6 +220,53 @@ export function DishaWorkbench({ principal }: { principal: PrincipalView }) {
     [result],
   );
 
+  const spineStages = [
+    {
+      label: "Mission",
+      caption: mission ? "Intent captured" : "Awaiting input",
+      detail: mission?.signal.context.intent ?? "Start with a public-interest question.",
+      complete: Boolean(mission),
+    },
+    {
+      label: "Signal",
+      caption: mission ? "Normalized" : "Not created",
+      detail: mission?.signal.id ?? "The mission becomes a typed signal.",
+      complete: Boolean(mission?.signal),
+    },
+    {
+      label: "Lenses",
+      caption: mission ? `${mission.selectedLenses.length} routed` : "Not routed",
+      detail: mission?.selectedLenses.join(", ") ?? "Evidence-aware lenses are selected.",
+      complete: Boolean(mission?.lensResults.length),
+    },
+    {
+      label: "Fusion",
+      caption: mission ? "Synthesized" : "Not fused",
+      detail: mission ? `${Math.round(mission.fusedIntelligence.confidence * 100)}% confidence` : "Conflicts and uncertainty stay visible.",
+      complete: Boolean(mission?.fusedSummary),
+    },
+    {
+      label: "Policy",
+      caption: mission?.policyDecision.decision ?? "Not evaluated",
+      detail: mission?.safeExecution ?? "The gate decides what may happen next.",
+      complete: Boolean(mission?.policyDecision),
+    },
+    {
+      label: "Ledger",
+      caption: evidence.length ? `${evidence.length} events` : "No events",
+      detail: evidence.length ? "Chain loaded and inspectable." : "Every stage will leave a trace.",
+      complete: evidence.length > 0,
+    },
+    {
+      label: "Report",
+      caption: result ? "Evidence-bound" : "Pending",
+      detail: result ? "Export is tied to the governed run." : "No conclusion before the chain.",
+      complete: Boolean(result),
+    },
+  ];
+  const firstPendingSpineStage = spineStages.findIndex((stage) => !stage.complete);
+  const activeSpineStage = firstPendingSpineStage === -1 ? spineStages.length - 1 : firstPendingSpineStage;
+
   useEffect(() => {
     const controller = new AbortController();
     void fetch("/api/dashboard/command", { cache: "no-store", signal: controller.signal })
@@ -328,11 +376,11 @@ export function DishaWorkbench({ principal }: { principal: PrincipalView }) {
 
       <section className={styles.grid}>
         <aside className={styles.sidebar} aria-label="Workbench navigation">
-          <NavItem label="Mission Input" active />
-          <NavItem label="Analysis Results" active={Boolean(mission)} />
-          <NavItem label="Policy Decision" active={Boolean(mission?.policyDecision)} />
-          <NavItem label="Evidence Chain" active={evidence.length > 0} />
-          <NavItem label="Memory / Graph" active={Boolean(memoryGraph)} />
+          <NavItem label="Mission Input" target="mission-input" active />
+          <NavItem label="Analysis Results" target="analysis-results" active={Boolean(mission)} />
+          <NavItem label="Policy Decision" target="policy-decision" active={Boolean(mission?.policyDecision)} />
+          <NavItem label="Evidence Chain" target="evidence-chain" active={evidence.length > 0} />
+          <NavItem label="Memory / Graph" target="memory-graph" active={Boolean(memoryGraph)} />
         </aside>
 
         <div className={styles.workspace}>
@@ -359,7 +407,51 @@ export function DishaWorkbench({ principal }: { principal: PrincipalView }) {
             </div>
           </section>
 
-          <section className={styles.panel}>
+          <section className={styles.spinePanel} aria-labelledby="constitutional-spine-title">
+            <div className={styles.spineHeader}>
+              <div>
+                <p className={styles.spineKicker}>The DISHA signature</p>
+                <h2 id="constitutional-spine-title">Constitutional Spine</h2>
+                <p>One inspectable view from intent to evidence-bound output. Nothing disappears behind a black box.</p>
+              </div>
+              <div className={styles.spineReadout}>
+                <span>Current boundary</span>
+                <strong>{spineStages[activeSpineStage].label}</strong>
+                <small>{statusLabel(status)} · {evidence.length} ledger events</small>
+              </div>
+            </div>
+
+            <div className={styles.spineTrack} role="list" aria-label="DISHA constitutional evidence flow">
+              {spineStages.map((stage, index) => (
+                <div className={styles.spineStageWrap} key={stage.label}>
+                  <div
+                    className={styles.spineStage}
+                    data-complete={stage.complete}
+                    data-current={index === activeSpineStage}
+                    role="listitem"
+                  >
+                    <div className={styles.spineNode}>
+                      {stage.complete ? <CheckCircle2 size={17} /> : <span>{index + 1}</span>}
+                    </div>
+                    <div className={styles.spineStageCopy}>
+                      <span>{stage.label}</span>
+                      <strong>{stage.caption}</strong>
+                      <small>{stage.detail}</small>
+                    </div>
+                  </div>
+                  {index < spineStages.length - 1 ? <ArrowRight className={styles.spineArrow} size={18} aria-hidden="true" /> : null}
+                </div>
+              ))}
+            </div>
+
+            <div className={styles.spineFooter}>
+              <span>Evidence-first by construction</span>
+              <span>Read-only until policy permits</span>
+              <span>Every output traceable</span>
+            </div>
+          </section>
+
+          <section id="mission-input" className={styles.panel}>
             <PanelTitle icon={<Landmark size={18} />} title="Mission Input" label="Dynamic form" />
             <div className={styles.dynamicBanner}>
               <span>Live backend</span>
@@ -421,7 +513,7 @@ export function DishaWorkbench({ principal }: { principal: PrincipalView }) {
             <Metric label="Risk score" value={mission ? `${Math.round(mission.riskScore * 100)}%` : "-"} detail={mission?.safeExecution ?? "Not evaluated"} />
           </section>
 
-          <section className={styles.panel}>
+          <section id="analysis-results" className={styles.panel}>
             <PanelTitle icon={<FileText size={18} />} title="Analysis Results" label="Core governed lenses" />
             {mission ? (
               <div className={styles.resultLayout}>
@@ -447,7 +539,7 @@ export function DishaWorkbench({ principal }: { principal: PrincipalView }) {
               )}
             </section>
 
-            <section className={styles.panel}>
+            <section id="policy-decision" className={styles.panel}>
               <PanelTitle icon={<LockKeyhole size={18} />} title="Policy Decision" label="Policy evaluated" />
               {mission ? <PolicyPanel policy={mission.policyDecision} approvalRequired={mission.approvalRequired} /> : <EmptyState text="Policy output will appear here." />}
             </section>
@@ -473,7 +565,7 @@ export function DishaWorkbench({ principal }: { principal: PrincipalView }) {
           </section>
 
           <section className={styles.twoColumn}>
-            <section className={styles.panel}>
+            <section id="evidence-chain" className={styles.panel}>
               <PanelTitle icon={<Database size={18} />} title="Evidence Chain Viewer" label="Evidence Ledger v2" />
               {evidence.length ? (
                 <div className={styles.ledgerLayout}>
@@ -499,7 +591,7 @@ export function DishaWorkbench({ principal }: { principal: PrincipalView }) {
               )}
             </section>
 
-            <section className={styles.panel}>
+            <section id="memory-graph" className={styles.panel}>
               <PanelTitle icon={<Network size={18} />} title="Memory / Graph Insights" label="When available" />
               {memoryGraph ? <MemoryGraphPanel extension={memoryGraph} /> : <EmptyState text="Memory/Graph runs when the mission asks for context, provenance, source hashes, or graph reasoning." />}
             </section>
@@ -538,12 +630,17 @@ function PanelTitle({ icon, title, label }: { icon: React.ReactNode; title: stri
   );
 }
 
-function NavItem({ label, active }: { label: string; active: boolean }) {
+function NavItem({ label, target, active }: { label: string; target: string; active: boolean }) {
   return (
-    <div className={styles.navItem} data-active={active}>
+    <button
+      className={styles.navItem}
+      data-active={active}
+      type="button"
+      onClick={() => document.getElementById(target)?.scrollIntoView({ behavior: "smooth", block: "start" })}
+    >
       <span />
       {label}
-    </div>
+    </button>
   );
 }
 

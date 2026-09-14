@@ -28,6 +28,22 @@ Internally, DISHA keeps a strict boundary:
 - Advanced capabilities enter through `web/lib/extensions/`.
 - Research/source material remains in `disha/` or `skills/` until promoted through an extension adapter.
 
+## Runtime and Language Ownership
+
+DISHA is one product, not one programming language. Language choice follows the operational boundary:
+
+| Boundary | Canonical runtime | Rule |
+| --- | --- | --- |
+| Browser product and public API gateway | TypeScript / Next.js in `web/` | Owns presentation, session handling, API contracts, policy decisions, and the user-visible evidence chain |
+| Intelligence and research runtime | Python in `disha/brain/` | Owns bounded analysis, graph reasoning, source processing, and research computation behind a read-only governed adapter |
+| Defensive formation source | Python in `skills/vyuha-defense-engine/` | Produces defensive proposals only; it cannot execute or bypass the product policy gate |
+| External integration retained from upstream | Original upstream language | Remains isolated and optional until a governed adapter and maintenance owner exist |
+| Historical or superseded implementation | Any language under `legacy/`, `disha/legacy-root-src/`, or documented research paths | Must not become a production dependency |
+
+New backend research capability defaults to Python. New browser or API-gateway behavior defaults to TypeScript. Go is permitted only for an isolated integration with a measured performance, concurrency, or upstream-maintenance reason; it is not a second DISHA application core.
+
+A language migration is approved only when it removes an active runtime boundary or duplicate production implementation. File-count reduction alone is not a reason to rewrite. Every migration must preserve the JSON contract, policy result, evidence events, and regression tests before the old implementation is retired.
+
 ```mermaid
 flowchart LR
     A["Workbench / API v1"] --> B["Mission Orchestrator"]

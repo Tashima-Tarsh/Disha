@@ -1,6 +1,6 @@
 {
   "name": "disha-web",
-  "version": "0.1.0",
+  "version": "6.6.0",
   "private": true,
   "scripts": {
     "dev": "next dev --port 3000",
@@ -9,7 +9,7 @@
     "db:migrate": "node scripts/apply-schema.mjs",
     "db:verify-schema": "node scripts/apply-schema.mjs --verify-only",
     "db:rollback": "node scripts/apply-schema.mjs --rollback",
-    "lint": "next lint",
+    "lint": "eslint .",
     "type-check": "tsc --noEmit",
     "type-check:full": "tsc --noEmit -p tsconfig.full.json",
     "test": "vitest run"
@@ -25,14 +25,18 @@
     "@radix-ui/react-switch": "^1.2.6",
     "@radix-ui/react-tabs": "^1.1.13",
     "@radix-ui/react-toast": "^1.2.17",
+dependabot/npm_and_yarn/web/radix-ui/react-tooltip-1.2.12
     "@radix-ui/react-tooltip": "^1.2.12",
     "@tanstack/react-virtual": "^3.13.23",
+    "@radix-ui/react-tooltip": "^1.2.8",
+    "@tanstack/react-virtual": "^3.14.5",
+main
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "framer-motion": "^12.38.0",
     "lucide-react": "^1.8.0",
-    "nanoid": "^5.1.7",
-    "next": "^16.3.0-preview.5",
+    "nanoid": "5.1.16",
+    "next": "16.3.4",
     "pg": "^8.20.0",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
@@ -53,9 +57,9 @@
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
     "autoprefixer": "^10.4.27",
-    "eslint": "^10.6.0",
-    "eslint-config-next": "^16.3.0-preview.5",
-    "postcss": "^8.5.10",
+    "eslint": "9.39.5",
+    "eslint-config-next": "16.3.4",
+    "postcss": "8.5.27",
     "tailwindcss": "^4.3.1",
     "typescript": "^6.0.3",
     "vitest": "^4.1.9"
