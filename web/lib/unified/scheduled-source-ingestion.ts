@@ -49,7 +49,7 @@ export type ScheduledIngestionSummary = {
   provenanceHash: string;
 };
 
-type FetchLike = Parameters<typeof probeSource>[1];
+type FetchLike = NonNullable<Parameters<typeof probeSource>[1]>;
 
 const cadenceBySource: Record<string, ScheduledIngestionCadence> = {
   "cag-audit-index": "daily",
