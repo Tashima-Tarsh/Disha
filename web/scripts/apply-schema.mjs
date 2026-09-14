@@ -109,7 +109,7 @@ async function rollbackLatest() {
   await withMigrationClient(async (client) => {
     await ensureMigrationTable(client);
     const applied = await client.query(
-      "select version from schema_migrations where direction = 'up' order by applied_at desc limit 1",
+      "select version from schema_migrations where direction = 'up' order by id desc limit 1",
     );
     const latest = applied.rows[0]?.version;
     if (!latest) throw new Error("No applied migration is available to roll back");
