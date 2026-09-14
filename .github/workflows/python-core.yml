@@ -5,8 +5,10 @@ on:
     branches: [main]
     paths:
       - "disha/brain/**"
+      - "disha/contracts/**"
       - "skills/vyuha-defense-engine/**"
       - "tests/test_disha_brain_graph.py"
+      - "tests/test_disha_contracts.py"
       - "pyproject.toml"
       - "disha/brain/requirements.txt"
       - ".github/workflows/python-core.yml"
@@ -14,8 +16,10 @@ on:
     branches: [main]
     paths:
       - "disha/brain/**"
+      - "disha/contracts/**"
       - "skills/vyuha-defense-engine/**"
       - "tests/test_disha_brain_graph.py"
+      - "tests/test_disha_contracts.py"
       - "pyproject.toml"
       - "disha/brain/requirements.txt"
       - ".github/workflows/python-core.yml"
@@ -30,7 +34,7 @@ concurrency:
 
 jobs:
   verify:
-    name: Brain and governed defensive source
+    name: Brain, contracts, and governed defensive source
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -45,5 +49,5 @@ jobs:
       - name: Install active Python runtime
         run: python -m pip install -r disha/brain/requirements.txt pytest
 
-      - name: Verify Brain and governed defensive source
-        run: python -m pytest tests/test_disha_brain_graph.py skills/vyuha-defense-engine/tests
+      - name: Verify Brain, canonical contracts, and governed defensive source
+        run: python -m pytest tests/test_disha_brain_graph.py tests/test_disha_contracts.py skills/vyuha-defense-engine/tests
