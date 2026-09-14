@@ -38,7 +38,7 @@ describe("DISHA database migration contract", () => {
     expect(migration).toContain("snapshot_hash text not null");
   });
 
-  it("keeps rollback files for registered migrations", () => {
+  it("keeps rollback files for registered migrations and selects the latest applied migration deterministically", () => {
     const migrationScript = fs.readFileSync(path.join(webRoot, "scripts/apply-schema.mjs"), "utf8");
     const coreRollback = fs.readFileSync(path.join(webRoot, "database/rollbacks/202607110001_core_schema_v1.down.sql"), "utf8");
     const durabilityRollback = fs.readFileSync(path.join(webRoot, "database/rollbacks/202609150001_ingestion_mission_durability.down.sql"), "utf8");
@@ -47,6 +47,7 @@ describe("DISHA database migration contract", () => {
     expect(migrationScript).toContain('version: "202609150001"');
     expect(migrationScript).toContain("downPath");
     expect(migrationScript).toContain("DISHA_CONFIRM_ROLLBACK");
+    expect(migrationScript).toContain("order by id desc limit 1");
     expect(coreRollback).toContain("drop table if exists extension_claim_records cascade");
     expect(coreRollback).toContain("drop table if exists evidence_events cascade");
     expect(durabilityRollback).toContain("drop table if exists model_call_audit cascade");
