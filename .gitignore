@@ -17,6 +17,8 @@ __pycache__/
 .env
 .env.local
 .env.*.local
+.dev.vars
+**/.dev.vars
 
 # OS files
 .DS_Store
@@ -62,6 +64,8 @@ decision-engine/data/index/*_lines.txt
 
 # Next.js
 .next/
+.open-next/
+**/.open-next/
 
 # Sentinel runtime logs
 logs/sentinel/
