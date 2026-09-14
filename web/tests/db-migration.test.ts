@@ -26,15 +26,32 @@ describe("DISHA database migration contract", () => {
     expect(schema).toContain("create index if not exists extension_memory_records_mission_idx");
   });
 
-  it("keeps a rollback file for every registered migration", () => {
+  it("adds durable source records, mission lifecycle, approvals, snapshots, and model-call audit", () => {
+    const migration = fs.readFileSync(path.join(webRoot, "database/202609150001_ingestion_mission_durability.sql"), "utf8");
+
+    expect(migration).toContain("create table if not exists source_records");
+    expect(migration).toContain("create table if not exists missions");
+    expect(migration).toContain("create table if not exists mission_analysis_snapshots");
+    expect(migration).toContain("create table if not exists mission_approvals");
+    expect(migration).toContain("create table if not exists model_call_audit");
+    expect(migration).toContain("source_record_hash text not null");
+    expect(migration).toContain("snapshot_hash text not null");
+  });
+
+  it("keeps rollback files for registered migrations and selects the latest applied migration deterministically", () => {
     const migrationScript = fs.readFileSync(path.join(webRoot, "scripts/apply-schema.mjs"), "utf8");
-    const rollback = fs.readFileSync(path.join(webRoot, "database/rollbacks/202607110001_core_schema_v1.down.sql"), "utf8");
+    const coreRollback = fs.readFileSync(path.join(webRoot, "database/rollbacks/202607110001_core_schema_v1.down.sql"), "utf8");
+    const durabilityRollback = fs.readFileSync(path.join(webRoot, "database/rollbacks/202609150001_ingestion_mission_durability.down.sql"), "utf8");
 
     expect(migrationScript).toContain('version: "202607110001"');
+    expect(migrationScript).toContain('version: "202609150001"');
     expect(migrationScript).toContain("downPath");
     expect(migrationScript).toContain("DISHA_CONFIRM_ROLLBACK");
-    expect(rollback).toContain("drop table if exists extension_claim_records cascade");
-    expect(rollback).toContain("drop table if exists evidence_events cascade");
+    expect(migrationScript).toContain("order by id desc limit 1");
+    expect(coreRollback).toContain("drop table if exists extension_claim_records cascade");
+    expect(coreRollback).toContain("drop table if exists evidence_events cascade");
+    expect(durabilityRollback).toContain("drop table if exists model_call_audit cascade");
+    expect(durabilityRollback).toContain("drop table if exists source_records cascade");
   });
 
   it("exposes explicit migration commands from the web package", () => {

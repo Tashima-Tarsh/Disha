@@ -3,7 +3,8 @@ import type { Pool } from "pg";
 import { getDbPool } from "../server/db";
 import { hashValue } from "./hash";
 import { getParserPlan, listSourceParserPlans, type SourceParserPlan } from "./source-ingestion";
-import { probeSource, type SourceProbeResult } from "./source-registry";
+import { parseSourcePayload, type ParsedSourceRecord } from "./source-parsers";
+import { getSourceDefinition, probeSource, type SourceProbeResult } from "./source-registry";
 
 export type ScheduledIngestionCadence = "hourly" | "daily" | "weekly" | "manual";
 
@@ -33,6 +34,8 @@ export type ScheduledIngestionRun = {
   blockerCount: number;
   blockers: string[];
   probe: SourceProbeResult | null;
+  recordCount: number;
+  records: ParsedSourceRecord[];
   retrievedAt: string;
   provenanceHash: string;
 };
@@ -46,22 +49,26 @@ export type ScheduledIngestionSummary = {
   provenanceHash: string;
 };
 
-type FetchLike = Parameters<typeof probeSource>[1];
+type FetchLike = NonNullable<Parameters<typeof probeSource>[1]>;
 
 const cadenceBySource: Record<string, ScheduledIngestionCadence> = {
   "cag-audit-index": "daily",
+  "egazette-india": "daily",
+  "india-code": "daily",
+  "cert-in-annual-reports": "weekly",
+  "ncrb-crime-in-india": "weekly",
+  ndma: "daily",
   "india-budget": "weekly",
   "gst-council-revenue": "daily",
-  "ncrb-crime-in-india": "weekly",
-  "cert-in-annual-reports": "weekly",
-  "egazette-india": "daily",
+  "data-gov-in": "daily",
+  "api-setu": "daily",
   lgd: "daily",
   "india-wris": "hourly",
-  ndma: "daily",
+  bhuvan: "daily",
 };
 
-const p0Sources = new Set(["cag-audit-index", "india-budget", "ncrb-crime-in-india", "cert-in-annual-reports", "egazette-india"]);
-const p1Sources = new Set(["lgd", "india-wris", "ndma", "gst-council-revenue"]);
+const p0Sources = new Set(["cag-audit-index", "egazette-india", "india-code", "ncrb-crime-in-india", "cert-in-annual-reports", "india-budget"]);
+const p1Sources = new Set(["lgd", "india-wris", "ndma", "gst-council-revenue", "data-gov-in", "api-setu", "bhuvan"]);
 
 export function listScheduledSourceJobs(): ScheduledSourceJob[] {
   return listSourceParserPlans().map((plan) => buildJob(plan));
@@ -92,7 +99,7 @@ export async function runScheduledSourceIngestion({
     requestedSourceIds,
     jobs,
     runs,
-    publicationRule: "Scheduled ingestion records source metadata and parser readiness only. Dashboard claims remain blocked until parser-backed claim provenance exists.",
+    publicationRule: "Only records emitted by a governed source parser from a retrieved official payload are eligible for claim-level provenance. Empty/failed parses remain blocked.",
   };
   return { ...summary, provenanceHash: hashValue(summary) };
 }
@@ -101,50 +108,78 @@ async function runJob(job: ScheduledSourceJob, fetcher: FetchLike): Promise<Sche
   const retrievedAt = new Date().toISOString();
   const plan = getParserPlan(job.sourceId);
   if (!plan) {
-    return buildRun(job, {
-      status: "blocked",
-      blockers: ["No parser plan exists for this scheduled source."],
-      probe: null,
-      retrievedAt,
-    });
+    return buildRun(job, { status: "blocked", blockers: ["No parser plan exists for this scheduled source."], probe: null, records: [], retrievedAt });
   }
 
   if (plan.status === "auth_required") {
-    return buildRun(job, {
-      status: "auth_required",
-      blockers: plan.blockers,
-      probe: null,
-      retrievedAt,
-    });
+    return buildRun(job, { status: "auth_required", blockers: plan.blockers, probe: null, records: [], retrievedAt });
   }
-
   if (plan.status === "blocked") {
-    return buildRun(job, {
-      status: "blocked",
-      blockers: plan.blockers,
-      probe: null,
-      retrievedAt,
-    });
+    return buildRun(job, { status: "blocked", blockers: plan.blockers, probe: null, records: [], retrievedAt });
   }
 
   try {
     const probe = await probeSource(job.sourceId, fetcher);
-    const status: ScheduledIngestionStatus = probe.ok
-      ? plan.claimLevelProvenance
-        ? "completed"
-        : "parser_required"
-      : "failed";
-    const blockers = [
-      ...(probe.ok ? [] : [`Source probe failed: ${probe.statusText}${probe.error ? ` (${probe.error})` : ""}`]),
-      ...(plan.claimLevelProvenance ? [] : ["Parser-backed claim provenance is not yet enabled for this source."]),
-      ...plan.blockers,
-    ];
-    return buildRun(job, { status, blockers, probe, retrievedAt });
+    if (!probe.ok) {
+      return buildRun(job, {
+        status: "failed",
+        blockers: [`Source probe failed: ${probe.statusText}${probe.error ? ` (${probe.error})` : ""}`, ...plan.blockers],
+        probe,
+        records: [],
+        retrievedAt,
+      });
+    }
+
+    if (!plan.parserAvailable) {
+      return buildRun(job, {
+        status: "parser_required",
+        blockers: ["No governed source parser is registered for this source.", ...plan.blockers],
+        probe,
+        records: [],
+        retrievedAt,
+      });
+    }
+
+    const source = getSourceDefinition(job.sourceId);
+    const endpoint = source?.endpoints.find((item) => item.method === "GET" && !item.requiresAuth) ?? source?.endpoints.find((item) => !item.requiresAuth);
+    if (!endpoint) {
+      return buildRun(job, {
+        status: "blocked",
+        blockers: ["No unauthenticated source endpoint is available for parser ingestion."],
+        probe,
+        records: [],
+        retrievedAt,
+      });
+    }
+
+    const response = await fetcher(endpoint.url, { method: "GET", headers: { Accept: "application/json,text/html,application/xhtml+xml,text/plain;q=0.9,*/*;q=0.5" } });
+    if (!response.ok) {
+      return buildRun(job, {
+        status: "failed",
+        blockers: [`Source retrieval failed: ${response.status} ${response.statusText}`],
+        probe,
+        records: [],
+        retrievedAt,
+      });
+    }
+
+    const body = await response.text();
+    const parsed = parseSourcePayload({
+      sourceId: job.sourceId,
+      url: endpoint.url,
+      contentType: response.headers.get("content-type") ?? "application/octet-stream",
+      body,
+      retrievedAt,
+    });
+    const status: ScheduledIngestionStatus = parsed.records.length > 0 ? "completed" : "parser_required";
+    const blockers = parsed.records.length > 0 ? [] : [...parsed.warnings, ...plan.blockers];
+    return buildRun(job, { status, blockers, probe, records: parsed.records, retrievedAt });
   } catch (error) {
     return buildRun(job, {
       status: "failed",
       blockers: [error instanceof Error ? error.message : "Unknown scheduled ingestion failure."],
       probe: null,
+      records: [],
       retrievedAt,
     });
   }
@@ -160,7 +195,7 @@ function buildJob(plan: SourceParserPlan): ScheduledSourceJob {
     priority: p0Sources.has(plan.sourceId) ? "p0" as const : p1Sources.has(plan.sourceId) ? "p1" as const : "p2" as const,
     enabled: plan.status !== "auth_required" && plan.status !== "blocked",
     expectedRecords: plan.expectedRecords,
-    publicationRule: "Record source probe metadata now; publish facts only after source-specific parser and claim provenance pass.",
+    publicationRule: "Publish facts only from records emitted by the registered parser and attached to claim provenance.",
   };
   return { ...job, provenanceHash: hashValue(job) };
 }
@@ -171,11 +206,12 @@ function buildRun(
     status: ScheduledIngestionStatus;
     blockers: string[];
     probe: SourceProbeResult | null;
+    records: ParsedSourceRecord[];
     retrievedAt: string;
   },
 ): ScheduledIngestionRun {
-  const run = {
-    runId: hashValue({ jobId: job.jobId, sourceId: job.sourceId, retrievedAt: input.retrievedAt, probe: input.probe }).slice(0, 24),
+  const base = {
+    runId: hashValue({ jobId: job.jobId, sourceId: job.sourceId, retrievedAt: input.retrievedAt, probe: input.probe, recordHashes: input.records.map((record) => record.sourceRecordHash) }).slice(0, 24),
     jobId: job.jobId,
     sourceId: job.sourceId,
     sourceName: job.sourceName,
@@ -185,9 +221,11 @@ function buildRun(
     blockerCount: input.blockers.length,
     blockers: input.blockers,
     probe: input.probe,
+    recordCount: input.records.length,
+    records: input.records,
     retrievedAt: input.retrievedAt,
   };
-  return { ...run, provenanceHash: hashValue(run) };
+  return { ...base, provenanceHash: hashValue(base) };
 }
 
 const memoryRuns: ScheduledIngestionRun[] = [];
@@ -202,22 +240,37 @@ async function persistScheduledIngestionRuns(runs: ScheduledIngestionRun[]): Pro
 }
 
 async function persistToPostgres(pool: Pool, runs: ScheduledIngestionRun[]): Promise<void> {
-  for (const run of runs) {
-    await pool.query(
-      `insert into source_ingestion_runs (
-        source_id, parser_key, status, expected_records, blocker_count, provenance_hash, started_at, completed_at
-      ) values ($1,$2,$3,$4,$5,$6,$7,$8)`,
-      [
-        run.sourceId,
-        run.parserKey,
-        run.status,
-        run.expectedRecords,
-        run.blockerCount,
-        run.provenanceHash,
-        run.retrievedAt,
-        ["completed", "parser_required", "auth_required", "blocked", "failed"].includes(run.status) ? run.retrievedAt : null,
-      ],
-    );
+  const client = await pool.connect();
+  try {
+    await client.query("begin");
+    for (const run of runs) {
+      await client.query(
+        `insert into source_ingestion_runs (
+          run_id, source_id, parser_key, status, expected_records, blocker_count, record_count, provenance_hash, started_at, completed_at
+        ) values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)
+        on conflict (run_id) do nothing`,
+        [run.runId, run.sourceId, run.parserKey, run.status, run.expectedRecords, run.blockerCount, run.recordCount, run.provenanceHash, run.retrievedAt, run.retrievedAt],
+      );
+      for (const record of run.records) {
+        await client.query(
+          `insert into source_records (
+            record_id, run_id, source_id, parser_key, record_type, title, source_url, fields, source_record_hash, retrieved_at
+          ) values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)
+          on conflict (record_id) do update set
+            run_id = excluded.run_id,
+            fields = excluded.fields,
+            source_record_hash = excluded.source_record_hash,
+            retrieved_at = excluded.retrieved_at`,
+          [record.recordId, run.runId, record.sourceId, record.parserKey, record.recordType, record.title, record.sourceUrl, JSON.stringify(record.fields), record.sourceRecordHash, record.retrievedAt],
+        );
+      }
+    }
+    await client.query("commit");
+  } catch (error) {
+    await client.query("rollback");
+    throw error;
+  } finally {
+    client.release();
   }
 }
 
