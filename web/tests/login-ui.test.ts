@@ -22,8 +22,8 @@ describe("DISHA secure login UI", () => {
     const source = fs.readFileSync(loginClient, "utf8");
     const css = fs.readFileSync(loginStyles, "utf8");
 
-    expect(css).toContain('url("/disha66-login-reference.avif")');
-    expect(css).toContain("left center / auto 100% no-repeat");
+    expect(css).toContain('url("/disha66-login-reference.webp")');
+    expect(css).toContain("left center / auto 118% no-repeat");
     expect(source).not.toContain("HERO_PARTS");
     expect(source).not.toContain("data:image/avif;base64,");
     expect(source).not.toContain("/disha-login-hero.webp");
