@@ -35,7 +35,8 @@ export function LoginClient({ returnUrl }: { returnUrl: string }) {
   const normalizedEmail = email.trim().toLowerCase();
   const isGodAdmin = normalizedEmail === GOD_ADMIN_EMAIL;
   const emailValid = useMemo(() => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail), [normalizedEmail]);
-  const formValid = emailValid && password.length >= 8;
+  const passwordMinLength = isGodAdmin ? 8 : 12;
+  const formValid = emailValid && password.length >= passwordMinLength;
 
   async function signIn(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -50,7 +51,7 @@ export function LoginClient({ returnUrl }: { returnUrl: string }) {
         method: "POST",
         credentials: "same-origin",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: normalizedEmail, password }),
+        body: JSON.stringify({ email: normalizedEmail, password, rememberMe }),
       });
 
       if (!response.ok) {
@@ -60,16 +61,6 @@ export function LoginClient({ returnUrl }: { returnUrl: string }) {
         }
         if (response.status === 429) throw new Error("Too many sign-in attempts. Please wait before trying again.");
         throw new Error("Secure sign-in is temporarily unavailable. Please try again.");
-      }
-
-      // Session persistence is provided by the existing secure HttpOnly access/refresh cookies.
-      // The checkbox intentionally controls browser credential persistence only; auth tokens never enter localStorage.
-      if (!rememberMe) {
-        try {
-          window.sessionStorage.setItem("disha-login-session-only", "1");
-        } catch {
-          // Session storage is non-authoritative and may be unavailable in hardened browsers.
-        }
       }
 
       router.replace(returnUrl);
@@ -147,7 +138,7 @@ export function LoginClient({ returnUrl }: { returnUrl: string }) {
             <LockKeyhole aria-hidden="true" size={19} />
             <input
               autoComplete="current-password"
-              minLength={8}
+              minLength={passwordMinLength}
               onChange={(event) => {
                 setPassword(event.target.value);
                 setError(null);
@@ -171,7 +162,7 @@ export function LoginClient({ returnUrl }: { returnUrl: string }) {
           <div className={styles.formMeta}>
             <label className={styles.rememberLabel}>
               <input checked={rememberMe} onChange={(event) => setRememberMe(event.target.checked)} type="checkbox" />
-              <span>Remember this browser</span>
+              <span>Remember me</span>
             </label>
             <button className={styles.adminShortcut} onClick={useGodAdmin} type="button">
               <KeyRound size={14} /> God Admin
