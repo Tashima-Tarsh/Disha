@@ -21,14 +21,29 @@ jobs:
           ref: fix/login-from-zip-reference
           fetch-depth: 0
 
-      - name: Decode supplied artwork
+      - name: Decode and verify supplied artwork
         shell: bash
         run: |
           set -euo pipefail
-          cat web/public/login-artwork-v2/part*.txt | tr -d '\r\n' | base64 --decode > web/public/disha66-login-reference.avif
+          payload="$(cat web/public/login-artwork-v2/part*.txt | tr -d '\r\n')"
+          remainder=$(( ${#payload} % 4 ))
+          if [ "$remainder" -eq 2 ]; then
+            payload="${payload}=="
+          elif [ "$remainder" -eq 3 ]; then
+            payload="${payload}="
+          elif [ "$remainder" -eq 1 ]; then
+            echo "Invalid base64 payload length" >&2
+            exit 1
+          fi
+          printf '%s' "$payload" | base64 --decode > web/public/disha66-login-reference.avif
           test -s web/public/disha66-login-reference.avif
-          file web/public/disha66-login-reference.avif | tee /tmp/filetype.txt
-          grep -Eqi 'AVIF|ISO Media|image' /tmp/filetype.txt
+          file web/public/disha66-login-reference.avif
+          ffprobe -v error -select_streams v:0 \
+            -show_entries stream=codec_name,width,height \
+            -of default=noprint_wrappers=1 web/public/disha66-login-reference.avif | tee /tmp/artwork-meta.txt
+          grep -Eq '^codec_name=av1$' /tmp/artwork-meta.txt
+          grep -Eq '^width=[1-9][0-9]+$' /tmp/artwork-meta.txt
+          grep -Eq '^height=[1-9][0-9]+$' /tmp/artwork-meta.txt
 
       - name: Commit static artwork asset
         shell: bash
