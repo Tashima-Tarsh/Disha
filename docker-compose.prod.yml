@@ -50,9 +50,9 @@ services:
     environment:
       DISHA_BRAIN_API_HOST: 0.0.0.0
       DISHA_BRAIN_API_PORT: 8080
-      DISHA_BRAIN_API_TOKEN: ${DISHA_BRAIN_API_TOKEN:-change-me}
+      DISHA_BRAIN_API_TOKEN: ${DISHA_BRAIN_API_TOKEN:?set-me}
       DISHA_BRAIN_DB_PATH: /data/disha_brain.db
-      DISHA_ALLOWED_ORIGINS: ${DISHA_ALLOWED_ORIGINS:-http://localhost:3000}
+      DISHA_ALLOWED_ORIGINS: ${DISHA_ALLOWED_ORIGINS:?set-production-origins}
     volumes:
       - disha_data:/data
     ports:
@@ -98,14 +98,17 @@ services:
     image: ghcr.io/${GITHUB_REPOSITORY_OWNER:-tashima-tarsh}/disha-web:latest
     environment:
       NODE_ENV: production
-      DISHA_AUTH_MODE: ${DISHA_AUTH_MODE:-dev-jwt}
+      DISHA_AUTH_MODE: ${DISHA_AUTH_MODE:?set-to-oidc}
       DISHA_JWT_SECRET: ${DISHA_JWT_SECRET:?set-me}
-      DISHA_DEV_PASSWORD: ${DISHA_DEV_PASSWORD:?set-me}
+      DISHA_OIDC_ISSUER: ${DISHA_OIDC_ISSUER:?set-me}
+      DISHA_OIDC_CLIENT_ID: ${DISHA_OIDC_CLIENT_ID:?set-me}
+      DISHA_OIDC_CLIENT_SECRET: ${DISHA_OIDC_CLIENT_SECRET:?set-me}
+      DISHA_OIDC_REDIRECT_URI: ${DISHA_OIDC_REDIRECT_URI:?set-me}
       DATABASE_URL: postgresql://disha:${POSTGRES_PASSWORD:?set-me}@postgres:5432/disha
       REDIS_URL: redis://redis:6379
-      DISHA_ALLOWED_ORIGINS: ${DISHA_ALLOWED_ORIGINS:-http://localhost:3000}
-      DISHA_BRAIN_URL: ${DISHA_BRAIN_URL:-}
-      DISHA_BRAIN_API_TOKEN: ${DISHA_BRAIN_API_TOKEN:-}
+      DISHA_ALLOWED_ORIGINS: ${DISHA_ALLOWED_ORIGINS:?set-production-origins}
+      DISHA_BRAIN_URL: ${DISHA_BRAIN_URL:?set-brain-url}
+      DISHA_BRAIN_API_TOKEN: ${DISHA_BRAIN_API_TOKEN:?set-me}
 
       # Cloud model (optional)
       OPENAI_API_KEY: ${OPENAI_API_KEY:-}
