@@ -47,7 +47,7 @@ export function LoginClient({ returnUrl }: { returnUrl: string }) {
       HERO_PARTS.map(async (part) => {
         const response = await fetch(part, { cache: "force-cache" });
         if (!response.ok) throw new Error(`Unable to load login artwork: ${part}`);
-        return response.text();
+        return (await response.text()).trim();
       }),
     )
       .then((parts) => {
@@ -115,30 +115,21 @@ export function LoginClient({ returnUrl }: { returnUrl: string }) {
 
   return (
     <main className={styles.shell}>
-      <div className={styles.visualLayer} aria-hidden="true">
+      <section className={styles.visualLayer} aria-label="DISHA secure access artwork">
         {heroSrc ? (
           <img
-            alt=""
+            alt="DISHA secure national intelligence artwork"
             className={styles.hero}
             decoding="async"
             fetchPriority="high"
             src={heroSrc}
           />
         ) : (
-          <div className={styles.heroLoading} />
+          <div className={styles.heroLoading} aria-label="Loading DISHA artwork" />
         )}
-      </div>
+      </section>
 
       <section className={styles.loginPanel} aria-labelledby="secure-access-title">
-        <header className={styles.brandHeader}>
-          <div className={styles.brandMark} aria-hidden="true">D</div>
-          <div>
-            <p className={styles.brandName}>DISHA <span>6.6</span></p>
-            <p className={styles.brandDescriptor}>National Intelligence Integration Platform</p>
-          </div>
-          <div className={styles.govtMark}>भारत सरकार<br /><span>GOVERNMENT OF INDIA</span></div>
-        </header>
-
         <div className={styles.headingBlock}>
           <p className={styles.kicker}>PROTECTED IDENTITY GATEWAY</p>
           <h1 id="secure-access-title">Secure Access</h1>
@@ -221,10 +212,6 @@ export function LoginClient({ returnUrl }: { returnUrl: string }) {
             <span><small>Continue with</small>Microsoft / Intra ID</span>
           </button>
         </div>
-
-        <p className={styles.lifecycleNote}>
-          Password reset and self-registration are not exposed here because this repository does not currently provide a production password-lifecycle/email service. Managed users should use their approved identity provider.
-        </p>
 
         <footer className={styles.securityFooter}>
           <div><ShieldCheck size={19} /><span>Encrypted<br />connection</span></div>
