@@ -1,0 +1,42 @@
+name: Assemble login artwork
+
+on:
+  push:
+    branches:
+      - fix/correct-login-reference-asset
+    paths:
+      - 'web/public/login-artwork/**'
+      - '.github/workflows/assemble-login-artwork.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  assemble:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: fix/correct-login-reference-asset
+          fetch-depth: 0
+
+      - name: Decode supplied artwork
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat web/public/login-artwork/part*.txt | tr -d '\r\n' | base64 --decode > web/public/disha-login-visual.avif
+          test -s web/public/disha-login-visual.avif
+          file web/public/disha-login-visual.avif
+
+      - name: Commit static artwork asset
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add web/public/disha-login-visual.avif
+          if git diff --cached --quiet; then
+            exit 0
+          fi
+          git commit -m 'fix: commit supplied login artwork as static asset'
+          git push origin HEAD:fix/correct-login-reference-asset
