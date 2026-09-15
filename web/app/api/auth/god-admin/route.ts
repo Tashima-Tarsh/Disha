@@ -13,9 +13,10 @@ const GOD_ADMIN_EMAIL = "nitish@thenitishkr.in";
 export async function POST(req: NextRequest) {
   try {
     await assertPublicRequestGuards(req);
-    const body = await req.json() as { email?: unknown; password?: unknown };
+    const body = await req.json() as { email?: unknown; password?: unknown; rememberMe?: unknown };
     const email = typeof body.email === "string" ? body.email.trim().toLowerCase() : "";
     const password = typeof body.password === "string" ? body.password : "";
+    const persistent = typeof body.rememberMe === "boolean" ? body.rememberMe : true;
 
     if (email !== GOD_ADMIN_EMAIL) {
       throw Object.assign(new Error("Invalid God Admin credentials"), { status: 401 });
@@ -30,9 +31,9 @@ export async function POST(req: NextRequest) {
       throw Object.assign(new Error("Invalid God Admin credentials"), { status: 401 });
     }
 
-    const session = await createSession(GOD_ADMIN_EMAIL, ["admin"]);
+    const session = await createSession(GOD_ADMIN_EMAIL, ["admin"], { persistent });
     const response = NextResponse.json({ user: session.principal });
-    setSessionCookies(response, session.accessToken, session.refreshToken);
+    setSessionCookies(response, session.accessToken, session.refreshToken, session.persistent);
     setCsrfCookie(response);
     await audit({
       requestId: requestId(req),

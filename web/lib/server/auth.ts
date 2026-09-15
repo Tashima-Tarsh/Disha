@@ -9,6 +9,7 @@ const ACCESS_COOKIE = ACCESS_COOKIE_NAME;
 const REFRESH_COOKIE = "disha_refresh";
 const ACCESS_TTL_SECONDS = 15 * 60;
 const REFRESH_TTL_SECONDS = 14 * 24 * 60 * 60;
+const SESSION_REFRESH_TTL_SECONDS = 8 * 60 * 60;
 
 interface TokenPayload {
   sub: string;
@@ -18,6 +19,7 @@ interface TokenPayload {
   typ: "access" | "refresh";
   jti: string;
   exp: number;
+  persistent?: boolean;
 }
 
 export function authSigningSecret(): string {
@@ -60,8 +62,12 @@ async function ensureRefreshUsable(payload: TokenPayload): Promise<void> {
   }
 }
 
-function createToken(base: Omit<TokenPayload, "typ" | "jti" | "exp">, typ: "access" | "refresh") {
-  const ttl = typ === "access" ? ACCESS_TTL_SECONDS : REFRESH_TTL_SECONDS;
+function createToken(
+  base: Omit<TokenPayload, "typ" | "jti" | "exp">,
+  typ: "access" | "refresh",
+  refreshTtlSeconds = REFRESH_TTL_SECONDS,
+) {
+  const ttl = typ === "access" ? ACCESS_TTL_SECONDS : refreshTtlSeconds;
   const payload: TokenPayload = {
     ...base,
     typ,
@@ -71,14 +77,28 @@ function createToken(base: Omit<TokenPayload, "typ" | "jti" | "exp">, typ: "acce
   return { payload, token: signJson({ ...payload }, authSigningSecret()) };
 }
 
-export async function createSession(email: string, roles: Role[] = ["analyst"]) {
+export async function createSession(
+  email: string,
+  roles: Role[] = ["analyst"],
+  options: { persistent?: boolean } = {},
+) {
+  const persistent = options.persistent ?? true;
   const userId = email.toLowerCase();
   const sessionId = randomToken();
-  const base = { sub: userId, email, roles, sessionId };
+  const base = { sub: userId, email, roles, sessionId, persistent };
   const access = createToken(base, "access");
-  const refresh = createToken(base, "refresh");
+  const refresh = createToken(
+    base,
+    "refresh",
+    persistent ? REFRESH_TTL_SECONDS : SESSION_REFRESH_TTL_SECONDS,
+  );
   await storeRefreshToken(refresh.payload, refresh.token);
-  return { accessToken: access.token, refreshToken: refresh.token, principal: { userId, email, roles, sessionId } };
+  return {
+    accessToken: access.token,
+    refreshToken: refresh.token,
+    principal: { userId, email, roles, sessionId },
+    persistent,
+  };
 }
 
 export async function rotateSession(refreshToken: string) {
@@ -86,12 +106,21 @@ export async function rotateSession(refreshToken: string) {
   if (payload.typ !== "refresh") throw Object.assign(new Error("Refresh token required"), { status: 401 });
   await ensureRefreshUsable(payload);
   await revokeRefreshToken(payload.jti);
-  return createSession(payload.email, payload.roles);
+  return createSession(payload.email, payload.roles, { persistent: payload.persistent ?? true });
 }
 
-export function setSessionCookies(response: NextResponse, accessToken: string, refreshToken: string): void {
+export function setSessionCookies(
+  response: NextResponse,
+  accessToken: string,
+  refreshToken: string,
+  persistent = true,
+): void {
   response.cookies.set(ACCESS_COOKIE, accessToken, cookieOptions(ACCESS_TTL_SECONDS));
-  response.cookies.set(REFRESH_COOKIE, refreshToken, cookieOptions(REFRESH_TTL_SECONDS));
+  response.cookies.set(
+    REFRESH_COOKIE,
+    refreshToken,
+    cookieOptions(persistent ? REFRESH_TTL_SECONDS : SESSION_REFRESH_TTL_SECONDS),
+  );
 }
 
 export function clearSessionCookies(response: NextResponse): void {
@@ -120,7 +149,7 @@ export function requirePrincipal(req: NextRequest): Principal {
   return principalFromAccessToken(token);
 }
 
-export async function devLogin(email: string, password: string) {
+export async function devLogin(email: string, password: string, persistent = true) {
   const env = getEnv();
   if (env.NODE_ENV === "production" || env.DISHA_AUTH_MODE !== "dev-jwt") {
     throw Object.assign(new Error("Development password login is disabled"), { status: 403 });
@@ -131,5 +160,5 @@ export async function devLogin(email: string, password: string) {
   const roles: Role[] = normalizedEmail === "nitish@thenitishkr.in" || normalizedEmail.endsWith("@admin.local")
     ? ["admin"]
     : ["analyst"];
-  return createSession(email, roles);
+  return createSession(email, roles, { persistent });
 }
