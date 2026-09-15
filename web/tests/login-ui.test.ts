@@ -18,15 +18,17 @@ describe("DISHA secure login UI", () => {
     expect(source).not.toContain("localStorage");
   });
 
-  it("keeps the cinematic reference full-screen without page scrolling", () => {
+  it("uses the latest bright reference artwork without page scrolling", () => {
     const source = fs.readFileSync(loginClient, "utf8");
     const css = fs.readFileSync(loginStyles, "utf8");
 
-    expect(source).toContain('src="/disha-login-hero.webp"');
+    expect(source).toContain('src="/disha-login-visual.avif"');
+    expect(source).toContain('sizes="(max-width: 700px) 100vw, 58vw"');
     expect(source).toContain("quality={100}");
     expect(css).toContain("height: 100dvh");
     expect(css).toContain("position: fixed");
     expect(css).toContain("overflow: hidden");
+    expect(css).toContain("width: 61vw");
     expect(css).toContain("object-fit: cover");
     expect(css).not.toContain("overflow: auto");
   });
