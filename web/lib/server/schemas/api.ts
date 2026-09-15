@@ -40,6 +40,7 @@ export const conversationSchema = z.object({
 export const loginSchema = z.object({
   email: z.string().email(),
   password: z.string().min(12).max(256),
+  rememberMe: z.boolean().optional().default(true),
 });
 
 export const otpRequestSchema = z.object({
