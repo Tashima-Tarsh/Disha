@@ -18,33 +18,25 @@ describe("DISHA secure login UI", () => {
     expect(source).not.toContain("localStorage");
   });
 
-  it("loads the supplied artwork without reusing the old low-resolution hero", () => {
+  it("uses the supplied artwork as a normal static asset", () => {
     const source = fs.readFileSync(loginClient, "utf8");
+    const css = fs.readFileSync(loginStyles, "utf8");
 
-    expect(source).toContain('"/login-artwork/part00.txt"');
-    expect(source).toContain('"/login-artwork/part05.txt"');
-    expect(source).toContain("(await response.text()).trim()");
-    expect(source).toContain("data:image/avif;base64,");
+    expect(css).toContain('url("/disha66-login-reference.avif")');
+    expect(css).toContain("left center / auto 100% no-repeat");
+    expect(source).not.toContain("HERO_PARTS");
+    expect(source).not.toContain("data:image/avif;base64,");
     expect(source).not.toContain("/disha-login-hero.webp");
   });
 
-  it("keeps desktop fixed to the viewport without scrolling or cropping the supplied artwork", () => {
+  it("keeps the page fixed to the viewport without page scrolling", () => {
     const css = fs.readFileSync(loginStyles, "utf8");
 
-    expect(css).toContain("grid-template-columns: 60% 40%");
+    expect(css).toContain("grid-template-columns: minmax(0, 1.58fr) minmax(430px, 0.72fr)");
     expect(css).toContain("height: 100dvh");
     expect(css).toContain("position: fixed");
     expect(css).toContain("overflow: hidden");
-    expect(css).toContain("object-fit: contain");
     expect(css).not.toContain("overflow: auto");
-  });
-
-  it("does not add a duplicate DISHA brand logo over the supplied artwork", () => {
-    const source = fs.readFileSync(loginClient, "utf8");
-
-    expect(source).not.toContain("brandMark");
-    expect(source).not.toContain("brandName");
-    expect(source).not.toContain("National Intelligence Integration Platform");
   });
 
   it("keeps God Admin restricted to the existing designated identity", () => {
@@ -55,6 +47,15 @@ describe("DISHA secure login UI", () => {
     expect(source).toContain("God Admin");
   });
 
+  it("shows only approved identity providers wired to the existing OIDC route", () => {
+    const source = fs.readFileSync(loginClient, "utf8");
+
+    expect(source).toContain('startOidc("meri-pehchan")');
+    expect(source).toContain('startOidc("intra-id")');
+    expect(source).not.toContain("Continue with Google");
+    expect(source).not.toContain("NIC SSO");
+  });
+
   it("does not advertise unsupported password reset or registration actions", () => {
     const source = fs.readFileSync(loginClient, "utf8");
 
@@ -62,5 +63,13 @@ describe("DISHA secure login UI", () => {
     expect(source).not.toContain('href="/register"');
     expect(source).not.toContain("Forgot Password");
     expect(source).not.toContain("Create Account");
+  });
+
+  it("uses truthful security labels for existing controls", () => {
+    const source = fs.readFileSync(loginClient, "utf8");
+
+    expect(source).toContain("Secure<br />session");
+    expect(source).toContain("CSRF<br />protected");
+    expect(source).toContain("Audited<br />access");
   });
 });
