@@ -1,0 +1,1 @@
+Final login artwork correction: trim chunk payloads before assembling the supplied AVIF, keep the supplied artwork only on the left pane, and remove duplicate generated DISHA branding from the login panel.
