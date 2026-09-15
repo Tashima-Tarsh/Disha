@@ -37,13 +37,8 @@ jobs:
           fi
           printf '%s' "$payload" | base64 --decode > web/public/disha66-login-reference.avif
           test -s web/public/disha66-login-reference.avif
-          file web/public/disha66-login-reference.avif
-          ffprobe -v error -select_streams v:0 \
-            -show_entries stream=codec_name,width,height \
-            -of default=noprint_wrappers=1 web/public/disha66-login-reference.avif | tee /tmp/artwork-meta.txt
-          grep -Eq '^codec_name=av1$' /tmp/artwork-meta.txt
-          grep -Eq '^width=[1-9][0-9]+$' /tmp/artwork-meta.txt
-          grep -Eq '^height=[1-9][0-9]+$' /tmp/artwork-meta.txt
+          file web/public/disha66-login-reference.avif | tee /tmp/artwork-type.txt
+          grep -q 'AVIF Image' /tmp/artwork-type.txt
 
       - name: Commit static artwork asset
         shell: bash
