@@ -4,7 +4,7 @@ import { LoginClient } from "./login-client";
 
 export const metadata: Metadata = {
   title: "Secure Access | DISHA 6.6",
-  description: "DISHA 6.6 production biometric and God Admin access gateway.",
+  description: "DISHA 6.6 secure identity and administrator access gateway.",
 };
 
 type LoginPageProps = {
