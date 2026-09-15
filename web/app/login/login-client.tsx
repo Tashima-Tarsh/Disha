@@ -12,13 +12,20 @@ import {
   Mail,
   ShieldCheck,
 } from "lucide-react";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { FormEvent, useMemo, useState } from "react";
+import { FormEvent, useEffect, useMemo, useState } from "react";
 
 import styles from "./login.module.css";
 
 const GOD_ADMIN_EMAIL = "nitish@thenitishkr.in";
+const HERO_PARTS = [
+  "/login-artwork/part00.txt",
+  "/login-artwork/part01.txt",
+  "/login-artwork/part02.txt",
+  "/login-artwork/part03.txt",
+  "/login-artwork/part04.txt",
+  "/login-artwork/part05.txt",
+] as const;
 
 type SubmitState = "idle" | "submitting" | "error";
 type OidcProvider = "meri-pehchan" | "intra-id";
@@ -31,6 +38,29 @@ export function LoginClient({ returnUrl }: { returnUrl: string }) {
   const [rememberMe, setRememberMe] = useState(true);
   const [state, setState] = useState<SubmitState>("idle");
   const [error, setError] = useState<string | null>(null);
+  const [heroSrc, setHeroSrc] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    void Promise.all(
+      HERO_PARTS.map(async (part) => {
+        const response = await fetch(part, { cache: "force-cache" });
+        if (!response.ok) throw new Error(`Unable to load login artwork: ${part}`);
+        return response.text();
+      }),
+    )
+      .then((parts) => {
+        if (!cancelled) setHeroSrc(`data:image/avif;base64,${parts.join("")}`);
+      })
+      .catch(() => {
+        if (!cancelled) setHeroSrc(null);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const normalizedEmail = email.trim().toLowerCase();
   const isGodAdmin = normalizedEmail === GOD_ADMIN_EMAIL;
@@ -86,16 +116,17 @@ export function LoginClient({ returnUrl }: { returnUrl: string }) {
   return (
     <main className={styles.shell}>
       <div className={styles.visualLayer} aria-hidden="true">
-        <Image
-          alt=""
-          className={styles.hero}
-          fill
-          priority
-          quality={100}
-          sizes="100vw"
-          src="/disha-login-hero.webp"
-          unoptimized
-        />
+        {heroSrc ? (
+          <img
+            alt=""
+            className={styles.hero}
+            decoding="async"
+            fetchPriority="high"
+            src={heroSrc}
+          />
+        ) : (
+          <div className={styles.heroLoading} />
+        )}
       </div>
 
       <section className={styles.loginPanel} aria-labelledby="secure-access-title">
