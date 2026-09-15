@@ -10,9 +10,9 @@ export async function POST(req: NextRequest) {
   try {
     await assertPublicRequestGuards(req);
     const body = loginSchema.parse(await req.json());
-    const session = await devLogin(body.email, body.password);
+    const session = await devLogin(body.email, body.password, body.rememberMe);
     const response = NextResponse.json({ user: session.principal });
-    setSessionCookies(response, session.accessToken, session.refreshToken);
+    setSessionCookies(response, session.accessToken, session.refreshToken, session.persistent);
     setCsrfCookie(response);
     await audit({
       requestId: requestId(req),
