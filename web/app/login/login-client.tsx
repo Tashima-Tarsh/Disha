@@ -92,8 +92,8 @@ export function LoginClient({ returnUrl }: { returnUrl: string }) {
           fill
           priority
           quality={100}
-          sizes="100vw"
-          src="/disha-login-hero.webp"
+          sizes="(max-width: 700px) 100vw, 58vw"
+          src="/disha-login-visual.avif"
           unoptimized
         />
       </div>
