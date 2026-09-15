@@ -4,28 +4,38 @@
 }
 
 .shell {
-  align-items: center;
   background: #020914;
+  color: #eefaff;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(420px, 1fr);
+  min-height: 100vh;
+  overflow: hidden;
+  width: 100vw;
+}
+
+.visualPane {
+  align-items: center;
+  background:
+    radial-gradient(circle at 55% 50%, rgba(0, 119, 255, 0.16), transparent 42%),
+    #010711;
   display: flex;
   justify-content: center;
   min-height: 100vh;
   overflow: hidden;
-  padding: 0;
+  padding: 18px;
 }
 
-.stage {
-  aspect-ratio: 3 / 2;
-  max-height: 100vh;
-  max-width: 100vw;
-  overflow: hidden;
+.imageFrame {
+  aspect-ratio: 1672 / 941;
+  max-height: calc(100vh - 36px);
   position: relative;
-  width: min(100vw, 150vh);
+  width: 100%;
 }
 
 .hero {
-  display: block;
   height: 100%;
   object-fit: contain;
+  object-position: center;
   pointer-events: none;
   user-select: none;
   width: 100%;
@@ -36,142 +46,133 @@
   border: 0;
   border-radius: 999px;
   cursor: pointer;
-  height: 8.2%;
-  left: 38.5%;
+  height: 7.2%;
+  left: 39.7%;
   outline: none;
   position: absolute;
-  top: 62.6%;
-  width: 32.8%;
+  top: 61.1%;
+  width: 21.8%;
+  z-index: 2;
 }
 
-.secureHotspot:focus-visible,
-.secureHotspot:hover {
-  box-shadow: 0 0 0 2px rgba(125, 212, 255, 0.86), 0 0 34px rgba(0, 165, 255, 0.76);
+.secureHotspot:hover,
+.secureHotspot:focus-visible {
+  box-shadow: 0 0 0 2px rgba(126, 217, 255, 0.95), 0 0 30px rgba(0, 167, 255, 0.72);
 }
 
-.godAdminTrigger {
-  align-items: center;
-  backdrop-filter: blur(18px);
-  background: rgba(1, 12, 27, 0.56);
-  border: 1px solid rgba(151, 213, 255, 0.35);
-  border-radius: 999px;
-  bottom: 2.2%;
-  color: #e9f8ff;
-  cursor: pointer;
-  display: inline-flex;
-  font: 700 11px/1 ui-sans-serif, system-ui, sans-serif;
-  gap: 7px;
-  letter-spacing: 0.14em;
-  padding: 10px 14px;
-  position: absolute;
-  right: 2.2%;
-  text-transform: uppercase;
-  z-index: 5;
+.loginPane {
+  background:
+    linear-gradient(135deg, rgba(1, 11, 27, 0.98), rgba(3, 26, 58, 0.97)),
+    #031229;
+  border-left: 1px solid rgba(102, 210, 255, 0.18);
+  display: flex;
+  min-height: 100vh;
+  overflow: auto;
+  position: relative;
 }
 
-.godAdminTrigger:hover,
-.godAdminTrigger:focus-visible {
-  border-color: #70d9ff;
-  box-shadow: 0 0 24px rgba(21, 174, 255, 0.32);
-  outline: none;
-}
-
-.backdrop {
-  backdrop-filter: blur(7px);
-  background: rgba(0, 5, 16, 0.58);
-  border: 0;
-  cursor: default;
-  inset: 0;
-  position: absolute;
-  z-index: 10;
-}
-
-.accessPanel,
-.adminPanel {
-  backdrop-filter: blur(28px) saturate(1.25);
-  background: linear-gradient(145deg, rgba(2, 16, 37, 0.95), rgba(3, 25, 54, 0.88));
-  border: 1px solid rgba(98, 206, 255, 0.46);
-  border-radius: 28px;
-  box-shadow: 0 28px 90px rgba(0, 0, 0, 0.6), 0 0 55px rgba(0, 151, 255, 0.16);
-  color: #eefaff;
-  left: 50%;
-  padding: 32px;
+.loginPane::before {
+  background: linear-gradient(180deg, #ff8a00 0 33.33%, #f8f9fb 33.33% 66.66%, #13b95f 66.66% 100%);
+  content: "";
+  height: 84px;
+  left: 0;
+  opacity: 0.78;
   position: absolute;
   top: 50%;
   transform: translate(-50%, -50%);
-  width: min(760px, 84%);
-  z-index: 20;
+  width: 3px;
 }
 
-.adminPanel {
-  width: min(440px, 82%);
-}
-
-.closeButton {
+.loginInner {
   align-items: center;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.13);
-  border-radius: 50%;
-  color: #d9f5ff;
-  cursor: pointer;
   display: flex;
-  height: 38px;
   justify-content: center;
-  position: absolute;
-  right: 18px;
-  top: 18px;
-  width: 38px;
+  margin: auto;
+  min-height: 100%;
+  padding: clamp(34px, 6vw, 86px);
+  width: min(720px, 100%);
+}
+
+.welcomePanel,
+.authPanel {
+  animation: rise 240ms ease-out;
+  width: 100%;
 }
 
 .eyebrow {
-  color: #65d8ff;
-  font: 800 11px/1 ui-sans-serif, system-ui, sans-serif;
-  letter-spacing: 0.22em;
-  margin: 0 0 10px;
+  color: #66d9ff;
+  font: 800 12px/1 ui-sans-serif, system-ui, sans-serif;
+  letter-spacing: 0.24em;
+  margin: 0 0 14px;
   text-transform: uppercase;
 }
 
-.accessPanel h1,
-.adminPanel h1 {
-  font: 800 clamp(24px, 3.2vw, 40px)/1.05 ui-sans-serif, system-ui, sans-serif;
-  letter-spacing: -0.03em;
+.welcomePanel h1,
+.authPanel h1 {
+  font: 800 clamp(34px, 4.2vw, 58px)/0.98 ui-sans-serif, system-ui, sans-serif;
+  letter-spacing: -0.045em;
   margin: 0;
 }
 
 .summary {
-  color: #a9c5d4;
-  font: 500 14px/1.55 ui-sans-serif, system-ui, sans-serif;
-  margin: 12px 0 24px;
-  max-width: 640px;
+  color: #9fbccc;
+  font: 500 15px/1.7 ui-sans-serif, system-ui, sans-serif;
+  margin: 18px 0 28px;
+  max-width: 620px;
+}
+
+.primaryButton,
+.secondaryButton,
+.backLink {
+  align-items: center;
+  border-radius: 16px;
+  cursor: pointer;
+  display: inline-flex;
+  font: 800 13px/1 ui-sans-serif, system-ui, sans-serif;
+  gap: 9px;
+  justify-content: center;
+  min-height: 54px;
+}
+
+.primaryButton {
+  background: linear-gradient(90deg, #087dc7, #0eb2ed);
+  border: 1px solid rgba(164, 230, 255, 0.62);
+  box-shadow: 0 16px 40px rgba(0, 145, 225, 0.25);
+  color: white;
+  padding: 0 24px;
+  width: 100%;
+}
+
+.secondaryButton {
+  background: rgba(4, 25, 52, 0.84);
+  border: 1px solid rgba(122, 205, 244, 0.25);
+  color: #dff7ff;
+  margin-top: 12px;
+  padding: 0 22px;
+  width: 100%;
 }
 
 .factorGrid {
   display: grid;
-  gap: 12px;
-  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  margin-top: 8px;
 }
 
 .factorCard {
-  background: rgba(1, 15, 34, 0.78);
-  border: 1px solid rgba(101, 216, 255, 0.23);
-  border-radius: 20px;
+  align-items: center;
+  background: rgba(1, 14, 31, 0.82);
+  border: 1px solid rgba(101, 216, 255, 0.18);
+  border-radius: 18px;
   display: grid;
-  gap: 13px;
-  min-height: 190px;
-  padding: 20px;
+  gap: 14px;
+  grid-template-columns: auto 1fr;
+  min-height: 118px;
+  padding: 18px 20px;
 }
 
-.factorCard:nth-child(1) svg {
-  color: #35a9ff;
-}
-
-.factorCard:nth-child(2) svg {
-  color: #44ffd7;
-}
-
-.factorCard:nth-child(3) svg {
-  color: #ff4d64;
-}
+.factorCard:nth-child(1) svg { color: #35a9ff; }
+.factorCard:nth-child(2) svg { color: #44ffd7; }
+.factorCard:nth-child(3) svg { color: #ff5369; }
 
 .factorCard div {
   display: grid;
@@ -179,7 +180,7 @@
 }
 
 .factorCard strong {
-  font: 800 16px/1.1 ui-sans-serif, system-ui, sans-serif;
+  font: 800 17px/1.1 ui-sans-serif, system-ui, sans-serif;
 }
 
 .factorCard span,
@@ -189,33 +190,40 @@
 }
 
 .factorCard small {
-  align-self: end;
-  color: #d8f6ff;
+  grid-column: 2;
+  color: #d7f5ff;
   font-weight: 700;
 }
 
 .policyNote {
   align-items: flex-start;
-  background: rgba(31, 132, 187, 0.08);
-  border: 1px solid rgba(99, 215, 255, 0.17);
+  background: rgba(33, 143, 198, 0.08);
+  border: 1px solid rgba(99, 215, 255, 0.16);
   border-radius: 16px;
-  color: #a8c6d5;
+  color: #a9c6d4;
   display: flex;
-  font: 500 12px/1.5 ui-sans-serif, system-ui, sans-serif;
+  font: 500 12px/1.55 ui-sans-serif, system-ui, sans-serif;
   gap: 10px;
   margin-top: 18px;
-  padding: 13px 15px;
+  padding: 14px 15px;
 }
 
 .policyNote svg {
-  color: #54d8ff;
+  color: #55d9ff;
   flex: 0 0 auto;
   margin-top: 1px;
 }
 
+.actionRow {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: 1fr 1fr;
+  margin-top: 8px;
+}
+
 .adminForm {
   display: grid;
-  gap: 15px;
+  gap: 16px;
 }
 
 .adminForm label {
@@ -227,12 +235,12 @@
 }
 
 .adminForm input {
-  background: rgba(0, 9, 22, 0.8);
+  background: rgba(0, 9, 22, 0.82);
   border: 1px solid rgba(118, 205, 244, 0.27);
   border-radius: 14px;
   color: #f3fbff;
   font: 500 14px/1 ui-sans-serif, system-ui, sans-serif;
-  min-height: 50px;
+  min-height: 52px;
   outline: none;
   padding: 0 14px;
 }
@@ -242,22 +250,7 @@
   box-shadow: 0 0 0 3px rgba(52, 185, 255, 0.13);
 }
 
-.adminForm button[type="submit"] {
-  align-items: center;
-  background: linear-gradient(90deg, #087bc5, #0da6e7);
-  border: 1px solid rgba(154, 226, 255, 0.56);
-  border-radius: 15px;
-  box-shadow: 0 12px 35px rgba(0, 141, 224, 0.28);
-  color: white;
-  cursor: pointer;
-  display: flex;
-  font: 800 13px/1 ui-sans-serif, system-ui, sans-serif;
-  gap: 9px;
-  justify-content: center;
-  min-height: 52px;
-}
-
-.adminForm button:disabled {
+.primaryButton:disabled {
   cursor: wait;
   opacity: 0.68;
 }
@@ -272,6 +265,14 @@
   padding: 11px 13px;
 }
 
+.backLink {
+  background: transparent;
+  border: 0;
+  color: #79d9ff;
+  margin-top: 18px;
+  padding: 0;
+}
+
 .spin {
   animation: spin 0.9s linear infinite;
 }
@@ -280,30 +281,42 @@
   to { transform: rotate(360deg); }
 }
 
-@media (max-width: 760px) {
-  .stage {
-    aspect-ratio: 3 / 2;
-    width: 100vw;
-  }
+@keyframes rise {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
 
-  .factorGrid {
-    grid-template-columns: 1fr;
-    max-height: 48vh;
+@media (max-width: 900px) {
+  .shell {
+    display: block;
     overflow: auto;
   }
 
-  .factorCard {
-    min-height: 118px;
+  .visualPane {
+    min-height: auto;
+    padding: 10px;
   }
 
-  .accessPanel,
-  .adminPanel {
-    padding: 25px;
-    width: 90%;
+  .imageFrame {
+    max-height: none;
+    width: 100%;
   }
 
-  .godAdminTrigger {
-    bottom: 14px;
-    right: 14px;
+  .loginPane {
+    border-left: 0;
+    border-top: 1px solid rgba(102, 210, 255, 0.18);
+    min-height: 58vh;
+  }
+
+  .loginPane::before {
+    display: none;
+  }
+
+  .loginInner {
+    padding: 34px 22px 48px;
+  }
+
+  .actionRow {
+    grid-template-columns: 1fr;
   }
 }
