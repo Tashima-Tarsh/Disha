@@ -6,25 +6,44 @@ const loginClient = path.resolve(__dirname, "../app/login/login-client.tsx");
 const loginStyles = path.resolve(__dirname, "../app/login/login.module.css");
 
 describe("DISHA secure login UI", () => {
-  it("keeps the DISHA artwork on the left and opens authentication on the right", () => {
+  it("renders a real backend-connected login instead of a flattened screenshot", () => {
+    const source = fs.readFileSync(loginClient, "utf8");
+
+    expect(source).toContain('fetch(endpoint');
+    expect(source).toContain('"/api/auth/god-admin"');
+    expect(source).toContain('"/api/auth/login"');
+    expect(source).toContain('/api/auth/oidc/start?');
+    expect(source).toContain('type={showPassword ? "text" : "password"}');
+    expect(source).toContain('disabled={!formValid || state === "submitting"}');
+    expect(source).not.toContain("localStorage");
+  });
+
+  it("keeps the cinematic reference full-screen without page scrolling", () => {
     const source = fs.readFileSync(loginClient, "utf8");
     const css = fs.readFileSync(loginStyles, "utf8");
 
-    expect(source).toContain('className={styles.visualPane}');
-    expect(source).toContain('className={styles.loginPane}');
-    expect(source).toContain('onClick={() => open("biometric")}');
     expect(source).toContain('src="/disha-login-hero.webp"');
     expect(source).toContain("quality={100}");
-    expect(css).toContain("grid-template-columns: minmax(0, 1fr) minmax(420px, 1fr)");
-    expect(css).toContain("object-fit: contain");
-    expect(css).not.toContain("backdrop-filter: blur(7px)");
+    expect(css).toContain("height: 100dvh");
+    expect(css).toContain("position: fixed");
+    expect(css).toContain("overflow: hidden");
+    expect(css).toContain("object-fit: cover");
+    expect(css).not.toContain("overflow: auto");
   });
 
-  it("keeps the privileged God Admin path on the authentication side", () => {
+  it("keeps God Admin restricted to the existing designated identity", () => {
     const source = fs.readFileSync(loginClient, "utf8");
 
     expect(source).toContain('const GOD_ADMIN_EMAIL = "nitish@thenitishkr.in"');
-    expect(source).toContain('/api/auth/god-admin');
+    expect(source).toContain("useGodAdmin");
     expect(source).toContain("God Admin");
+  });
+
+  it("does not advertise unsupported password reset or registration actions", () => {
+    const source = fs.readFileSync(loginClient, "utf8");
+
+    expect(source).not.toContain('href="/forgot-password"');
+    expect(source).not.toContain('href="/register"');
+    expect(source).toContain("does not currently provide a production password-lifecycle/email service");
   });
 });
