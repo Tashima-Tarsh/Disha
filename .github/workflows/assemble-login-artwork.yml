@@ -3,9 +3,9 @@ name: Assemble login artwork
 on:
   push:
     branches:
-      - fix/correct-login-reference-asset
+      - fix/login-from-zip-reference
     paths:
-      - 'web/public/login-artwork/**'
+      - 'web/public/login-artwork-v2/**'
       - '.github/workflows/assemble-login-artwork.yml'
 
 permissions:
@@ -18,25 +18,26 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: fix/correct-login-reference-asset
+          ref: fix/login-from-zip-reference
           fetch-depth: 0
 
       - name: Decode supplied artwork
         shell: bash
         run: |
           set -euo pipefail
-          cat web/public/login-artwork/part*.txt | tr -d '\r\n' | base64 --decode > web/public/disha-login-visual.avif
-          test -s web/public/disha-login-visual.avif
-          file web/public/disha-login-visual.avif
+          cat web/public/login-artwork-v2/part*.txt | tr -d '\r\n' | base64 --decode > web/public/disha66-login-reference.avif
+          test -s web/public/disha66-login-reference.avif
+          file web/public/disha66-login-reference.avif | tee /tmp/filetype.txt
+          grep -Eqi 'AVIF|ISO Media|image' /tmp/filetype.txt
 
       - name: Commit static artwork asset
         shell: bash
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add web/public/disha-login-visual.avif
+          git add web/public/disha66-login-reference.avif
           if git diff --cached --quiet; then
             exit 0
           fi
-          git commit -m 'fix: commit supplied login artwork as static asset'
-          git push origin HEAD:fix/correct-login-reference-asset
+          git commit -m 'fix: publish supplied DISHA login artwork as static asset'
+          git push origin HEAD:fix/login-from-zip-reference
