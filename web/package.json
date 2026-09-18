@@ -13,7 +13,9 @@
     "lint": "eslint .",
     "type-check": "tsc --noEmit",
     "type-check:full": "tsc --noEmit -p tsconfig.full.json",
-    "test": "vitest run"
+    "test": "vitest run",
+    "db:supabase-bootstrap": "node scripts/supabase-compatibility.mjs",
+    "db:supabase-verify": "node scripts/supabase-compatibility.mjs --verify-only"
   },
   "dependencies": {
     "@radix-ui/react-collapsible": "^1.1.16",

@@ -77,9 +77,58 @@ jobs:
       - name: Verify schema after rollback rehearsal
         run: npm run db:verify-schema
 
+  supabase-compatibility:
+    name: Supabase Postgres 17 + PostGIS compatibility
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:54322/postgres
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+
+      - uses: supabase/setup-cli@v1
+        with:
+          version: 2.117.0
+
+      - name: Install dependencies
+        working-directory: web
+        run: npm ci
+
+      - name: Start Supabase Postgres
+        run: supabase db start
+
+      - name: Apply Supabase extension policy
+        working-directory: web
+        run: npm run db:supabase-bootstrap
+
+      - name: Apply DISHA migrations on Supabase
+        working-directory: web
+        run: npm run db:migrate
+
+      - name: Verify DISHA schema on Supabase
+        working-directory: web
+        run: npm run db:verify-schema
+
+      - name: Verify Supabase vector and PostGIS readiness
+        working-directory: web
+        run: npm run db:supabase-verify
+
+      - name: Stop Supabase Postgres
+        if: always()
+        run: supabase stop --no-backup
+
   production-migration:
     name: Approved production migration
-    needs: migration-rehearsal
+    needs:
+      - migration-rehearsal
+      - supabase-compatibility
     runs-on: ubuntu-latest
     if: >-
       (github.event_name == 'push' && github.ref == 'refs/heads/main' && vars.RUN_PRODUCTION_MIGRATIONS == 'true') ||

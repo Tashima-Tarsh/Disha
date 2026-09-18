@@ -1,6 +1,6 @@
 # DISHA Premium Geospatial Command Architecture
 
-Status: production architecture decision record  
+Status: production architecture decision record
 Date: 2026-09-18
 
 ## Product rule

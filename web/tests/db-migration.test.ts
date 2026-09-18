@@ -9,6 +9,7 @@ const webRoot = path.resolve(__dirname, "..");
 describe("DISHA database migration contract", () => {
   it("keeps the migration runner valid JavaScript", () => {
     expect(() => execFileSync(process.execPath, ["--check", path.join(webRoot, "scripts/apply-schema.mjs")])).not.toThrow();
+    expect(() => execFileSync(process.execPath, ["--check", path.join(webRoot, "scripts/supabase-compatibility.mjs")])).not.toThrow();
   });
 
   it("keeps the production schema aligned with evidence, mission, and extension persistence", () => {
@@ -56,9 +57,10 @@ describe("DISHA database migration contract", () => {
 
   it("adds pgvector hybrid retrieval, durable work leasing, and change-driven activation persistence", () => {
     const migration = fs.readFileSync(path.join(webRoot, "database/202609180004_retrieval_workflows.sql"), "utf8");
-    expect(migration).toContain("create extension if not exists vector");
+    expect(migration).toContain("create extension if not exists vector with schema extensions");
+    expect(migration).toContain("embedding extensions.vector(384)");
     expect(migration).toContain("create table if not exists intelligence_search_documents");
-    expect(migration).toContain("using hnsw (embedding vector_cosine_ops)");
+    expect(migration).toContain("using hnsw (embedding extensions.vector_cosine_ops)");
     expect(migration).toContain("create table if not exists durable_work_items");
     expect(migration).toContain("create table if not exists intelligence_activation_policies");
     expect(migration).toContain("create table if not exists intelligence_activation_runs");
@@ -70,6 +72,8 @@ describe("DISHA database migration contract", () => {
     expect(packageJson.scripts["db:migrate"]).toBe("node scripts/apply-schema.mjs");
     expect(packageJson.scripts["db:verify-schema"]).toBe("node scripts/apply-schema.mjs --verify-only");
     expect(packageJson.scripts["db:rollback"]).toBe("node scripts/apply-schema.mjs --rollback");
+    expect(packageJson.scripts["db:supabase-bootstrap"]).toBe("node scripts/supabase-compatibility.mjs");
+    expect(packageJson.scripts["db:supabase-verify"]).toBe("node scripts/supabase-compatibility.mjs --verify-only");
   });
 
   it("runs database migration before the web service in compose deployments", () => {
@@ -94,5 +98,15 @@ describe("DISHA database migration contract", () => {
     expect(workflow).toContain("name: production");
     expect(workflow).toContain("PRODUCTION_DATABASE_URL");
     expect(workflow).toContain("RUN_PRODUCTION_MIGRATIONS");
+    expect(workflow).toContain("Supabase Postgres 17 + PostGIS compatibility");
+    expect(workflow).toContain("supabase/setup-cli@v1");
+    expect(workflow).toContain("version: 2.117.0");
+    expect(workflow).toContain("supabase db start");
+    expect(workflow).toContain("npm run db:supabase-bootstrap");
+    expect(workflow).toContain("npm run db:supabase-verify");
+
+    const supabaseConfig = fs.readFileSync(path.join(repoRoot, "supabase/config.toml"), "utf8");
+    expect(supabaseConfig).toContain('project_id = "disha"');
+    expect(supabaseConfig).toContain("major_version = 17");
   });
 });

@@ -1,4 +1,5 @@
-create extension if not exists vector;
+create schema if not exists extensions;
+create extension if not exists vector with schema extensions;
 
 create table if not exists intelligence_search_documents (
   doc_id text primary key,
@@ -11,7 +12,7 @@ create table if not exists intelligence_search_documents (
   source_hashes text[] not null default array[]::text[],
   entity_ids text[] not null default array[]::text[],
   embedding_model text not null,
-  embedding vector(384) not null,
+  embedding extensions.vector(384) not null,
   observed_at timestamptz not null default now(),
   provenance_hash text not null,
   updated_at timestamptz not null default now(),
@@ -23,7 +24,7 @@ create table if not exists intelligence_search_documents (
   unique (doc_kind, ref_id)
 );
 create index if not exists intelligence_search_documents_tsv_idx on intelligence_search_documents using gin (search_tsv);
-create index if not exists intelligence_search_documents_vector_idx on intelligence_search_documents using hnsw (embedding vector_cosine_ops);
+create index if not exists intelligence_search_documents_vector_idx on intelligence_search_documents using hnsw (embedding extensions.vector_cosine_ops);
 create index if not exists intelligence_search_documents_entity_ids_idx on intelligence_search_documents using gin (entity_ids);
 create index if not exists intelligence_search_documents_time_idx on intelligence_search_documents (observed_at desc);
 
