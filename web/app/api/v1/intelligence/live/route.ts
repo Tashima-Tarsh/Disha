@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { withContext } from "@/lib/unified/api";
 import { listRecentChangeImpacts } from "@/lib/unified/change-impact";
 import { listAnalystReviews } from "@/lib/unified/analyst-review";
+import { getContinuousOsintOverview } from "@/lib/unified/continuous-osint";
 
 export const dynamic = "force-dynamic";
 
@@ -10,9 +11,10 @@ export async function GET(req: NextRequest) {
   return withContext(req, "agent:read", async (ctx) => {
     const limitRaw = Number(req.nextUrl.searchParams.get("limit") ?? 100);
     const limit = Number.isFinite(limitRaw) ? Math.max(1, Math.min(500, Math.trunc(limitRaw))) : 100;
-    const [changes, openReviews] = await Promise.all([
+    const [changes, openReviews, continuousOsint] = await Promise.all([
       listRecentChangeImpacts(limit),
       listAnalystReviews({ status: "open", limit }),
+      getContinuousOsintOverview(ctx.principal.userId, limit),
     ]);
     const response = {
       generatedAt: new Date().toISOString(),
@@ -24,6 +26,7 @@ export async function GET(req: NextRequest) {
       },
       changes,
       openReviews,
+      continuousOsint,
     };
     return NextResponse.json(response, {
       headers: { "X-Request-ID": ctx.requestId, "Cache-Control": "no-store, max-age=0" },

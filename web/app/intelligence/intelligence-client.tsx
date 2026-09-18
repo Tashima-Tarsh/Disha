@@ -39,11 +39,29 @@ type IntelligenceState = {
   hypotheses: Array<{ hypothesisId: string; statement: string; status: string; confidence: number; independentSupportLineages: number; independentContradictionLineages: number; verifyRequired: boolean; unresolvedQuestions: string[] }>;
 };
 
+type ContinuousWatchSummary = {
+  watchId: string;
+  adapterId: string;
+  enabled: boolean;
+  nextRunAt: string;
+  lastRunAt?: string;
+  lastStatus?: "completed" | "partial" | "failed" | "cancelled" | "timed_out";
+  lastChangedAt?: string;
+};
+
 type LiveFeed = {
   generatedAt: string;
   motion: { changeCount: number; openReviewCount: number; highImpactCount: number; verificationRequiredCount: number };
   changes: Change[];
   openReviews: Review[];
+  continuousOsint: {
+    totalWatches: number;
+    activeWatches: number;
+    changedWatches: number;
+    failedWatches: number;
+    dueWatches: number;
+    watches: ContinuousWatchSummary[];
+  };
 };
 
 export function IntelligenceClient({ principal }: { principal: { email: string; roles: string[] } }) {
@@ -53,6 +71,9 @@ export function IntelligenceClient({ principal }: { principal: { email: string; 
   const [autoRefresh, setAutoRefresh] = useState(true);
   const [selectedState, setSelectedState] = useState<IntelligenceState | null>(null);
   const [selectedChangeId, setSelectedChangeId] = useState<string | null>(null);
+  const [bundleKind, setBundleKind] = useState("domain");
+  const [bundleFields, setBundleFields] = useState<Record<string, string>>({});
+  const [creatingWatch, setCreatingWatch] = useState(false);
 
   const load = useCallback(async () => {
     try {
@@ -84,6 +105,32 @@ export function IntelligenceClient({ principal }: { principal: { email: string; 
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : "State inspection failed");
       setSelectedState(null);
+    }
+  }
+
+  async function createWatchBundle() {
+    setCreatingWatch(true);
+    try {
+      const bundle = buildBundlePayload(bundleKind, bundleFields);
+      const response = await fetch("/api/v1/osint/watch-bundles", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          purpose: `Continuous ${bundleKind.replaceAll("_", " ")} intelligence watch`,
+          reviewOnChange: true,
+          bundle,
+        }),
+      });
+      if (!response.ok) {
+        const detail = await response.text();
+        throw new Error(`Watch creation failed (${response.status}): ${detail.slice(0, 180)}`);
+      }
+      setBundleFields({});
+      await load();
+    } catch (caught) {
+      setError(caught instanceof Error ? caught.message : "Watch creation failed");
+    } finally {
+      setCreatingWatch(false);
     }
   }
 
@@ -121,6 +168,8 @@ export function IntelligenceClient({ principal }: { principal: { email: string; 
         <Metric label="High impact" value={feed?.motion.highImpactCount ?? 0} />
         <Metric label="Open review" value={feed?.motion.openReviewCount ?? 0} />
         <Metric label="Verify required" value={feed?.motion.verificationRequiredCount ?? 0} />
+        <Metric label="Active watches" value={feed?.continuousOsint.activeWatches ?? 0} />
+        <Metric label="Watch failures" value={feed?.continuousOsint.failedWatches ?? 0} />
       </section>
 
       <div className={styles.grid}>
@@ -161,9 +210,70 @@ export function IntelligenceClient({ principal }: { principal: { email: string; 
             ))}
           </div>
         </section>
+
+        <section className={`${styles.panel} ${styles.meshPanel}`}>
+          <div className={styles.panelTitle}>
+            <div><h2>Continuous source mesh</h2><p className={styles.panelSubtitle}>Official feeds run from the source registry. Targeted public APIs run only through explicit governed watches.</p></div>
+            <span>{feed?.continuousOsint.totalWatches ?? 0} configured</span>
+          </div>
+
+          <div className={styles.watchBuilder}>
+            <select value={bundleKind} onChange={(event) => { setBundleKind(event.target.value); setBundleFields({}); }} aria-label="Continuous watch type">
+              <option value="domain">Domain intelligence</option>
+              <option value="topic">Topic intelligence</option>
+              <option value="company">Company intelligence</option>
+              <option value="repository">Repository intelligence</option>
+              <option value="vulnerability">Defensive vulnerability</option>
+              <option value="macro">Macro indicator</option>
+              <option value="official_source">Official source</option>
+              <option value="dynamic_source">Registered public source</option>
+            </select>
+            <BundleFields kind={bundleKind} values={bundleFields} onChange={(key, value) => setBundleFields((current) => ({ ...current, [key]: value }))} />
+            <button className={styles.createWatchButton} disabled={creatingWatch} onClick={() => void createWatchBundle()}>
+              {creatingWatch ? "Creating…" : "Start governed watch"}
+            </button>
+          </div>
+
+          <div className={styles.watchGrid}>
+            {(feed?.continuousOsint.watches ?? []).length === 0
+              ? <Empty label="No targeted OSINT watches yet. Official fixed-source schedules remain active independently." />
+              : feed!.continuousOsint.watches.slice(0, 24).map((watch) => (
+                <article key={watch.watchId} className={styles.watchCard}>
+                  <div className={styles.cardHeader}>
+                    <span className={`${styles.badge} ${watch.lastStatus === "failed" || watch.lastStatus === "timed_out" ? styles.high : styles.low}`}>
+                      {watch.lastStatus ?? (watch.enabled ? "scheduled" : "paused")}
+                    </span>
+                    <time>{watch.lastRunAt ? formatTime(watch.lastRunAt) : "not run yet"}</time>
+                  </div>
+                  <h3>{watch.adapterId.replaceAll("-", " ")}</h3>
+                  <div className={styles.meta}>
+                    <span>next {formatTime(watch.nextRunAt)}</span>
+                    {watch.lastChangedAt ? <strong>changed {formatTime(watch.lastChangedAt)}</strong> : <span>baseline/no change</span>}
+                  </div>
+                </article>
+              ))}
+          </div>
+        </section>
       </div>
     </main>
   );
+}
+
+function BundleFields({ kind, values, onChange }: { kind: string; values: Record<string, string>; onChange: (key: string, value: string) => void }) {
+  const input = (key: string, placeholder: string) => <input value={values[key] ?? ""} onChange={(event) => onChange(key, event.target.value)} placeholder={placeholder} aria-label={placeholder} />;
+  if (kind === "domain") return input("domain", "example.org");
+  if (kind === "topic") return input("query", "Public-interest topic");
+  if (kind === "company") return <>{input("cik", "SEC CIK")}{input("query", "Company name / topic")}</>;
+  if (kind === "repository") return input("repository", "owner/repository");
+  if (kind === "vulnerability") return <>{input("cve", "CVE (optional)")}{input("vendor", "Vendor (optional)")}{input("product", "Product (optional)")}</>;
+  if (kind === "macro") return <>{input("country", "Country code, e.g. IND")}{input("indicator", "World Bank indicator")}</>;
+  if (kind === "official_source") return input("sourceId", "DISHA source ID");
+  return <>{input("sourceId", "Registered source ID")}{input("path", "Optional /path")}</>;
+}
+
+function buildBundlePayload(kind: string, fields: Record<string, string>): Record<string, string> {
+  const cleaned = Object.fromEntries(Object.entries(fields).map(([key, value]) => [key, value.trim()]).filter(([, value]) => value));
+  return { kind, ...cleaned };
 }
 
 function Metric({ label, value }: { label: string; value: number }) { return <div className={styles.metric}><span>{label}</span><strong>{value}</strong></div>; }

@@ -54,6 +54,27 @@ export type ContinuousOsintRun = {
   completedAt: string;
 };
 
+
+export type ContinuousOsintBundleInput =
+  | { kind: "domain"; domain: string }
+  | { kind: "topic"; query: string }
+  | { kind: "company"; cik: string; query: string }
+  | { kind: "repository"; repository: string }
+  | { kind: "vulnerability"; cve?: string; vendor?: string; product?: string }
+  | { kind: "macro"; country: string; indicator: string }
+  | { kind: "official_source"; sourceId: string }
+  | { kind: "dynamic_source"; sourceId: string; path?: string; query?: Record<string, string> };
+
+export type ContinuousOsintOverview = {
+  generatedAt: string;
+  totalWatches: number;
+  activeWatches: number;
+  changedWatches: number;
+  failedWatches: number;
+  dueWatches: number;
+  watches: Array<Pick<ContinuousOsintWatch, "watchId" | "adapterId" | "enabled" | "nextRunAt" | "lastRunAt" | "lastStatus" | "lastChangedAt">>;
+};
+
 export type ContinuousOsintCapability = {
   adapterId: string;
   watchable: boolean;
@@ -169,6 +190,104 @@ export function listContinuousOsintCapabilities(): ContinuousOsintCapability[] {
     inputShape: inputShapes[adapter.id] ?? "{}",
     safety: "passive_public_only" as const,
   }));
+}
+
+
+export function listContinuousOsintBundleTemplates() {
+  return [
+    { kind: "domain", label: "Domain intelligence", adapters: ["public-dns-google","public-certificate-transparency","public-rdap","public-wayback-cdx","public-common-crawl"], inputShape: "{ domain }" },
+    { kind: "topic", label: "Topic intelligence", adapters: ["public-gdelt-news","public-openalex","public-wikidata-search"], inputShape: "{ query }" },
+    { kind: "company", label: "Company intelligence", adapters: ["public-sec-edgar","public-gdelt-news","public-wikidata-search"], inputShape: "{ cik, query }" },
+    { kind: "repository", label: "Repository intelligence", adapters: ["public-github-repository"], inputShape: "{ repository }" },
+    { kind: "vulnerability", label: "Defensive vulnerability intelligence", adapters: ["public-cisa-kev"], inputShape: "{ cve?, vendor?, product? }" },
+    { kind: "macro", label: "Macro indicator intelligence", adapters: ["public-world-bank"], inputShape: "{ country, indicator }" },
+    { kind: "official_source", label: "Official source availability", adapters: ["official-public-source-probe"], inputShape: "{ sourceId }" },
+    { kind: "dynamic_source", label: "Registered public API/source", adapters: ["dynamic-public-source"], inputShape: "{ sourceId, path?, query? }" },
+  ] as const;
+}
+
+export async function createContinuousOsintWatchBundle(input: {
+  userId: string;
+  missionId?: string;
+  purpose: string;
+  bundle: ContinuousOsintBundleInput;
+  reviewOnChange?: boolean;
+}): Promise<ContinuousOsintWatch[]> {
+  const common = { userId: input.userId, missionId: input.missionId, purpose: input.purpose, reviewOnChange: input.reviewOnChange };
+  const specs: Array<{ adapterId: string; input: Record<string, unknown>; intervalSeconds?: number }> = [];
+  switch (input.bundle.kind) {
+    case "domain":
+      specs.push(
+        { adapterId:"public-dns-google", input:{domain:input.bundle.domain} },
+        { adapterId:"public-certificate-transparency", input:{domain:input.bundle.domain} },
+        { adapterId:"public-rdap", input:{query:input.bundle.domain,kind:"domain"} },
+        { adapterId:"public-wayback-cdx", input:{domain:input.bundle.domain} },
+        { adapterId:"public-common-crawl", input:{domain:input.bundle.domain} },
+      );
+      break;
+    case "topic":
+      specs.push(
+        { adapterId:"public-gdelt-news", input:{query:input.bundle.query}, intervalSeconds:900 },
+        { adapterId:"public-openalex", input:{query:input.bundle.query} },
+        { adapterId:"public-wikidata-search", input:{query:input.bundle.query} },
+      );
+      break;
+    case "company":
+      specs.push(
+        { adapterId:"public-sec-edgar", input:{cik:input.bundle.cik} },
+        { adapterId:"public-gdelt-news", input:{query:input.bundle.query}, intervalSeconds:900 },
+        { adapterId:"public-wikidata-search", input:{query:input.bundle.query} },
+      );
+      break;
+    case "repository":
+      specs.push({adapterId:"public-github-repository",input:{repository:input.bundle.repository}});
+      break;
+    case "vulnerability":
+      specs.push({adapterId:"public-cisa-kev",input:{cve:input.bundle.cve,vendor:input.bundle.vendor,product:input.bundle.product}});
+      break;
+    case "macro":
+      specs.push({adapterId:"public-world-bank",input:{country:input.bundle.country,indicator:input.bundle.indicator}});
+      break;
+    case "official_source":
+      specs.push({adapterId:"official-public-source-probe",input:{sourceId:input.bundle.sourceId}});
+      break;
+    case "dynamic_source":
+      specs.push({adapterId:"dynamic-public-source",input:{sourceId:input.bundle.sourceId,path:input.bundle.path,query:input.bundle.query}});
+      break;
+  }
+  const watches: ContinuousOsintWatch[] = [];
+  for (const spec of specs) {
+    const cleanedInput = Object.fromEntries(Object.entries(spec.input).filter(([, value]) => value !== undefined));
+    watches.push(await createContinuousOsintWatch({
+      ...common,
+      adapterId:spec.adapterId,
+      input:cleanedInput,
+      intervalSeconds:spec.intervalSeconds,
+    }));
+  }
+  return watches;
+}
+
+export async function getContinuousOsintOverview(userId: string, limit = 100): Promise<ContinuousOsintOverview> {
+  const watches = await listContinuousOsintWatches(userId, limit);
+  const now = Date.now();
+  return {
+    generatedAt:new Date().toISOString(),
+    totalWatches:watches.length,
+    activeWatches:watches.filter((watch)=>watch.enabled).length,
+    changedWatches:watches.filter((watch)=>Boolean(watch.lastChangedAt)).length,
+    failedWatches:watches.filter((watch)=>watch.lastStatus === "failed" || watch.lastStatus === "timed_out").length,
+    dueWatches:watches.filter((watch)=>watch.enabled && Date.parse(watch.nextRunAt) <= now).length,
+    watches:watches.map((watch)=>({
+      watchId:watch.watchId,
+      adapterId:watch.adapterId,
+      enabled:watch.enabled,
+      nextRunAt:watch.nextRunAt,
+      lastRunAt:watch.lastRunAt,
+      lastStatus:watch.lastStatus,
+      lastChangedAt:watch.lastChangedAt,
+    })),
+  };
 }
 
 export async function createContinuousOsintWatch(input: {

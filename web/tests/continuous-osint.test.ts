@@ -5,6 +5,9 @@ import { beforeEach, describe, expect, it } from "vitest";
 import {
   clearContinuousOsintForTests,
   createContinuousOsintWatch,
+  createContinuousOsintWatchBundle,
+  getContinuousOsintOverview,
+  listContinuousOsintBundleTemplates,
   listContinuousOsintCapabilities,
   listContinuousOsintWatches,
   runDueOsintWatches,
@@ -86,15 +89,39 @@ describe("continuous governed OSINT", () => {
     expect(work.some((item) => item.workflowType === "osint_watch" && item.payload.watchId === watch.watchId)).toBe(true);
   });
 
+  it("creates safe multi-adapter bundles without active reconnaissance", async () => {
+    const domain = await createContinuousOsintWatchBundle({
+      userId:"user-a",
+      purpose:"Continuous public domain intelligence",
+      bundle:{kind:"domain",domain:"example.org"},
+    });
+    expect(domain.map((watch)=>watch.adapterId)).toEqual([
+      "public-dns-google",
+      "public-certificate-transparency",
+      "public-rdap",
+      "public-wayback-cdx",
+      "public-common-crawl",
+    ]);
+    expect(listContinuousOsintBundleTemplates().some((template)=>template.kind==="company")).toBe(true);
+    const overview = await getContinuousOsintOverview("user-a");
+    expect(overview.activeWatches).toBe(5);
+    expect(overview.failedWatches).toBe(0);
+  });
+
   it("wires scheduler, worker and authenticated API routes", () => {
     const root = path.resolve(__dirname, "..");
     const scheduler = fs.readFileSync(path.join(root, "app/api/internal/scheduler/tick/route.ts"), "utf8");
     const worker = fs.readFileSync(path.join(root, "lib/unified/workflow-executor.ts"), "utf8");
     const watches = fs.readFileSync(path.join(root, "app/api/v1/osint/watches/route.ts"), "utf8");
+    const bundles = fs.readFileSync(path.join(root, "app/api/v1/osint/watch-bundles/route.ts"), "utf8");
+    const live = fs.readFileSync(path.join(root, "app/api/v1/intelligence/live/route.ts"), "utf8");
     expect(scheduler).toContain("runDueOsintWatches");
     expect(worker).toContain('"osint_watch"');
     expect(worker).toContain("runContinuousOsintWatch");
     expect(watches).toContain('"agent:run"');
     expect(watches).toContain("passive/public adapters");
+    expect(bundles).toContain("createContinuousOsintWatchBundle");
+    expect(bundles).toContain("Active reconnaissance");
+    expect(live).toContain("getContinuousOsintOverview");
   });
 });
