@@ -80,6 +80,8 @@ services:
       NODE_ENV: production
       DATABASE_URL: postgresql://disha:${POSTGRES_PASSWORD:?set-postgres-password}@postgres:5432/disha
     depends_on:
+      web-migrate:
+        condition: service_completed_successfully
       postgres:
         condition: service_healthy
     read_only: true
