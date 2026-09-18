@@ -29,6 +29,7 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 
+import { CommandPalette } from "./command-palette";
 import styles from "./dashboard.module.css";
 
 type PrincipalView = {
@@ -246,15 +247,6 @@ type WorldFeatureCollection = {
   }>;
 };
 
-const regionCoordinates: Record<string, { x: number; y: number }> = {
-  North: { x: 46, y: 22 },
-  "North East": { x: 75, y: 35 },
-  East: { x: 64, y: 52 },
-  Central: { x: 48, y: 50 },
-  West: { x: 30, y: 53 },
-  South: { x: 50, y: 76 },
-};
-
 const toneClass: Record<string, string> = {
   operational: styles.toneGood,
   working: styles.toneGood,
@@ -401,14 +393,14 @@ export function DashboardClient({ principal }: { principal: PrincipalView }) {
             <section className={styles.mapPanel}>
               <PanelTitle
                 icon={<MapPinned size={18} />}
-                title="India Command Map"
-                subtitle={`${data.india.states} states, ${data.india.unionTerritories} union territories. Geometry status: ${displayState(data.india.geometryStatus)}.`}
+                title="India Geospatial Command Surface"
+                subtitle={`${data.india.states} states, ${data.india.unionTerritories} union territories. Authoritative geometry status: ${displayState(data.india.geometryStatus)}.`}
               />
               <div className={styles.filterRow}>
                 <SelectFilter label="Region" value={selectedRegion} options={regions} onChange={setSelectedRegion} />
                 <SelectFilter label="Operational lane" value={selectedLane} options={lanes} onChange={setSelectedLane} />
               </div>
-              <IndiaCommandMap territories={territories} regionSummary={data.india.regionSummary} />
+              <IndiaGeospatialSurface territories={territories} geospatial={data.geospatial} />
             </section>
 
             <aside className={styles.commandStack}>
@@ -633,6 +625,7 @@ function DashboardShell({ principal, body }: { principal: PrincipalView; body: R
         <div className={styles.topBar}>
           <div><span className={styles.systemDot} /> DISHA governed command runtime</div>
           <div>
+            <CommandPalette />
             <Link href="/intelligence">Live Intelligence <RadioTower size={14} /></Link>
             <Link href="/workbench">Workbench <ArrowUpRight size={14} /></Link>
           </div>
@@ -709,56 +702,81 @@ function OverviewCard({
   );
 }
 
-function IndiaCommandMap({
+function IndiaGeospatialSurface({
   territories,
-  regionSummary,
+  geospatial,
 }: {
   territories: CommandFeed["india"]["territories"];
-  regionSummary: CommandFeed["india"]["regionSummary"];
+  geospatial: CommandFeed["geospatial"];
 }) {
-  const plotted = useMemo(
-    () =>
-      territories.map((territory, index) => {
-        const base = regionCoordinates[territory.region] ?? { x: 50, y: 50 };
-        const angle = (index % 10) * 0.63;
-        const radius = 3 + (index % 6) * 1.8;
-        return {
-          ...territory,
-          x: Math.max(8, Math.min(92, base.x + Math.cos(angle) * radius)),
-          y: Math.max(8, Math.min(92, base.y + Math.sin(angle) * radius)),
-        };
-      }),
-    [territories],
+  const primarySource = geospatial.sources.find((source) => source.sourceId === "survey-of-india-admin-boundaries");
+  const identitySource = geospatial.sources.find((source) => source.sourceId === "lgd");
+  const enrichmentSources = geospatial.sources.filter(
+    (source) => source.sourceId !== "survey-of-india-admin-boundaries" && source.sourceId !== "lgd",
   );
 
   return (
-    <div className={styles.mapWrap} id="map">
-      <svg viewBox="0 0 100 100" role="img" aria-label="DISHA India command map">
-        <path
-          className={styles.indiaShape}
-          d="M43 8 L55 10 L67 18 L73 31 L70 43 L63 51 L59 66 L52 91 L43 76 L35 66 L25 62 L29 48 L22 38 L31 26 Z"
-        />
-        <path className={styles.routeLine} d="M47 15 C39 27 35 42 38 56 C42 69 50 77 55 87" />
-        <path className={styles.routeLineAlt} d="M29 53 C42 47 55 47 70 34" />
-        <path className={styles.routeLine} d="M45 24 C55 30 63 39 65 53" />
-        {plotted.map((territory) => (
-          <g key={territory.name}>
-            <circle className={styles.mapPoint} cx={territory.x} cy={territory.y} r={territory.kind === "State" ? "1.9" : "1.35"} />
-            <title>{`${territory.name}: ${territory.commandTask}`}</title>
-          </g>
-        ))}
-      </svg>
-      <div className={styles.mapLegend}>
-        {Object.entries(regionSummary).map(([region, summary]) => (
-          <span key={region}>
-            <i /> {region}: {summary.total}
-          </span>
+    <div className={styles.geoTruthSurface} id="map">
+      <div className={styles.geoTruthGate}>
+        <div>
+          <p className={styles.eyebrow}>Authoritative geometry gate</p>
+          <h3>No decorative India polygon is rendered.</h3>
+          <p>
+            DISHA will display India only after versioned geographic geometry is imported with source,
+            product/version, CRS, retrieval timestamp, applicable terms and source hash. Until then this
+            surface reports readiness instead of inventing geography.
+          </p>
+        </div>
+        <div className={styles.geoTruthMetrics}>
+          <span><strong>{territories.length}</strong> administrative units in current filter</span>
+          <span><strong>{displayState(geospatial.geometryStatus)}</strong> geometry state</span>
+          <span><strong>{geospatial.sources.length}</strong> governed geospatial sources</span>
+        </div>
+      </div>
+
+      <div className={styles.geoTruthPipeline} aria-label="Authoritative India map pipeline">
+        <article>
+          <span>1 · Boundary truth</span>
+          <strong>{primarySource?.sourceName ?? "Survey of India import required"}</strong>
+          <p>{primarySource?.limitation ?? "Register and import an identified authoritative boundary product."}</p>
+        </article>
+        <article>
+          <span>2 · Administrative identity</span>
+          <strong>{identitySource?.sourceName ?? "LGD mapping required"}</strong>
+          <p>Bind state, district and lower administrative units to stable government identifiers before evidence joins.</p>
+        </article>
+        <article>
+          <span>3 · Operational rendering</span>
+          <strong>MapLibre + Deck.gl + PMTiles / PostGIS</strong>
+          <p>Render admitted geometry and evidence overlays only after provenance and license checks pass.</p>
+        </article>
+      </div>
+
+      <div className={styles.geoTruthRule}>
+        <span>Boundary publication rule</span>
+        <p>{geospatial.boundaryImportRule}</p>
+        <code>{geospatial.sourceHash}</code>
+      </div>
+
+      <div className={styles.geoSourceCards} id="sources">
+        {geospatial.sources.map((source) => (
+          <a href={source.url} key={source.sourceId} rel="noreferrer" target="_blank">
+            <div>
+              <span>{source.status.replaceAll("_", " ")}</span>
+              <strong>{source.sourceName}</strong>
+              <small>{source.owner}</small>
+            </div>
+            <p>{source.limitation}</p>
+          </a>
         ))}
       </div>
-      <div className={styles.mapMetrics}>
-        <strong>{territories.length}</strong>
-        <span>administrative units in view</span>
-      </div>
+
+      {enrichmentSources.length ? (
+        <p className={styles.geoSourceFootnote}>
+          Bhuvan, DataMeet and other layers are treated as separate enrichments with their own terms; they do not replace
+          the authoritative administrative-boundary source.
+        </p>
+      ) : null}
     </div>
   );
 }

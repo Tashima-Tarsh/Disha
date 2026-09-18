@@ -33,6 +33,11 @@ describe("DISHA command dashboard", () => {
     expect(source).toContain("Interactive Constitutional Evidence Atlas");
     expect(source).toContain("Constitutional Evidence Atlas");
     expect(source).toContain("Evidence Atlas layers");
+    expect(source).toContain("CommandPalette");
+    expect(source).toContain("India Geospatial Command Surface");
+    expect(source).toContain("No decorative India polygon is rendered.");
+    expect(source).toContain("MapLibre + Deck.gl + PMTiles / PostGIS");
+    expect(source).not.toContain('d="M43 8 L55 10');
     expect(source).toContain("Follow the evidence chain");
     expect(source).toContain("Open mission workbench");
     expect(source).toContain("Pause motion");
@@ -60,6 +65,7 @@ describe("DISHA command dashboard", () => {
     const geo = fs.readFileSync(geospatialLayer, "utf8");
     const claims = fs.readFileSync(claimChain, "utf8");
 
+    expect(geo).toContain("survey-of-india-admin-boundaries");
     expect(geo).toContain("datameet-maps");
     expect(geo).toContain("bhuvan");
     expect(geo).toContain("source_registered_intake_queued");

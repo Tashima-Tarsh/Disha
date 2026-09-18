@@ -23,6 +23,7 @@ describe("DISHA constitutional evidence source registry", () => {
       "lgd-states",
       "lgd",
       "api-setu",
+      "survey-of-india-admin-boundaries",
       "bhuvan",
       "bhuvan-api",
       "india-wris",

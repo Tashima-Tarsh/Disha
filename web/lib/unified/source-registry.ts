@@ -290,6 +290,31 @@ export const sourceRegistry: SourceDefinition[] = [
     verification: { verifiedOn: "2026-07-02", basis: "Official API Setu homepage." },
   },
   {
+    sourceId: "survey-of-india-admin-boundaries",
+    sourceName: "Survey of India Administrative Boundary Database",
+    owner: "Survey of India, Department of Science & Technology, Government of India",
+    domain: "geospatial",
+    sourceType: "geospatial_portal",
+    url: "https://onlinemaps.surveyofindia.gov.in/Digital_Products.aspx",
+    license: "Survey of India Online Maps Portal terms and applicable geospatial-data policy",
+    geographyLevel: ["state", "district", "local_body", "national"],
+    updateMode: "download_and_parse",
+    endpoints: [{
+      url: "https://onlinemaps.surveyofindia.gov.in/Digital_Products.aspx",
+      method: "GET",
+      purpose: "Administrative Boundary Database product discovery for state, district and taluk/subdistrict geometry",
+      requiresAuth: false,
+    }],
+    knownLimitations: [
+      "Geometry must be imported from an identified Survey of India product/version and stored with product code, retrieval timestamp, source hash, CRS and applicable usage terms before publication.",
+      "Free-of-cost access does not remove attribution, registration-category or policy obligations; redistribution rights must be reviewed for each imported product.",
+    ],
+    verification: {
+      verifiedOn: "2026-09-18",
+      basis: "Official Survey of India Online Maps Portal lists Administrative Boundary Database shapefiles for the entire country up to district and taluk/subdistrict level.",
+    },
+  },
+  {
     sourceId: "bhuvan",
     sourceName: "Bhuvan Indian Geoportal",
     owner: "National Remote Sensing Centre, ISRO",

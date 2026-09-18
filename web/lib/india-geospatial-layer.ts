@@ -32,7 +32,7 @@ export type IndiaGeospatialLayer = {
   }>;
 };
 
-const GEOSPATIAL_SOURCE_IDS = new Set(["datameet-maps", "bhuvan", "bhuvan-api", "lgd", "lgd-states"]);
+const GEOSPATIAL_SOURCE_IDS = new Set(["survey-of-india-admin-boundaries", "lgd", "lgd-states", "bhuvan", "bhuvan-api", "datameet-maps"]);
 
 export function buildIndiaGeospatialLayer(items: Territory[] = territories): IndiaGeospatialLayer {
   const sources = listSourceRegistry()
@@ -44,7 +44,7 @@ export function buildIndiaGeospatialLayer(items: Territory[] = territories): Ind
       url: source.url,
       geographyLevel: source.geographyLevel,
       updateMode: source.updateMode,
-      status: source.sourceId === "bhuvan-api" ? "license_review" : "intake_queued",
+      status: source.sourceId === "bhuvan-api" || source.sourceId === "datameet-maps" ? "license_review" : "intake_queued",
       limitation: source.knownLimitations[0] ?? "Dataset-specific intake and attribution review queued.",
     }));
 
@@ -54,7 +54,7 @@ export function buildIndiaGeospatialLayer(items: Territory[] = territories): Ind
     mapMode: "state_ut_source_readiness",
     attributionRequired: true,
     boundaryImportRule:
-      "Only official or attribution-compliant public geometry enters DISHA. District and village layers move through source hash, license note, and LGD/code mapping before dashboard publication.",
+      "Survey of India geometry is the preferred administrative-boundary source. Every imported boundary must carry product/version metadata, retrieval timestamp, CRS, source hash and applicable terms; LGD codes bind administrative identity. Bhuvan and community layers may enrich the map only under their own layer-specific terms.",
     sourceHash: hashValue({
       sources: sources.map((source) => source.sourceId),
       territories: items.map((item) => item.name),

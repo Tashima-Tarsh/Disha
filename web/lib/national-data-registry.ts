@@ -140,6 +140,17 @@ export const nationalDataSources: NationalSource[] = [
     dashboardUse: "NDMA disaster layer, resilience risk, and district readiness scan",
   },
   {
+    id: "survey-of-india-admin-boundaries",
+    layer: "Authoritative administrative geometry",
+    scope: "India state, district and taluk/subdistrict administrative boundary products",
+    authority: "Survey of India",
+    sourceUrl: "https://onlinemaps.surveyofindia.gov.in/Digital_Products.aspx",
+    status: "requires_bulk_import",
+    updateModel: "Versioned Survey of India shapefile import with CRS validation, geometry repair, product-code metadata and LGD identifier mapping",
+    repoPolicy: "Store import manifests, hashes, transforms and license notes in repo; do not commit or republish raw geometry unless the applicable Survey of India terms allow it",
+    dashboardUse: "Authoritative India administrative boundary geometry for state/district/subdistrict filtering and evidence-linked map navigation",
+  },
+  {
     id: "bhuvan-geospatial",
     layer: "Geospatial base map",
     scope: "India geospatial services, map APIs, thematic layers, and official map surfaces",

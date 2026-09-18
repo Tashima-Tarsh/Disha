@@ -114,6 +114,12 @@
   text-transform: uppercase;
 }
 
+.topBar > div:last-child {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
 .topBar a {
   display: inline-flex;
   align-items: center;
@@ -533,116 +539,428 @@
   text-transform: none;
 }
 
-.mapWrap {
-  position: relative;
+
+.geoTruthSurface {
   min-height: 520px;
+  display: grid;
+  align-content: start;
+  gap: 14px;
+  padding: 18px;
   overflow: hidden;
   border: 1px solid #d8d0c1;
   border-radius: 16px;
   background:
-    linear-gradient(145deg, rgba(246, 241, 229, 0.95), rgba(255, 255, 255, 0.95)),
-    #f8f5ef;
+    radial-gradient(circle at 88% 8%, rgba(47, 111, 94, 0.08), transparent 28%),
+    linear-gradient(145deg, #fbfaf7, #ffffff);
 }
 
-.mapWrap svg {
-  width: 100%;
-  height: 520px;
+.geoTruthGate {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(240px, 0.6fr);
+  gap: 22px;
+  padding: 18px;
+  border: 1px solid #dce4de;
+  border-radius: 14px;
+  background: rgba(247, 251, 248, 0.88);
 }
 
-.indiaShape {
-  fill: rgba(47, 111, 94, 0.16);
-  stroke: #2f6f5e;
-  stroke-width: 0.75;
+.geoTruthGate h3 {
+  margin: 0;
+  color: #182331;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(1.25rem, 2vw, 1.8rem);
 }
 
-.routeLine,
-.routeLineAlt {
-  fill: none;
-  stroke: rgba(49, 95, 140, 0.52);
-  stroke-width: 0.55;
-  stroke-dasharray: 2 2;
+.geoTruthGate p {
+  margin: 9px 0 0;
+  color: #5d6b75;
+  line-height: 1.55;
 }
 
-.routeLineAlt {
-  stroke: rgba(180, 132, 46, 0.58);
-}
-
-.mapPoint {
-  stroke: #ffffff;
-  stroke-width: 0.7;
-}
-
-.priorityStable,
-.priorityWatch,
-.priorityHigh,
-.priorityCritical {
-  fill: #2f7d5b;
-  background: #2f7d5b;
-}
-
-.priorityWatch {
-  fill: #c49036;
-  background: #c49036;
-}
-
-.priorityHigh,
-.priorityCritical {
-  fill: #b24a42;
-  background: #b24a42;
-}
-
-.mapLegend {
-  position: absolute;
-  left: 16px;
-  bottom: 16px;
-  display: flex;
-  flex-wrap: wrap;
+.geoTruthMetrics {
+  display: grid;
   gap: 8px;
+  align-content: start;
 }
 
-.mapLegend span {
+.geoTruthMetrics span {
+  display: grid;
+  gap: 3px;
+  padding: 10px 12px;
+  color: #64717b;
+  border: 1px solid #dfe7e2;
+  border-radius: 10px;
+  background: #ffffff;
+  font-size: 0.74rem;
+  font-weight: 750;
+}
+
+.geoTruthMetrics strong {
+  color: #1f5847;
+  font-size: 0.88rem;
+  overflow-wrap: anywhere;
+}
+
+.geoTruthPipeline {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.geoTruthPipeline article {
+  min-width: 0;
+  display: grid;
+  align-content: start;
+  gap: 7px;
+  padding: 14px;
+  border: 1px solid #e4ddd1;
+  border-radius: 12px;
+  background: #ffffff;
+}
+
+.geoTruthPipeline span,
+.geoTruthRule span {
+  color: #765923;
+  font-size: 0.68rem;
+  font-weight: 900;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.geoTruthPipeline strong {
+  color: #182331;
+  line-height: 1.3;
+}
+
+.geoTruthPipeline p,
+.geoTruthRule p,
+.geoSourceCards p,
+.geoSourceFootnote {
+  margin: 0;
+  color: #63717b;
+  font-size: 0.8rem;
+  line-height: 1.5;
+}
+
+.geoTruthRule {
+  display: grid;
+  gap: 7px;
+  padding: 14px;
+  border: 1px dashed #cfc4b1;
+  border-radius: 12px;
+  background: #fffdf8;
+}
+
+.geoTruthRule code {
+  color: #31414e;
+  font-size: 0.7rem;
+  overflow-wrap: anywhere;
+}
+
+.geoSourceCards {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.geoSourceCards a {
+  min-width: 0;
+  display: grid;
+  gap: 8px;
+  padding: 13px;
+  color: inherit;
+  text-decoration: none;
+  border: 1px solid #e3ddd3;
+  border-radius: 12px;
+  background: #ffffff;
+  transition: border-color 150ms ease, transform 150ms ease, box-shadow 150ms ease;
+}
+
+.geoSourceCards a:hover {
+  border-color: #9ebcac;
+  transform: translateY(-1px);
+  box-shadow: 0 8px 20px rgba(28, 54, 45, 0.07);
+}
+
+.geoSourceCards a > div {
+  min-width: 0;
+  display: grid;
+  gap: 3px;
+}
+
+.geoSourceCards span {
+  color: #765923;
+  font-size: 0.66rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.geoSourceCards strong {
+  color: #182331;
+  overflow-wrap: anywhere;
+}
+
+.geoSourceCards small {
+  color: #6b7881;
+  font-size: 0.73rem;
+}
+
+.geoSourceFootnote {
+  padding: 0 2px;
+}
+
+.commandTrigger {
+  min-height: 30px;
   display: inline-flex;
   align-items: center;
   gap: 7px;
-  min-height: 30px;
-  padding: 0 10px;
-  color: #2b3742;
-  border: 1px solid #ded6c7;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.86);
-  font-size: 0.76rem;
-  font-weight: 800;
+  padding: 0 9px;
+  color: #f5efe2;
+  border: 1px solid rgba(245, 239, 226, 0.2);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.06);
+  font: inherit;
+  cursor: pointer;
 }
 
-.mapLegend i {
-  width: 9px;
-  height: 9px;
-  border-radius: 999px;
+.commandTrigger:hover {
+  border-color: rgba(196, 154, 74, 0.6);
+  background: rgba(255, 255, 255, 0.1);
 }
 
-.mapMetrics {
-  position: absolute;
-  right: 16px;
-  top: 16px;
+.commandTrigger kbd {
+  padding: 2px 5px;
+  color: rgba(245, 239, 226, 0.78);
+  border: 1px solid rgba(245, 239, 226, 0.18);
+  border-radius: 5px;
+  background: rgba(0, 0, 0, 0.14);
+  font-family: inherit;
+  font-size: 0.66rem;
+}
+
+.commandOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  background: rgba(7, 13, 19, 0.58);
+  backdrop-filter: blur(8px);
+  animation: commandFade 120ms ease-out;
+}
+
+.commandDialog {
+  position: fixed;
+  top: 10vh;
+  left: 50%;
+  z-index: 100;
+  width: min(760px, calc(100vw - 32px));
+  max-height: min(78vh, 760px);
   display: grid;
-  gap: 2px;
-  min-width: 150px;
-  padding: 14px;
-  border: 1px solid #ded6c7;
-  border-radius: 14px;
-  background: rgba(255, 255, 255, 0.9);
+  grid-template-rows: auto auto minmax(0, 1fr) auto;
+  transform: translateX(-50%);
+  overflow: hidden;
+  color: #eef3f6;
+  border: 1px solid rgba(203, 218, 226, 0.18);
+  border-radius: 16px;
+  background: #111b25;
+  box-shadow: 0 30px 100px rgba(0, 0, 0, 0.42);
+  animation: commandLift 140ms ease-out;
 }
 
-.mapMetrics strong {
-  color: #182331;
-  font-size: 2rem;
+.commandDialogHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 18px 18px 13px;
+  border-bottom: 1px solid rgba(203, 218, 226, 0.1);
 }
 
-.mapMetrics span {
-  color: #60707d;
+.commandDialogHeader h2 {
+  margin: 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.15rem;
+}
+
+.commandDialogHeader p {
+  margin: 5px 0 0;
+  color: #9babb5;
   font-size: 0.78rem;
+  line-height: 1.45;
+}
+
+.commandClose {
+  width: 32px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+  color: #b9c5cc;
+  border: 1px solid rgba(203, 218, 226, 0.14);
+  border-radius: 8px;
+  background: transparent;
+  cursor: pointer;
+}
+
+.commandSearch {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 14px 16px 10px;
+  padding: 0 12px;
+  border: 1px solid rgba(203, 218, 226, 0.16);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.045);
+}
+
+.commandSearch svg {
+  color: #7fa993;
+}
+
+.commandSearch input {
+  width: 100%;
+  min-height: 46px;
+  color: #f6f8f9;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  font: inherit;
+  font-size: 0.94rem;
+}
+
+.commandSearch input::placeholder {
+  color: #768792;
+}
+
+.commandList {
+  min-height: 0;
+  overflow-y: auto;
+  padding: 4px 10px 12px;
+}
+
+.commandGroup {
+  display: grid;
+  gap: 5px;
+  padding: 8px 6px;
+}
+
+.commandGroup h3 {
+  margin: 4px 5px;
+  color: #82949f;
+  font-size: 0.67rem;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+}
+
+.commandItem,
+.commandItemPlanned {
+  width: 100%;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 16px;
+  padding: 11px 12px;
+  text-align: left;
+  color: #edf3f5;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  background: transparent;
+  font: inherit;
+}
+
+.commandItem {
+  cursor: pointer;
+}
+
+.commandItem:hover,
+.commandItem:focus-visible {
+  border-color: rgba(111, 171, 142, 0.26);
+  outline: 0;
+  background: rgba(87, 143, 114, 0.1);
+}
+
+.commandItemPlanned {
+  color: #9aabb5;
+  cursor: default;
+}
+
+.commandItemMain {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: minmax(120px, auto) minmax(0, 1fr);
+  gap: 3px 12px;
+  align-items: baseline;
+}
+
+.commandItemMain code {
+  color: #d0b16a;
+  font-size: 0.78rem;
+  white-space: nowrap;
+}
+
+.commandItemMain strong {
+  min-width: 0;
+  font-size: 0.84rem;
+}
+
+.commandItemMain span {
+  grid-column: 1 / -1;
+  color: #8597a2;
+  font-size: 0.72rem;
+  line-height: 1.4;
+}
+
+.commandMeta {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: #758792;
+  font-size: 0.65rem;
+  white-space: nowrap;
+}
+
+.commandMeta span {
+  text-transform: uppercase;
+}
+
+.commandMeta b {
+  padding: 3px 6px;
+  color: #b8c6cd;
+  border: 1px solid rgba(203, 218, 226, 0.13);
+  border-radius: 999px;
   font-weight: 750;
 }
+
+.commandItem .commandMeta b {
+  color: #9ed2b6;
+  border-color: rgba(90, 167, 126, 0.28);
+  background: rgba(90, 167, 126, 0.08);
+}
+
+.commandEmpty {
+  margin: 28px;
+  color: #8fa0aa;
+  text-align: center;
+}
+
+.commandFooter {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 16px;
+  color: #7e909a;
+  border-top: 1px solid rgba(203, 218, 226, 0.1);
+  font-size: 0.68rem;
+}
+
+@keyframes commandFade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes commandLift {
+  from { opacity: 0; transform: translate(-50%, 8px) scale(0.99); }
+  to { opacity: 1; transform: translate(-50%, 0) scale(1); }
+}
+
 
 .statusList,
 .laneList,
@@ -1821,10 +2139,28 @@
     height: 140px;
   }
 
-  .mapWrap,
-  .mapWrap svg {
-    min-height: 420px;
-    height: 420px;
+  .geoTruthGate,
+  .geoTruthPipeline,
+  .geoSourceCards {
+    grid-template-columns: 1fr;
+  }
+
+  .geoTruthSurface {
+    min-height: 0;
+  }
+
+  .commandDialog {
+    top: 5vh;
+    max-height: 88vh;
+  }
+
+  .commandItem,
+  .commandItemPlanned {
+    grid-template-columns: 1fr;
+  }
+
+  .commandMeta {
+    justify-content: flex-start;
   }
 
   .connectorRow,
