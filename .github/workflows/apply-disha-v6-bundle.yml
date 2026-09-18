@@ -41,9 +41,12 @@ jobs:
           fi
 
           rm -f .disha-delete-list
+
+          # Do not let the workflow's GitHub App token modify workflow files.
+          # Those two production workflow updates are applied separately through
+          # the authenticated repository connector after this source sync.
+          git restore --source=HEAD -- .github/workflows
           rm -rf .disha-bundle .disha-patch
-          rm -f .github/workflows/apply-disha-v6.yml
-          rm -f .github/workflows/apply-disha-v6-bundle.yml
 
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
