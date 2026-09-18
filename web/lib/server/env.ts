@@ -4,7 +4,10 @@ const envSchema = z.object({
   DISHA_AUTH_MODE: z.enum(["dev-jwt", "password", "oidc"]).default("dev-jwt"),
   DISHA_JWT_SECRET: z.string().min(32).optional(),
   DISHA_DEV_PASSWORD: z.string().min(12).optional(),
-  DISHA_DEV_ADMIN_EMAILS: z.string().optional(),
+  DISHA_DEV_ADMIN_EMAILS: z.preprocess(
+    (value) => (typeof value === "string" && value.trim() === "" ? undefined : value),
+    z.string().optional(),
+  ),
   DISHA_OIDC_ISSUER: z.string().url().optional(),
   DISHA_OIDC_CLIENT_ID: z.string().optional(),
   DISHA_OIDC_CLIENT_SECRET: z.string().optional(),
