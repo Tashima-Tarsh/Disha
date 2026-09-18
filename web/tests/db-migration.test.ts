@@ -102,6 +102,8 @@ describe("DISHA database migration contract", () => {
     expect(workflow).toContain("supabase/setup-cli@v3");
     expect(workflow).toContain("version: 2.117.0");
     expect(workflow).toContain("supabase db start");
+    expect(workflow).toContain("SUPABASE_WORKDIR");
+    expect(workflow).toContain('cd "$RUNNER_TEMP" && supabase db start');
     expect(workflow).toContain("npm run db:supabase-bootstrap");
     expect(workflow).toContain("npm run db:supabase-verify");
 
