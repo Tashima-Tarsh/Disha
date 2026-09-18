@@ -22,7 +22,9 @@ export async function readWorkspaceFile(ctx: RequestContext, filePath: string) {
 
   const ext = resolvedPath.split(".").pop()?.toLowerCase() ?? "";
   const isImage = ext in IMAGE_MIME;
-  const raw = await fs.readFile(resolvedPath, isImage ? undefined : "utf-8");
+  const raw = isImage
+    ? await fs.readFile(resolvedPath)
+    : await fs.readFile(resolvedPath, { encoding: "utf8" });
   await audit({
     requestId: ctx.requestId,
     userId: ctx.principal.userId,
