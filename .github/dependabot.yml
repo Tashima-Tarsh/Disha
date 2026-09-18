@@ -19,3 +19,16 @@ updates:
           - eslint
           - eslint-config-next
           - "@types/*"
+    ignore:
+      # Keep automated tooling updates inside the compatibility window used by
+      # eslint-config-next/typescript-eslint. Major upgrades are reviewed
+      # deliberately instead of being grouped into an auto-generated PR.
+      - dependency-name: typescript
+        update-types:
+          - version-update:semver-major
+      - dependency-name: eslint
+        update-types:
+          - version-update:semver-major
+      - dependency-name: vitest
+        update-types:
+          - version-update:semver-major
