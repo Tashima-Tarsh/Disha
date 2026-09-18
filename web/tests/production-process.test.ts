@@ -13,6 +13,8 @@ describe("production process hardening", () => {
     expect(source).toContain('NODE_ENV: "production"');
     expect(source).toContain('DISHA_BIND_HOST');
     expect(source).toContain('"0.0.0.0"');
+    expect(source).toContain('DISHA_APPLY_MIGRATIONS_ON_START');
+    expect(source).toContain('github-oidc-production-migration');
   });
 
   it("copies public and static assets into the standalone runtime", () => {

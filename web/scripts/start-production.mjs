@@ -9,12 +9,20 @@ if (cliPort) runtimeEnv.PORT = cliPort;
 runtimeEnv.PORT ||= "3000";
 runtimeEnv.HOSTNAME = process.env.DISHA_BIND_HOST?.trim() || "0.0.0.0";
 
-if (runtimeEnv.DATABASE_URL) {
+const applyMigrationsOnStart = runtimeEnv.DISHA_APPLY_MIGRATIONS_ON_START === "true";
+if (applyMigrationsOnStart) {
+  if (!runtimeEnv.DATABASE_URL) throw new Error("DATABASE_URL is required when DISHA_APPLY_MIGRATIONS_ON_START=true");
   const migration = spawnSync(process.execPath, ["scripts/apply-schema.mjs"], {
     stdio: "inherit",
     env: runtimeEnv,
   });
   if (migration.status !== 0) process.exit(migration.status ?? 1);
+} else {
+  process.stdout.write(JSON.stringify({
+    type: "startup_migrations",
+    status: "skipped",
+    owner: "github-oidc-production-migration",
+  }) + "\n");
 }
 
 const serverPath = resolveStandaloneServer();
