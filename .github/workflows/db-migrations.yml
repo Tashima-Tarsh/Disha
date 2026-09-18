@@ -61,6 +61,16 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Install PostGIS in pgvector rehearsal container
+        run: |
+          container_id="$(docker ps --filter "ancestor=pgvector/pgvector:pg16" --format '{{.ID}}' | head -n 1)"
+          if [ -z "$container_id" ]; then
+            echo "pgvector rehearsal container not found" >&2
+            exit 1
+          fi
+          docker exec -u root "$container_id" bash -lc 'apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends postgresql-16-postgis-3'
+          docker exec "$container_id" bash -lc 'test -f /usr/share/postgresql/16/extension/postgis.control'
+
       - name: Apply migrations
         run: npm run db:migrate
 

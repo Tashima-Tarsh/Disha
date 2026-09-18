@@ -20,7 +20,10 @@ export function IntelligenceGraph({
   const containerRef = useRef<HTMLDivElement>(null);
   const cyRef = useRef<Core | null>(null);
   const onSelectRef = useRef(onSelectEntity);
-  onSelectRef.current = onSelectEntity;
+
+  useEffect(() => {
+    onSelectRef.current = onSelectEntity;
+  }, [onSelectEntity]);
 
   useEffect(() => {
     if (!containerRef.current || !entities.length) return;

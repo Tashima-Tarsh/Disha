@@ -111,6 +111,8 @@ describe("DISHA database migration contract", () => {
     const workflow = fs.readFileSync(path.join(repoRoot, ".github/workflows/db-migrations.yml"), "utf8");
 
     expect(workflow).toContain("pgvector/pgvector:pg16");
+    expect(workflow).toContain("Install PostGIS in pgvector rehearsal container");
+    expect(workflow).toContain("postgresql-16-postgis-3");
     expect(workflow).toContain("npm run db:migrate");
     expect(workflow).toContain("npm run db:verify-schema");
     expect(workflow).toContain("npm run db:rollback");

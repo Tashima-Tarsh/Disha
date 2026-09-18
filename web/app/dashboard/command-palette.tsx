@@ -81,6 +81,7 @@ export function CommandPalette() {
                 {commands.filter((command) => command.group === group).map((command) => (
                   <button
                     aria-disabled={!command.href}
+                    aria-selected={false}
                     className={command.href ? styles.commandItem : styles.commandItemPlanned}
                     key={command.id}
                     onClick={() => activate(command)}
