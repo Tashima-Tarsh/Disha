@@ -67,6 +67,7 @@ const parserExpectations: Record<string, string[]> = {
   openalex: ["OpenAlex work id", "DOI", "title", "publication year", "citation count"],
 };
 
+// Every registered public source is represented in the production plan; parser readiness controls claim publication.
 export function listSourceParserPlans(): SourceParserPlan[] {
   const prioritySet = new Set<string>(priorityParserSources);
   const orderedSourceIds = [
