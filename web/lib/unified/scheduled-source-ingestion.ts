@@ -112,24 +112,13 @@ async function runJob(job: ScheduledSourceJob, fetcher: FetchLike): Promise<Sche
   }
 
   if (plan.status === "auth_required") {
-    try {
-      const probe = await probeSource(job.sourceId, fetcher);
-      return buildRun(job, {
-        status: "auth_required",
-        blockers: ["Source requires credentials for ingestion; reachability is monitored only.", ...plan.blockers],
-        probe,
-        records: [],
-        retrievedAt,
-      });
-    } catch (error) {
-      return buildRun(job, {
-        status: "auth_required",
-        blockers: [error instanceof Error ? error.message : "Source reachability probe failed.", ...plan.blockers],
-        probe: null,
-        records: [],
-        retrievedAt,
-      });
-    }
+    return buildRun(job, {
+      status: "auth_required",
+      blockers: ["Source requires credentials before any scheduled network request is allowed.", ...plan.blockers],
+      probe: null,
+      records: [],
+      retrievedAt,
+    });
   }
   if (plan.status === "blocked") {
     return buildRun(job, { status: "blocked", blockers: plan.blockers, probe: null, records: [], retrievedAt });

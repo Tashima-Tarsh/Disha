@@ -99,7 +99,7 @@ describe("DISHA database migration contract", () => {
     expect(workflow).toContain("PRODUCTION_DATABASE_URL");
     expect(workflow).toContain("RUN_PRODUCTION_MIGRATIONS");
     expect(workflow).toContain("Supabase Postgres 17 + PostGIS compatibility");
-    expect(workflow).toContain("supabase/setup-cli@v1");
+    expect(workflow).toContain("supabase/setup-cli@v3");
     expect(workflow).toContain("version: 2.117.0");
     expect(workflow).toContain("supabase db start");
     expect(workflow).toContain("npm run db:supabase-bootstrap");
