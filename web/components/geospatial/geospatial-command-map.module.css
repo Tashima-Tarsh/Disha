@@ -1,0 +1,64 @@
+.shell {
+  position: relative;
+  min-height: 560px;
+  height: min(68vh, 760px);
+  overflow: hidden;
+  border: 1px solid rgba(142, 166, 177, 0.18);
+  border-radius: 20px;
+  background: #071117;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.02), 0 24px 60px rgba(0,0,0,0.28);
+}
+.shell :global(.maplibregl-map) { position: absolute; inset: 0; }
+.shell :global(.maplibregl-ctrl-group) {
+  background: rgba(8, 18, 24, 0.88);
+  border: 1px solid rgba(151, 179, 188, 0.18);
+  box-shadow: none;
+}
+.shell :global(.maplibregl-ctrl-group button) { filter: invert(1) saturate(0); opacity: .78; }
+.shell :global(.maplibregl-ctrl-attrib) {
+  background: rgba(5, 13, 18, .76);
+  color: rgba(235,243,242,.68);
+}
+.shell :global(.maplibregl-ctrl-attrib a) { color: #9ec8bc; }
+.mapStatus {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  z-index: 5;
+  max-width: min(520px, calc(100% - 110px));
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 11px 13px;
+  border: 1px solid rgba(166, 193, 198, .18);
+  border-radius: 12px;
+  background: rgba(6, 16, 22, .86);
+  backdrop-filter: blur(14px);
+  color: #e9f1ef;
+}
+.mapStatus div { display: grid; gap: 3px; }
+.mapStatus strong { font-size: .78rem; letter-spacing: .04em; text-transform: uppercase; }
+.mapStatus small { color: rgba(222,235,232,.64); line-height: 1.4; }
+.statusReady,.statusPending { width: 8px; height: 8px; flex: 0 0 auto; margin-top: 4px; border-radius: 50%; }
+.statusReady { background: #4fc4a5; box-shadow: 0 0 0 4px rgba(79,196,165,.12); }
+.statusPending { background: #d4a958; box-shadow: 0 0 0 4px rgba(212,169,88,.12); }
+.sourceBadge {
+  position: absolute;
+  left: 16px;
+  bottom: 32px;
+  z-index: 5;
+  display: grid;
+  gap: 2px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: rgba(6,16,22,.78);
+  color: #dfe9e6;
+  backdrop-filter: blur(12px);
+  pointer-events: none;
+}
+.sourceBadge strong { font-size: .7rem; }
+.sourceBadge span { color: rgba(223,233,230,.52); font-size: .62rem; text-transform: uppercase; letter-spacing: .08em; }
+@media (max-width: 900px) {
+  .shell { min-height: 480px; height: 62vh; border-radius: 14px; }
+  .mapStatus { right: 64px; max-width: none; }
+}

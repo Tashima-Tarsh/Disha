@@ -16,6 +16,7 @@ const migrations = [
   ["202609180002", "intelligence_depth", "202609180002_intelligence_depth.sql"],
   ["202609180003", "continuous_intelligence", "202609180003_continuous_intelligence.sql"],
   ["202609180004", "retrieval_workflows", "202609180004_retrieval_workflows.sql"],
+  ["202609180005", "geospatial_runtime", "202609180005_geospatial_runtime.sql"],
 ];
 
 const requiredTables = [
@@ -54,6 +55,10 @@ const requiredTables = [
   "durable_work_items",
   "intelligence_activation_policies",
   "intelligence_activation_runs",
+  "geospatial_import_jobs",
+  "geospatial_datasets",
+  "geospatial_features",
+  "geospatial_feature_links",
 ];
 
 const requiredIndexes = [
@@ -107,6 +112,16 @@ const requiredIndexes = [
   "durable_work_items_expiry_idx",
   "intelligence_activation_runs_change_idx",
   "intelligence_activation_runs_time_idx",
+  "geospatial_import_jobs_source_idx",
+  "geospatial_datasets_source_idx",
+  "geospatial_datasets_status_idx",
+  "geospatial_features_geom_gix",
+  "geospatial_features_geog_gix",
+  "geospatial_features_centroid_gix",
+  "geospatial_features_dataset_idx",
+  "geospatial_features_lgd_idx",
+  "geospatial_features_name_idx",
+  "geospatial_feature_links_ref_idx",
 ];
 
 async function githubOidcToken() {

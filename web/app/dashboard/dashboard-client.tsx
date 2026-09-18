@@ -1,1126 +1,402 @@
 "use client";
 
+import dynamic from "next/dynamic";
+import Link from "next/link";
 import {
-  AlertTriangle,
+  Activity,
   ArrowUpRight,
-  BadgeCheck,
-  Banknote,
-  Brain,
-  ClipboardCheck,
-  DatabaseZap,
-  Eye,
+  Clock3,
   FileSearch,
   Fingerprint,
   GitBranch,
-  Globe2,
-  Landmark,
-  LockKeyhole,
-  MapPinned,
-  Maximize2,
+  Layers3,
+  Map as MapIcon,
   Network,
-  Pause,
-  Play,
-  RadioTower,
-  Scale,
-  Shield,
-  Siren,
+  Settings2,
+  ShieldCheck,
+  Waypoints,
 } from "lucide-react";
-import Link from "next/link";
-import type { ReactNode } from "react";
-import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
+import { useEffect, useMemo, useState } from "react";
 
+import type {
+  IntelligenceWorkspace,
+  WorkspaceEntity,
+  WorkspaceTimelineItem,
+} from "@/lib/intelligence/workspace-contract";
+import type { OperationalGeoFeature } from "@/lib/geospatial/contracts";
 import { CommandPalette } from "./command-palette";
-import styles from "./dashboard.module.css";
+import styles from "./analyst-workspace.module.css";
 
-type PrincipalView = {
-  email: string;
-  roles: string[];
-};
+const GeospatialCommandMap = dynamic(
+  () => import("@/components/geospatial/GeospatialCommandMap").then((module) => module.GeospatialCommandMap),
+  { ssr: false, loading: () => <div className={styles.mapLoading}>Initializing governed map runtime…</div> },
+);
+const IntelligenceGraph = dynamic(
+  () => import("@/components/intelligence/IntelligenceGraph").then((module) => module.IntelligenceGraph),
+  { ssr: false, loading: () => <div className={styles.graphLoading}>Loading persisted entity graph…</div> },
+);
 
-type CommandFeed = {
-  generatedAt: string;
-  title: string;
-  invariant: string;
-  commandReadiness: {
-    score: number;
-    productionScore: number;
-    extensionScore: number;
-    sourceRegistry: number;
-    nationalSources: number;
-    connectorManifest: number;
-  };
-  governance: {
-    policyGate: string;
-    evidenceLedger: string;
-    noSyntheticData: boolean;
-    extensionStatus: "pass" | "warn" | "fail";
-    extensionBlockers: string[];
-    extensionWarnings: string[];
-  };
-  lanes: Array<{
-    id: string;
-    title: string;
-    posture: "operational" | "watch" | "blocked";
-    scope: string;
-    primaryAuthority: string;
-    sourceCount: number;
-    evidenceMode: string;
-  }>;
-  india: {
-    totalTerritories: number;
-    states: number;
-    unionTerritories: number;
-    mapMode: string;
-    geometryStatus: string;
-    regionSummary: Record<string, { total: number; states: number; uts: number }>;
-    territories: Array<{
-      id: string;
-      name: string;
-      kind: "State" | "Union Territory";
-      region: string;
-      posture: string;
-      evidenceCoverage: number;
-      commandTask: string;
-    }>;
-  };
-  geospatial: {
-    layerId: string;
-    geometryStatus: string;
-    mapMode: string;
-    attributionRequired: boolean;
-    boundaryImportRule: string;
-    sourceHash: string;
-    sources: Array<{
-      sourceId: string;
-      sourceName: string;
-      owner: string;
-      url: string;
-      geographyLevel: string[];
-      updateMode: string;
-      status: "registered" | "intake_queued" | "license_review";
-      limitation: string;
-    }>;
-  };
-  globalFlow: {
-    mapAsset: string;
-    attribution: string;
-    generatedFrom: string;
-    nodes: Array<{
-      id: string;
-      label: string;
-      country: string;
-      lon: number;
-      lat: number;
-      kind: "command_hub" | "national_source" | "global_source" | "evidence_store";
-    }>;
-    flows: Array<{
-      id: string;
-      from: string;
-      to: string;
-      label: string;
-      authority: string;
-      status: "live_source" | "registered_source" | "parser_queued";
-      cadence: string;
-      hash: string;
-    }>;
-  };
-  claimChains: Array<{
-    claimId: string;
-    title: string;
-    domain: "audit" | "finance" | "geospatial" | "source-registry";
-    claim: string;
-    status: "publishable_metadata" | "source_gap" | "intake_queued";
-    source: {
-      authority: string;
-      url: string;
-      recordId: string;
-    };
-    policy: {
-      decision: "ALLOW_METADATA" | "REQUIRE_PARSER" | "REQUIRE_IMPORT";
-      reason: string;
-    };
-    evidence: {
-      sourceRecordHash: string;
-      chainHash: string;
-      ledgerAction: string;
-    };
-    chain: Array<{
-      step: "source" | "claim" | "policy" | "evidence";
-      label: string;
-      detail: string;
-    }>;
-  }>;
-  audit: {
-    authority: string;
-    sourceNotice: string;
-    fetchedRecords: number;
-    matchedRecords: number;
-    pdfLinks: number;
-    findingExtraction: string;
-    records: Array<{
-      id: string;
-      title: string;
-      government: string | null;
-      reportYear: number | null;
-      topics: string[];
-      detailUrl: string | null;
-      pdfUrl: string | null;
-      extractionStatus: string;
-    }>;
-  };
-  finance: {
-    sourceNotice: string;
-    fiscalYears: number;
-    documentRecords: number;
-    taxCollectionDocuments: number;
-    stateDevolutionDocuments: number;
-    departmentDocuments: number;
-    extraction: string;
-    records: Array<{
-      id: string;
-      fiscalYear: string;
-      title: string;
-      dataNeed: string;
-      sourceUrl: string;
-      extractionStatus: string;
-    }>;
-  };
-  connectors: Array<{
-    id: string;
-    label: string;
-    layer: string;
-    authority: string;
-    cadence: string;
-    kind: string;
-    needsApiKey: boolean;
-    needsBulkImport: boolean;
-    endpoint: string;
-    safetyBoundary: string;
-  }>;
-  production: {
-    noSyntheticDataRule: string;
-    capabilities: Array<{
-      id: string;
-      title: string;
-      status: "working" | "partial" | "blocked";
-      evidenceRule: string;
-      nextHardening: string[];
-    }>;
-  };
-  extensions: {
-    activeExtensions: number;
-    gates: Array<{
-      id: string;
-      title: string;
-      kind: string;
-      status: "pass" | "warn" | "fail";
-      score: number;
-    }>;
-  };
-  sourceRegistry: Array<{
-    sourceId: string;
-    sourceName: string;
-    owner: string;
-    domain: string;
-    sourceType: string;
-    updateMode: string;
-    endpoints: number;
-    limitations: string[];
-  }>;
-};
-
+type PrincipalView = { email: string; roles: string[] };
 type LoadState =
   | { status: "loading" }
-  | { status: "ready"; data: CommandFeed }
+  | { status: "ready"; data: IntelligenceWorkspace }
   | { status: "error"; message: string };
 
-type WorldFeatureCollection = {
-  type: "FeatureCollection";
-  features: Array<{
-    type: "Feature";
-    id?: string;
-    properties?: { name?: string };
-    geometry: {
-      type: "Polygon" | "MultiPolygon";
-      coordinates: number[][][] | number[][][][];
-    };
-  }>;
-};
-
-const toneClass: Record<string, string> = {
-  operational: styles.toneGood,
-  working: styles.toneGood,
-  pass: styles.toneGood,
-  watch: styles.toneWarn,
-  partial: styles.toneWarn,
-  warn: styles.toneWarn,
-  blocked: styles.toneBad,
-  fail: styles.toneBad,
-};
-
 export function DashboardClient({ principal }: { principal: PrincipalView }) {
-  const [loadState, setLoadState] = useState<LoadState>({ status: "loading" });
-  const [worldMap, setWorldMap] = useState<WorldFeatureCollection | null>(null);
-  const [selectedRegion, setSelectedRegion] = useState("All");
-  const [selectedLane, setSelectedLane] = useState("All");
-  const [selectedClaimId, setSelectedClaimId] = useState<string | null>(null);
+  const [state, setState] = useState<LoadState>({ status: "loading" });
+  const [selectedFeatureId, setSelectedFeatureId] = useState<string | null>(null);
+  const [selectedEntityId, setSelectedEntityId] = useState<string | null>(null);
+  const [selectedTimelineId, setSelectedTimelineId] = useState<string | null>(null);
+  const [playing, setPlaying] = useState(false);
+  const [playbackIndex, setPlaybackIndex] = useState(0);
+  const [reducedMotion, setReducedMotion] = useState(false);
 
   useEffect(() => {
     const controller = new AbortController();
-    void fetchJson<CommandFeed>("/api/dashboard/command", controller.signal)
-      .then((data) => setLoadState({ status: "ready", data }))
+    void fetch("/api/v1/intelligence/workspace", {
+      cache: "no-store",
+      credentials: "same-origin",
+      signal: controller.signal,
+    })
+      .then(async (response) => {
+        if (!response.ok) throw new Error(`Workspace returned ${response.status}`);
+        return response.json() as Promise<IntelligenceWorkspace>;
+      })
+      .then((data) => setState({ status: "ready", data }))
       .catch((error) => {
         if (!controller.signal.aborted) {
-          setLoadState({ status: "error", message: error instanceof Error ? error.message : "Command feed unavailable" });
+          setState({ status: "error", message: error instanceof Error ? error.message : "Workspace unavailable" });
         }
       });
     return () => controller.abort();
   }, []);
 
   useEffect(() => {
-    const controller = new AbortController();
-    void fetch("/data/world-countries.geojson", { cache: "force-cache", signal: controller.signal })
-      .then((response) => response.ok ? response.json() : null)
-      .then((payload) => setWorldMap(payload as WorldFeatureCollection | null))
-      .catch(() => {
-        if (!controller.signal.aborted) setWorldMap(null);
-      });
-    return () => controller.abort();
+    const media = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const sync = () => setReducedMotion(media.matches);
+    sync();
+    media.addEventListener("change", sync);
+    return () => media.removeEventListener("change", sync);
   }, []);
 
-  if (loadState.status === "loading") {
-    return <DashboardShell principal={principal} body={<LoadingState />} />;
-  }
-
-  if (loadState.status === "error") {
-    return <DashboardShell principal={principal} body={<ErrorState message={loadState.message} />} />;
-  }
-
-  const { data } = loadState;
-  const regions = ["All", ...Object.keys(data.india.regionSummary).sort()];
-  const lanes = ["All", ...data.lanes.map((lane) => lane.title).sort()];
-  const territories = data.india.territories.filter((territory) => selectedRegion === "All" || territory.region === selectedRegion);
-  const connectors = data.connectors.filter((connector) => selectedLane === "All" || connector.layer === selectedLane);
-  const selectedClaim = data.claimChains.find((claim) => claim.claimId === selectedClaimId) ?? data.claimChains[0];
-  const blockedCapabilities = data.production.capabilities.filter((capability) => capability.status === "blocked");
-  const partialCapabilities = data.production.capabilities.filter((capability) => capability.status === "partial");
-  const attentionItems = [
-    ...data.governance.extensionBlockers,
-    ...data.governance.extensionWarnings,
-    ...blockedCapabilities.flatMap((capability) => capability.nextHardening),
-    ...partialCapabilities.flatMap((capability) => capability.nextHardening),
-  ];
-  const nextAction = attentionItems[0] ?? "No blocking action is reported by the current command feed.";
-
-  return (
-    <DashboardShell
-      principal={principal}
-      body={
-        <div className={styles.contentGrid}>
-          <section className={styles.worldBoard} id="atlas">
-            <PanelTitle
-              icon={<Globe2 size={18} />}
-              title="Constitutional Evidence Atlas"
-              subtitle="Explore real-world source-to-evidence movement by operational state. Every line represents a registered DISHA source or connector—not an invented event."
-            />
-            <WorldFlowMap worldMap={worldMap} flow={data.globalFlow} generatedAt={data.generatedAt} />
-          </section>
-
-          <section className={styles.commandHero}>
-            <div className={styles.heroText}>
-              <p className={styles.eyebrow}>DISHA 6.6 / National Command Feed</p>
-              <h1>Constitutional Evidence Command Centre</h1>
-              <p>{data.invariant}</p>
-            </div>
-            <div className={styles.readinessDial} aria-label="Command readiness">
-              <span>{data.commandReadiness.score}</span>
-              <strong>readiness</strong>
-              <small>{formatDateTime(data.generatedAt)}</small>
-            </div>
-          </section>
-
-          <section className={styles.overviewBoard} id="overview" aria-labelledby="overview-title">
-            <header className={styles.overviewHeader}>
-              <div>
-                <p className={styles.eyebrow}>System overview</p>
-                <h2 id="overview-title">One view from source intake to accountable action</h2>
-                <p>Read the current posture, inspect what needs attention, or move directly into a governed mission.</p>
-              </div>
-              <div className={styles.overviewActions}>
-                <Link className={styles.primaryButton} href="/workbench">Run a governed mission <ArrowUpRight size={15} /></Link>
-                <a className={styles.secondaryButton} href="#evidence">Inspect evidence chains</a>
-              </div>
-            </header>
-
-            <div className={styles.overviewGrid}>
-              <OverviewCard
-                icon={<RadioTower size={18} />}
-                label="Intake"
-                value={`${data.commandReadiness.sourceRegistry} sources`}
-                detail={`${data.lanes.length} operational lanes across ${data.india.totalTerritories} states and union territories.`}
-              />
-              <OverviewCard
-                icon={<Shield size={18} />}
-                label="Governance"
-                value={data.governance.policyGate}
-                detail={`Evidence ledger: ${data.governance.evidenceLedger}. Synthetic data: ${data.governance.noSyntheticData ? "denied" : "under review"}.`}
-              />
-              <OverviewCard
-                icon={<ClipboardCheck size={18} />}
-                label="Review queue"
-                value={`${attentionItems.length} items`}
-                detail={`${blockedCapabilities.length} blocked and ${partialCapabilities.length} partial production capabilities.`}
-                tone={attentionItems.length ? "warn" : "good"}
-              />
-              <OverviewCard
-                icon={<Eye size={18} />}
-                label="Next accountable action"
-                value="Review required"
-                detail={nextAction}
-                tone={attentionItems.length ? "warn" : "good"}
-              />
-            </div>
-          </section>
-
-          <section className={styles.kpiGrid} aria-label="Command KPIs">
-            <KpiCard icon={<RadioTower size={20} />} label="Command feed" value="LIVE" detail="Single backend contract" tone="good" />
-            <KpiCard icon={<DatabaseZap size={20} />} label="Source registry" value={formatNumber(data.commandReadiness.sourceRegistry)} detail={`${data.commandReadiness.nationalSources} national sources`} tone="good" />
-            <KpiCard icon={<Network size={20} />} label="Connectors" value={formatNumber(data.commandReadiness.connectorManifest)} detail="Official-source manifest" tone="warn" />
-            <KpiCard icon={<Brain size={20} />} label="Extensions" value={formatNumber(data.extensions.activeExtensions)} detail={`${data.commandReadiness.extensionScore}% governance score`} tone={data.governance.extensionStatus === "pass" ? "good" : "warn"} />
-          </section>
-
-          <section className={styles.opsBoard}>
-            <section className={styles.mapPanel}>
-              <PanelTitle
-                icon={<MapPinned size={18} />}
-                title="India Geospatial Command Surface"
-                subtitle={`${data.india.states} states, ${data.india.unionTerritories} union territories. Authoritative geometry status: ${displayState(data.india.geometryStatus)}.`}
-              />
-              <div className={styles.filterRow}>
-                <SelectFilter label="Region" value={selectedRegion} options={regions} onChange={setSelectedRegion} />
-                <SelectFilter label="Operational lane" value={selectedLane} options={lanes} onChange={setSelectedLane} />
-              </div>
-              <IndiaGeospatialSurface territories={territories} geospatial={data.geospatial} />
-            </section>
-
-            <aside className={styles.commandStack}>
-              <Panel title="Rules of Engagement" icon={<LockKeyhole size={18} />}>
-                <div className={styles.statusList}>
-                  <StatusRow label="Policy Gate" value={data.governance.policyGate} tone="good" />
-                  <StatusRow label="Evidence Ledger" value={data.governance.evidenceLedger} tone="good" />
-                  <StatusRow label="Synthetic data" value={data.governance.noSyntheticData ? "denied" : "review"} tone="good" />
-                  <StatusRow label="Extension gate" value={data.governance.extensionStatus} tone={data.governance.extensionStatus === "pass" ? "good" : "warn"} />
-                </div>
-              </Panel>
-
-              <Panel title="Active Command Lanes" icon={<Siren size={18} />}>
-                <div className={styles.laneList}>
-                  {data.lanes.slice(0, 7).map((lane) => (
-                    <article className={styles.laneItem} key={lane.id}>
-                      <div>
-                        <strong>{lane.title}</strong>
-                        <span>{lane.primaryAuthority}</span>
-                      </div>
-                      <Badge tone={lane.posture}>{lane.sourceCount} src</Badge>
-                    </article>
-                  ))}
-                </div>
-              </Panel>
-            </aside>
-          </section>
-
-          <section className={styles.evidenceGrid} id="evidence">
-            <Panel title="Constitutional Chain Explorer" icon={<Fingerprint size={18} />}>
-              <div className={styles.chainExplorer}>
-                <div className={styles.claimList}>
-                  {data.claimChains.slice(0, 12).map((claim) => (
-                    <button
-                      className={claim.claimId === selectedClaim.claimId ? styles.claimButtonActive : styles.claimButton}
-                      key={claim.claimId}
-                      type="button"
-                      onClick={() => setSelectedClaimId(claim.claimId)}
-                    >
-                      <span>{claim.domain}</span>
-                      <strong>{claim.title}</strong>
-                      <small>{displayState(claim.status)}</small>
-                    </button>
-                  ))}
-                </div>
-                <div className={styles.chainDetail}>
-                  <div className={styles.chainDetailHead}>
-                    <div>
-                      <p className={styles.eyebrow}>Claim-level provenance</p>
-                      <h3>{selectedClaim.title}</h3>
-                    </div>
-                    <Badge tone={selectedClaim.status === "publishable_metadata" ? "operational" : "watch"}>{displayState(selectedClaim.status)}</Badge>
-                  </div>
-                  <p>{selectedClaim.claim}</p>
-                  <div className={styles.chainSteps}>
-                    {selectedClaim.chain.map((step) => (
-                      <article className={styles.chainStep} key={`${selectedClaim.claimId}-${step.step}`}>
-                        <BadgeCheck size={16} />
-                        <div>
-                          <span>{step.step}</span>
-                          <strong>{step.label}</strong>
-                          <small>{step.detail}</small>
-                        </div>
-                      </article>
-                    ))}
-                  </div>
-                  <div className={styles.hashBlock}>
-                    <span>source hash</span>
-                    <code>{selectedClaim.evidence.sourceRecordHash}</code>
-                    <span>chain hash</span>
-                    <code>{selectedClaim.evidence.chainHash}</code>
-                  </div>
-                </div>
-              </div>
-            </Panel>
-
-            <Panel title="Geospatial Import Layer" icon={<MapPinned size={18} />}>
-              <p className={styles.notice}>{data.geospatial.boundaryImportRule}</p>
-              <div className={styles.geoSourceGrid}>
-                {data.geospatial.sources.map((source) => (
-                  <article className={styles.geoSource} key={source.sourceId}>
-                    <div>
-                      <strong>{source.sourceName}</strong>
-                      <span>{source.owner}</span>
-                    </div>
-                    <Badge tone={source.status === "license_review" ? "watch" : "partial"}>{displayState(source.status)}</Badge>
-                    <small>{source.geographyLevel.join(", ")}</small>
-                  </article>
-                ))}
-              </div>
-              <div className={styles.hashBlock}>
-                <span>geometry source hash</span>
-                <code>{data.geospatial.sourceHash}</code>
-              </div>
-            </Panel>
-          </section>
-
-          <section className={styles.intelGrid}>
-            <Panel title="CAG Audit Intelligence Lane" icon={<FileSearch size={18} />}>
-              <div className={styles.metricStrip}>
-                <Metric label="Fetched" value={data.audit.fetchedRecords} />
-                <Metric label="Matched" value={data.audit.matchedRecords} />
-                <Metric label="PDF links" value={data.audit.pdfLinks} />
-              </div>
-              <p className={styles.notice}>{data.audit.sourceNotice}</p>
-              <div className={styles.recordList}>
-                {data.audit.records.map((record) => (
-                  <article className={styles.recordItem} key={record.id}>
-                    <div>
-                      <strong>{record.title}</strong>
-                      <span>{record.government ?? "Government not parsed"} / {record.reportYear ?? "year pending"}</span>
-                    </div>
-                    <Badge tone={record.extractionStatus === "metadata_only" ? "warn" : "operational"}>{displayState(record.extractionStatus)}</Badge>
-                  </article>
-                ))}
-              </div>
-            </Panel>
-
-            <Panel title="Finance and Tax Evidence Lane" icon={<Banknote size={18} />}>
-              <div className={styles.metricStrip}>
-                <Metric label="Fiscal years" value={data.finance.fiscalYears} />
-                <Metric label="Documents" value={data.finance.documentRecords} />
-                <Metric label="State devolution" value={data.finance.stateDevolutionDocuments} />
-              </div>
-              <p className={styles.notice}>{data.finance.sourceNotice}</p>
-              <div className={styles.recordList}>
-                {data.finance.records.slice(0, 7).map((record) => (
-                  <article className={styles.recordItem} key={record.id}>
-                    <div>
-                      <strong>{record.title}</strong>
-                      <span>{record.fiscalYear} / {displayState(record.dataNeed)}</span>
-                    </div>
-                    <Badge tone={record.extractionStatus === "source_manifest" ? "operational" : "watch"}>{displayState(record.extractionStatus)}</Badge>
-                  </article>
-                ))}
-              </div>
-            </Panel>
-          </section>
-
-          <section className={styles.lowerGrid}>
-            <Panel title="Connector Mesh" icon={<GitBranch size={18} />}>
-              <div className={styles.connectorTable}>
-                {connectors.slice(0, 12).map((connector) => (
-                  <article className={styles.connectorRow} key={connector.id}>
-                    <div>
-                      <strong>{connector.label}</strong>
-                      <span>{connector.authority}</span>
-                    </div>
-                    <Badge tone={connector.needsBulkImport || connector.needsApiKey ? "watch" : "operational"}>
-                      {connector.needsBulkImport ? "bulk" : connector.needsApiKey ? "key" : connector.cadence}
-                    </Badge>
-                    <span className={styles.connectorKind}>{connector.kind}</span>
-                  </article>
-                ))}
-              </div>
-            </Panel>
-
-            <Panel title="State and UT Task Queue" icon={<Landmark size={18} />}>
-              <div className={styles.coverageList}>
-                {territories.slice(0, 10).map((territory) => (
-                  <article className={styles.coverageItem} key={territory.name}>
-                    <div>
-                      <strong>{territory.name}</strong>
-                      <span>{territory.commandTask}</span>
-                    </div>
-                    <ProgressBar value={territory.evidenceCoverage} label={`${territory.evidenceCoverage}%`} />
-                  </article>
-                ))}
-              </div>
-            </Panel>
-          </section>
-
-          <section className={styles.capabilityBand} id="hardening">
-            <PanelTitle icon={<Scale size={18} />} title="Production Hardening Track" subtitle={data.production.noSyntheticDataRule} />
-            <div className={styles.capabilityGrid}>
-              {data.production.capabilities.map((capability) => (
-                <article className={styles.capabilityCard} key={capability.id}>
-                  <div className={styles.capabilityHeader}>
-                    <strong>{capability.title}</strong>
-                    <Badge tone={capability.status}>{capability.status}</Badge>
-                  </div>
-                  <p>{capability.evidenceRule}</p>
-                  <span>{capability.nextHardening[0]}</span>
-                </article>
-              ))}
-            </div>
-          </section>
-        </div>
-      }
-    />
+  const data = state.status === "ready" ? state.data : null;
+  const timelineAscending = useMemo(
+    () => data ? [...data.timeline].sort((a, b) => Date.parse(a.timestamp) - Date.parse(b.timestamp)) : [],
+    [data],
   );
-}
 
-function DashboardShell({ principal, body }: { principal: PrincipalView; body: ReactNode }) {
+  useEffect(() => {
+    if (!playing || reducedMotion || timelineAscending.length < 2) return;
+    const timer = window.setInterval(() => {
+      setPlaybackIndex((current) => {
+        const next = (current + 1) % timelineAscending.length;
+        const item = timelineAscending[next];
+        if (item) setSelectedTimelineId(item.id);
+        return next;
+      });
+    }, 1800);
+    return () => window.clearInterval(timer);
+  }, [playing, reducedMotion, timelineAscending]);
+
+  if (state.status === "loading") return <WorkspaceState principal={principal} title="Opening DISHA intelligence workspace" />;
+  if (state.status === "error") return <WorkspaceState principal={principal} title="Workspace unavailable" message={state.message} />;
+
+  const selectedFeature = data.geo.features.find((feature) => feature.properties.featureId === selectedFeatureId) ?? null;
+  const selectedEntity = data.entities.find((entity) => entity.entityId === selectedEntityId) ?? null;
+  const selectedTimeline = data.timeline.find((item) => item.id === selectedTimelineId) ?? null;
+  const activeMission = data.missions[0] ?? null;
+
+  function selectFeature(feature: OperationalGeoFeature) {
+    setSelectedFeatureId(feature.properties.featureId);
+    const entityLink = feature.properties.links.find((link) => link.linkType === "entity");
+    if (entityLink) setSelectedEntityId(entityLink.refId);
+  }
+
+  function selectEntity(entityId: string) {
+    setSelectedEntityId(entityId);
+    const linked = data.geo.features.find((feature) =>
+      feature.properties.links.some((link) => link.linkType === "entity" && link.refId === entityId),
+    );
+    if (linked) setSelectedFeatureId(linked.properties.featureId);
+  }
+
+  function selectTimeline(item: WorkspaceTimelineItem) {
+    setSelectedTimelineId(item.id);
+    const entityId = item.entityIds?.[0];
+    if (entityId) selectEntity(entityId);
+    if (item.missionId) {
+      const linked = data.geo.features.find((feature) =>
+        feature.properties.links.some((link) => link.linkType === "mission" && link.refId === item.missionId),
+      );
+      if (linked) setSelectedFeatureId(linked.properties.featureId);
+    }
+  }
+
   return (
-    <main className={styles.shell}>
+    <div className={styles.shell}>
       <aside className={styles.rail}>
-        <div className={styles.mark}>
-          <Shield size={24} />
-          <div>
-            <strong>DISHA</strong>
-            <span>6.6</span>
-          </div>
-        </div>
-        <nav className={styles.railNav} aria-label="Dashboard sections">
-          <a href="#atlas"><Globe2 size={18} /> Evidence Atlas</a>
-          <a href="#overview"><Eye size={18} /> Overview</a>
-          <a href="#map"><MapPinned size={18} /> India Map</a>
-          <a href="#audit"><FileSearch size={18} /> Audit</a>
-          <a href="#evidence"><Fingerprint size={18} /> Evidence</a>
-          <Link href="/intelligence"><RadioTower size={18} /> Live Intelligence</Link>
-          <a href="#hardening"><ClipboardCheck size={18} /> Hardening</a>
+        <Link className={styles.brand} href="/dashboard" aria-label="DISHA intelligence workspace">
+          <span>D</span>
+          <div><strong>DISHA</strong><small>Constitutional Evidence OS</small></div>
+        </Link>
+
+        <nav className={styles.nav} aria-label="Primary">
+          <a href="#map" className={styles.navActive}><MapIcon size={16} /> Situation map</a>
+          <a href="#timeline"><Clock3 size={16} /> Timeline</a>
+          <a href="#graph"><Network size={16} /> Entity graph</a>
+          <a href="#evidence"><Fingerprint size={16} /> Evidence</a>
+          <Link href="/workbench"><Waypoints size={16} /> Mission workbench</Link>
+          <Link href="/intelligence"><FileSearch size={16} /> Intelligence</Link>
+          <Link href="/system"><Settings2 size={16} /> System console</Link>
         </nav>
-        <div className={styles.railFooter}>
-          <span>Mission owner</span>
-          <strong>{principal.email}</strong>
-          <small>{principal.roles.join(", ")}</small>
-        </div>
+
+        <section className={styles.missionRail}>
+          <p>Current mission</p>
+          {activeMission ? (
+            <>
+              <strong>{activeMission.missionId}</strong>
+              <span>{humanize(activeMission.status)}</span>
+              <small>Updated {formatDateTime(activeMission.updatedAt)}</small>
+            </>
+          ) : (
+            <>
+              <strong>No active mission</strong>
+              <span>Start a governed mission to bind analysis, policy and evidence.</span>
+            </>
+          )}
+          <Link href="/workbench">Open workbench <ArrowUpRight size={13} /></Link>
+        </section>
+
+        <footer className={styles.railFooter}>
+          <ShieldCheck size={15} />
+          <div><strong>Evidence-first runtime</strong><span>{principal.email}</span></div>
+        </footer>
       </aside>
 
-      <section className={styles.workspace} id="command">
-        <div className={styles.topBar}>
-          <div><span className={styles.systemDot} /> DISHA governed command runtime</div>
+      <main className={styles.workspace}>
+        <header className={styles.topbar}>
           <div>
-            <CommandPalette />
-            <Link href="/intelligence">Live Intelligence <RadioTower size={14} /></Link>
-            <Link href="/workbench">Workbench <ArrowUpRight size={14} /></Link>
+            <p>National intelligence workspace</p>
+            <h1>Operational picture</h1>
           </div>
+          <div className={styles.topActions}>
+            <div className={styles.asOf}><span /> As of {formatDateTime(data.generatedAt)}</div>
+            <CommandPalette />
+          </div>
+        </header>
+
+        <section className={styles.workspaceGrid}>
+          <section className={styles.mapPanel} aria-labelledby="map-heading">
+            <header className={styles.sectionHead}>
+              <div>
+                <span className={styles.kicker}>Geospatial intelligence</span>
+                <h2 id="map-heading">India operational map</h2>
+              </div>
+              <div className={styles.mapMeta}>
+                <span><Layers3 size={14} /> {data.geoStatus.admittedDatasets} admitted datasets</span>
+                <span><Activity size={14} /> {data.geoStatus.admittedFeatures} admitted features</span>
+              </div>
+            </header>
+            <GeospatialCommandMap
+              features={data.geo}
+              selectedFeatureId={selectedFeatureId}
+              onSelectFeature={selectFeature}
+            />
+          </section>
+
+          <aside className={styles.inspector} id="evidence">
+            <header>
+              <span className={styles.kicker}>Context inspector</span>
+              <h2>{selectedFeature ? "Geospatial evidence" : selectedEntity ? "Entity context" : selectedTimeline ? "Timeline evidence" : "Evidence context"}</h2>
+            </header>
+            <Inspector
+              feature={selectedFeature}
+              entity={selectedEntity}
+              timeline={selectedTimeline}
+              latestEvidence={data.evidence[0] ?? null}
+            />
+          </aside>
+
+          <section className={styles.intelStrip} aria-label="Persisted intelligence counts">
+            <Metric label="Missions" value={data.counts.missions} />
+            <Metric label="Evidence events" value={data.counts.evidenceEvents} />
+            <Metric label="Entities" value={data.counts.entities} />
+            <Metric label="Relationships" value={data.counts.edges} />
+            <Metric label="Claims" value={data.counts.claims} />
+          </section>
+
+          <section className={styles.graphPanel} id="graph">
+            <header className={styles.sectionHead}>
+              <div>
+                <span className={styles.kicker}>Network intelligence</span>
+                <h2>Entity / evidence graph</h2>
+              </div>
+              <span className={styles.subtle}>{data.edges.length} persisted edges in view</span>
+            </header>
+            <IntelligenceGraph
+              entities={data.entities}
+              edges={data.edges}
+              selectedEntityId={selectedEntityId}
+              onSelectEntity={selectEntity}
+            />
+          </section>
+
+          <section className={styles.timelinePanel} id="timeline">
+            <header className={styles.sectionHead}>
+              <div>
+                <span className={styles.kicker}>Temporal intelligence</span>
+                <h2>Evidence timeline</h2>
+              </div>
+              <button
+                className={styles.playButton}
+                type="button"
+                disabled={reducedMotion || timelineAscending.length < 2}
+                onClick={() => setPlaying((current) => !current)}
+              >
+                {playing ? "Pause playback" : "Play evidence"}
+              </button>
+            </header>
+            {data.timeline.length ? (
+              <div className={styles.timelineTrack}>
+                {data.timeline.slice(0, 28).map((item) => (
+                  <button
+                    type="button"
+                    key={item.id}
+                    className={item.id === selectedTimelineId ? styles.timelineItemActive : styles.timelineItem}
+                    onClick={() => selectTimeline(item)}
+                  >
+                    <span>{formatCompactDate(item.timestamp)}</span>
+                    <strong>{item.title}</strong>
+                    <small>{item.summary}</small>
+                  </button>
+                ))}
+              </div>
+            ) : (
+              <EmptyState text="No persisted intelligence, change or evidence events are available yet." />
+            )}
+          </section>
+        </section>
+      </main>
+    </div>
+  );
+}
+
+function Inspector({
+  feature,
+  entity,
+  timeline,
+  latestEvidence,
+}: {
+  feature: OperationalGeoFeature | null;
+  entity: WorkspaceEntity | null;
+  timeline: WorkspaceTimelineItem | null;
+  latestEvidence: IntelligenceWorkspace["evidence"][number] | null;
+}) {
+  if (feature) {
+    return (
+      <div className={styles.inspectorBody}>
+        <StatusChip>{feature.properties.geographyLevel}</StatusChip>
+        <h3>{feature.properties.name ?? feature.properties.featureId}</h3>
+        <Definition label="LGD code" value={feature.properties.lgdCode ?? "Not mapped"} />
+        <Definition label="Authority" value={feature.properties.sourceId} />
+        <Definition label="Product" value={[feature.properties.productId, feature.properties.productVersion].filter(Boolean).join(" · ")} />
+        <Definition label="Observed" value={formatDateTime(feature.properties.observedAt)} />
+        <HashBlock label="Source record" value={feature.properties.sourceRecordHash} />
+        <HashBlock label="Provenance" value={feature.properties.provenanceHash} />
+        <div className={styles.linkList}>
+          <span>Evidence links</span>
+          {feature.properties.links.length
+            ? feature.properties.links.map((link) => <code key={`${link.linkType}:${link.refId}`}>{link.linkType} · {link.refId}</code>)
+            : <small>No entity, claim, mission or evidence link is persisted for this feature.</small>}
         </div>
-        {body}
-      </section>
-    </main>
-  );
-}
-
-function LoadingState() {
-  return (
-    <div className={styles.statePanel}>
-      <RadioTower size={30} />
-      <h1>Building command feed</h1>
-      <p>Authenticating, pulling official-source connectors, and assembling the governed DISHA 6.6 command model.</p>
-    </div>
-  );
-}
-
-function ErrorState({ message }: { message: string }) {
-  return (
-    <div className={styles.statePanel}>
-      <AlertTriangle size={30} />
-      <h1>Command feed unavailable</h1>
-      <p>{message}</p>
-      <Link className={styles.primaryButton} href="/login?mode=password&returnUrl=%2Fdashboard">Login again</Link>
-    </div>
-  );
-}
-
-function KpiCard({
-  icon,
-  label,
-  value,
-  detail,
-  tone,
-}: {
-  icon: ReactNode;
-  label: string;
-  value: string;
-  detail: string;
-  tone: "good" | "warn" | "bad";
-}) {
-  return (
-    <article className={`${styles.kpiCard} ${styles[`kpi_${tone}`]}`}>
-      <div className={styles.kpiIcon}>{icon}</div>
-      <span>{label}</span>
-      <strong>{value}</strong>
-      <small>{detail}</small>
-    </article>
-  );
-}
-
-function OverviewCard({
-  icon,
-  label,
-  value,
-  detail,
-  tone = "good",
-}: {
-  icon: ReactNode;
-  label: string;
-  value: string;
-  detail: string;
-  tone?: "good" | "warn";
-}) {
-  return (
-    <article className={`${styles.overviewCard} ${styles[`overview_${tone}`]}`}>
-      <div className={styles.overviewCardLabel}>{icon}<span>{label}</span></div>
-      <strong>{value}</strong>
-      <p>{detail}</p>
-    </article>
-  );
-}
-
-function IndiaGeospatialSurface({
-  territories,
-  geospatial,
-}: {
-  territories: CommandFeed["india"]["territories"];
-  geospatial: CommandFeed["geospatial"];
-}) {
-  const primarySource = geospatial.sources.find((source) => source.sourceId === "survey-of-india-admin-boundaries");
-  const identitySource = geospatial.sources.find((source) => source.sourceId === "lgd");
-  const enrichmentSources = geospatial.sources.filter(
-    (source) => source.sourceId !== "survey-of-india-admin-boundaries" && source.sourceId !== "lgd",
-  );
-
-  return (
-    <div className={styles.geoTruthSurface} id="map">
-      <div className={styles.geoTruthGate}>
-        <div>
-          <p className={styles.eyebrow}>Authoritative geometry gate</p>
-          <h3>No decorative India polygon is rendered.</h3>
-          <p>
-            DISHA will display India only after versioned geographic geometry is imported with source,
-            product/version, CRS, retrieval timestamp, applicable terms and source hash. Until then this
-            surface reports readiness instead of inventing geography.
-          </p>
-        </div>
-        <div className={styles.geoTruthMetrics}>
-          <span><strong>{territories.length}</strong> administrative units in current filter</span>
-          <span><strong>{displayState(geospatial.geometryStatus)}</strong> geometry state</span>
-          <span><strong>{geospatial.sources.length}</strong> governed geospatial sources</span>
-        </div>
+        <a href={feature.properties.sourceUrl} target="_blank" rel="noreferrer">Open authoritative source <ArrowUpRight size={13} /></a>
       </div>
-
-      <div className={styles.geoTruthPipeline} aria-label="Authoritative India map pipeline">
-        <article>
-          <span>1 · Boundary truth</span>
-          <strong>{primarySource?.sourceName ?? "Survey of India import required"}</strong>
-          <p>{primarySource?.limitation ?? "Register and import an identified authoritative boundary product."}</p>
-        </article>
-        <article>
-          <span>2 · Administrative identity</span>
-          <strong>{identitySource?.sourceName ?? "LGD mapping required"}</strong>
-          <p>Bind state, district and lower administrative units to stable government identifiers before evidence joins.</p>
-        </article>
-        <article>
-          <span>3 · Operational rendering</span>
-          <strong>MapLibre + Deck.gl + PMTiles / PostGIS</strong>
-          <p>Render admitted geometry and evidence overlays only after provenance and license checks pass.</p>
-        </article>
-      </div>
-
-      <div className={styles.geoTruthRule}>
-        <span>Boundary publication rule</span>
-        <p>{geospatial.boundaryImportRule}</p>
-        <code>{geospatial.sourceHash}</code>
-      </div>
-
-      <div className={styles.geoSourceCards} id="sources">
-        {geospatial.sources.map((source) => (
-          <a href={source.url} key={source.sourceId} rel="noreferrer" target="_blank">
-            <div>
-              <span>{source.status.replaceAll("_", " ")}</span>
-              <strong>{source.sourceName}</strong>
-              <small>{source.owner}</small>
-            </div>
-            <p>{source.limitation}</p>
-          </a>
-        ))}
-      </div>
-
-      {enrichmentSources.length ? (
-        <p className={styles.geoSourceFootnote}>
-          Bhuvan, DataMeet and other layers are treated as separate enrichments with their own terms; they do not replace
-          the authoritative administrative-boundary source.
-        </p>
-      ) : null}
-    </div>
-  );
-}
-
-function Panel({ title, icon, children }: { title: string; icon: ReactNode; children: ReactNode }) {
-  return (
-    <section className={styles.panel} id={title.includes("CAG") ? "audit" : undefined}>
-      <PanelTitle icon={icon} title={title} />
-      {children}
-    </section>
-  );
-}
-
-function PanelTitle({ icon, title, subtitle }: { icon: ReactNode; title: string; subtitle?: string }) {
-  return (
-    <header className={styles.panelTitle}>
-      <div>{icon}</div>
-      <div>
-        <h2>{title}</h2>
-        {subtitle ? <p>{subtitle}</p> : null}
-      </div>
-    </header>
-  );
-}
-
-function SelectFilter({ label, value, options, onChange }: { label: string; value: string; options: string[]; onChange: (next: string) => void }) {
-  return (
-    <label className={styles.selectFilter}>
-      <span>{label}</span>
-      <select value={value} onChange={(event) => onChange(event.target.value)}>
-        {options.map((option) => <option key={option} value={option}>{option}</option>)}
-      </select>
-    </label>
-  );
-}
-
-function StatusRow({ label, value, tone }: { label: string; value: string; tone: "good" | "warn" | "bad" }) {
-  return (
-    <div className={styles.statusRow}>
-      <span>{label}</span>
-      <strong className={styles[`tone_${tone}`]}>{value}</strong>
-    </div>
-  );
-}
-
-function Badge({ tone, children }: { tone: string; children: ReactNode }) {
-  return <span className={`${styles.badge} ${toneClass[tone] ?? styles.toneWarn}`}>{children}</span>;
-}
-
-function WorldFlowMap({
-  worldMap,
-  flow,
-  generatedAt,
-}: {
-  worldMap: WorldFeatureCollection | null;
-  flow: CommandFeed["globalFlow"];
-  generatedAt: string;
-}) {
-  const atlasRef = useRef<HTMLDivElement>(null);
-  const nodeById = useMemo(() => new Map(flow.nodes.map((node) => [node.id, node])), [flow.nodes]);
-  const [statusFilter, setStatusFilter] = useState<"all" | CommandFeed["globalFlow"]["flows"][number]["status"]>("all");
-  const [selectedFlowId, setSelectedFlowId] = useState(flow.flows[0]?.id ?? "");
-  const [motionEnabled, setMotionEnabled] = useState(true);
-  const [guidedTour, setGuidedTour] = useState(true);
-  const [isFullscreen, setIsFullscreen] = useState(false);
-  const prefersReducedMotion = useSyncExternalStore(subscribeReducedMotion, getReducedMotion, () => false);
-  const motionActive = motionEnabled && !prefersReducedMotion;
-  const guidedTourActive = guidedTour && !prefersReducedMotion;
-  const visibleFlows = useMemo(
-    () => flow.flows.filter((item) => statusFilter === "all" || item.status === statusFilter),
-    [flow.flows, statusFilter],
-  );
-  const selectedFlow = visibleFlows.find((item) => item.id === selectedFlowId) ?? visibleFlows[0];
-
-  useEffect(() => {
-    if (!motionActive || !guidedTourActive || visibleFlows.length < 2) return;
-    const timer = window.setInterval(() => {
-      setSelectedFlowId((current) => {
-        const currentIndex = visibleFlows.findIndex((item) => item.id === current);
-        return visibleFlows[(currentIndex + 1 + visibleFlows.length) % visibleFlows.length]?.id ?? current;
-      });
-    }, 3600);
-    return () => window.clearInterval(timer);
-  }, [guidedTourActive, motionActive, visibleFlows]);
-
-  useEffect(() => {
-    function syncFullscreen() {
-      setIsFullscreen(document.fullscreenElement === atlasRef.current);
-    }
-    document.addEventListener("fullscreenchange", syncFullscreen);
-    return () => document.removeEventListener("fullscreenchange", syncFullscreen);
-  }, []);
-
-  function chooseFilter(next: typeof statusFilter) {
-    setStatusFilter(next);
-    const firstMatch = flow.flows.find((item) => next === "all" || item.status === next);
-    if (firstMatch) setSelectedFlowId(firstMatch.id);
+    );
   }
 
-  async function toggleFullscreen() {
-    if (document.fullscreenElement === atlasRef.current) {
-      await document.exitFullscreen();
-      return;
-    }
-    await atlasRef.current?.requestFullscreen();
+  if (entity) {
+    return (
+      <div className={styles.inspectorBody}>
+        <StatusChip>{entity.entityType}</StatusChip>
+        <h3>{entity.displayName}</h3>
+        <Definition label="Last observed" value={formatDateTime(entity.lastSeenAt)} />
+        <Definition label="Aliases" value={entity.aliases.length ? entity.aliases.join(", ") : "None persisted"} />
+        <HashBlock label="Entity provenance" value={entity.provenanceHash} />
+        <small>Map linkage appears only when a persisted geospatial feature explicitly links to this entity.</small>
+      </div>
+    );
   }
 
+  if (timeline) {
+    return (
+      <div className={styles.inspectorBody}>
+        <StatusChip>{timeline.kind}</StatusChip>
+        <h3>{timeline.title}</h3>
+        <p>{timeline.summary}</p>
+        <Definition label="Timestamp" value={formatDateTime(timeline.timestamp)} />
+        {timeline.missionId ? <Definition label="Mission" value={timeline.missionId} /> : null}
+        {timeline.sourceHashes.map((hash, index) => <HashBlock key={hash} label={index ? "Linked hash" : "Evidence hash"} value={hash} />)}
+        <HashBlock label="Provenance" value={timeline.provenanceHash} />
+      </div>
+    );
+  }
+
+  if (latestEvidence) {
+    return (
+      <div className={styles.inspectorBody}>
+        <StatusChip>{latestEvidence.nodeKind}</StatusChip>
+        <h3>{latestEvidence.title ?? latestEvidence.sourceId}</h3>
+        <Definition label="Source" value={latestEvidence.sourceId} />
+        <Definition label="Observed" value={formatDateTime(latestEvidence.observedAt)} />
+        <HashBlock label="Source hash" value={latestEvidence.sourceHash} />
+        <HashBlock label="Content hash" value={latestEvidence.contentHash} />
+        <HashBlock label="Provenance" value={latestEvidence.provenanceHash} />
+        {latestEvidence.sourceUrl ? <a href={latestEvidence.sourceUrl} target="_blank" rel="noreferrer">Open source <ArrowUpRight size={13} /></a> : null}
+      </div>
+    );
+  }
+
+  return <EmptyState text="Select a map feature, graph node or timeline event to inspect its evidence and provenance." />;
+}
+
+function WorkspaceState({ principal, title, message }: { principal: PrincipalView; title: string; message?: string }) {
   return (
-    <div className={`${styles.worldMapShell} ${motionActive ? "" : styles.motionPaused}`} ref={atlasRef}>
-      <header className={styles.atlasMasthead}>
-        <div>
-          <p className={styles.eyebrow}>Governed spatial intelligence</p>
-          <h3>See the record move from source to evidence.</h3>
-          <span>Command feed captured {formatDateTime(generatedAt)}</span>
-        </div>
-        <div className={styles.atlasControls}>
-          <button aria-pressed={motionActive} onClick={() => setMotionEnabled((current) => !current)} type="button">
-            {motionActive ? <Pause size={15} /> : <Play size={15} />}
-            {motionActive ? "Pause motion" : "Resume motion"}
-          </button>
-          <button aria-pressed={guidedTourActive} onClick={() => setGuidedTour((current) => !current)} type="button">
-            <Eye size={15} /> {guidedTourActive ? "Guided tour on" : "Guided tour off"}
-          </button>
-          <button onClick={() => void toggleFullscreen()} type="button">
-            <Maximize2 size={15} /> {isFullscreen ? "Exit full screen" : "Full screen"}
-          </button>
-        </div>
-      </header>
-      <div className={styles.atlasToolbar} aria-label="Evidence Atlas layers">
-        <div>
-          <span>Evidence layers</span>
-          <strong>{visibleFlows.length} of {flow.flows.length} flows visible</strong>
-        </div>
-        <div className={styles.atlasFilters}>
-          {(["all", "live_source", "registered_source", "parser_queued"] as const).map((status) => (
-            <button
-              aria-pressed={statusFilter === status}
-              className={statusFilter === status ? styles.atlasFilterActive : styles.atlasFilter}
-              key={status}
-              onClick={() => chooseFilter(status)}
-              type="button"
-            >
-              {status === "all" ? "All sources" : displayState(status)}
-            </button>
-          ))}
-        </div>
-      </div>
-      <div className={styles.atlasWorkspace}>
-        <svg viewBox="0 0 1000 520" role="img" aria-label="Interactive Constitutional Evidence Atlas">
-          <defs>
-            <marker id="flowArrow" markerHeight="8" markerWidth="8" orient="auto" refX="8" refY="4">
-              <path d="M0,0 L8,4 L0,8 Z" />
-            </marker>
-          </defs>
-          <rect className={styles.worldOcean} x="0" y="0" width="1000" height="520" rx="18" />
-          <g>
-            {worldMap?.features.map((feature, index) => (
-              <path className={styles.worldCountry} d={featureToPath(feature)} key={feature.id ?? feature.properties?.name ?? index}>
-                <title>{feature.properties?.name ?? "Country"}</title>
-              </path>
-            ))}
-          </g>
-          <g>
-            {visibleFlows.map((item, index) => {
-              const from = nodeById.get(item.from);
-              const to = nodeById.get(item.to);
-              if (!from || !to) return null;
-              const start = projectWorld(from.lon, from.lat);
-              const end = projectWorld(to.lon, to.lat);
-              const curve = `M ${start.x} ${start.y} Q ${(start.x + end.x) / 2} ${Math.min(start.y, end.y) - 42 - (index % 4) * 10} ${end.x} ${end.y}`;
-              const isSelected = item.id === selectedFlow?.id;
-              return (
-                <g
-                  aria-label={`Inspect ${item.label}`}
-                  className={styles.flowTarget}
-                  key={item.id}
-                  onClick={() => setSelectedFlowId(item.id)}
-                  onKeyDown={(event) => {
-                    if (event.key === "Enter" || event.key === " ") setSelectedFlowId(item.id);
-                  }}
-                  role="button"
-                  tabIndex={0}
-                >
-                  <path className={isSelected ? styles.worldFlowSelected : item.status === "live_source" ? styles.worldFlowStrong : styles.worldFlow} d={curve} markerEnd="url(#flowArrow)">
-                    <title>{`${item.label} / ${displayState(item.status)} / ${item.authority}`}</title>
-                  </path>
-                  <path className={styles.flowHitArea} d={curve} />
-                  {motionActive ? (
-                    <circle className={styles.flowPulse} r="4">
-                      <animateMotion dur={`${5 + (index % 5)}s`} repeatCount="indefinite" path={curve} />
-                    </circle>
-                  ) : null}
-                </g>
-              );
-            })}
-          </g>
-          <g>
-            {flow.nodes.map((node) => {
-              const point = projectWorld(node.lon, node.lat);
-              return (
-                <g className={styles.worldNode} key={node.id} transform={`translate(${point.x} ${point.y})`}>
-                  <circle className={styles.worldNodePulse} r={node.kind === "command_hub" ? 16 : 10} />
-                  <circle r={node.kind === "command_hub" ? 8 : node.kind === "evidence_store" ? 6 : 4} />
-                  <text x="10" y="-8">{node.label}</text>
-                </g>
-              );
-            })}
-          </g>
-        </svg>
-        <aside className={styles.atlasInspector} aria-live="polite">
-          <p className={styles.eyebrow}>Selected source movement</p>
-          {selectedFlow ? (
-            <>
-              <Badge tone={selectedFlow.status === "live_source" ? "operational" : "watch"}>{displayState(selectedFlow.status)}</Badge>
-              <h3>{selectedFlow.label}</h3>
-              <dl>
-                <div><dt>Authority</dt><dd>{selectedFlow.authority}</dd></div>
-                <div><dt>Cadence</dt><dd>{selectedFlow.cadence}</dd></div>
-                <div><dt>From</dt><dd>{nodeById.get(selectedFlow.from)?.label ?? selectedFlow.from}</dd></div>
-                <div><dt>To</dt><dd>{nodeById.get(selectedFlow.to)?.label ?? selectedFlow.to}</dd></div>
-              </dl>
-              <div className={styles.atlasHash}><span>Source hash</span><code>{selectedFlow.hash}</code></div>
-              <a className={styles.secondaryButton} href="#evidence">Follow the evidence chain</a>
-              <Link className={styles.primaryButton} href="/workbench">Open mission workbench <ArrowUpRight size={14} /></Link>
-            </>
-          ) : <p>No source movement is available for this layer.</p>}
-        </aside>
-      </div>
-      <div className={styles.atlasActivity} aria-label="Source movement activity">
-        <span>Source movement</span>
-        <div>
-          {visibleFlows.map((item) => (
-            <button
-              className={item.id === selectedFlow?.id ? styles.activityItemActive : styles.activityItem}
-              key={item.id}
-              onClick={() => {
-                setSelectedFlowId(item.id);
-                setGuidedTour(false);
-              }}
-              type="button"
-            >
-              <i />
-              <strong>{item.label}</strong>
-              <small>{displayState(item.status)}</small>
-            </button>
-          ))}
-        </div>
-      </div>
-      <div className={styles.worldMapFooter}>
-        <span>{flow.generatedFrom}</span>
-        <span>{flow.attribution}</span>
-      </div>
+    <div className={styles.stateShell}>
+      <Fingerprint size={28} />
+      <span>DISHA · {principal.email}</span>
+      <h1>{title}</h1>
+      <p>{message ?? "Loading persisted mission, geospatial, temporal and network intelligence."}</p>
     </div>
   );
 }
 
 function Metric({ label, value }: { label: string; value: number }) {
-  return (
-    <div className={styles.metric}>
-      <strong>{formatNumber(value)}</strong>
-      <span>{label}</span>
-    </div>
-  );
+  return <div className={styles.metric}><strong>{new Intl.NumberFormat("en-IN").format(value)}</strong><span>{label}</span></div>;
 }
 
-function ProgressBar({ value, label }: { value: number; label: string }) {
-  return (
-    <div className={styles.progressWrap}>
-      <div className={styles.progressTrack}><span style={{ width: `${Math.max(0, Math.min(100, value))}%` }} /></div>
-      <small>{label}</small>
-    </div>
-  );
+function Definition({ label, value }: { label: string; value: string }) {
+  return <div className={styles.definition}><span>{label}</span><strong>{value}</strong></div>;
 }
 
-async function fetchJson<T>(url: string, signal: AbortSignal): Promise<T> {
-  const response = await fetch(url, { cache: "no-store", signal });
-  if (!response.ok) throw new Error(`${url} returned ${response.status}`);
-  return response.json() as Promise<T>;
+function HashBlock({ label, value }: { label: string; value: string }) {
+  return <div className={styles.hash}><span>{label}</span><code title={value}>{shortHash(value)}</code></div>;
 }
 
-function subscribeReducedMotion(onChange: () => void): () => void {
-  const media = window.matchMedia("(prefers-reduced-motion: reduce)");
-  media.addEventListener("change", onChange);
-  return () => media.removeEventListener("change", onChange);
+function StatusChip({ children }: { children: string }) {
+  return <span className={styles.statusChip}>{humanize(children)}</span>;
 }
 
-function getReducedMotion(): boolean {
-  return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+function EmptyState({ text }: { text: string }) {
+  return <div className={styles.empty}><GitBranch size={20} /><p>{text}</p></div>;
 }
 
-function formatNumber(value: number): string {
-  return new Intl.NumberFormat("en-IN").format(value);
+function shortHash(value: string): string {
+  return value.length > 26 ? `${value.slice(0, 12)}…${value.slice(-10)}` : value;
 }
-
+function humanize(value: string): string { return value.replaceAll("_", " "); }
 function formatDateTime(value: string): string {
   return new Intl.DateTimeFormat("en-IN", { dateStyle: "medium", timeStyle: "short" }).format(new Date(value));
 }
-
-function humanize(value: string): string {
-  return value.replace(/_/g, " ");
-}
-
-function displayState(value: string): string {
-  const label: Record<string, string> = {
-    source_gap: "source gap",
-    parser_queued: "parser queued",
-    intake_queued: "intake queued",
-    source_registered_intake_queued: "source registered, intake queued",
-    license_review: "license review",
-    publishable_metadata: "evidence-ready metadata",
-    metadata_only: "metadata captured",
-    metadata_captured: "metadata captured",
-    pdf_parser_queued: "PDF parser queued",
-    table_parser_queued: "table parser queued",
-    publication_watch: "publication watch",
-    requires_pdf_extraction: "PDF parser queued",
-    requires_pdf_table_extraction: "table parser queued",
-    requires_source_publication: "publication watch",
-    source_manifest: "source manifest",
-    tax_collected: "tax collection",
-    state_devolution: "state devolution",
-    department_finance_audit: "department finance audit",
-    transfer_to_states: "transfer to states",
-  };
-  return label[value] ?? humanize(value);
-}
-
-function featureToPath(feature: WorldFeatureCollection["features"][number]): string {
-  if (feature.geometry.type === "Polygon") {
-    return polygonToPath(feature.geometry.coordinates as number[][][]);
-  }
-  return (feature.geometry.coordinates as number[][][][]).map((polygon) => polygonToPath(polygon)).join(" ");
-}
-
-function polygonToPath(polygon: number[][][]): string {
-  return polygon.map((ring) => ring.map(([lon, lat], index) => {
-    const point = projectWorld(lon, lat);
-    return `${index === 0 ? "M" : "L"} ${point.x.toFixed(2)} ${point.y.toFixed(2)}`;
-  }).join(" ") + " Z").join(" ");
-}
-
-function projectWorld(lon: number, lat: number): { x: number; y: number } {
-  return {
-    x: ((lon + 180) / 360) * 1000,
-    y: ((90 - lat) / 180) * 520,
-  };
+function formatCompactDate(value: string): string {
+  return new Intl.DateTimeFormat("en-IN", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" }).format(new Date(value));
 }

@@ -67,6 +67,17 @@ describe("DISHA database migration contract", () => {
     expect(migration).toContain("create table if not exists intelligence_activation_runs");
   });
 
+  it("adds PostGIS dataset provenance, admitted features, links, and spatial indexes", () => {
+    const migration = fs.readFileSync(path.join(webRoot, "database/202609180005_geospatial_runtime.sql"), "utf8");
+    expect(migration).toContain("create extension if not exists postgis");
+    expect(migration).toContain("create table if not exists geospatial_import_jobs");
+    expect(migration).toContain("create table if not exists geospatial_datasets");
+    expect(migration).toContain("create table if not exists geospatial_features");
+    expect(migration).toContain("geospatial_features_geom_gix");
+    expect(migration).toContain("geospatial_features_geog_gix");
+    expect(migration).toContain("lgd_mapping_coverage");
+  });
+
   it("exposes explicit migration commands from the web package", () => {
     const packageJson = JSON.parse(fs.readFileSync(path.join(webRoot, "package.json"), "utf8"));
 
@@ -76,6 +87,8 @@ describe("DISHA database migration contract", () => {
     expect(packageJson.scripts["db:supabase-bootstrap"]).toBe("node scripts/supabase-compatibility.mjs");
     expect(packageJson.scripts["db:supabase-verify"]).toBe("node scripts/supabase-compatibility.mjs --verify-only");
     expect(packageJson.scripts["db:production-oidc"]).toBe("node scripts/github-oidc-production-migrate.mjs");
+    expect(packageJson.scripts["geo:import"]).toBe("node scripts/geospatial/import-authoritative-geojson.mjs");
+    expect(packageJson.scripts.start).toBe("node scripts/start-production.mjs");
     const supabaseBootstrap = fs.readFileSync(path.join(webRoot, "database/providers/supabase.sql"), "utf8");
     expect(supabaseBootstrap).toContain("create extension if not exists vector with schema extensions");
     expect(supabaseBootstrap).toContain("create extension if not exists postgis with schema extensions");

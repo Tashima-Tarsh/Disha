@@ -4,87 +4,68 @@ import { describe, expect, it } from "vitest";
 
 const dashboardClient = path.resolve(__dirname, "../app/dashboard/dashboard-client.tsx");
 const dashboardPage = path.resolve(__dirname, "../app/dashboard/page.tsx");
-const commandRoute = path.resolve(__dirname, "../app/api/dashboard/command/route.ts");
-const claimChain = path.resolve(__dirname, "../lib/dashboard-claim-chain.ts");
-const geospatialLayer = path.resolve(__dirname, "../lib/india-geospatial-layer.ts");
-const globalFlow = path.resolve(__dirname, "../lib/dashboard-global-flow.ts");
-const worldMap = path.resolve(__dirname, "../public/data/world-countries.geojson");
+const mapComponent = path.resolve(__dirname, "../components/geospatial/GeospatialCommandMap.tsx");
+const graphComponent = path.resolve(__dirname, "../components/intelligence/IntelligenceGraph.tsx");
+const workspaceRoute = path.resolve(__dirname, "../app/api/v1/intelligence/workspace/route.ts");
+const systemPage = path.resolve(__dirname, "../app/system/page.tsx");
+const basemapContract = path.resolve(__dirname, "../lib/geospatial/basemap-contract.ts");
 const legacyRoute = path.resolve(__dirname, "../app/dashboard/route.ts");
 const legacyHtml = path.resolve(__dirname, "../app/dashboard/disha66-command-centre-v3.html");
 
-describe("DISHA command dashboard", () => {
-  it("is a protected Next.js dashboard instead of a static HTML file", () => {
+describe("DISHA analyst workspace", () => {
+  it("keeps the dashboard authenticated and removes legacy static dashboard delivery", () => {
     const page = fs.readFileSync(dashboardPage, "utf8");
-
     expect(page).toContain("principalFromAccessToken");
     expect(page).toContain("returnUrl=%2Fdashboard");
     expect(fs.existsSync(legacyRoute)).toBe(false);
     expect(fs.existsSync(legacyHtml)).toBe(false);
   });
 
-  it("uses a single backend command feed for operational data", () => {
+  it("makes the authenticated dashboard map-first instead of backend-readiness-first", () => {
     const source = fs.readFileSync(dashboardClient, "utf8");
-
-    expect(source).toContain("/api/dashboard/command");
-    expect(source).toContain("CommandFeed");
-    expect(source).toContain("Constitutional Chain Explorer");
-    expect(source).toContain("Geospatial Import Layer");
-    expect(source).toContain("WorldFlowMap");
-    expect(source).toContain("Interactive Constitutional Evidence Atlas");
-    expect(source).toContain("Constitutional Evidence Atlas");
-    expect(source).toContain("Evidence Atlas layers");
+    expect(source).toContain("/api/v1/intelligence/workspace");
+    expect(source).toContain("India operational map");
+    expect(source).toContain("Context inspector");
+    expect(source).toContain("Entity / evidence graph");
+    expect(source).toContain("Evidence timeline");
+    expect(source).toContain('href="/system"');
     expect(source).toContain("CommandPalette");
-    expect(source).toContain("India Geospatial Command Surface");
-    expect(source).toContain("No decorative India polygon is rendered.");
-    expect(source).toContain("MapLibre + Deck.gl + PMTiles / PostGIS");
+    expect(source).not.toContain("Constitutional Evidence Command Centre");
+    expect(source).not.toContain("Rules of Engagement");
     expect(source).not.toContain('d="M43 8 L55 10');
-    expect(source).toContain("Follow the evidence chain");
-    expect(source).toContain("Open mission workbench");
-    expect(source).toContain("Pause motion");
-    expect(source).toContain("Guided tour on");
-    expect(source).toContain("requestFullscreen");
-    expect(source).toContain("prefers-reduced-motion");
-    expect(source).toContain("Source movement activity");
-    expect(source).toContain("/data/world-countries.geojson");
-    expect(source).not.toContain("Interactive demo runtime");
   });
 
-  it("builds the command feed from real connector and governance modules", () => {
-    const route = fs.readFileSync(commandRoute, "utf8");
-
-    expect(route).toContain("fetchCagAuditRecords");
-    expect(route).toContain("fetchFinanceBudgetRecords");
-    expect(route).toContain("getProductionSpineReport");
-    expect(route).toContain("getGovernedExtensionControlPlane");
-    expect(route).toContain("requirePrincipal");
-    expect(route).toContain("buildIndiaGeospatialLayer");
-    expect(route).toContain("claimChains");
+  it("ships a real MapLibre runtime with contextual attribution and persisted overlays only", () => {
+    const source = fs.readFileSync(mapComponent, "utf8");
+    const basemap = fs.readFileSync(basemapContract, "utf8");
+    expect(source).toContain('from "react-map-gl/maplibre"');
+    expect(source).toContain("maplibregl.setWorkerUrl");
+    expect(source).toContain("DeckGL");
+    expect(source).toContain("HeatmapLayer");
+    expect(source).toContain("ScatterplotLayer");
+    expect(source).toContain("No authoritative DISHA geometry is admitted yet");
+    expect(basemap).toContain("https://tiles.openfreemap.org/styles/liberty");
+    expect(basemap).toContain("OpenStreetMap contributors");
+    expect(basemap).toContain('role: "context_only"');
   });
 
-  it("keeps geospatial and claim-chain work provenance-first", () => {
-    const geo = fs.readFileSync(geospatialLayer, "utf8");
-    const claims = fs.readFileSync(claimChain, "utf8");
-
-    expect(geo).toContain("survey-of-india-admin-boundaries");
-    expect(geo).toContain("datameet-maps");
-    expect(geo).toContain("bhuvan");
-    expect(geo).toContain("source_registered_intake_queued");
-    expect(geo).toContain("attributionRequired: true");
-    expect(claims).toContain("buildCagClaimChains");
-    expect(claims).toContain("buildFinanceClaimChains");
-    expect(claims).toContain("sourceRecordHash");
-    expect(claims).toContain("chainHash");
+  it("uses persisted entity edges and a DB-backed workspace feed", () => {
+    const graph = fs.readFileSync(graphComponent, "utf8");
+    const route = fs.readFileSync(workspaceRoute, "utf8");
+    expect(graph).toContain('from "cytoscape"');
+    expect(graph).toContain("edges.filter");
+    expect(route).toContain("intelligence_entities");
+    expect(route).toContain("intelligence_edges");
+    expect(route).toContain("intelligence_change_events");
+    expect(route).toContain("evidence_events");
+    expect(route).toContain("evidence_lineage_nodes");
+    expect(route).toContain("listOperationalGeoFeatures");
   });
 
-  it("ships a real local world map and backend source-flow model", () => {
-    const flow = fs.readFileSync(globalFlow, "utf8");
-    const map = JSON.parse(fs.readFileSync(worldMap, "utf8")) as { type: string; features: unknown[] };
-
-    expect(map.type).toBe("FeatureCollection");
-    expect(map.features.length).toBeGreaterThan(100);
-    expect(flow).toContain("buildDashboardGlobalFlowLayer");
-    expect(flow).toContain("world-countries.geojson");
-    expect(flow).toContain("CISA KEV catalog");
-    expect(flow).toContain("Evidence Ledger v2");
+  it("moves infrastructure detail to a dedicated protected system console", () => {
+    const source = fs.readFileSync(systemPage, "utf8");
+    expect(source).toContain("principalFromAccessToken");
+    expect(source).toContain("returnUrl=%2Fsystem");
+    expect(source).toContain("SystemClient");
   });
 });
