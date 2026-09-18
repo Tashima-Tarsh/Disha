@@ -150,5 +150,5 @@ jobs:
 
       - name: Apply and verify production migrations via GitHub OIDC
         env:
-          DISHA_PRODUCTION_MIGRATION_URL: https://ttkpckwejvvwjowxitrp.supabase.co/functions/v1/github-production-migrate-v2
+          DISHA_PRODUCTION_MIGRATION_URL: https://ttkpckwejvvwjowxitrp.supabase.co/functions/v1/github-production-migrate-v3
         run: npm run db:production-oidc

@@ -92,24 +92,36 @@ Deno.serve(async (req: Request) => {
             on public.schema_migrations (version, applied_at desc);
         `);
         await tx`select pg_advisory_xact_lock(hashtext('disha-schema-migrations'))`;
-        const appliedRows = await tx`select version, checksum from public.schema_migrations where direction = 'up'`;
-        const applied = new Map(appliedRows.map((row) => [String(row.version), String(row.checksum)]));
+        const appliedRows = await tx`select version, name, checksum from public.schema_migrations where direction = 'up'`;
+        const applied = new Map(appliedRows.map((row) => [
+          String(row.version),
+          { name: String(row.name), checksum: String(row.checksum) },
+        ]));
         const appliedNow: string[] = [];
         const alreadyApplied: string[] = [];
+        const legacyChecksums: MigrationInput[] = [];
 
         for (const migration of request.migrations) {
-          const existingChecksum = applied.get(migration.version);
-          if (existingChecksum) {
-            if (existingChecksum !== migration.checksum) throw new Error(`checksum_mismatch:${migration.version}`);
-            alreadyApplied.push(migration.version);
-            continue;
+          const existing = applied.get(migration.version);
+          if (existing) {
+            if (existing.checksum === migration.checksum) {
+              alreadyApplied.push(migration.version);
+              continue;
+            }
+            const legacyMarker = `supabase-managed:${migration.name}`;
+            if (existing.name === migration.name && existing.checksum === legacyMarker) {
+              legacyChecksums.push(migration);
+              alreadyApplied.push(migration.version);
+              continue;
+            }
+            throw new Error(`checksum_mismatch:${migration.version}`);
           }
           await tx.unsafe(migration.sql);
           await tx`
             insert into public.schema_migrations (version, name, direction, checksum, applied_at)
             values (${migration.version}, ${migration.name}, 'up', ${migration.checksum}, now())
           `;
-          applied.set(migration.version, migration.checksum);
+          applied.set(migration.version, { name: migration.name, checksum: migration.checksum });
           appliedNow.push(migration.version);
         }
 
@@ -123,7 +135,25 @@ Deno.serve(async (req: Request) => {
         if (missingTables.length || missingIndexes.length || missingMigrations.length) {
           throw new Error(JSON.stringify({ code: "verification_failed", missingTables, missingIndexes, missingMigrations }));
         }
-        return { appliedNow, alreadyApplied };
+
+        const reconciledLegacy: string[] = [];
+        for (const migration of legacyChecksums) {
+          const legacyMarker = `supabase-managed:${migration.name}`;
+          const updated = await tx`
+            update public.schema_migrations
+            set checksum = ${migration.checksum}
+            where version = ${migration.version}
+              and name = ${migration.name}
+              and direction = 'up'
+              and checksum = ${legacyMarker}
+            returning version
+          `;
+          if (updated.length !== 1) throw new Error(`legacy_checksum_reconciliation_failed:${migration.version}`);
+          reconciledLegacy.push(migration.version);
+          applied.set(migration.version, { name: migration.name, checksum: migration.checksum });
+        }
+
+        return { appliedNow, alreadyApplied, reconciledLegacy };
       });
       return json({ ok: true, identity, ...outcome, verifiedAt: new Date().toISOString() });
     } finally {

@@ -5,7 +5,7 @@ import process from "node:process";
 import { fileURLToPath } from "node:url";
 
 const AUDIENCE = "disha-supabase-production";
-const DEFAULT_ENDPOINT = "https://ttkpckwejvvwjowxitrp.supabase.co/functions/v1/github-production-migrate-v2";
+const DEFAULT_ENDPOINT = "https://ttkpckwejvvwjowxitrp.supabase.co/functions/v1/github-production-migrate-v3";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const databaseRoot = path.resolve(__dirname, "../database");
 
@@ -180,6 +180,7 @@ async function main() {
     status: "success",
     appliedNow: payload.appliedNow ?? [],
     alreadyApplied: payload.alreadyApplied ?? [],
+    reconciledLegacy: payload.reconciledLegacy ?? [],
     verifiedAt: payload.verifiedAt,
     runId: payload.identity?.runId,
   }));

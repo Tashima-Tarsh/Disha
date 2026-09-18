@@ -105,7 +105,7 @@ describe("DISHA database migration contract", () => {
     expect(workflow).not.toContain("PRODUCTION_DATABASE_URL");
     expect(workflow).toContain("id-token: write");
     expect(workflow).toContain("npm run db:production-oidc");
-    expect(workflow).toContain("github-production-migrate-v2");
+    expect(workflow).toContain("github-production-migrate-v3");
     expect(workflow).not.toContain("RUN_PRODUCTION_MIGRATIONS");
     expect(workflow).toContain("(github.event_name == 'push' && github.ref == 'refs/heads/main')");
     expect(workflow).toContain("github.event_name == 'workflow_dispatch'");
