@@ -1,0 +1,5 @@
+import { NextRequest, NextResponse } from "next/server";
+import { withContext } from "@/lib/unified/api";
+import { hybridRetrieve, type SearchDocumentKind } from "@/lib/unified/hybrid-retrieval";
+export const dynamic="force-dynamic";
+export async function GET(req:NextRequest){return withContext(req,"agent:read",async(ctx)=>{const q=req.nextUrl.searchParams.get("q")?.trim()??"";if(!q||q.length>4000)return NextResponse.json({error:"q_required"},{status:400,headers:{"X-Request-ID":ctx.requestId}});const limitRaw=Number(req.nextUrl.searchParams.get("limit")??12);const kindsRaw=req.nextUrl.searchParams.get("kinds")?.split(",").map((v: string)=>v.trim()).filter(Boolean)??[];const allowed=new Set<SearchDocumentKind>(["entity","claim","hypothesis","event","source_record","activation"]);const kinds=kindsRaw.filter((v: string): v is SearchDocumentKind=>allowed.has(v as SearchDocumentKind));const result=await hybridRetrieve(q,{limit:Number.isFinite(limitRaw)?Math.max(1,Math.min(50,Math.trunc(limitRaw))):12,kinds:kinds.length?kinds:undefined});return NextResponse.json(result,{headers:{"X-Request-ID":ctx.requestId,"Cache-Control":"no-store, max-age=0"}});});}

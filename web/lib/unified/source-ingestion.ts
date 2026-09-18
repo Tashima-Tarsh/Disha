@@ -33,6 +33,14 @@ const priorityParserSources = [
   "lgd",
   "india-wris",
   "bhuvan",
+  "cert-in-vulnerability-notes",
+  "nvd-vulnerability-database",
+  "github-advisory-database",
+  "cve-org",
+  "rbi-dbie",
+  "cisa-kev",
+  "common-crawl",
+  "openalex",
 ] as const;
 
 const parserExpectations: Record<string, string[]> = {
@@ -49,6 +57,14 @@ const parserExpectations: Record<string, string[]> = {
   lgd: ["state", "district", "local body", "LGD code", "effective status"],
   "india-wris": ["basin/river", "station or reservoir", "time period", "source layer/link"],
   bhuvan: ["layer title", "geospatial layer/reference", "provider", "source link"],
+  "cert-in-vulnerability-notes": ["advisory title", "CVE identifier when published", "official advisory link", "publication year"],
+  "nvd-vulnerability-database": ["CVE identifier", "vulnerability record link", "publication metadata"],
+  "github-advisory-database": ["GHSA identifier", "CVE identifier when mapped", "advisory link"],
+  "cve-org": ["CVE identifier", "official record/reference", "publication metadata"],
+  "rbi-dbie": ["economic series/document", "observation year", "official source link"],
+  "cisa-kev": ["CVE identifier", "vendor/product", "date added", "required action", "due date", "ransomware-use flag"],
+  "common-crawl": ["crawl index id", "crawl name", "CDX endpoint", "timegate"],
+  openalex: ["OpenAlex work id", "DOI", "title", "publication year", "citation count"],
 };
 
 export function listSourceParserPlans(): SourceParserPlan[] {

@@ -1,6 +1,8 @@
 import { getAgenticReadinessReport } from "./agentic-readiness";
 import { summarizeIngestionReadiness } from "./source-ingestion";
 import { getGovernedExtensionControlPlane } from "../extensions";
+import { createDefaultOsintBus } from "./osint-default-bus";
+import { getOsintToolCatalogSummary } from "./osint-tool-catalog";
 
 export type ProductionCapability = {
   id: string;
@@ -21,10 +23,10 @@ export function getSevenProductionCapabilities(): ProductionCapability[] {
       id: "source-parsers",
       title: "Official Source Parser Registry",
       status: ingestion.parserRequired > 0 ? "partial" : "working",
-      openSourcePath: "web/lib/unified/source-ingestion.ts + web/lib/unified/scheduled-source-ingestion.ts",
+      openSourcePath: "web/lib/unified/source-ingestion.ts + web/lib/unified/source-parsers.ts + web/lib/unified/scheduled-source-ingestion.ts + web/lib/unified/dynamic-source-scheduler.ts",
       openAiPath: "OpenAI may summarize parser-backed records only after provenance is attached.",
       evidenceRule: "No parsed source record means no dashboard statistic.",
-      nextHardening: ["Add source fixtures.", "Promote scheduled metadata probes into source-specific claim-provenance parsers.", "Attach parserKey to every parsed record."],
+      nextHardening: ["Add fixtures for every upstream schema revision.", "Promote runtime-registered sources only after license and parser review.", "Expand semantic profiles to additional high-value sources."],
     },
     {
       id: "persistent-evidence",
@@ -58,11 +60,11 @@ export function getSevenProductionCapabilities(): ProductionCapability[] {
       title: "Policy-Gated Agent Runtime",
       status: agentic.readiness.partial > 0 || extensions.status !== "pass" ? "partial" : "working",
       openSourcePath: "web/lib/unified/orchestrator.ts + web/lib/extensions",
-      openAiPath: "DISHA_MODEL_PROVIDER=openai uses the governed Responses API adapter.",
+      openAiPath: "Live model routes in runtime_configuration can target OpenAI or OpenAI-compatible open-source inference servers; legacy DISHA_MODEL_PROVIDER=openai remains supported.",
       evidenceRule: "Model and extension output is advisory until policy-gated, ledger-recorded, and attached to a durable mission result.",
       nextHardening: [
-        "Add prompt-injection fixtures.",
-        "Add request signing for provider calls.",
+        "Expand prompt-injection fixtures across runtime-registered sources.",
+        "Add deployment-specific request signing or mTLS for external model gateways.",
         ...(extensions.status === "pass" ? [] : ["Resolve governed extension quality-gate warnings."]),
       ],
     },
@@ -70,10 +72,10 @@ export function getSevenProductionCapabilities(): ProductionCapability[] {
       id: "security-boundaries",
       title: "Security and Controlled Data Boundaries",
       status: "working",
-      openSourcePath: "web/lib/unified/policy-gate.ts",
+      openSourcePath: "web/lib/unified/policy-gate.ts + web/lib/server/safe-public-fetch.ts",
       openAiPath: "OpenAI receives only post-policy mission summaries, not controlled data by default.",
       evidenceRule: "Controlled connectors deny by default.",
-      nextHardening: ["Resolve dependency advisories.", "Add deployment-specific auth review."],
+      nextHardening: ["Resolve dependency advisories.", "Add deployment-specific OIDC/ABAC review.", "Use network-layer egress policy in addition to application SSRF guards."],
     },
     {
       id: "deployment-readiness",
@@ -82,7 +84,7 @@ export function getSevenProductionCapabilities(): ProductionCapability[] {
       openSourcePath: "README.md + docs/architecture/PREMIUM_REARCHITECTURE_2026.md",
       openAiPath: "OpenAI is optional; open-source operation remains deterministic when provider is disabled.",
       evidenceRule: "A release cannot claim production readiness while listed production gaps remain.",
-      nextHardening: ["Add Docker/Vercel smoke tests.", "Add environment readiness endpoint."],
+      nextHardening: ["Run full container smoke tests on the release commit.", "Exercise PostgreSQL backup/restore in the deployment environment.", "Add SLO/alert integrations."],
     },
   ];
 }
@@ -90,16 +92,41 @@ export function getSevenProductionCapabilities(): ProductionCapability[] {
 export function getProductionSpineReport() {
   const capabilities = getSevenProductionCapabilities();
   const governedExtensions = getGovernedExtensionControlPlane();
+  const osintBus = createDefaultOsintBus();
   return {
     product: "DISHA 6.6 production spine",
     generatedAt: new Date().toISOString(),
     openSourceFirst: true,
     openAiCompatible: true,
-    openAiMode: "Optional governed adapter via DISHA_MODEL_PROVIDER=openai and OPENAI_API_KEY.",
-    noSyntheticDataRule: "OpenAI or any model may not invent records, source rows, government statistics, or dashboard values.",
+    openAiMode: "Dynamic governed routes via /api/v1/runtime/model-routes; legacy DISHA_MODEL_PROVIDER=openai + OPENAI_API_KEY remains compatible.",
+    noSyntheticDataRule: "OpenAI, local models, or any provider may not invent records, source rows, government statistics, or dashboard values.",
     capabilityScore: Number((capabilities.filter((item) => item.status === "working").length / capabilities.length).toFixed(2)),
     capabilities,
     governedExtensions,
+    osint: {
+      governedAdapters: osintBus.list(),
+      adapterCount: osintBus.list().length,
+      upstreamCatalog: getOsintToolCatalogSummary(),
+      defaultExecutionPolicy: "passive_public_only",
+    },
     ingestion: summarizeIngestionReadiness(),
+    dynamicRuntime: {
+      modelRoutes: "PostgreSQL runtime_configuration + /api/v1/runtime/model-routes",
+      sourceSchedules: "PostgreSQL source_refresh_policies + dynamic-worker",
+      runtimeEvents: "Redis Streams with bounded development fallback",
+      dynamicPublicSources: "/api/v1/sources/dynamic + dynamic-public-source governed adapter",
+      temporalGraph: "intelligence_entities + intelligence_entity_identifiers + intelligence_events + intelligence_edges",
+      entityResolution: "web/lib/unified/entity-resolution.ts + /api/v1/graph/resolve; thresholds are runtime-configurable via entity-resolution.policy",
+      evidenceLineage: "evidence_lineage_nodes + evidence_lineage_edges + /api/v1/evidence/lineage",
+      contradictionEngine: "temporal/unit/definition/lineage-aware engine at /api/v1/analysis/contradictions",
+      hypotheses: "intelligence_claims + intelligence_hypotheses; affected claim sets recompute after semantic ingestion",
+      changeImpact: "intelligence_state_snapshots + intelligence_change_events; normalized state fingerprints drive materiality without rebuilding unrelated intelligence",
+      analystReview: "analyst_review_queue + append-only analyst_review_actions; ambiguous entity matches and medium+ intelligence changes are reviewable",
+      liveIntelligence: "/intelligence + /api/v1/intelligence/live; no-store polling surface for continuous analyst awareness",
+      hybridRetrieval: "PostgreSQL full-text + pgvector HNSW + temporal graph expansion via /api/v1/intelligence/search; production compose includes self-hosted multilingual TEI and local deterministic projection remains the failure fallback",
+      durableWorkflows: "durable_work_items leased with PostgreSQL FOR UPDATE SKIP LOCKED, expiring leases, heartbeats, retry backoff, dead-letter state, and dedupe keys",
+      changeDrivenActivation: "medium+ change events enqueue intelligence_activation work; runtime activation policy selects Memory Graph / Cognitive Engine / DISHA Brain after hybrid evidence retrieval",
+      governedResearchRuntime: "Independent read-only DISHA Brain / Cognitive Engine / Memory Graph via /api/v1/governed/*",
+    },
   };
 }

@@ -30,7 +30,7 @@ Local and CI default to deterministic mode:
 DISHA_MODEL_PROVIDER=disabled
 ```
 
-Production may enable one provider on the server:
+Production may enable a legacy single provider on the server, or configure live failover routes through `PUT /api/v1/runtime/model-routes`:
 
 ```env
 DISHA_MODEL_PROVIDER=anthropic
@@ -45,11 +45,11 @@ or:
 ```env
 DISHA_MODEL_PROVIDER=openai
 OPENAI_API_KEY=...
-OPENAI_MODEL=gpt-5.4-mini
+OPENAI_MODEL=gpt-5.6-luna
 OPENAI_BASE_URL=https://api.openai.com/v1
 ```
 
-If the provider is configured without the matching key, DISHA falls back to deterministic advisory output.
+Dynamic routes are stored in PostgreSQL under `runtime_configuration`; each route references an API-key environment variable instead of storing the secret. Routes are attempted in priority order, allowing OpenAI-compatible open-source inference servers and provider failover without a rebuild. If no configured route has a key, DISHA falls back to deterministic advisory output.
 
 ## Safety and Evidence Rules
 

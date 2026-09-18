@@ -6,6 +6,7 @@
     "dev": "next dev --port 3000",
     "build": "next build",
     "start": "next start",
+    "worker": "node scripts/dynamic-worker.mjs",
     "db:migrate": "node scripts/apply-schema.mjs",
     "db:verify-schema": "node scripts/apply-schema.mjs --verify-only",
     "db:rollback": "node scripts/apply-schema.mjs --rollback",

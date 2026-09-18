@@ -2,6 +2,7 @@ import { hashValue } from "./hash";
 
 export type AdapterHealth = "healthy" | "degraded" | "unavailable" | "not_configured";
 export type AdapterAuth = "none" | "api_key" | "oauth2" | "session" | "service_account";
+export type AdapterExecutionClass = "passive_public" | "credentialed_public_api" | "active_recon" | "identity_enumeration" | "prohibited";
 
 export type AdapterMetadata = {
   id: string;
@@ -14,6 +15,9 @@ export type AdapterMetadata = {
   rateLimitPerMinute?: number;
   timeoutMs: number;
   maxRetries: number;
+  executionClass?: AdapterExecutionClass;
+  defaultEnabled?: boolean;
+  upstreamRepository?: string;
 };
 
 export type AdapterContext = {
@@ -88,43 +92,50 @@ export class OsintAdapterBus {
     if (!adapter) throw new Error(`Unknown adapter: ${adapterId}`);
 
     const started = Date.now();
+    const executionClass = adapter.metadata.executionClass ?? "passive_public";
+    if (["active_recon", "identity_enumeration", "prohibited"].includes(executionClass)) {
+      return this.result<TOutput>(adapterId, "failed", started, 0, [], [`Adapter execution class ${executionClass} is disabled on the default OSINT bus`], undefined, "execution_class_denied");
+    }
+    if (adapter.metadata.defaultEnabled === false) {
+      return this.result<TOutput>(adapterId, "failed", started, 0, [], ["Adapter is disabled by default"], undefined, "adapter_disabled");
+    }
     if (context.signal?.aborted) {
-      return this.result(adapterId, "cancelled", started, 0, [], [], undefined, "cancelled");
+      return this.result<TOutput>(adapterId, "cancelled", started, 0, [], [], undefined, "cancelled");
     }
 
     const health = await adapter.health();
     if (health.status === "not_configured" || health.status === "unavailable") {
-      return this.result(adapterId, "failed", started, 0, [], [health.detail ?? health.status], undefined, health.status);
+      return this.result<TOutput>(adapterId, "failed", started, 0, [], [health.detail ?? health.status], undefined, health.status);
     }
 
     const allowed = await this.policyCheck(adapter.metadata, context);
     if (!allowed) {
-      return this.result(adapterId, "failed", started, 0, [], ["Policy gate denied adapter execution"], undefined, "policy_denied");
+      return this.result<TOutput>(adapterId, "failed", started, 0, [], ["Policy gate denied adapter execution"], undefined, "policy_denied");
     }
 
     const maxAttempts = adapter.metadata.maxRetries + 1;
     let lastError = "unknown_error";
     for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
       if (context.signal?.aborted) {
-        return this.result(adapterId, "cancelled", started, attempt - 1, [], [], undefined, "cancelled");
+        return this.result<TOutput>(adapterId, "cancelled", started, attempt - 1, [], [], undefined, "cancelled");
       }
       try {
         const output = await this.withTimeout(adapter.execute(input, context), adapter.metadata.timeoutMs, context.signal);
-        return this.result(adapterId, output.warnings?.length ? "partial" : "completed", started, attempt, output.evidence, output.warnings ?? [], output.data);
+        return this.result<TOutput>(adapterId, output.warnings?.length ? "partial" : "completed", started, attempt, output.evidence, output.warnings ?? [], output.data);
       } catch (error) {
         lastError = error instanceof Error ? error.message : String(error);
         if (lastError === "adapter_timeout") {
-          if (attempt === maxAttempts) return this.result(adapterId, "timed_out", started, attempt, [], [], undefined, lastError);
+          if (attempt === maxAttempts) return this.result<TOutput>(adapterId, "timed_out", started, attempt, [], [], undefined, lastError);
         } else if (lastError === "adapter_cancelled") {
-          return this.result(adapterId, "cancelled", started, attempt, [], [], undefined, lastError);
+          return this.result<TOutput>(adapterId, "cancelled", started, attempt, [], [], undefined, lastError);
         } else if (attempt === maxAttempts) {
-          return this.result(adapterId, "failed", started, attempt, [], [], undefined, lastError);
+          return this.result<TOutput>(adapterId, "failed", started, attempt, [], [], undefined, lastError);
         }
         await this.sleep(Math.min(250 * attempt, 1000));
       }
     }
 
-    return this.result(adapterId, "failed", started, maxAttempts, [], [], undefined, lastError);
+    return this.result<TOutput>(adapterId, "failed", started, maxAttempts, [], [], undefined, lastError);
   }
 
   private async withTimeout<T>(promise: Promise<T>, timeoutMs: number, signal?: AbortSignal): Promise<T> {

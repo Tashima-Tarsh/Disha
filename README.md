@@ -105,7 +105,7 @@ The authenticated product has two working surfaces:
 4. Open `/dashboard` for the system overview. Use **Run a governed mission** to enter `/workbench`.
 5. Submit a public-interest question, then inspect the selected lenses, policy decision, evidence events, uncertainty, and export.
 
-Development password login is local-only. Production rejects `dev-jwt` mode.
+`dev-jwt` remains local-only. Production supports either OIDC or the explicit `password` mode, which requires a strong server-side password secret.
 
 | Path | Responsibility |
 | --- | --- |
@@ -220,3 +220,9 @@ Read [CONTRIBUTING.md](CONTRIBUTING.md) before opening a pull request.
 ## License
 
 The repository currently contains a placeholder license file and is detected by GitHub as `Other`. Before a major open-source launch, the maintainer should replace it with a standard license such as Apache-2.0 or MIT. Until then, do not assume reuse rights beyond what the owner explicitly grants.
+
+## GitHub Production
+
+The active public deployment is driven from the GitHub `main` branch. DISHA can run on Render with managed PostgreSQL (including pgvector), managed Key Value/Redis, the Next.js web service, and the governed Brain service. The web service applies schema migrations at startup and launches the durable workflow worker alongside the web process.
+
+See `docs/production/GITHUB_RENDER_DEPLOYMENT.md` for the active live deployment path.

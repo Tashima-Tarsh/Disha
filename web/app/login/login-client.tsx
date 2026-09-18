@@ -6,7 +6,6 @@ import {
   Eye,
   EyeOff,
   Fingerprint,
-  KeyRound,
   Loader2,
   LockKeyhole,
   Mail,
@@ -17,7 +16,6 @@ import { FormEvent, useMemo, useState } from "react";
 
 import styles from "./login.module.css";
 
-const GOD_ADMIN_EMAIL = "nitish@thenitishkr.in";
 
 type SubmitState = "idle" | "submitting" | "error";
 type OidcProvider = "meri-pehchan" | "intra-id";
@@ -32,9 +30,8 @@ export function LoginClient({ returnUrl }: { returnUrl: string }) {
   const [error, setError] = useState<string | null>(null);
 
   const normalizedEmail = email.trim().toLowerCase();
-  const isGodAdmin = normalizedEmail === GOD_ADMIN_EMAIL;
   const emailValid = useMemo(() => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail), [normalizedEmail]);
-  const passwordMinLength = isGodAdmin ? 8 : 12;
+  const passwordMinLength = 12;
   const formValid = emailValid && password.length >= passwordMinLength;
 
   async function signIn(event: FormEvent<HTMLFormElement>) {
@@ -45,8 +42,7 @@ export function LoginClient({ returnUrl }: { returnUrl: string }) {
     setError(null);
 
     try {
-      const endpoint = isGodAdmin ? "/api/auth/god-admin" : "/api/auth/login";
-      const response = await fetch(endpoint, {
+      const response = await fetch("/api/auth/login", {
         method: "POST",
         credentials: "same-origin",
         headers: { "Content-Type": "application/json" },
@@ -55,7 +51,7 @@ export function LoginClient({ returnUrl }: { returnUrl: string }) {
 
       if (!response.ok) {
         if (response.status === 401) throw new Error("Email/User ID or password is incorrect.");
-        if (response.status === 403 && !isGodAdmin) {
+        if (response.status === 403) {
           throw new Error("Password sign-in is not enabled for this account. Use an approved identity provider below.");
         }
         if (response.status === 429) throw new Error("Too many sign-in attempts. Please wait before trying again.");
@@ -73,13 +69,6 @@ export function LoginClient({ returnUrl }: { returnUrl: string }) {
   function startOidc(provider: OidcProvider) {
     const params = new URLSearchParams({ provider, returnUrl });
     window.location.assign(`/api/auth/oidc/start?${params.toString()}`);
-  }
-
-  function useGodAdmin() {
-    setEmail(GOD_ADMIN_EMAIL);
-    setPassword("");
-    setError(null);
-    setState("idle");
   }
 
   return (
@@ -144,9 +133,6 @@ export function LoginClient({ returnUrl }: { returnUrl: string }) {
                 <input checked={rememberMe} onChange={(event) => setRememberMe(event.target.checked)} type="checkbox" />
                 <span>Remember me</span>
               </label>
-              <button className={styles.adminShortcut} onClick={useGodAdmin} type="button">
-                <KeyRound size={15} /> God Admin
-              </button>
             </div>
 
             {error ? <div className={styles.error} role="alert">{error}</div> : null}

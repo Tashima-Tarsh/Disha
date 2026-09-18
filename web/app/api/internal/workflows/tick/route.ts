@@ -1,0 +1,6 @@
+import crypto from "node:crypto";
+import { NextRequest, NextResponse } from "next/server";
+import { getEnv } from "@/lib/server/env";
+import { processWorkflowTick } from "@/lib/unified/workflow-executor";
+export async function POST(req:NextRequest){const env=getEnv();const provided=req.headers.get("authorization")?.replace(/^Bearer\s+/i,"")??"";if(!env.DISHA_WORKER_TOKEN||!safeEqual(provided,env.DISHA_WORKER_TOKEN))return NextResponse.json({error:"unauthorized_worker"},{status:401});const body=await req.json().catch(()=>({})) as {workerId?:unknown;maxJobs?:unknown;leaseSeconds?:unknown};const workerId=typeof body.workerId==="string"&&body.workerId.trim()?body.workerId.trim().slice(0,160):`worker-${crypto.randomUUID()}`;const result=await processWorkflowTick({workerId,maxJobs:typeof body.maxJobs==="number"?Math.max(1,Math.min(100,Math.trunc(body.maxJobs))):10,leaseSeconds:typeof body.leaseSeconds==="number"?Math.max(15,Math.min(3600,Math.trunc(body.leaseSeconds))):env.DISHA_WORKFLOW_LEASE_SECONDS});return NextResponse.json({generatedAt:new Date().toISOString(),...result});}
+function safeEqual(left:string,right:string):boolean{const a=Buffer.from(left);const b=Buffer.from(right);if(a.length!==b.length)return false;return crypto.timingSafeEqual(a,b);}

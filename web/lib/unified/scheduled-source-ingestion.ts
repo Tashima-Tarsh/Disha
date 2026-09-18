@@ -1,10 +1,16 @@
 import type { Pool } from "pg";
 
 import { getDbPool } from "../server/db";
+import { safePublicFetch } from "../server/safe-public-fetch";
 import { hashValue } from "./hash";
+import { resolveAndUpsertEntity } from "./entity-resolution";
+import { analyzeEvidenceIndependence, inferAndLinkLineage, recordEvidenceLineageNode, type EvidenceLineageNode } from "./evidence-lineage";
+import { persistEvidenceClaim, recomputeClaimHypotheses } from "./contradiction-engine";
+import { recordChangeImpact } from "./change-impact";
+import { indexSearchDocument } from "./hybrid-retrieval";
 import { getParserPlan, listSourceParserPlans, type SourceParserPlan } from "./source-ingestion";
 import { parseSourcePayload, type ParsedSourceRecord } from "./source-parsers";
-import { getSourceDefinition, probeSource, type SourceProbeResult } from "./source-registry";
+import { getSourceDefinition, probeSource, type SourceProbeResult, type SourceDefinition } from "./source-registry";
 
 export type ScheduledIngestionCadence = "hourly" | "daily" | "weekly" | "manual";
 
@@ -51,24 +57,18 @@ export type ScheduledIngestionSummary = {
 
 type FetchLike = NonNullable<Parameters<typeof probeSource>[1]>;
 
-const cadenceBySource: Record<string, ScheduledIngestionCadence> = {
-  "cag-audit-index": "daily",
-  "egazette-india": "daily",
-  "india-code": "daily",
-  "cert-in-annual-reports": "weekly",
-  "ncrb-crime-in-india": "weekly",
-  ndma: "daily",
-  "india-budget": "weekly",
-  "gst-council-revenue": "daily",
-  "data-gov-in": "daily",
-  "api-setu": "daily",
-  lgd: "daily",
-  "india-wris": "hourly",
-  bhuvan: "daily",
-};
+function defaultCadenceForSource(source: SourceDefinition | null | undefined): ScheduledIngestionCadence {
+  if (!source) return "manual";
+  if (source.updateMode === "live_probe" || source.updateMode === "api_pull") return "hourly";
+  if (source.updateMode === "download_and_parse") return "daily";
+  return "manual";
+}
 
-const p0Sources = new Set(["cag-audit-index", "egazette-india", "india-code", "ncrb-crime-in-india", "cert-in-annual-reports", "india-budget"]);
-const p1Sources = new Set(["lgd", "india-wris", "ndma", "gst-council-revenue", "data-gov-in", "api-setu", "bhuvan"]);
+function defaultPriorityForPlan(plan: SourceParserPlan): "p0" | "p1" | "p2" {
+  if (plan.status === "ready_manifest" && plan.parserAvailable) return "p0";
+  if (plan.status !== "blocked") return "p1";
+  return "p2";
+}
 
 export function listScheduledSourceJobs(): ScheduledSourceJob[] {
   return listSourceParserPlans().map((plan) => buildJob(plan));
@@ -81,7 +81,7 @@ export function getScheduledSourceJob(sourceId: string): ScheduledSourceJob | nu
 
 export async function runScheduledSourceIngestion({
   sourceIds,
-  fetcher = fetch,
+  fetcher = safePublicFetch,
 }: {
   sourceIds?: string[];
   fetcher?: FetchLike;
@@ -191,8 +191,8 @@ function buildJob(plan: SourceParserPlan): ScheduledSourceJob {
     sourceId: plan.sourceId,
     sourceName: plan.sourceName,
     parserKey: plan.parserKey,
-    cadence: cadenceBySource[plan.sourceId] ?? "manual",
-    priority: p0Sources.has(plan.sourceId) ? "p0" as const : p1Sources.has(plan.sourceId) ? "p1" as const : "p2" as const,
+    cadence: defaultCadenceForSource(getSourceDefinition(plan.sourceId)),
+    priority: defaultPriorityForPlan(plan),
     enabled: plan.status !== "auth_required" && plan.status !== "blocked",
     expectedRecords: plan.expectedRecords,
     publicationRule: "Publish facts only from records emitted by the registered parser and attached to claim provenance.",
@@ -232,11 +232,9 @@ const memoryRuns: ScheduledIngestionRun[] = [];
 
 async function persistScheduledIngestionRuns(runs: ScheduledIngestionRun[]): Promise<void> {
   const pool = getDbPool();
-  if (!pool) {
-    memoryRuns.push(...runs);
-    return;
-  }
-  await persistToPostgres(pool, runs);
+  if (!pool) memoryRuns.push(...runs);
+  else await persistToPostgres(pool, runs);
+  await promoteRunsToIntelligence(runs);
 }
 
 async function persistToPostgres(pool: Pool, runs: ScheduledIngestionRun[]): Promise<void> {
@@ -254,14 +252,15 @@ async function persistToPostgres(pool: Pool, runs: ScheduledIngestionRun[]): Pro
       for (const record of run.records) {
         await client.query(
           `insert into source_records (
-            record_id, run_id, source_id, parser_key, record_type, title, source_url, fields, source_record_hash, retrieved_at
-          ) values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)
+            record_id, run_id, source_id, parser_key, record_type, title, source_url, fields, semantic, source_record_hash, retrieved_at
+          ) values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)
           on conflict (record_id) do update set
             run_id = excluded.run_id,
             fields = excluded.fields,
+            semantic = excluded.semantic,
             source_record_hash = excluded.source_record_hash,
             retrieved_at = excluded.retrieved_at`,
-          [record.recordId, run.runId, record.sourceId, record.parserKey, record.recordType, record.title, record.sourceUrl, JSON.stringify(record.fields), record.sourceRecordHash, record.retrievedAt],
+          [record.recordId, run.runId, record.sourceId, record.parserKey, record.recordType, record.title, record.sourceUrl, JSON.stringify(record.fields), JSON.stringify(record.semantic), record.sourceRecordHash, record.retrievedAt],
         );
       }
     }
@@ -271,6 +270,120 @@ async function persistToPostgres(pool: Pool, runs: ScheduledIngestionRun[]): Pro
     throw error;
   } finally {
     client.release();
+  }
+}
+
+
+async function promoteRunsToIntelligence(runs: ScheduledIngestionRun[]): Promise<void> {
+  const lineageNodes: EvidenceLineageNode[] = [];
+  const recordNodes = new Map<string, EvidenceLineageNode>();
+  const promotedRecords: ParsedSourceRecord[] = [];
+  const recordEntityIds = new Map<string, string[]>();
+  for (const run of runs) {
+    for (const record of run.records) {
+      try {
+        const node = await recordEvidenceLineageNode({
+          nodeKind: "dataset_record",
+          sourceId: record.sourceId,
+          sourceHash: record.sourceRecordHash,
+          contentHash: hashValue({ title: record.title, fields: record.fields }),
+          sourceUrl: record.sourceUrl,
+          observedAt: record.retrievedAt,
+          publishedAt: record.semantic.temporal.publishedAt,
+          title: record.title,
+          metadata: { parserKey: record.parserKey, recordType: record.recordType, parserVersion: record.semantic.parserVersion },
+        });
+        lineageNodes.push(node);
+        recordNodes.set(record.recordId, node);
+        promotedRecords.push(record);
+        const resolvedIds: string[] = [];
+        for (const candidate of record.semantic.entities) {
+          const resolved = await resolveAndUpsertEntity({
+            entityType: candidate.entityType,
+            displayName: candidate.displayName,
+            aliases: candidate.aliases,
+            identifiers: candidate.identifiers?.map((identifier) => ({ ...identifier, sourceHash: record.sourceRecordHash })),
+            attributes: { ...(candidate.attributes ?? {}), sourceId: record.sourceId, sourceUrl: record.sourceUrl },
+            observedAt: record.retrievedAt,
+            sourceHashes: [record.sourceRecordHash],
+          });
+          resolvedIds.push(resolved.entity.entityId);
+        }
+        recordEntityIds.set(record.recordId, [...new Set(resolvedIds)]);
+        try {
+          await indexSearchDocument({ docKind: "source_record", refId: record.recordId, subject: record.semantic.claims[0]?.subject ?? record.title, title: record.title, content: `${record.title}
+${JSON.stringify(record.fields).slice(0, 16000)}
+Claims: ${record.semantic.claims.map((claim) => `${claim.subject} ${claim.predicate} ${String(claim.value)}`).join("; ")}`, sourceHashes: [record.sourceRecordHash], entityIds: recordEntityIds.get(record.recordId) ?? [], metadata: { sourceId: record.sourceId, parserKey: record.parserKey, tags: record.semantic.tags }, observedAt: record.retrievedAt });
+        } catch { /* retrieval projection is replayable */ }
+      } catch {
+        // Source-record durability is authoritative; graph/lineage enrichment can be replayed independently.
+      }
+    }
+  }
+
+  if (lineageNodes.length > 1) {
+    try { await inferAndLinkLineage(lineageNodes); } catch { /* replayable enrichment */ }
+  }
+
+  const lineageByNode = new Map<string, string>();
+  if (lineageNodes.length) {
+    try {
+      const independence = await analyzeEvidenceIndependence(lineageNodes.map((node) => node.nodeId));
+      for (const lineage of independence.lineages) {
+        const lineageId = `lineage-${hashValue(lineage.rootNodeIds.sort()).slice(0, 24)}`;
+        for (const memberNodeId of lineage.memberNodeIds) lineageByNode.set(memberNodeId, lineageId);
+      }
+    } catch { /* lineage ids fall back to record node ids */ }
+  }
+
+  const affected = new Map<string, { subject: string; predicate: string; sourceIds: Set<string>; sourceHashes: Set<string>; claimIds: string[]; observedAt: string }>();
+  for (const record of promotedRecords) {
+    const node = recordNodes.get(record.recordId);
+    if (!node) continue;
+    for (const semanticClaim of record.semantic.claims) {
+      const claimId = `claim-${hashValue({ sourceRecordHash: record.sourceRecordHash, claim: semanticClaim }).slice(0, 24)}`;
+      try {
+        await persistEvidenceClaim({
+          claimId,
+          subject: semanticClaim.subject,
+          predicate: semanticClaim.predicate,
+          value: semanticClaim.value,
+          confidence: semanticClaim.confidence,
+          sourceId: record.sourceId,
+          sourceHash: record.sourceRecordHash,
+          lineageId: lineageByNode.get(node.nodeId) ?? node.nodeId,
+          observedAt: record.retrievedAt,
+          validFrom: semanticClaim.validFrom ?? record.semantic.temporal.periodStart,
+          validTo: semanticClaim.validTo ?? record.semantic.temporal.periodEnd,
+          unit: semanticClaim.unit,
+        });
+        try {
+          await indexSearchDocument({ docKind: "claim", refId: claimId, subject: semanticClaim.subject, title: `${semanticClaim.subject} · ${semanticClaim.predicate}`, content: `${semanticClaim.subject} ${semanticClaim.predicate} ${String(semanticClaim.value)}. Source ${record.sourceId}.`, sourceHashes: [record.sourceRecordHash], entityIds: recordEntityIds.get(record.recordId) ?? [], metadata: { predicate: semanticClaim.predicate, sourceId: record.sourceId }, observedAt: record.retrievedAt });
+        } catch { /* retrieval projection is replayable */ }
+        const affectedKey = `${semanticClaim.subject}\u0000${semanticClaim.predicate}`;
+        const current = affected.get(affectedKey) ?? { subject: semanticClaim.subject, predicate: semanticClaim.predicate, sourceIds: new Set<string>(), sourceHashes: new Set<string>(), claimIds: [], observedAt: record.retrievedAt };
+        current.sourceIds.add(record.sourceId);
+        current.sourceHashes.add(record.sourceRecordHash);
+        current.claimIds.push(claimId);
+        current.observedAt = Date.parse(record.retrievedAt) > Date.parse(current.observedAt) ? record.retrievedAt : current.observedAt;
+        affected.set(affectedKey, current);
+      } catch { /* claim promotion is replayable */ }
+    }
+  }
+  for (const state of affected.values()) {
+    try {
+      const recomputed = await recomputeClaimHypotheses(state.subject, state.predicate);
+      await recordChangeImpact({
+        sourceId: state.sourceIds.size === 1 ? [...state.sourceIds][0]! : "multi-source-ingestion",
+        sourceRecordHash: state.sourceHashes.size === 1 ? [...state.sourceHashes][0]! : hashValue([...state.sourceHashes].sort()),
+        claimId: state.claimIds.length === 1 ? state.claimIds[0] : undefined,
+        subject: state.subject,
+        predicate: state.predicate,
+        sets: recomputed.sets,
+        hypotheses: recomputed.hypotheses,
+        observedAt: state.observedAt,
+      });
+    } catch { /* replayable analytical projection */ }
   }
 }
 

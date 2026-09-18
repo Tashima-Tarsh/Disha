@@ -54,6 +54,16 @@ describe("DISHA database migration contract", () => {
     expect(durabilityRollback).toContain("drop table if exists source_records cascade");
   });
 
+  it("adds pgvector hybrid retrieval, durable work leasing, and change-driven activation persistence", () => {
+    const migration = fs.readFileSync(path.join(webRoot, "database/202609180004_retrieval_workflows.sql"), "utf8");
+    expect(migration).toContain("create extension if not exists vector");
+    expect(migration).toContain("create table if not exists intelligence_search_documents");
+    expect(migration).toContain("using hnsw (embedding vector_cosine_ops)");
+    expect(migration).toContain("create table if not exists durable_work_items");
+    expect(migration).toContain("create table if not exists intelligence_activation_policies");
+    expect(migration).toContain("create table if not exists intelligence_activation_runs");
+  });
+
   it("exposes explicit migration commands from the web package", () => {
     const packageJson = JSON.parse(fs.readFileSync(path.join(webRoot, "package.json"), "utf8"));
 
@@ -76,7 +86,7 @@ describe("DISHA database migration contract", () => {
   it("runs migration rehearsal and approved production migration in GitHub Actions", () => {
     const workflow = fs.readFileSync(path.join(repoRoot, ".github/workflows/db-migrations.yml"), "utf8");
 
-    expect(workflow).toContain("postgres:16-alpine");
+    expect(workflow).toContain("pgvector/pgvector:pg16");
     expect(workflow).toContain("npm run db:migrate");
     expect(workflow).toContain("npm run db:verify-schema");
     expect(workflow).toContain("npm run db:rollback");

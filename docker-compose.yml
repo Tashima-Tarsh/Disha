@@ -1,6 +1,6 @@
 services:
   postgres:
-    image: postgres:16-alpine
+    image: pgvector/pgvector:pg16
     environment:
       POSTGRES_DB: disha
       POSTGRES_USER: disha
@@ -116,6 +116,10 @@ services:
       DISHA_BRAIN_URL: ${DISHA_BRAIN_URL:-}
       DISHA_BRAIN_API_TOKEN: ${DISHA_BRAIN_API_TOKEN:-}
       NEXT_PUBLIC_API_URL: http://localhost:3000
+      DISHA_EMBEDDING_PROVIDER: ${DISHA_EMBEDDING_PROVIDER:-local-hash}
+      DISHA_EMBEDDING_BASE_URL: ${DISHA_EMBEDDING_BASE_URL:-}
+      DISHA_EMBEDDING_MODEL: ${DISHA_EMBEDDING_MODEL:-sentence-transformers/all-MiniLM-L6-v2}
+      DISHA_EMBEDDING_API_KEY: ${DISHA_EMBEDDING_API_KEY:-}
     volumes:
       - ./:/workspace:ro
     depends_on:

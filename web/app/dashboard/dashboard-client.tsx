@@ -619,6 +619,7 @@ function DashboardShell({ principal, body }: { principal: PrincipalView; body: R
           <a href="#map"><MapPinned size={18} /> India Map</a>
           <a href="#audit"><FileSearch size={18} /> Audit</a>
           <a href="#evidence"><Fingerprint size={18} /> Evidence</a>
+          <Link href="/intelligence"><RadioTower size={18} /> Live Intelligence</Link>
           <a href="#hardening"><ClipboardCheck size={18} /> Hardening</a>
         </nav>
         <div className={styles.railFooter}>
@@ -632,6 +633,7 @@ function DashboardShell({ principal, body }: { principal: PrincipalView; body: R
         <div className={styles.topBar}>
           <div><span className={styles.systemDot} /> DISHA governed command runtime</div>
           <div>
+            <Link href="/intelligence">Live Intelligence <RadioTower size={14} /></Link>
             <Link href="/workbench">Workbench <ArrowUpRight size={14} /></Link>
           </div>
         </div>

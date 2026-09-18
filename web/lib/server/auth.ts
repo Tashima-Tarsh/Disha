@@ -151,14 +151,15 @@ export function requirePrincipal(req: NextRequest): Principal {
 
 export async function devLogin(email: string, password: string, persistent = true) {
   const env = getEnv();
-  if (env.NODE_ENV === "production" || env.DISHA_AUTH_MODE !== "dev-jwt") {
-    throw Object.assign(new Error("Development password login is disabled"), { status: 403 });
+  const passwordMode = env.DISHA_AUTH_MODE === "password";
+  const developmentMode = env.NODE_ENV !== "production" && env.DISHA_AUTH_MODE === "dev-jwt";
+  if (!passwordMode && !developmentMode) {
+    throw Object.assign(new Error("Password login is disabled"), { status: 403 });
   }
   const expected = env.DISHA_DEV_PASSWORD ?? "change-me-in-env";
   if (password !== expected) throw Object.assign(new Error("Invalid credentials"), { status: 401 });
   const normalizedEmail = email.toLowerCase();
-  const roles: Role[] = normalizedEmail === "nitish@thenitishkr.in" || normalizedEmail.endsWith("@admin.local")
-    ? ["admin"]
-    : ["analyst"];
+  const devAdmins = new Set((env.DISHA_DEV_ADMIN_EMAILS ?? "").split(",").map((item) => item.trim().toLowerCase()).filter(Boolean));
+  const roles: Role[] = devAdmins.has(normalizedEmail) ? ["admin"] : ["analyst"];
   return createSession(email, roles, { persistent });
 }
