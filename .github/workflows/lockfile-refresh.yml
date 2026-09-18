@@ -1,0 +1,52 @@
+name: DISHA Lockfile Refresh
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - web/package.json
+      - .github/workflows/lockfile-refresh.yml
+
+permissions:
+  contents: write
+
+jobs:
+  lockfile:
+    name: Generate, audit and commit exact npm lockfile
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: true
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+
+      - name: Refresh package lock
+        run: npm install --package-lock-only --ignore-scripts
+
+      - name: Validate lock
+        run: npm ci --ignore-scripts
+
+      - name: Enforce dependency security
+        run: npm audit --audit-level=high
+
+      - name: Commit synchronized lockfile and remove temporary workflow
+        working-directory: .
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          rm -f .github/workflows/lockfile-refresh.yml
+          git add web/package-lock.json .github/workflows/lockfile-refresh.yml
+          if git diff --cached --quiet; then
+            echo "No lockfile changes to commit."
+            exit 0
+          fi
+          git commit -m "build: remove vulnerable deck geo-layer dependency"
+          git push origin HEAD:main
