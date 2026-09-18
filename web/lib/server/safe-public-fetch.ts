@@ -2,6 +2,7 @@ import dns from "node:dns/promises";
 import net from "node:net";
 
 const BLOCKED_HOSTS = new Set(["localhost", "localhost.localdomain"]);
+const DEFAULT_FETCH_TIMEOUT_MS = 12_000;
 
 export async function safePublicFetch(input: string | URL, init: RequestInit = {}): Promise<Response> {
   return fetchPublicChecked(input, init, 0);
@@ -14,7 +15,11 @@ async function fetchPublicChecked(input: string | URL, init: RequestInit, redire
   if (BLOCKED_HOSTS.has(url.hostname.toLowerCase())) throw new Error("private_network_target_blocked");
   await assertPublicHost(url.hostname);
 
-  const response = await fetch(url, { ...init, redirect: "manual" });
+  const response = await fetch(url, {
+    ...init,
+    redirect: "manual",
+    signal: init.signal ?? AbortSignal.timeout(DEFAULT_FETCH_TIMEOUT_MS),
+  });
   if (response.status >= 300 && response.status < 400) {
     const location = response.headers.get("location");
     if (!location) return response;
