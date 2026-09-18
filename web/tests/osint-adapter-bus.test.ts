@@ -1,8 +1,9 @@
-import { describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import {
   OsintAdapterBus,
   buildAdapterEvidence,
+  clearOsintAdapterRateLimitsForTests,
   type GovernedOsintAdapter,
 } from "../lib/unified/osint-adapter-bus";
 
@@ -32,6 +33,10 @@ function adapter(overrides: Partial<GovernedOsintAdapter<Input, Output>> = {}): 
 }
 
 describe("OSINT adapter bus", () => {
+  beforeEach(() => {
+    clearOsintAdapterRateLimitsForTests();
+    vi.restoreAllMocks();
+  });
   it("executes a healthy governed adapter and preserves provenance", async () => {
     const bus = new OsintAdapterBus();
     bus.register(adapter());
@@ -78,6 +83,28 @@ describe("OSINT adapter bus", () => {
 
     expect(result.status).toBe("completed");
     expect(result.attempts).toBe(2);
+  });
+
+  it("enforces the declared per-adapter request budget across bus instances", async () => {
+    let now = 0;
+    const sleep = vi.fn(async (ms: number) => { now += ms; });
+    vi.spyOn(Date, "now").mockImplementation(() => now);
+    const limited = adapter({
+      metadata: {
+        ...adapter().metadata,
+        rateLimitPerMinute: 1,
+        maxRetries: 0,
+      },
+    });
+    const first = new OsintAdapterBus({ sleep });
+    const second = new OsintAdapterBus({ sleep });
+    first.register(limited);
+    second.register(limited);
+
+    await first.run("test-public-source", { query: "one" }, { missionId: "m1", userId: "u1", purpose: "test" });
+    await second.run("test-public-source", { query: "two" }, { missionId: "m2", userId: "u1", purpose: "test" });
+
+    expect(sleep).toHaveBeenCalledWith(60_000);
   });
 
   it("returns timed_out instead of hanging the mission", async () => {

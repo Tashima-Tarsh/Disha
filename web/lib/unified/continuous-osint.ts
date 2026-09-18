@@ -6,6 +6,7 @@ import { appendEvidenceEvent } from "./evidence-ledger";
 import { hashValue } from "./hash";
 import { recordIntelligenceEvent } from "./intelligence-graph";
 import { createDefaultOsintBus } from "./osint-default-bus";
+import { promoteOsintObservation } from "./osint-observation-promotion";
 import type { AdapterExecutionResult, OsintAdapterBus } from "./osint-adapter-bus";
 import { emitRuntimeEvent } from "./runtime-event-bus";
 import { enqueueWorkflow } from "./durable-workflow-store";
@@ -415,7 +416,29 @@ export async function runContinuousOsintWatch(watchId: string, options: { bus?: 
   const run: ContinuousOsintRun = { ...base, provenanceHash:hashValue(base) };
   await persistRunAndWatch(watch,run);
 
-  const sourceHashes = result.evidence.map((item)=>item.provenanceHash).filter(Boolean);
+  const sourceHashes = [...new Set([
+    ...(outputHash ? [outputHash] : []),
+    ...result.evidence.map((item)=>item.provenanceHash).filter(Boolean),
+  ])];
+  if (outputHash && result.data !== undefined && (!previousOutputHash || changed)) {
+    try {
+      await promoteOsintObservation({
+        adapterId: watch.adapterId,
+        data: result.data,
+        evidence: result.evidence,
+        outputHash,
+        observedAt: completedAt,
+        watchId: watch.watchId,
+      });
+    } catch (error) {
+      await emitRuntimeEvent("osint.observation_promotion_failed", {
+        watchId: watch.watchId,
+        adapterId: watch.adapterId,
+        outputHash,
+        error: error instanceof Error ? error.message : String(error),
+      }, watch.watchId);
+    }
+  }
   if (watch.missionId) {
     await appendEvidenceEvent({
       missionId:watch.missionId,

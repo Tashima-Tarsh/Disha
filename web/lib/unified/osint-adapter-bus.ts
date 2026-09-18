@@ -59,6 +59,8 @@ export type AdapterBusOptions = {
   sleep?: (ms: number) => Promise<void>;
 };
 
+const adapterRequestWindows = new Map<string, number[]>();
+
 export class OsintAdapterBus {
   private readonly adapters = new Map<string, GovernedOsintAdapter<unknown, unknown>>();
   private readonly policyCheck: NonNullable<AdapterBusOptions["policyCheck"]>;
@@ -73,7 +75,7 @@ export class OsintAdapterBus {
     if (this.adapters.has(adapter.metadata.id)) {
       throw new Error(`Adapter already registered: ${adapter.metadata.id}`);
     }
-    if (adapter.metadata.timeoutMs <= 0 || adapter.metadata.maxRetries < 0) {
+    if (adapter.metadata.timeoutMs <= 0 || adapter.metadata.maxRetries < 0 || (adapter.metadata.rateLimitPerMinute !== undefined && adapter.metadata.rateLimitPerMinute <= 0)) {
       throw new Error(`Invalid runtime limits for adapter: ${adapter.metadata.id}`);
     }
     this.adapters.set(adapter.metadata.id, adapter as GovernedOsintAdapter<unknown, unknown>);
@@ -120,6 +122,7 @@ export class OsintAdapterBus {
         return this.result<TOutput>(adapterId, "cancelled", started, attempt - 1, [], [], undefined, "cancelled");
       }
       try {
+        await this.acquireRateLimit(adapter.metadata);
         const output = await this.withTimeout(adapter.execute(input, context), adapter.metadata.timeoutMs, context.signal);
         return this.result<TOutput>(adapterId, output.warnings?.length ? "partial" : "completed", started, attempt, output.evidence, output.warnings ?? [], output.data);
       } catch (error) {
@@ -136,6 +139,22 @@ export class OsintAdapterBus {
     }
 
     return this.result<TOutput>(adapterId, "failed", started, maxAttempts, [], [], undefined, lastError);
+  }
+
+  private async acquireRateLimit(metadata: AdapterMetadata): Promise<void> {
+    const limit = Math.max(1, Math.trunc(metadata.rateLimitPerMinute ?? 60));
+    for (;;) {
+      const now = Date.now();
+      const cutoff = now - 60_000;
+      const current = (adapterRequestWindows.get(metadata.id) ?? []).filter((timestamp) => timestamp > cutoff);
+      if (current.length < limit) {
+        current.push(now);
+        adapterRequestWindows.set(metadata.id, current);
+        return;
+      }
+      const waitMs = Math.max(10, current[0]! + 60_000 - now);
+      await this.sleep(waitMs);
+    }
   }
 
   private async withTimeout<T>(promise: Promise<T>, timeoutMs: number, signal?: AbortSignal): Promise<T> {
@@ -169,4 +188,8 @@ export function buildAdapterEvidence(input: Omit<AdapterEvidence, "id" | "retrie
     retrievedAt,
     provenanceHash: hashValue({ ...input, retrievedAt }),
   };
+}
+
+export function clearOsintAdapterRateLimitsForTests(): void {
+  adapterRequestWindows.clear();
 }
