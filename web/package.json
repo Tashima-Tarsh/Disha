@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev --port 3000",
-    "build": "next build",
+    "build": "node scripts/build-production.mjs",
     "start": "next start",
     "worker": "node scripts/dynamic-worker.mjs",
     "db:migrate": "node scripts/apply-schema.mjs",
