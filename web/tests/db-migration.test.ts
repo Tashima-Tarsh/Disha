@@ -101,7 +101,7 @@ describe("DISHA database migration contract", () => {
     expect(workflow).toContain("npm run db:migrate");
     expect(workflow).toContain("npm run db:verify-schema");
     expect(workflow).toContain("npm run db:rollback");
-    expect(workflow).toContain("environment:");
+    expect(workflow).not.toContain("environment:\n      name: production");
     expect(workflow).not.toContain("PRODUCTION_DATABASE_URL");
     expect(workflow).toContain("id-token: write");
     expect(workflow).toContain("npm run db:production-oidc");
