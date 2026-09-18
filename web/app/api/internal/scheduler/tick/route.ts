@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 import { getEnv } from "@/lib/server/env";
 import { runDueSourceJobs } from "@/lib/unified/dynamic-source-scheduler";
+import { runDueOsintWatches } from "@/lib/unified/continuous-osint";
 
 export async function POST(req: NextRequest) {
   const expected = getEnv().DISHA_WORKER_TOKEN;
@@ -10,8 +11,12 @@ export async function POST(req: NextRequest) {
   if (!expected || !safeEqual(provided, expected)) return NextResponse.json({ error: "unauthorized_worker" }, { status: 401 });
   const body = await req.json().catch(() => ({})) as { maxJobs?: unknown };
   const maxJobs = typeof body.maxJobs === "number" ? Math.max(1, Math.min(100, Math.trunc(body.maxJobs))) : 10;
-  const result = await runDueSourceJobs(new Date(), maxJobs);
-  return NextResponse.json({ generatedAt: new Date().toISOString(), ...result });
+  const now = new Date();
+  const [sources, osint] = await Promise.all([
+    runDueSourceJobs(now, maxJobs),
+    runDueOsintWatches(now, maxJobs),
+  ]);
+  return NextResponse.json({ generatedAt: new Date().toISOString(), sources, osint });
 }
 
 function safeEqual(left: string, right: string): boolean {

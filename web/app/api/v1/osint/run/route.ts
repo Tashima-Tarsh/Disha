@@ -2,7 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 
 import { withContext } from "@/lib/unified/api";
+import { validateContinuousOsintInput } from "@/lib/unified/continuous-osint";
 import { appendEvidenceEvent } from "@/lib/unified/evidence-ledger";
+import { hashValue } from "@/lib/unified/hash";
 import { createDefaultOsintBus } from "@/lib/unified/osint-default-bus";
 
 const requestSchema = z.object({
@@ -15,10 +17,14 @@ const requestSchema = z.object({
 export async function POST(req: NextRequest) {
   return withContext(req, "agent:run", async (ctx) => {
     const body = requestSchema.parse(await req.json());
+    const input = validateContinuousOsintInput(body.adapterId, body.input);
     const bus = createDefaultOsintBus({
-      policyCheck: (metadata) => (metadata.executionClass ?? "passive_public") === "passive_public" || metadata.executionClass === "credentialed_public_api",
+      policyCheck: (metadata) => {
+        const executionClass = metadata.executionClass ?? "passive_public";
+        return (executionClass === "passive_public" || executionClass === "credentialed_public_api") && metadata.defaultEnabled !== false;
+      },
     });
-    const result = await bus.run(body.adapterId, body.input, {
+    const result = await bus.run(body.adapterId, input, {
       missionId: body.missionId,
       userId: ctx.principal.userId,
       purpose: body.purpose,
@@ -28,7 +34,7 @@ export async function POST(req: NextRequest) {
       missionId: body.missionId,
       actor: ctx.principal.userId,
       action: "governed_osint_adapter_executed",
-      input: { adapterId: body.adapterId, purpose: body.purpose, input: body.input },
+      input: { adapterId: body.adapterId, purpose: body.purpose, inputHash: hashValue(input) },
       output: result,
     });
     return NextResponse.json(result, {

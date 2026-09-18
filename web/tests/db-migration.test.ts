@@ -91,6 +91,24 @@ describe("DISHA database migration contract", () => {
     expect(runner).toContain("RLS is not enabled on required table(s)");
   });
 
+  it("adds durable continuous OSINT watches, runs, indexes, and RLS", () => {
+    const migration = fs.readFileSync(path.join(webRoot, "database/202609190002_continuous_osint.sql"), "utf8");
+    const runner = fs.readFileSync(path.join(webRoot, "scripts/apply-schema.mjs"), "utf8");
+    const oidc = fs.readFileSync(path.join(webRoot, "scripts/github-oidc-production-migrate.mjs"), "utf8");
+    expect(migration).toContain("create table if not exists continuous_osint_watches");
+    expect(migration).toContain("create table if not exists continuous_osint_runs");
+    expect(migration).toContain("continuous_osint_watches_due_idx");
+    expect(migration).toContain("continuous_osint_runs_changed_idx");
+    expect(migration).toContain("continuous_osint_watches enable row level security");
+    expect(migration).toContain("continuous_osint_runs enable row level security");
+    expect(migration).toContain("from anon");
+    expect(migration).toContain("from authenticated");
+    expect(runner).toContain('"202609190002"');
+    expect(runner).toContain('"continuous_osint_watches"');
+    expect(runner).toContain('"continuous_osint_runs"');
+    expect(oidc).toContain('"202609190002"');
+  });
+
   it("exposes explicit migration commands from the web package", () => {
     const packageJson = JSON.parse(fs.readFileSync(path.join(webRoot, "package.json"), "utf8"));
 

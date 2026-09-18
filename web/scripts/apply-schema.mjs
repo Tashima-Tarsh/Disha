@@ -59,6 +59,12 @@ const migrations = [
     upPath: path.join(databaseRoot, "202609190001_geospatial_rls.sql"),
     downPath: path.join(databaseRoot, "rollbacks/202609190001_geospatial_rls.down.sql"),
   },
+  {
+    version: "202609190002",
+    name: "continuous_osint",
+    upPath: path.join(databaseRoot, "202609190002_continuous_osint.sql"),
+    downPath: path.join(databaseRoot, "rollbacks/202609190002_continuous_osint.down.sql"),
+  },
 ];
 
 const requiredTables = [
@@ -101,6 +107,8 @@ const requiredTables = [
   "geospatial_datasets",
   "geospatial_features",
   "geospatial_feature_links",
+  "continuous_osint_watches",
+  "continuous_osint_runs",
 ];
 
 const requiredIndexes = [
@@ -164,6 +172,12 @@ const requiredIndexes = [
   "geospatial_features_lgd_idx",
   "geospatial_features_name_idx",
   "geospatial_feature_links_ref_idx",
+  "continuous_osint_watches_dedupe_idx",
+  "continuous_osint_watches_due_idx",
+  "continuous_osint_watches_user_idx",
+  "continuous_osint_runs_watch_idx",
+  "continuous_osint_runs_changed_idx",
+  "continuous_osint_runs_status_idx",
 ];
 
 const requiredRlsTables = [
@@ -171,6 +185,8 @@ const requiredRlsTables = [
   "geospatial_datasets",
   "geospatial_features",
   "geospatial_feature_links",
+  "continuous_osint_watches",
+  "continuous_osint_runs",
 ];
 
 const mode = process.argv.includes("--verify-only") ? "verify" : process.argv.includes("--rollback") ? "rollback" : "migrate";

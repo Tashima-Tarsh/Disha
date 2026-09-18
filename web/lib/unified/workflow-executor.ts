@@ -1,11 +1,12 @@
 import { failWorkflow, completeWorkflow, leaseWorkflowItems, renewWorkflowLease, type DurableWorkItem } from "./durable-workflow-store";
 import { runChangeDrivenActivation, type IntelligenceActivationInput } from "./intelligence-activation";
 import { runScheduledSourceIngestion } from "./scheduled-source-ingestion";
+import { runContinuousOsintWatch } from "./continuous-osint";
 
 export type WorkflowTickResult = { workerId: string; leased: number; completed: string[]; failed: Array<{ workId: string; error: string }> };
 
 export async function processWorkflowTick(input: { workerId: string; maxJobs?: number; leaseSeconds?: number }): Promise<WorkflowTickResult> {
-  const items = await leaseWorkflowItems({ workerId: input.workerId, workflowTypes: ["source_ingestion","intelligence_activation"], maxItems: input.maxJobs ?? 10, leaseSeconds: input.leaseSeconds ?? 120 });
+  const items = await leaseWorkflowItems({ workerId: input.workerId, workflowTypes: ["source_ingestion","osint_watch","intelligence_activation"], maxItems: input.maxJobs ?? 10, leaseSeconds: input.leaseSeconds ?? 120 });
   const completed: string[] = []; const failed: Array<{workId:string;error:string}> = [];
   for (const item of items) {
     const leaseSeconds = input.leaseSeconds ?? 120;
@@ -34,6 +35,15 @@ async function execute(item: DurableWorkItem): Promise<unknown> {
       throw new Error(`source_ingestion_failed:${retryableFailures.map((run) => run.sourceId).join(",")}`);
     }
     return summary;
+  }
+  if (item.workflowType === "osint_watch") {
+    const watchId = typeof item.payload.watchId === "string" ? item.payload.watchId : "";
+    if (!watchId) throw new Error("osint_watch_work_missing_watch_id");
+    const result = await runContinuousOsintWatch(watchId);
+    if (["failed", "timed_out"].includes(result.status)) {
+      throw new Error(`osint_watch_failed:${watchId}:${result.error ?? result.status}`);
+    }
+    return result;
   }
   if (item.workflowType === "intelligence_activation") {
     const result = await runChangeDrivenActivation(item.payload as unknown as IntelligenceActivationInput);

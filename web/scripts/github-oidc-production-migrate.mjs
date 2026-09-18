@@ -18,6 +18,7 @@ const migrations = [
   ["202609180004", "retrieval_workflows", "202609180004_retrieval_workflows.sql"],
   ["202609180005", "geospatial_runtime", "202609180005_geospatial_runtime.sql"],
   ["202609190001", "geospatial_rls", "202609190001_geospatial_rls.sql"],
+  ["202609190002", "continuous_osint", "202609190002_continuous_osint.sql"],
 ];
 
 const requiredTables = [
@@ -60,6 +61,8 @@ const requiredTables = [
   "geospatial_datasets",
   "geospatial_features",
   "geospatial_feature_links",
+  "continuous_osint_watches",
+  "continuous_osint_runs",
 ];
 
 const requiredIndexes = [
@@ -123,6 +126,12 @@ const requiredIndexes = [
   "geospatial_features_lgd_idx",
   "geospatial_features_name_idx",
   "geospatial_feature_links_ref_idx",
+  "continuous_osint_watches_dedupe_idx",
+  "continuous_osint_watches_due_idx",
+  "continuous_osint_watches_user_idx",
+  "continuous_osint_runs_watch_idx",
+  "continuous_osint_runs_changed_idx",
+  "continuous_osint_runs_status_idx",
 ];
 
 async function githubOidcToken() {
