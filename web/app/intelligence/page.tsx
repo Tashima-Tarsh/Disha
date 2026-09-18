@@ -11,14 +11,19 @@ export const metadata: Metadata = {
   description: "Continuous intelligence change-impact and analyst review surface.",
 };
 
+function requirePrincipal(token: string) {
+  try {
+    return principalFromAccessToken(token);
+  } catch {
+    redirect("/login?mode=password&returnUrl=%2Fintelligence");
+  }
+}
+
 export default async function IntelligencePage() {
   const cookieStore = await cookies();
   const token = cookieStore.get(ACCESS_COOKIE_NAME)?.value;
   if (!token) redirect("/login?mode=password&returnUrl=%2Fintelligence");
-  try {
-    const principal = principalFromAccessToken(token);
-    return <IntelligenceClient principal={{ email: principal.email, roles: principal.roles }} />;
-  } catch {
-    redirect("/login?mode=password&returnUrl=%2Fintelligence");
-  }
+
+  const principal = requirePrincipal(token);
+  return <IntelligenceClient principal={{ email: principal.email, roles: principal.roles }} />;
 }
