@@ -1,0 +1,35 @@
+name: DISHA Lockfile Refresh
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - web/package.json
+
+permissions:
+  contents: read
+
+jobs:
+  lockfile:
+    name: Generate exact npm lockfile
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - name: Refresh package lock
+        run: npm install --package-lock-only --ignore-scripts
+      - name: Validate lock
+        run: npm ci --ignore-scripts
+      - uses: actions/upload-artifact@v4
+        with:
+          name: disha-package-lock
+          path: web/package-lock.json
+          if-no-files-found: error
+          retention-days: 1
