@@ -153,7 +153,7 @@ export function GeospatialCommandMap({
         viewState={viewState}
         layers={deckLayers}
         controller={false}
-        style={{ position: "absolute", inset: 0, pointerEvents: "none" }}
+        style={{ position: "absolute", inset: "0px", pointerEvents: "none" }}
       />
 
       <div className={styles.mapStatus}>

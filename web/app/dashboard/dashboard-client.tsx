@@ -79,10 +79,10 @@ export function DashboardClient({ principal }: { principal: PrincipalView }) {
     return () => media.removeEventListener("change", sync);
   }, []);
 
-  const data = state.status === "ready" ? state.data : null;
+  const timelineData = state.status === "ready" ? state.data : null;
   const timelineAscending = useMemo(
-    () => data ? [...data.timeline].sort((a, b) => Date.parse(a.timestamp) - Date.parse(b.timestamp)) : [],
-    [data],
+    () => timelineData ? [...timelineData.timeline].sort((a, b) => Date.parse(a.timestamp) - Date.parse(b.timestamp)) : [],
+    [timelineData],
   );
 
   useEffect(() => {
@@ -101,6 +101,7 @@ export function DashboardClient({ principal }: { principal: PrincipalView }) {
   if (state.status === "loading") return <WorkspaceState principal={principal} title="Opening DISHA intelligence workspace" />;
   if (state.status === "error") return <WorkspaceState principal={principal} title="Workspace unavailable" message={state.message} />;
 
+  const data = state.data;
   const selectedFeature = data.geo.features.find((feature) => feature.properties.featureId === selectedFeatureId) ?? null;
   const selectedEntity = data.entities.find((entity) => entity.entityId === selectedEntityId) ?? null;
   const selectedTimeline = data.timeline.find((item) => item.id === selectedTimelineId) ?? null;

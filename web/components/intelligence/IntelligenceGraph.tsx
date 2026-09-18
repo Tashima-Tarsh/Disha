@@ -55,7 +55,7 @@ export function IntelligenceGraph({
             label: "data(label)",
             "font-size": 9,
             "text-wrap": "ellipsis",
-            "text-max-width": 84,
+            "text-max-width": "84px",
             "text-valign": "bottom",
             "text-margin-y": 8,
             width: 18,
