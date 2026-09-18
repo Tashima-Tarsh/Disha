@@ -78,6 +78,19 @@ describe("DISHA database migration contract", () => {
     expect(migration).toContain("lgd_mapping_coverage");
   });
 
+  it("locks geospatial tables behind RLS and removes Data API role grants", () => {
+    const migration = fs.readFileSync(path.join(webRoot, "database/202609190001_geospatial_rls.sql"), "utf8");
+    const runner = fs.readFileSync(path.join(webRoot, "scripts/apply-schema.mjs"), "utf8");
+    expect(migration).toContain("geospatial_import_jobs enable row level security");
+    expect(migration).toContain("geospatial_datasets enable row level security");
+    expect(migration).toContain("geospatial_features enable row level security");
+    expect(migration).toContain("geospatial_feature_links enable row level security");
+    expect(migration).toContain("from anon");
+    expect(migration).toContain("from authenticated");
+    expect(runner).toContain("requiredRlsTables");
+    expect(runner).toContain("RLS is not enabled on required table(s)");
+  });
+
   it("exposes explicit migration commands from the web package", () => {
     const packageJson = JSON.parse(fs.readFileSync(path.join(webRoot, "package.json"), "utf8"));
 

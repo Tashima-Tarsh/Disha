@@ -53,6 +53,12 @@ const migrations = [
     upPath: path.join(databaseRoot, "202609180005_geospatial_runtime.sql"),
     downPath: path.join(databaseRoot, "rollbacks/202609180005_geospatial_runtime.down.sql"),
   },
+  {
+    version: "202609190001",
+    name: "geospatial_rls",
+    upPath: path.join(databaseRoot, "202609190001_geospatial_rls.sql"),
+    downPath: path.join(databaseRoot, "rollbacks/202609190001_geospatial_rls.down.sql"),
+  },
 ];
 
 const requiredTables = [
@@ -160,6 +166,13 @@ const requiredIndexes = [
   "geospatial_feature_links_ref_idx",
 ];
 
+const requiredRlsTables = [
+  "geospatial_import_jobs",
+  "geospatial_datasets",
+  "geospatial_features",
+  "geospatial_feature_links",
+];
+
 const mode = process.argv.includes("--verify-only") ? "verify" : process.argv.includes("--rollback") ? "rollback" : "migrate";
 const databaseUrl = process.env.DATABASE_URL;
 
@@ -246,6 +259,19 @@ async function verifySchema() {
   const presentIndexes = new Set(indexes.rows.map((row) => row.indexname));
   const missingIndexes = requiredIndexes.filter((index) => !presentIndexes.has(index));
   if (missingIndexes.length) throw new Error(`Missing required index(es): ${missingIndexes.join(", ")}`);
+
+  const rls = await pool.query(
+    `select c.relname
+     from pg_class c
+     join pg_namespace n on n.oid = c.relnamespace
+     where n.nspname = 'public'
+       and c.relname = any($1::text[])
+       and c.relrowsecurity = true`,
+    [requiredRlsTables],
+  );
+  const protectedTables = new Set(rls.rows.map((row) => row.relname));
+  const missingRls = requiredRlsTables.filter((table) => !protectedTables.has(table));
+  if (missingRls.length) throw new Error(`RLS is not enabled on required table(s): ${missingRls.join(", ")}`);
 
   const applied = await pool.query(
     "select version from schema_migrations where direction = 'up'",

@@ -17,6 +17,7 @@ const migrations = [
   ["202609180003", "continuous_intelligence", "202609180003_continuous_intelligence.sql"],
   ["202609180004", "retrieval_workflows", "202609180004_retrieval_workflows.sql"],
   ["202609180005", "geospatial_runtime", "202609180005_geospatial_runtime.sql"],
+  ["202609190001", "geospatial_rls", "202609190001_geospatial_rls.sql"],
 ];
 
 const requiredTables = [
