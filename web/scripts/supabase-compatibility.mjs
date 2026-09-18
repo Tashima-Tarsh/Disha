@@ -18,10 +18,27 @@ if (!databaseUrl) {
 
 const client = new Client({ connectionString: databaseUrl });
 
+let extensionDiagnostics = null;
+
 try {
   await client.connect();
 
+  const diagnosticResult = await client.query(`
+    select
+      name,
+      default_version,
+      installed_version
+    from pg_available_extensions
+    where name in ('vector', 'postgis')
+    order by name
+  `);
+  extensionDiagnostics = diagnosticResult.rows;
+
   if (!verifyOnly) {
+    console.info(JSON.stringify({
+      type: "supabase_extension_inventory",
+      extensions: extensionDiagnostics,
+    }));
     const sql = await fs.readFile(sqlPath, "utf8");
     await client.query(sql);
   }
@@ -60,6 +77,7 @@ try {
     type: "supabase_compatibility",
     status: "failure",
     reason: error instanceof Error ? error.message : String(error),
+    extensionDiagnostics,
   }));
   process.exitCode = 1;
 } finally {

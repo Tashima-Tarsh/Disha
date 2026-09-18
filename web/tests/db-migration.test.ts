@@ -74,6 +74,11 @@ describe("DISHA database migration contract", () => {
     expect(packageJson.scripts["db:rollback"]).toBe("node scripts/apply-schema.mjs --rollback");
     expect(packageJson.scripts["db:supabase-bootstrap"]).toBe("node scripts/supabase-compatibility.mjs");
     expect(packageJson.scripts["db:supabase-verify"]).toBe("node scripts/supabase-compatibility.mjs --verify-only");
+    const supabaseBootstrap = fs.readFileSync(path.join(webRoot, "database/providers/supabase.sql"), "utf8");
+    expect(supabaseBootstrap).toContain("create extension if not exists vector with schema extensions");
+    expect(supabaseBootstrap).toContain("create extension if not exists postgis with schema extensions");
+    const supabaseVerifier = fs.readFileSync(path.join(webRoot, "scripts/supabase-compatibility.mjs"), "utf8");
+    expect(supabaseVerifier).toContain("supabase_extension_inventory");
   });
 
   it("runs database migration before the web service in compose deployments", () => {
