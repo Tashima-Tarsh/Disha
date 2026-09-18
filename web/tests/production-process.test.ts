@@ -11,6 +11,8 @@ describe("production process hardening", () => {
     expect(source).toContain(".next/standalone/server.js");
     expect(source).not.toContain('nextCli, "start"');
     expect(source).toContain('NODE_ENV: "production"');
+    expect(source).toContain('DISHA_BIND_HOST');
+    expect(source).toContain('"0.0.0.0"');
   });
 
   it("copies public and static assets into the standalone runtime", () => {

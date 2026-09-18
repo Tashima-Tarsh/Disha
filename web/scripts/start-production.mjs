@@ -7,7 +7,7 @@ const runtimeEnv = { ...process.env, NODE_ENV: "production" };
 const cliPort = readPort(process.argv.slice(2));
 if (cliPort) runtimeEnv.PORT = cliPort;
 runtimeEnv.PORT ||= "3000";
-runtimeEnv.HOSTNAME ||= "0.0.0.0";
+runtimeEnv.HOSTNAME = process.env.DISHA_BIND_HOST?.trim() || "0.0.0.0";
 
 if (runtimeEnv.DATABASE_URL) {
   const migration = spawnSync(process.execPath, ["scripts/apply-schema.mjs"], {
