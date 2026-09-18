@@ -91,7 +91,9 @@ const watchSchemas: Record<string, z.ZodType> = {
     limit: limitedInt(200, 100).optional(),
   }).strict(),
   "public-github-repository": z.object({
-    repository: z.string().trim().min(3).max(200).regex(/^[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/),
+    repository: z.string().trim().min(3).max(200)
+      .regex(/^[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/)
+      .refine((value) => value.split("/").every((segment) => segment !== "." && segment !== ".."), "invalid_repository_path"),
   }).strict(),
   "public-common-crawl": z.object({ domain: domainSchema, limit: limitedInt(100, 50).optional() }).strict(),
   "public-sec-edgar": z.object({ cik: z.string().trim().regex(/^\d{1,10}$/) }).strict(),

@@ -16,7 +16,7 @@ export async function POST(req: NextRequest) {
     runDueSourceJobs(now, maxJobs),
     runDueOsintWatches(now, maxJobs),
   ]);
-  return NextResponse.json({ generatedAt: new Date().toISOString(), sources, osint });
+  return NextResponse.json({ generatedAt: new Date().toISOString(), ...sources, osint });
 }
 
 function safeEqual(left: string, right: string): boolean {
