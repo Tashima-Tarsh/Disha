@@ -5,7 +5,7 @@ import process from "node:process";
 import { fileURLToPath } from "node:url";
 
 const AUDIENCE = "disha-supabase-production";
-const DEFAULT_ENDPOINT = "https://ttkpckwejvvwjowxitrp.supabase.co/functions/v1/github-production-migrate";
+const DEFAULT_ENDPOINT = "https://ttkpckwejvvwjowxitrp.supabase.co/functions/v1/github-production-migrate-v2";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const databaseRoot = path.resolve(__dirname, "../database");
 

@@ -138,8 +138,6 @@ jobs:
     if: >-
       (github.event_name == 'push' && github.ref == 'refs/heads/main') ||
       github.event_name == 'workflow_dispatch'
-    environment:
-      name: production
     defaults:
       run:
         working-directory: web
@@ -152,5 +150,5 @@ jobs:
 
       - name: Apply and verify production migrations via GitHub OIDC
         env:
-          DISHA_PRODUCTION_MIGRATION_URL: https://ttkpckwejvvwjowxitrp.supabase.co/functions/v1/github-production-migrate
+          DISHA_PRODUCTION_MIGRATION_URL: https://ttkpckwejvvwjowxitrp.supabase.co/functions/v1/github-production-migrate-v2
         run: npm run db:production-oidc

@@ -7,7 +7,6 @@ const ISSUER = "https://token.actions.githubusercontent.com";
 const REPOSITORY = "Tashima-Tarsh/Disha";
 const REPOSITORY_ID = "1205353755";
 const REF = "refs/heads/main";
-const ENVIRONMENT = "production";
 const WORKFLOW_REF = "Tashima-Tarsh/Disha/.github/workflows/db-migrations.yml@refs/heads/main";
 const MAX_MIGRATIONS = 32;
 const MAX_SQL_BYTES = 2_000_000;
@@ -35,7 +34,6 @@ async function authorize(req: Request) {
   if (payload.repository !== REPOSITORY) throw new Error("repository_not_allowed");
   if (String(payload.repository_id ?? "") !== REPOSITORY_ID) throw new Error("repository_id_not_allowed");
   if (payload.ref !== REF) throw new Error("ref_not_allowed");
-  if (payload.environment !== ENVIRONMENT) throw new Error("environment_not_allowed");
   if (payload.workflow_ref !== WORKFLOW_REF) throw new Error("workflow_not_allowed");
   if (payload.event_name !== "push" && payload.event_name !== "workflow_dispatch") throw new Error("event_not_allowed");
   return {
