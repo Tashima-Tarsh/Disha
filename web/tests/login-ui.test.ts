@@ -9,8 +9,8 @@ describe("DISHA secure login UI", () => {
   it("renders a real backend-connected login instead of a flattened screenshot", () => {
     const source = fs.readFileSync(loginClient, "utf8");
 
-    expect(source).toContain("fetch(endpoint");
-    expect(source).toContain('"/api/auth/god-admin"');
+    expect(source).toContain('fetch("/api/auth/login"');
+    expect(source).not.toContain("/api/auth/god-admin");
     expect(source).toContain('"/api/auth/login"');
     expect(source).toContain("/api/auth/oidc/start?");
     expect(source).toContain('type={showPassword ? "text" : "password"}');
@@ -40,12 +40,12 @@ describe("DISHA secure login UI", () => {
     expect(css).not.toContain("overflow: auto");
   });
 
-  it("keeps God Admin restricted to the existing designated identity", () => {
+  it("does not expose a hard-coded privileged identity bypass", () => {
     const source = fs.readFileSync(loginClient, "utf8");
 
-    expect(source).toContain('const GOD_ADMIN_EMAIL = "nitish@thenitishkr.in"');
-    expect(source).toContain("useGodAdmin");
-    expect(source).toContain("God Admin");
+    expect(source).not.toContain("GOD_ADMIN_EMAIL");
+    expect(source).not.toContain("God Admin");
+    expect(source).not.toContain("/api/auth/god-admin");
   });
 
   it("shows only approved identity providers wired to the existing OIDC route", () => {

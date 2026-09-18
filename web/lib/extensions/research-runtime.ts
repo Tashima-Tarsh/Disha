@@ -92,7 +92,7 @@ export async function queryGovernedResearchRuntime(
   }
 
   try {
-    const endpoint = new URL("/governed/analyze", env.DISHA_RESEARCH_RUNTIME_URL);
+    const endpoint = new URL("/api/v1/governed/analyze", env.DISHA_RESEARCH_RUNTIME_URL);
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), request.constraints.maxRuntimeMs);
     try {
@@ -119,6 +119,55 @@ export async function queryGovernedResearchRuntime(
   }
 }
 
+
+export async function queryGovernedResearchRuntimeDirect(input: {
+  requestId: string;
+  missionId: string;
+  component: GovernedResearchComponent;
+  rawText: string;
+  selectedLenses?: string[];
+  evidenceEventIds?: string[];
+  sensitivity?: "public" | "internal" | "controlled" | "classified";
+}): Promise<GovernedResearchRuntimeResponse> {
+  const env = getEnv();
+  const request = governedResearchRuntimeRequestSchema.parse({
+    contractVersion: "disha.research-runtime.v1",
+    requestId: input.requestId,
+    missionId: input.missionId,
+    component: input.component,
+    mode: "read_only",
+    rawText: input.rawText,
+    context: {
+      selectedLenses: input.selectedLenses ?? [],
+      evidenceEventIds: input.evidenceEventIds ?? [],
+      sensitivity: input.sensitivity ?? "public",
+    },
+    constraints: {
+      noExternalActions: true,
+      noStateMutation: true,
+      requireSourceHashes: true,
+      maxRuntimeMs: Math.min(env.DISHA_RESEARCH_RUNTIME_TIMEOUT_MS, 5_000),
+    },
+  });
+  if (!env.DISHA_RESEARCH_RUNTIME_URL) return unavailable(input.component, "No governed research runtime URL is configured.");
+  try {
+    const endpoint = new URL("/api/v1/governed/analyze", env.DISHA_RESEARCH_RUNTIME_URL);
+    const response = await fetch(endpoint, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...(env.DISHA_RESEARCH_RUNTIME_TOKEN ? { Authorization: `Bearer ${env.DISHA_RESEARCH_RUNTIME_TOKEN}` } : {}),
+      },
+      body: JSON.stringify(request),
+      signal: AbortSignal.timeout(request.constraints.maxRuntimeMs),
+    });
+    if (!response.ok) return unavailable(input.component, `Research runtime returned HTTP ${response.status}.`);
+    return governedResearchRuntimeResponseSchema.parse(await response.json());
+  } catch (error) {
+    return unavailable(input.component, error instanceof Error ? error.message : "Research runtime request failed.");
+  }
+}
+
 export async function checkGovernedResearchRuntimeHealth(): Promise<GovernedResearchRuntimeHealth> {
   const env = getEnv();
 
@@ -133,7 +182,7 @@ export async function checkGovernedResearchRuntimeHealth(): Promise<GovernedRese
   }
 
   try {
-    const endpoint = new URL("/governed/health", env.DISHA_RESEARCH_RUNTIME_URL);
+    const endpoint = new URL("/api/v1/governed/health", env.DISHA_RESEARCH_RUNTIME_URL);
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), Math.min(env.DISHA_RESEARCH_RUNTIME_TIMEOUT_MS, 5_000));
     try {
@@ -162,7 +211,7 @@ export async function checkGovernedResearchRuntimeHealth(): Promise<GovernedRese
     return {
       contractVersion: "disha.research-runtime.v1",
       configured: true,
-      endpoint: redactEndpoint(new URL("/governed/health", env.DISHA_RESEARCH_RUNTIME_URL)),
+      endpoint: redactEndpoint(new URL("/api/v1/governed/health", env.DISHA_RESEARCH_RUNTIME_URL)),
       status: "error",
       components: [],
       message: error instanceof Error ? error.message : "Research runtime health check failed.",

@@ -66,19 +66,19 @@ describe("schemas", () => {
   });
 });
 
-describe("God Admin configuration", () => {
-  it("accepts a dedicated God Admin password only from environment configuration", () => {
+describe("development admin configuration", () => {
+  it("accepts development admin identities only from environment configuration", () => {
     vi.stubEnv("NODE_ENV", "test");
-    vi.stubEnv("DISHA_GOD_ADMIN_PASSWORD", "admin-secret-123");
+    vi.stubEnv("DISHA_DEV_ADMIN_EMAILS", "admin@example.com,ops@example.com");
     resetEnvForTests();
-    expect(getEnv().DISHA_GOD_ADMIN_PASSWORD).toBe("admin-secret-123");
+    expect(getEnv().DISHA_DEV_ADMIN_EMAILS).toContain("admin@example.com");
   });
 
-  it("does not invent a God Admin password when none is configured", () => {
+  it("does not invent privileged development identities", () => {
     vi.stubEnv("NODE_ENV", "test");
-    vi.stubEnv("DISHA_GOD_ADMIN_PASSWORD", "");
+    vi.stubEnv("DISHA_DEV_ADMIN_EMAILS", "");
     resetEnvForTests();
-    expect(getEnv().DISHA_GOD_ADMIN_PASSWORD).toBeUndefined();
+    expect(getEnv().DISHA_DEV_ADMIN_EMAILS).toBeUndefined();
   });
 });
 

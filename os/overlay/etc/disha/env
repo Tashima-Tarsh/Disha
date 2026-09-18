@@ -7,8 +7,10 @@ DISHA_DEV_PASSWORD=replace-with-local-password
 DISHA_ALLOWED_ORIGINS=http://127.0.0.1:3000
 
 # Use OpenAI when internet is available. Key is injected by the OS setup flow.
-OPENAI_MODEL=gpt-5.4-mini
+OPENAI_MODEL=gpt-5.6-luna
 OPENAI_BASE_URL=https://api.openai.com/v1
+DISHA_MODEL_ROUTES_JSON=
+DISHA_MODEL_ROLE=analysis
 
 # Prefer local-first (no external DB). These can be enabled later if desired.
 DATABASE_URL=

@@ -15,6 +15,8 @@ from ..brain.reasoning import ReasoningBrain
 from ..brain.risk_engine import RiskEngine
 from ..database.store import SQLiteStore
 from ..graph import DishaAgenticGraph, DishaGraphResult, GraphInput
+from ..governed import GovernedRuntimeRegistry
+from ..governed.base import GovernedAnalysisInput
 from ..models.schemas import (
     CommandResponse,
     DecisionAction,
@@ -51,6 +53,7 @@ class AppContext:
         self.risk_engine = RiskEngine()
         self.decision_engine = DecisionEngine()
         self.graph = DishaAgenticGraph()
+        self.governed_runtime = GovernedRuntimeRegistry(self.store)
         self.monitoring: MonitoringService | None = None
 
     def module_health(self) -> dict[str, str]:
@@ -66,6 +69,7 @@ class AppContext:
             "risk_engine": "ok" if self.risk_engine else "degraded",
             "decision_engine": "ok" if self.decision_engine else "degraded",
             "agentic_graph": "ok" if self.graph else "degraded",
+            "governed_runtime": "ok" if self.governed_runtime else "degraded",
             "monitoring": "ok" if self.monitoring else "degraded",
         }
         return modules
@@ -77,6 +81,32 @@ router = APIRouter(prefix="/api/v1")
 
 def get_context() -> AppContext:
     return context
+
+
+
+
+class GovernedResearchContext(BaseModel):
+    selectedLenses: list[str] = Field(default_factory=list, max_length=20)
+    evidenceEventIds: list[str] = Field(default_factory=list, max_length=200)
+    sensitivity: str = "public"
+
+
+class GovernedResearchConstraints(BaseModel):
+    noExternalActions: bool = True
+    noStateMutation: bool = True
+    requireSourceHashes: bool = True
+    maxRuntimeMs: int = Field(default=2500, ge=100, le=5000)
+
+
+class GovernedResearchRequest(BaseModel):
+    contractVersion: str
+    requestId: str
+    missionId: str
+    component: str
+    mode: str
+    rawText: str = Field(max_length=20000)
+    context: GovernedResearchContext
+    constraints: GovernedResearchConstraints
 
 
 class WebAuditEventIn(BaseModel):
@@ -109,6 +139,63 @@ async def health() -> HealthResponse:
         websocket_path="/ws/alerts",
         modules=modules,
     )
+
+
+
+
+@router.get(
+    "/governed/health",
+    dependencies=[Depends(require_api_token)],
+)
+async def governed_health(app: AppContext = Depends(get_context)) -> dict:
+    return {
+        "contractVersion": "disha.research-runtime.v1",
+        "status": "ok",
+        "components": app.governed_runtime.components,
+        "message": "Independent read-only DISHA Brain, Cognitive Engine, and Memory Graph analyzers are available.",
+    }
+
+
+@router.post(
+    "/governed/analyze",
+    dependencies=[Depends(require_api_token)],
+)
+async def governed_analyze(
+    payload: GovernedResearchRequest, app: AppContext = Depends(get_context)
+) -> dict:
+    if payload.contractVersion != "disha.research-runtime.v1":
+        raise HTTPException(status_code=400, detail="unsupported_contract_version")
+    if payload.mode != "read_only" or not payload.constraints.noExternalActions or not payload.constraints.noStateMutation:
+        raise HTTPException(status_code=400, detail="governed_runtime_requires_read_only_constraints")
+    if payload.component not in app.governed_runtime.components:
+        raise HTTPException(status_code=400, detail="unsupported_component")
+
+    import hashlib
+    source_material = [payload.rawText, *payload.context.evidenceEventIds]
+    source_hashes = [hashlib.sha256(item.encode("utf-8")).hexdigest() for item in source_material if item][:50]
+    analysis_input = GovernedAnalysisInput(
+        request_id=payload.requestId,
+        mission_id=payload.missionId,
+        raw_text=payload.rawText,
+        selected_lenses=payload.context.selectedLenses,
+        evidence_event_ids=payload.context.evidenceEventIds,
+        sensitivity=payload.context.sensitivity,
+        source_hashes=source_hashes,
+    )
+    try:
+        analysis = app.governed_runtime.analyze(payload.component, analysis_input)
+    except KeyError:
+        raise HTTPException(status_code=400, detail="unsupported_component") from None
+
+    return {
+        "contractVersion": "disha.research-runtime.v1",
+        "component": payload.component,
+        "status": "ok",
+        "summary": analysis["summary"],
+        "observations": analysis["observations"],
+        "sourceHashes": source_hashes,
+        "limitations": analysis["limitations"],
+    }
 
 
 @router.post(

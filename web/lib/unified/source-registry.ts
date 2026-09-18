@@ -1,4 +1,5 @@
 import { hashValue } from "./hash";
+import { safePublicFetch } from "../server/safe-public-fetch";
 
 export type SourceDomain =
   | "constitution"
@@ -21,7 +22,11 @@ export type SourceDomain =
   | "vulnerability_intelligence"
   | "consumer_finance_protection"
   | "macro_economy"
-  | "api_directory";
+  | "api_directory"
+  | "news"
+  | "web_archive"
+  | "domain_registration"
+  | "open_source_repository";
 
 export type SourceDefinition = {
   sourceId: string;
@@ -536,6 +541,147 @@ export const sourceRegistry: SourceDefinition[] = [
     knownLimitations: ["Series-level extraction needs table-specific parsers and metadata checks."],
     verification: { verifiedOn: "2026-07-02", basis: "Official RBI DBIE portal." },
   },
+  {
+    sourceId: "cisa-kev",
+    sourceName: "CISA Known Exploited Vulnerabilities Catalog",
+    owner: "Cybersecurity and Infrastructure Security Agency (CISA)",
+    domain: "vulnerability_intelligence",
+    sourceType: "data_warehouse",
+    url: "https://www.cisa.gov/known-exploited-vulnerabilities-catalog",
+    license: "U.S. Government public information / CISA website terms",
+    geographyLevel: ["national"],
+    updateMode: "api_pull",
+    endpoints: [{ url: "https://www.cisa.gov/sites/default/files/feeds/known_exploited_vulnerabilities.json", method: "GET", purpose: "Defensive known-exploited-vulnerability catalog", requiresAuth: false }],
+    knownLimitations: ["Catalog presence indicates known exploitation evidence, not local exposure or compromise."],
+    verification: { verifiedOn: "2026-09-17", basis: "CISA public KEV JSON feed used by governed adapter." },
+  },
+  {
+    sourceId: "gdelt-doc",
+    sourceName: "GDELT DOC 2.0",
+    owner: "GDELT Project",
+    domain: "news",
+    sourceType: "data_warehouse",
+    url: "https://www.gdeltproject.org/",
+    license: "GDELT public data terms",
+    geographyLevel: ["national", "point"],
+    updateMode: "api_pull",
+    endpoints: [{ url: "https://api.gdeltproject.org/api/v2/doc/doc", method: "GET", purpose: "Global public-news discovery", requiresAuth: false }],
+    knownLimitations: ["Article metadata requires source-page verification before treating extracted claims as facts."],
+    verification: { verifiedOn: "2026-09-17", basis: "GDELT DOC 2.0 public endpoint used by governed adapter." },
+  },
+  {
+    sourceId: "internet-archive-wayback",
+    sourceName: "Internet Archive Wayback Machine CDX",
+    owner: "Internet Archive",
+    domain: "web_archive",
+    sourceType: "data_warehouse",
+    url: "https://web.archive.org/",
+    license: "Internet Archive terms and source-site rights",
+    geographyLevel: ["national", "point"],
+    updateMode: "api_pull",
+    endpoints: [{ url: "https://web.archive.org/cdx/search/cdx", method: "GET", purpose: "Historical public-web snapshot discovery", requiresAuth: false }],
+    knownLimitations: ["Archive availability is incomplete; archived content must retain original URL and capture timestamp provenance."],
+    verification: { verifiedOn: "2026-09-17", basis: "Internet Archive CDX endpoint used by governed adapter." },
+  },
+  {
+    sourceId: "rdap-org",
+    sourceName: "RDAP.org",
+    owner: "RDAP bootstrap service / authoritative RDAP registries",
+    domain: "domain_registration",
+    sourceType: "api",
+    url: "https://rdap.org/",
+    license: "Authoritative registry/RDAP terms vary by registry",
+    geographyLevel: ["national"],
+    updateMode: "api_pull",
+    endpoints: [{ url: "https://rdap.org/", method: "GET", purpose: "Bootstrap to public domain and IP registration data", requiresAuth: false }],
+    knownLimitations: ["Registration data may be redacted and registry-specific; absence of fields is not evidence of absence."],
+    verification: { verifiedOn: "2026-09-17", basis: "RDAP.org bootstrap service used by governed adapter." },
+  },
+  {
+    sourceId: "github-public-repositories",
+    sourceName: "GitHub Public Repository Metadata",
+    owner: "GitHub",
+    domain: "open_source_repository",
+    sourceType: "api",
+    url: "https://github.com/",
+    license: "GitHub API and repository-specific license terms",
+    geographyLevel: ["national"],
+    updateMode: "api_pull",
+    endpoints: [{ url: "https://api.github.com/", method: "GET", purpose: "Public repository metadata and upstream provenance", requiresAuth: false }],
+    knownLimitations: ["Unauthenticated API quotas apply; repository content retains its own license and must be reviewed before reuse."],
+    verification: { verifiedOn: "2026-09-17", basis: "GitHub public REST repository endpoint used by governed adapter." },
+  },
+  {
+    sourceId: "common-crawl",
+    sourceName: "Common Crawl Index",
+    owner: "Common Crawl Foundation",
+    domain: "web_archive",
+    sourceType: "data_warehouse",
+    url: "https://index.commoncrawl.org/",
+    license: "Common Crawl terms and source-site rights",
+    geographyLevel: ["national", "point"],
+    updateMode: "api_pull",
+    endpoints: [{ url: "https://index.commoncrawl.org/collinfo.json", method: "GET", purpose: "Discover current public web crawl indexes", requiresAuth: false }],
+    knownLimitations: ["Crawl coverage is incomplete and archived pages retain source-site rights; captures are evidence of observed web content, not independent truth."],
+    verification: { verifiedOn: "2026-09-18", basis: "Public Common Crawl index discovery endpoint used by governed adapter." },
+  },
+  {
+    sourceId: "sec-edgar",
+    sourceName: "SEC EDGAR submissions API",
+    owner: "U.S. Securities and Exchange Commission",
+    domain: "finance",
+    sourceType: "api",
+    url: "https://data.sec.gov/",
+    license: "U.S. Government public information / SEC fair-access policy",
+    geographyLevel: ["national"],
+    updateMode: "api_pull",
+    endpoints: [{ url: "https://data.sec.gov/submissions/", method: "GET", purpose: "Public company filing metadata by CIK", requiresAuth: false }],
+    knownLimitations: ["CIK resolution must be independently verified; requests require a descriptive user-agent and filing contents may need source-specific parsers."],
+    verification: { verifiedOn: "2026-09-18", basis: "Official SEC EDGAR data API documentation." },
+  },
+  {
+    sourceId: "openalex",
+    sourceName: "OpenAlex Scholarly Graph",
+    owner: "OurResearch",
+    domain: "open_data",
+    sourceType: "api",
+    url: "https://openalex.org/",
+    license: "OpenAlex public data/API terms",
+    geographyLevel: ["national"],
+    updateMode: "api_pull",
+    endpoints: [{ url: "https://api.openalex.org/works", method: "GET", purpose: "Public scholarly work and citation discovery", requiresAuth: false }],
+    knownLimitations: ["Metadata and citation relationships are enrichment signals; consequential scientific claims require primary-paper verification."],
+    verification: { verifiedOn: "2026-09-18", basis: "OpenAlex public works API used by governed adapter." },
+  },
+  {
+    sourceId: "world-bank-indicators",
+    sourceName: "World Bank Indicators API",
+    owner: "World Bank Group",
+    domain: "macro_economy",
+    sourceType: "api",
+    url: "https://api.worldbank.org/",
+    license: "World Bank open data terms",
+    geographyLevel: ["national"],
+    updateMode: "api_pull",
+    endpoints: [{ url: "https://api.worldbank.org/v2/", method: "GET", purpose: "Public country and development indicator series", requiresAuth: false }],
+    knownLimitations: ["Indicator metadata distinguishes modeled estimates, revisions, units, and observation coverage and must be retained with claims."],
+    verification: { verifiedOn: "2026-09-18", basis: "Official World Bank API v2 documentation." },
+  },
+  {
+    sourceId: "wikidata",
+    sourceName: "Wikidata",
+    owner: "Wikimedia Foundation / Wikidata community",
+    domain: "open_data",
+    sourceType: "api",
+    url: "https://www.wikidata.org/",
+    license: "Wikidata CC0 data terms",
+    geographyLevel: ["national", "point"],
+    updateMode: "api_pull",
+    endpoints: [{ url: "https://www.wikidata.org/w/api.php", method: "GET", purpose: "Public entity discovery and alias enrichment", requiresAuth: false }],
+    knownLimitations: ["Community-maintained data is enrichment only and must not replace authoritative sources for consequential claims."],
+    verification: { verifiedOn: "2026-09-18", basis: "Wikidata MediaWiki entity-search endpoint used by governed adapter." },
+  },
+
 ];
 
 const unauthorizedLeakPatterns = [
@@ -618,7 +764,7 @@ export function admitSourceForOperation(sourceReference: string): SourceAdmissio
   return { ...decision, provenanceHash: hashValue(decision) };
 }
 
-export async function probeSource(sourceId: string, fetcher: FetchLike = fetch): Promise<SourceProbeResult> {
+export async function probeSource(sourceId: string, fetcher: FetchLike = safePublicFetch): Promise<SourceProbeResult> {
   const source = getSourceDefinition(sourceId);
   if (!source) throw new Error(`Unknown sourceId: ${sourceId}`);
   const endpoint = source.endpoints[0];
@@ -660,7 +806,7 @@ export async function probeSource(sourceId: string, fetcher: FetchLike = fetch):
   }
 }
 
-export async function probeSources(sourceId?: string, fetcher: FetchLike = fetch): Promise<SourceProbeResult[]> {
+export async function probeSources(sourceId?: string, fetcher: FetchLike = safePublicFetch): Promise<SourceProbeResult[]> {
   const sources = sourceId ? [getSourceDefinition(sourceId)].filter((source): source is SourceDefinition => Boolean(source)) : listSourceRegistry();
   return Promise.all(sources.map((source) => probeSource(source.sourceId, fetcher)));
 }

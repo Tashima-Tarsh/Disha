@@ -1,10 +1,13 @@
 import { z } from "zod";
 
 const envSchema = z.object({
-  DISHA_AUTH_MODE: z.enum(["dev-jwt", "oidc"]).default("dev-jwt"),
+  DISHA_AUTH_MODE: z.enum(["dev-jwt", "password", "oidc"]).default("dev-jwt"),
   DISHA_JWT_SECRET: z.string().min(32).optional(),
   DISHA_DEV_PASSWORD: z.string().min(12).optional(),
-  DISHA_GOD_ADMIN_PASSWORD: z.string().min(8).optional(),
+  DISHA_DEV_ADMIN_EMAILS: z.preprocess(
+    (value) => (typeof value === "string" && value.trim() === "" ? undefined : value),
+    z.string().optional(),
+  ),
   DISHA_OIDC_ISSUER: z.string().url().optional(),
   DISHA_OIDC_CLIENT_ID: z.string().optional(),
   DISHA_OIDC_CLIENT_SECRET: z.string().optional(),
@@ -31,13 +34,24 @@ const envSchema = z.object({
   DISHA_WORKFLOW_TOTAL_TIMEOUT_MS: z.coerce.number().int().positive().default(60_000),
   DISHA_WORKFLOW_ALLOWED_HOSTS: z.string().optional(),
   DISHA_MODEL_PROVIDER: z.enum(["disabled", "anthropic", "openai"]).default("disabled"),
+  DISHA_MODEL_ROUTES_JSON: z.string().optional(),
+  DISHA_MODEL_ROLE: z.string().default("analysis"),
+  DISHA_WORKER_TOKEN: z.string().min(24).optional(),
+  DISHA_WORKFLOW_LEASE_SECONDS: z.coerce.number().int().min(15).max(3600).default(120),
+  DISHA_EMBEDDING_PROVIDER: z.enum(["local-hash", "openai-compatible"]).default("local-hash"),
+  DISHA_EMBEDDING_BASE_URL: z.string().url().optional(),
+  DISHA_EMBEDDING_MODEL: z.string().default("sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"),
+  DISHA_EMBEDDING_TIMEOUT_MS: z.coerce.number().int().min(250).max(20_000).default(3_000),
+  DISHA_EMBEDDING_API_KEY: z.string().optional(),
+  DISHA_SCHEDULER_POLL_SECONDS: z.coerce.number().int().min(5).max(3600).default(30),
+  DISHA_RUNTIME_EVENT_STREAM: z.string().default("disha:runtime-events"),
   DISHA_MODEL_TIMEOUT_MS: z.coerce.number().int().positive().default(20_000),
   ANTHROPIC_API_KEY: z.string().optional(),
   ANTHROPIC_MODEL: z.string().default("claude-sonnet-4-5"),
   ANTHROPIC_BASE_URL: z.string().url().default("https://api.anthropic.com/v1"),
   ANTHROPIC_VERSION: z.string().default("2023-06-01"),
   OPENAI_API_KEY: z.string().optional(),
-  OPENAI_MODEL: z.string().default("gpt-5.4-mini"),
+  OPENAI_MODEL: z.string().default("gpt-5.6-luna"),
   OPENAI_BASE_URL: z.string().url().default("https://api.openai.com/v1"),
   OPENAI_PROJECT: z.string().optional(),
   OPENAI_ORGANIZATION: z.string().optional(),
@@ -60,7 +74,7 @@ export function getEnv(): RuntimeEnv {
       DISHA_AUTH_MODE: "dev-jwt",
       DISHA_JWT_SECRET: "dev-jwt-secret-for-local-testing-32bytes-long-enough",
       DISHA_DEV_PASSWORD: "devpassword1234",
-      DISHA_GOD_ADMIN_PASSWORD: undefined,
+      DISHA_DEV_ADMIN_EMAILS: undefined,
       DISHA_OIDC_ISSUER: undefined,
       DISHA_OIDC_CLIENT_ID: undefined,
       DISHA_OIDC_CLIENT_SECRET: undefined,
@@ -87,13 +101,24 @@ export function getEnv(): RuntimeEnv {
       DISHA_WORKFLOW_TOTAL_TIMEOUT_MS: 60000,
       DISHA_WORKFLOW_ALLOWED_HOSTS: undefined,
       DISHA_MODEL_PROVIDER: "disabled",
+      DISHA_MODEL_ROUTES_JSON: undefined,
+      DISHA_MODEL_ROLE: "analysis",
+      DISHA_WORKER_TOKEN: undefined,
+      DISHA_WORKFLOW_LEASE_SECONDS: 120,
+      DISHA_EMBEDDING_PROVIDER: "local-hash",
+      DISHA_EMBEDDING_BASE_URL: undefined,
+      DISHA_EMBEDDING_MODEL: "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
+      DISHA_EMBEDDING_TIMEOUT_MS: 3000,
+      DISHA_EMBEDDING_API_KEY: undefined,
+      DISHA_SCHEDULER_POLL_SECONDS: 30,
+      DISHA_RUNTIME_EVENT_STREAM: "disha:runtime-events",
       DISHA_MODEL_TIMEOUT_MS: 20000,
       ANTHROPIC_API_KEY: undefined,
       ANTHROPIC_MODEL: "claude-sonnet-4-5",
       ANTHROPIC_BASE_URL: "https://api.anthropic.com/v1",
       ANTHROPIC_VERSION: "2023-06-01",
       OPENAI_API_KEY: undefined,
-      OPENAI_MODEL: "gpt-5.4-mini",
+      OPENAI_MODEL: "gpt-5.6-luna",
       OPENAI_BASE_URL: "https://api.openai.com/v1",
       OPENAI_PROJECT: undefined,
       OPENAI_ORGANIZATION: undefined,
@@ -121,6 +146,12 @@ export function getEnv(): RuntimeEnv {
   }
   if (env.NODE_ENV === "production" && env.DISHA_AUTH_MODE === "dev-jwt") {
     throw new Error("DISHA_AUTH_MODE=dev-jwt is not allowed in production");
+  }
+  if (env.DISHA_AUTH_MODE === "password" && !env.DISHA_DEV_PASSWORD) {
+    throw new Error("DISHA_DEV_PASSWORD is required when DISHA_AUTH_MODE=password");
+  }
+  if (env.NODE_ENV === "production" && !env.DISHA_WORKER_TOKEN) {
+    throw new Error("DISHA_WORKER_TOKEN is required in production for internal scheduler/worker calls");
   }
   return env;
 }

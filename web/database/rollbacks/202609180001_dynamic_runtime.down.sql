@@ -1,0 +1,15 @@
+drop index if exists dynamic_public_sources_enabled_idx;
+drop table if exists dynamic_public_sources cascade;
+drop index if exists intelligence_event_entities_entity_idx;
+drop table if exists intelligence_event_entities cascade;
+drop index if exists intelligence_edges_to_idx;
+drop index if exists intelligence_edges_from_idx;
+drop table if exists intelligence_edges cascade;
+drop index if exists intelligence_events_time_idx;
+drop table if exists intelligence_events cascade;
+drop index if exists intelligence_entities_type_idx;
+drop table if exists intelligence_entities cascade;
+drop index if exists runtime_configuration_updated_idx;
+drop table if exists runtime_configuration cascade;
+drop index if exists source_refresh_policies_due_idx;
+drop table if exists source_refresh_policies cascade;

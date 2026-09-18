@@ -1,0 +1,36 @@
+import { OsintAdapterBus, type AdapterBusOptions } from "./osint-adapter-bus";
+import { createDynamicPublicSourceAdapter } from "./dynamic-public-source";
+import {
+  createCertificateTransparencyAdapter,
+  createCisaKevAdapter,
+  createGdeltNewsAdapter,
+  createGithubRepositoryAdapter,
+  createOfficialPublicSourceProbeAdapter,
+  createPassiveDnsAdapter,
+  createRdapAdapter,
+  createWaybackAdapter,
+  createCommonCrawlAdapter,
+  createSecEdgarAdapter,
+  createOpenAlexAdapter,
+  createWorldBankAdapter,
+  createWikidataSearchAdapter,
+} from "./public-osint-adapters";
+
+export function createDefaultOsintBus(options: AdapterBusOptions = {}): OsintAdapterBus {
+  const bus = new OsintAdapterBus(options);
+  bus.register(createPassiveDnsAdapter());
+  bus.register(createCertificateTransparencyAdapter());
+  bus.register(createRdapAdapter());
+  bus.register(createWaybackAdapter());
+  bus.register(createGdeltNewsAdapter());
+  bus.register(createCisaKevAdapter());
+  bus.register(createGithubRepositoryAdapter());
+  bus.register(createOfficialPublicSourceProbeAdapter());
+  bus.register(createCommonCrawlAdapter());
+  bus.register(createSecEdgarAdapter());
+  bus.register(createOpenAlexAdapter());
+  bus.register(createWorldBankAdapter());
+  bus.register(createWikidataSearchAdapter());
+  bus.register(createDynamicPublicSourceAdapter());
+  return bus;
+}

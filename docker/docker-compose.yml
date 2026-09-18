@@ -33,7 +33,7 @@ services:
       start_period: 10s
 
   postgres:
-    image: postgres:16-alpine
+    image: pgvector/pgvector:pg16
     environment:
       POSTGRES_DB: disha
       POSTGRES_USER: disha
