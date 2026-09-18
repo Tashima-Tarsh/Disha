@@ -21,7 +21,7 @@ The India surface must not render an artistic India silhouette as if it were geo
 | Geospatial overlays | deck.gl | incidents, clusters, heatmaps, routes, corridors, coverage, temporal layers |
 | Static vector tiles | PMTiles | versioned boundary/base-layer delivery without a bespoke tile server |
 | Queryable spatial data | PostgreSQL + PostGIS | radius/within/intersects, administrative joins, evidence-linked geometry |
-| 3D product visuals | Three.js + React Three Fiber + Drei | cinematic non-authoritative product surfaces and prepared visual assets |
+| 3D product visuals | Three.js now; React Three Fiber + Drei after React 19.3 peer support | cinematic non-authoritative product surfaces and prepared visual assets without forcing an incompatible React peer tree |
 | Dedicated 3D globe/terrain | CesiumJS, only when the use case requires it | optional 3D geospatial workspace, not the default map |
 | Entity/evidence graph | Cytoscape.js first; evaluate G6 for richer analyst interactions | deterministic evidence-linked graph navigation |
 | Blender automation | MCP for Blender with telemetry disabled | offline cinematic assets, materials, lighting, camera and render workflows |
@@ -91,6 +91,6 @@ Phase 4: add deck.gl evidence overlays, temporal playback, clustering, heatmaps,
 
 Phase 5: add Cytoscape evidence/entity graph synchronized with map and timeline selection.
 
-Phase 6: add a separate Three.js/R3F cinematic layer and Blender-authored assets. Keep operational maps visually and architecturally independent from cinematic 3D.
+Phase 6: add a separate Three.js cinematic layer and Blender-authored assets. Adopt React Three Fiber/Drei only when their published peer range includes DISHA's React 19.3 runtime. Keep operational maps visually and architecturally independent from cinematic 3D.
 
 Phase 7: evaluate CesiumJS for a dedicated 3D geospatial workspace only after the 2D evidence map, data licensing, performance budgets and provenance model are mature.
