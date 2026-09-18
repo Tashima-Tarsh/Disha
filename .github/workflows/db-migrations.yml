@@ -15,6 +15,7 @@ on:
 
 permissions:
   contents: read
+  id-token: write
 
 concurrency:
   group: disha-db-migrations-${{ github.ref }}
@@ -142,29 +143,14 @@ jobs:
     defaults:
       run:
         working-directory: web
-    env:
-      DATABASE_URL: ${{ secrets.PRODUCTION_DATABASE_URL }}
     steps:
       - uses: actions/checkout@v5
 
       - uses: actions/setup-node@v5
         with:
           node-version: "22"
-          cache: npm
-          cache-dependency-path: web/package-lock.json
 
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Require production database secret
-        run: |
-          if [ -z "$DATABASE_URL" ]; then
-            echo "PRODUCTION_DATABASE_URL environment secret is required for production migrations." >&2
-            exit 1
-          fi
-
-      - name: Apply approved production migrations
-        run: npm run db:migrate
-
-      - name: Verify production schema
-        run: npm run db:verify-schema
+      - name: Apply and verify production migrations via GitHub OIDC
+        env:
+          DISHA_PRODUCTION_MIGRATION_URL: https://ttkpckwejvvwjowxitrp.supabase.co/functions/v1/github-production-migrate
+        run: npm run db:production-oidc

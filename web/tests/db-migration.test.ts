@@ -10,6 +10,7 @@ describe("DISHA database migration contract", () => {
   it("keeps the migration runner valid JavaScript", () => {
     expect(() => execFileSync(process.execPath, ["--check", path.join(webRoot, "scripts/apply-schema.mjs")])).not.toThrow();
     expect(() => execFileSync(process.execPath, ["--check", path.join(webRoot, "scripts/supabase-compatibility.mjs")])).not.toThrow();
+    expect(() => execFileSync(process.execPath, ["--check", path.join(webRoot, "scripts/github-oidc-production-migrate.mjs")])).not.toThrow();
   });
 
   it("keeps the production schema aligned with evidence, mission, and extension persistence", () => {
@@ -74,6 +75,7 @@ describe("DISHA database migration contract", () => {
     expect(packageJson.scripts["db:rollback"]).toBe("node scripts/apply-schema.mjs --rollback");
     expect(packageJson.scripts["db:supabase-bootstrap"]).toBe("node scripts/supabase-compatibility.mjs");
     expect(packageJson.scripts["db:supabase-verify"]).toBe("node scripts/supabase-compatibility.mjs --verify-only");
+    expect(packageJson.scripts["db:production-oidc"]).toBe("node scripts/github-oidc-production-migrate.mjs");
     const supabaseBootstrap = fs.readFileSync(path.join(webRoot, "database/providers/supabase.sql"), "utf8");
     expect(supabaseBootstrap).toContain("create extension if not exists vector with schema extensions");
     expect(supabaseBootstrap).toContain("create extension if not exists postgis with schema extensions");
@@ -101,7 +103,10 @@ describe("DISHA database migration contract", () => {
     expect(workflow).toContain("npm run db:rollback");
     expect(workflow).toContain("environment:");
     expect(workflow).toContain("name: production");
-    expect(workflow).toContain("PRODUCTION_DATABASE_URL");
+    expect(workflow).not.toContain("PRODUCTION_DATABASE_URL");
+    expect(workflow).toContain("id-token: write");
+    expect(workflow).toContain("npm run db:production-oidc");
+    expect(workflow).toContain("github-production-migrate");
     expect(workflow).not.toContain("RUN_PRODUCTION_MIGRATIONS");
     expect(workflow).toContain("(github.event_name == 'push' && github.ref == 'refs/heads/main')");
     expect(workflow).toContain("github.event_name == 'workflow_dispatch'");
