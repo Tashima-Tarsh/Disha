@@ -19,10 +19,26 @@ const memoryPolicies = new Map<string, DynamicSourcePolicy>();
 export async function listDynamicSourcePolicies(now = new Date()): Promise<DynamicSourcePolicy[]> {
   const pool = getDbPool();
   if (!pool) return listMemoryPolicies(now);
-  const result = await pool.query(`select source_id, enabled, interval_seconds, jitter_seconds, next_run_at, last_run_at, updated_at from source_refresh_policies order by source_id`);
+  let result = await pool.query(`select source_id, enabled, interval_seconds, jitter_seconds, next_run_at, last_run_at, updated_at from source_refresh_policies order by source_id`);
   if (!result.rows.length) {
     await seedPoliciesFromRegistry(now);
-    return listDynamicSourcePolicies(now);
+    result = await pool.query(`select source_id, enabled, interval_seconds, jitter_seconds, next_run_at, last_run_at, updated_at from source_refresh_policies order by source_id`);
+  } else {
+    const knownSourceIds = new Set(result.rows.map((row: Record<string, unknown>) => String(row.source_id)));
+    const missingJobs = listScheduledSourceJobs().filter((job) => Boolean(cadenceSeconds(job.cadence)) && !knownSourceIds.has(job.sourceId));
+    for (const job of missingJobs) {
+      const intervalSeconds = cadenceSeconds(job.cadence);
+      if (!intervalSeconds) continue;
+      await upsertDynamicSourcePolicy({
+        sourceId: job.sourceId,
+        enabled: job.enabled,
+        intervalSeconds,
+        nextRunAt: now.toISOString(),
+      });
+    }
+    if (missingJobs.length) {
+      result = await pool.query(`select source_id, enabled, interval_seconds, jitter_seconds, next_run_at, last_run_at, updated_at from source_refresh_policies order by source_id`);
+    }
   }
   return result.rows.map((row: Record<string, unknown>) => materializePolicy({
     sourceId: String(row.source_id),
@@ -131,13 +147,12 @@ async function seedPoliciesFromRegistry(now: Date): Promise<void> {
 }
 
 function listMemoryPolicies(now: Date): DynamicSourcePolicy[] {
-  if (!memoryPolicies.size) {
-    for (const job of listScheduledSourceJobs()) {
-      const intervalSeconds = cadenceSeconds(job.cadence);
-      if (!intervalSeconds) continue;
-      const base = { sourceId: job.sourceId, enabled: job.enabled, intervalSeconds, jitterSeconds: Math.min(300, Math.floor(intervalSeconds / 10)), nextRunAt: now.toISOString(), updatedAt: now.toISOString() };
-      memoryPolicies.set(job.sourceId, materializePolicy(base));
-    }
+  for (const job of listScheduledSourceJobs()) {
+    if (memoryPolicies.has(job.sourceId)) continue;
+    const intervalSeconds = cadenceSeconds(job.cadence);
+    if (!intervalSeconds) continue;
+    const base = { sourceId: job.sourceId, enabled: job.enabled, intervalSeconds, jitterSeconds: Math.min(300, Math.floor(intervalSeconds / 10)), nextRunAt: now.toISOString(), updatedAt: now.toISOString() };
+    memoryPolicies.set(job.sourceId, materializePolicy(base));
   }
   return [...memoryPolicies.values()].sort((a, b) => a.sourceId.localeCompare(b.sourceId));
 }

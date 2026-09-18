@@ -60,8 +60,8 @@ type FetchLike = NonNullable<Parameters<typeof probeSource>[1]>;
 function defaultCadenceForSource(source: SourceDefinition | null | undefined): ScheduledIngestionCadence {
   if (!source) return "manual";
   if (source.updateMode === "live_probe" || source.updateMode === "api_pull") return "hourly";
-  if (source.updateMode === "download_and_parse") return "daily";
-  return "manual";
+  if (source.updateMode === "download_and_parse" || source.updateMode === "manual_review_required") return "daily";
+  return "weekly";
 }
 
 function defaultPriorityForPlan(plan: SourceParserPlan): "p0" | "p1" | "p2" {
@@ -112,7 +112,24 @@ async function runJob(job: ScheduledSourceJob, fetcher: FetchLike): Promise<Sche
   }
 
   if (plan.status === "auth_required") {
-    return buildRun(job, { status: "auth_required", blockers: plan.blockers, probe: null, records: [], retrievedAt });
+    try {
+      const probe = await probeSource(job.sourceId, fetcher);
+      return buildRun(job, {
+        status: "auth_required",
+        blockers: ["Source requires credentials for ingestion; reachability is monitored only.", ...plan.blockers],
+        probe,
+        records: [],
+        retrievedAt,
+      });
+    } catch (error) {
+      return buildRun(job, {
+        status: "auth_required",
+        blockers: [error instanceof Error ? error.message : "Source reachability probe failed.", ...plan.blockers],
+        probe: null,
+        records: [],
+        retrievedAt,
+      });
+    }
   }
   if (plan.status === "blocked") {
     return buildRun(job, { status: "blocked", blockers: plan.blockers, probe: null, records: [], retrievedAt });
@@ -193,7 +210,7 @@ function buildJob(plan: SourceParserPlan): ScheduledSourceJob {
     parserKey: plan.parserKey,
     cadence: defaultCadenceForSource(getSourceDefinition(plan.sourceId)),
     priority: defaultPriorityForPlan(plan),
-    enabled: plan.status !== "auth_required" && plan.status !== "blocked",
+    enabled: plan.status !== "blocked",
     expectedRecords: plan.expectedRecords,
     publicationRule: "Publish facts only from records emitted by the registered parser and attached to claim provenance.",
   };

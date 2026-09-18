@@ -68,7 +68,12 @@ const parserExpectations: Record<string, string[]> = {
 };
 
 export function listSourceParserPlans(): SourceParserPlan[] {
-  return priorityParserSources.map((sourceId) => {
+  const prioritySet = new Set<string>(priorityParserSources);
+  const orderedSourceIds = [
+    ...priorityParserSources,
+    ...listSourceRegistry().map((source) => source.sourceId).filter((sourceId) => !prioritySet.has(sourceId)),
+  ];
+  return orderedSourceIds.map((sourceId) => {
     const source = getSourceDefinition(sourceId);
     if (!source) return buildMissingPlan(sourceId);
 
