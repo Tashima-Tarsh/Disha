@@ -68,7 +68,7 @@ export function LoginClient({ returnUrl }: { returnUrl: string }) {
 
   function startOidc(provider: OidcProvider) {
     const params = new URLSearchParams({ provider, returnUrl });
-    window.location.assign(`/api/auth/oidc/start?${params.toString()}`);
+    window.location.assign(new URL(`/api/auth/oidc/start?${params.toString()}`, window.location.origin).toString());
   }
 
   return (
