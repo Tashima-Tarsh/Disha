@@ -15,6 +15,18 @@ describe("production process hardening", () => {
     expect(source).toContain('"0.0.0.0"');
     expect(source).toContain('DISHA_APPLY_MIGRATIONS_ON_START');
     expect(source).toContain('github-oidc-production-migration');
+    expect(source).toContain('resolveProductionDatabaseUrl');
+    expect(source).toContain('runtimeEnv.DATABASE_URL = resolvedDatabase.databaseUrl');
+  });
+
+  it("resolves Supabase session-pooler runtime connections without logging credentials", () => {
+    const source = fs.readFileSync(path.join(root, "scripts/resolve-production-database.mjs"), "utf8");
+    expect(source).toContain("aws-");
+    expect(source).toContain(".pooler.supabase.com");
+    expect(source).toContain("5432/postgres?sslmode=require");
+    expect(source).toContain("DISHA_SUPABASE_DB_PASSWORD");
+    expect(source).toContain("select 1");
+    expect(source).not.toContain("databaseUrl,\n        password");
   });
 
   it("copies public and static assets into the standalone runtime", () => {

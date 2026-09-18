@@ -2,12 +2,16 @@ import fs from "node:fs";
 import path from "node:path";
 import { spawn, spawnSync } from "node:child_process";
 import process from "node:process";
+import { resolveProductionDatabaseUrl } from "./resolve-production-database.mjs";
 
 const runtimeEnv = { ...process.env, NODE_ENV: "production" };
 const cliPort = readPort(process.argv.slice(2));
 if (cliPort) runtimeEnv.PORT = cliPort;
 runtimeEnv.PORT ||= "3000";
 runtimeEnv.HOSTNAME = process.env.DISHA_BIND_HOST?.trim() || "0.0.0.0";
+
+const resolvedDatabase = await resolveProductionDatabaseUrl(runtimeEnv);
+runtimeEnv.DATABASE_URL = resolvedDatabase.databaseUrl;
 
 const applyMigrationsOnStart = runtimeEnv.DISHA_APPLY_MIGRATIONS_ON_START === "true";
 if (applyMigrationsOnStart) {
