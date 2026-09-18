@@ -9,7 +9,7 @@ describe("DISHA secure login UI", () => {
   it("renders a real backend-connected login instead of a flattened screenshot", () => {
     const source = fs.readFileSync(loginClient, "utf8");
 
-    expect(source).toContain("fetch(endpoint");
+    expect(source).toContain('fetch("/api/auth/login"');
     expect(source).not.toContain("/api/auth/god-admin");
     expect(source).toContain('"/api/auth/login"');
     expect(source).toContain("/api/auth/oidc/start?");
