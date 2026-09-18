@@ -26,6 +26,9 @@ The India surface must not render an artistic India silhouette as if it were geo
 | Entity/evidence graph | Cytoscape.js first; evaluate G6 for richer analyst interactions | deterministic evidence-linked graph navigation |
 | Blender automation | MCP for Blender with telemetry disabled | offline cinematic assets, materials, lighting, camera and render workflows |
 
+
+Dependency boundary: DISHA uses `@deck.gl/core`, `@deck.gl/layers`, `@deck.gl/aggregation-layers`, and `@deck.gl/react` for the initial analyst overlays. `@deck.gl/geo-layers` is intentionally excluded from the production dependency set until its transitive high-severity npm advisories are resolved; MapLibre/PMTiles remains the tile delivery path.
+
 ## India data-source hierarchy
 
 1. **Administrative geometry truth:** Survey of India Administrative Boundary Database. Store product code/version, source URL, retrieval timestamp, CRS, geometry-validation result, source hash, and applicable terms.
