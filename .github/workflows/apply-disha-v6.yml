@@ -21,7 +21,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          cat .disha-patch/part-* | base64 -d > /tmp/disha-v6.patch
+          for part in .disha-patch/part-*; do base64 -d "$part"; done > /tmp/disha-v6.patch
           git apply --check /tmp/disha-v6.patch
           git apply /tmp/disha-v6.patch
           rm -rf .disha-patch
