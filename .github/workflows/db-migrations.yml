@@ -135,8 +135,8 @@ jobs:
       - supabase-compatibility
     runs-on: ubuntu-latest
     if: >-
-      (github.event_name == 'push' && github.ref == 'refs/heads/main' && vars.RUN_PRODUCTION_MIGRATIONS == 'true') ||
-      (github.event_name == 'workflow_dispatch' && inputs.run_production_migration)
+      (github.event_name == 'push' && github.ref == 'refs/heads/main') ||
+      github.event_name == 'workflow_dispatch'
     environment:
       name: production
     defaults:
