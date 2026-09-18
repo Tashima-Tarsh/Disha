@@ -44,8 +44,8 @@ describe("hybrid intelligence retrieval", () => {
 
 describe("durable leased workflows", () => {
   it("prevents a second worker from leasing live work and reclaims it after expiry", async () => {
-    const queued = await enqueueWorkflow({ workflowType: "test", dedupeKey: "lease-one", payload: { value: 1 } });
     const t0 = new Date("2026-09-18T00:00:00.000Z");
+    const queued = await enqueueWorkflow({ workflowType: "test", dedupeKey: "lease-one", payload: { value: 1 }, availableAt: t0.toISOString() });
     const first = await leaseWorkflowItems({ workerId: "worker-a", workflowTypes: ["test"], leaseSeconds: 30, now: t0 });
     expect(first.map((item) => item.workId)).toEqual([queued.workId]);
     const blocked = await leaseWorkflowItems({ workerId: "worker-b", workflowTypes: ["test"], now: new Date("2026-09-18T00:00:10.000Z") });
