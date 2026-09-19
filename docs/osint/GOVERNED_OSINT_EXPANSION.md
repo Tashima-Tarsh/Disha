@@ -90,3 +90,23 @@ Active-recon and identity-enumeration projects remain blocked by default. They a
 The next useful promotions are service-backed or dataset-backed connectors that preserve this same contract rather than bypassing it. Candidates include OpenSanctions entity screening and configured OpenCTI/IntelOwl services, followed by carefully selected passive modules from mature upstream projects.
 
 SpiderFoot, Maigret, Sherlock, Amass and similar projects must not be exposed as arbitrary command execution. A production connector should select a reviewed passive profile, enforce target/purpose policy, bound runtime and result volume, and convert every accepted observation into DISHA evidence/provenance records.
+
+## OSINT + CTI + SPACEINT source universe
+
+DISHA also maintains a searchable source universe at `GET /api/v1/osint/sources`. This registry is deliberately broader than the live adapter bus and records 100+ investigation, cyber-intelligence, and space-intelligence sources with explicit access and risk metadata.
+
+The registry includes:
+
+- master directories and investigation toolkits,
+- search engines, archives, image/media verification and geolocation,
+- conflict/event, humanitarian, corporate, sanctions and public-record sources,
+- aviation/maritime movement sources and public social-media research tools,
+- internet-wide scanners, IOC/malware feeds, DNS/routing services and vulnerability sources,
+- CTI knowledge bases and frameworks such as MITRE ATT&CK, MISP, SpiderFoot and OpenCTI,
+- orbital catalogs, satellite databases, space-situational-awareness providers, SatNOGS and signal references,
+- Sentinel/Landsat/NASA Earth observation, commercial imagery providers, space-policy sources, launch warnings and space weather.
+
+Every entry is labeled as one of `builtin`, `connector_ready`, `requires_configuration`, `reference_only`, or `blocked_by_default`. Catalog presence never implies that DISHA can call the source without credentials, licensing review, or policy approval.
+
+Credential/breach repositories, leaked-data archives, active-reconnaissance frameworks, and other restricted sources remain non-executable by Universal Search unless a separately reviewed lawful workflow is added.
+
