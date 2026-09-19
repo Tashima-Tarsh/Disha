@@ -9,8 +9,8 @@ import { DashboardClient } from "./dashboard-client";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "DISHA 6.6 Command Dashboard",
-  description: "Governed national evidence operations dashboard for DISHA 6.6.",
+  title: "disha6.6 Command Dashboard",
+  description: "Governed evidence operations dashboard for disha6.6.",
 };
 
 export default async function DashboardPage() {
