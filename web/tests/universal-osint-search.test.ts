@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 
+import { listOsintToolCatalog } from "../lib/unified/osint-tool-catalog";
 import {
   buildUniversalOsintPlan,
   classifyUniversalOsintQuery,
@@ -65,5 +66,11 @@ describe("universal OSINT search planner", () => {
       adapterId: "public-sec-edgar",
       input: { cik: "320193" },
     });
+  });
+
+  it("catalogs OpenSanctions and OpenCTI without pretending they are live adapters", () => {
+    const catalog = listOsintToolCatalog();
+    expect(catalog.find((entry) => entry.id === "opensanctions")?.mode).toBe("catalog_only");
+    expect(catalog.find((entry) => entry.id === "opencti")?.mode).toBe("catalog_only");
   });
 });
