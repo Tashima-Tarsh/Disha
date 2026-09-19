@@ -22,6 +22,7 @@ if (runtimeEnv.DATABASE_URL?.trim() || hasSupabaseRuntimeConfig) {
     const resolvedDatabase = await resolveProductionDatabaseUrl(runtimeEnv);
     runtimeEnv.DATABASE_URL = resolvedDatabase.databaseUrl;
   } catch (error) {
+    if (runtimeEnv.DISHA_ALLOW_STATELESS_AUTH !== "true") throw error;
     delete runtimeEnv.DATABASE_URL;
     process.stderr.write(JSON.stringify({
       type: "production_database_resolution",
@@ -29,12 +30,14 @@ if (runtimeEnv.DATABASE_URL?.trim() || hasSupabaseRuntimeConfig) {
       message: error instanceof Error ? error.message : String(error),
     }) + "\n");
   }
-} else {
+} else if (runtimeEnv.DISHA_ALLOW_STATELESS_AUTH === "true") {
   process.stderr.write(JSON.stringify({
     type: "production_database_resolution",
     status: "degraded",
-    message: "Persistent database credentials are not configured; web authentication remains available in stateless mode.",
+    message: "Persistent database credentials are not configured; explicit stateless-auth mode keeps web authentication available.",
   }) + "\n");
+} else {
+  throw new Error("DATABASE_URL is required in production unless DISHA_ALLOW_STATELESS_AUTH=true");
 }
 
 const applyMigrationsOnStart = runtimeEnv.DISHA_APPLY_MIGRATIONS_ON_START === "true";
