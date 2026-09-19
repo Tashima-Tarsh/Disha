@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getDbPool } from "@/lib/server/db";
 import { withContext } from "@/lib/unified/api";
 import { createDefaultOsintBus } from "@/lib/unified/osint-default-bus";
+import { getOsintSourceUniverseSummary } from "@/lib/unified/osint-source-universe";
 import { runUniversalOsintSearch } from "@/lib/unified/universal-osint-search";
 
 export const dynamic = "force-dynamic";
@@ -113,6 +114,7 @@ export async function GET(req: NextRequest) {
         unavailable: health.filter((item) => item.status === "unavailable" || item.status === "not_configured").length,
       },
       health,
+      sourceUniverseSummary: getOsintSourceUniverseSummary(),
       universal,
       news: {
         status: newsResult?.status ?? "failed",
