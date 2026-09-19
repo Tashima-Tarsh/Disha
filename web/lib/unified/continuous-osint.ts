@@ -61,6 +61,9 @@ export type ContinuousOsintBundleInput =
   | { kind: "company"; cik: string; query: string }
   | { kind: "repository"; repository: string }
   | { kind: "vulnerability"; cve?: string; vendor?: string; product?: string }
+  | { kind: "network_resource"; resource: string }
+  | { kind: "space_object"; catalogNumber: string }
+  | { kind: "space_weather" }
   | { kind: "macro"; country: string; indicator: string }
   | { kind: "official_source"; sourceId: string }
   | { kind: "dynamic_source"; sourceId: string; path?: string; query?: Record<string, string> };
@@ -130,6 +133,13 @@ const watchSchemas: Record<string, z.ZodType> = {
     language: z.string().trim().min(2).max(12).optional(),
     limit: limitedInt(50, 10).optional(),
   }).strict(),
+  "public-nvd-cve": z.object({ cve: z.string().trim().regex(/^CVE-\\d{4}-\\d{4,}$/i) }).strict(),
+  "public-epss": z.object({ cve: z.string().trim().regex(/^CVE-\\d{4}-\\d{4,}$/i) }).strict(),
+  "public-ripestat-whois": z.object({
+    resource: z.string().trim().min(2).max(80).regex(/^(?:AS\\d{1,10}|(?:\\d{1,3}\\.){3}\\d{1,3}|[0-9a-f:]{2,45})$/i),
+  }).strict(),
+  "public-celestrak-gp": z.object({ catalogNumber: z.string().trim().regex(/^\\d{1,9}$/) }).strict(),
+  "public-noaa-space-weather": z.object({ limit: limitedInt(50, 12).optional() }).strict(),
   "dynamic-public-source": z.object({
     sourceId: z.string().trim().min(3).max(80).regex(/^[a-z0-9][a-z0-9._-]+$/),
     path: z.string().trim().startsWith("/").max(300).optional(),
@@ -151,6 +161,11 @@ const defaultIntervals: Record<string, number> = {
   "public-openalex": 21_600,
   "public-world-bank": 86_400,
   "public-wikidata-search": 21_600,
+  "public-nvd-cve": 21_600,
+  "public-epss": 21_600,
+  "public-ripestat-whois": 21_600,
+  "public-celestrak-gp": 7_200,
+  "public-noaa-space-weather": 900,
   "dynamic-public-source": 3_600,
 };
 
@@ -168,6 +183,11 @@ const inputShapes: Record<string, string> = {
   "public-openalex": "{ query, limit? }",
   "public-world-bank": "{ country, indicator, limit? }",
   "public-wikidata-search": "{ query, language?, limit? }",
+  "public-nvd-cve": "{ cve }",
+  "public-epss": "{ cve }",
+  "public-ripestat-whois": "{ resource: IP|ASN }",
+  "public-celestrak-gp": "{ catalogNumber }",
+  "public-noaa-space-weather": "{ limit? }",
   "dynamic-public-source": "{ sourceId, path?, query? }",
 };
 
@@ -199,7 +219,10 @@ export function listContinuousOsintBundleTemplates() {
     { kind: "topic", label: "Topic intelligence", adapters: ["public-gdelt-news","public-openalex","public-wikidata-search"], inputShape: "{ query }" },
     { kind: "company", label: "Company intelligence", adapters: ["public-sec-edgar","public-gdelt-news","public-wikidata-search"], inputShape: "{ cik, query }" },
     { kind: "repository", label: "Repository intelligence", adapters: ["public-github-repository"], inputShape: "{ repository }" },
-    { kind: "vulnerability", label: "Defensive vulnerability intelligence", adapters: ["public-cisa-kev"], inputShape: "{ cve?, vendor?, product? }" },
+    { kind: "vulnerability", label: "Defensive vulnerability intelligence", adapters: ["public-cisa-kev","public-nvd-cve","public-epss"], inputShape: "{ cve?, vendor?, product? }" },
+    { kind: "network_resource", label: "IP / ASN intelligence", adapters: ["public-ripestat-whois"], inputShape: "{ resource }" },
+    { kind: "space_object", label: "Orbital object intelligence", adapters: ["public-celestrak-gp"], inputShape: "{ catalogNumber }" },
+    { kind: "space_weather", label: "Space weather intelligence", adapters: ["public-noaa-space-weather"], inputShape: "{}" },
     { kind: "macro", label: "Macro indicator intelligence", adapters: ["public-world-bank"], inputShape: "{ country, indicator }" },
     { kind: "official_source", label: "Official source availability", adapters: ["official-public-source-probe"], inputShape: "{ sourceId }" },
     { kind: "dynamic_source", label: "Registered public API/source", adapters: ["dynamic-public-source"], inputShape: "{ sourceId, path?, query? }" },
@@ -244,6 +267,21 @@ export async function createContinuousOsintWatchBundle(input: {
       break;
     case "vulnerability":
       specs.push({adapterId:"public-cisa-kev",input:{cve:input.bundle.cve,vendor:input.bundle.vendor,product:input.bundle.product}});
+      if (input.bundle.cve) {
+        specs.push(
+          {adapterId:"public-nvd-cve",input:{cve:input.bundle.cve}},
+          {adapterId:"public-epss",input:{cve:input.bundle.cve}},
+        );
+      }
+      break;
+    case "network_resource":
+      specs.push({adapterId:"public-ripestat-whois",input:{resource:input.bundle.resource}});
+      break;
+    case "space_object":
+      specs.push({adapterId:"public-celestrak-gp",input:{catalogNumber:input.bundle.catalogNumber},intervalSeconds:7200});
+      break;
+    case "space_weather":
+      specs.push({adapterId:"public-noaa-space-weather",input:{limit:12},intervalSeconds:900});
       break;
     case "macro":
       specs.push({adapterId:"public-world-bank",input:{country:input.bundle.country,indicator:input.bundle.indicator}});
