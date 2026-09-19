@@ -29,9 +29,9 @@ DISHA is a **Constitutional Evidence Operating System**: an evidence-first intel
 
 The product thesis is simple:
 
-\`\`\`text
+```text
 public sources -> signal -> analysis -> policy -> evidence -> reviewable decision
-\`\`\`
+```
 
 A model can help. A data feed can help. An analyst can help. But none of them are allowed to become invisible authority.
 
@@ -85,9 +85,9 @@ DISHA is not limited to one industry. The reusable asset is the **governed intel
 
 The product rule is:
 
-\`\`\`text
+```text
 contract -> policy -> evidence -> test
-\`\`\`
+```
 
 If a capability cannot pass that path, it is not promoted as production behavior.
 
@@ -104,7 +104,7 @@ DISHA intentionally separates **working product**, **partial capability**, and *
 | Governed OSINT adapter bus | ✅ Working | Passive/public adapters with declared purpose, execution class, retry/timeout boundaries, policy checks, and evidence output. |
 | Continuous OSINT watches | ✅ Working | Database-backed watches and runs, worker scheduling, change detection, governed watch bundles, and evidence emission. |
 | Public-source adapters | ✅ Working | Google Public DNS, Certificate Transparency, RDAP, Wayback, GDELT, CISA KEV, GitHub public repository metadata, official-source probes, plus governed dynamic public-source paths. |
-| Intelligence surface | ✅ Working | \`/intelligence\` continuous-source mesh, watch creation, run history, and governed public observation promotion. |
+| Intelligence surface | ✅ Working | `/intelligence` continuous-source mesh, watch creation, run history, and governed public observation promotion. |
 | Geospatial command map | ✅ Working / data-dependent | Real MapLibre runtime and persisted overlays. PostGIS/geospatial import paths exist; authoritative coverage depends on reviewed datasets loaded into the deployment. |
 | Source registry & scheduled ingestion | 🟡 Partial | Registry, source admission, probes, scheduling, persistence and evidence exist; source-specific production parsers and claim publication coverage are still expanding. |
 | Durable mission history | 🟡 Partial | Final mission-result persistence exists; full lifecycle durability, approvals, snapshots, model-call history, and richer case state still need hardening. |
@@ -133,7 +133,7 @@ An operator can create a governed watch for a company, topic, or domain.
 
 For a domain watch, DISHA can route the request through passive/public sources such as DNS, certificate transparency, RDAP, web history, and other approved public adapters.
 
-\`\`\`mermaid
+```mermaid
 flowchart LR
     A[Watch target] --> B[Governed adapter bus]
     B --> C[Passive / public sources]
@@ -142,7 +142,7 @@ flowchart LR
     E --> F[Evidence Ledger v2]
     F --> G[Change detection]
     G --> H[Intelligence graph / review]
-\`\`\`
+```
 
 Each run can preserve:
 
@@ -161,16 +161,16 @@ That makes monitoring useful for more than alerting: it creates a reviewable rec
 
 | Surface | Purpose |
 | --- | --- |
-| \`/dashboard\` | Command view for system posture, source state, evidence, geography, governance and review. |
-| \`/workbench\` | Run a governed mission from question to lenses, policy decision, evidence chain and export. |
-| \`/intelligence\` | Continuous public-source intelligence mesh, governed watches and observation review. |
-| \`/api/v1\` | Versioned API for missions, policy, evidence, sources, extensions, OSINT, readiness and related services. |
+| `/dashboard` | Command view for system posture, source state, evidence, geography, governance and review. |
+| `/workbench` | Run a governed mission from question to lenses, policy decision, evidence chain and export. |
+| `/intelligence` | Continuous public-source intelligence mesh, governed watches and observation review. |
+| `/api/v1` | Versioned API for missions, policy, evidence, sources, extensions, OSINT, readiness and related services. |
 
 ## Core architecture
 
 DISHA presents as one product but keeps strict runtime boundaries.
 
-\`\`\`mermaid
+```mermaid
 flowchart TD
     U[User / API / Workbench] --> S[Typed signal]
     S --> L[Evidence-aware lenses]
@@ -183,7 +183,7 @@ flowchart TD
     X[Governed extensions] --> G
     E --> M[Mission result + provenance]
     M --> R
-\`\`\`
+```
 
 ### Runtime ownership
 
@@ -201,7 +201,7 @@ A DISHA result is designed to answer more than "what did the system conclude?"
 
 It should also answer:
 
-\`\`\`text
+```text
 What was asked?
  -> which sources were used?
  -> which lenses ran?
@@ -210,7 +210,7 @@ What was asked?
  -> which claims are verified?
  -> what remains uncertain?
  -> can the evidence chain still be verified?
-\`\`\`
+```
 
 Evidence Ledger v2 records ordered events with hash-linked integrity fields. Unsupported factual claims are expected to remain marked **[VERIFY REQUIRED]** rather than being upgraded by model confidence or visual polish.
 
@@ -236,76 +236,76 @@ Requirements:
 
 Install and run:
 
-\`\`\`bash
+```bash
 npm install --prefix web
 npm --prefix web run dev
-\`\`\`
+```
 
 Open:
 
-\`\`\`text
+```text
 http://127.0.0.1:3000/workbench
 http://127.0.0.1:3000/dashboard
 http://127.0.0.1:3000/intelligence
-\`\`\`
+```
 
-For local password authentication, configure a strong \`DISHA_JWT_SECRET\` and \`DISHA_DEV_PASSWORD\` as described in \`.env.example\`.
+For local password authentication, configure a strong `DISHA_JWT_SECRET` and `DISHA_DEV_PASSWORD` as described in `.env.example`.
 
 Verify the product:
 
-\`\`\`bash
+```bash
 npm --prefix web run type-check:full
 npm --prefix web test
 npm --prefix web run build
-\`\`\`
+```
 
 Python core verification:
 
-\`\`\`bash
+```bash
 python -m pip install -r disha/brain/requirements.txt pytest
 python -m pytest tests/test_disha_brain_graph.py skills/vyuha-defense-engine/tests
-\`\`\`
+```
 
 Docker development:
 
-\`\`\`bash
+```bash
 docker compose up --build web
-\`\`\`
+```
 
 Full research profile:
 
-\`\`\`bash
+```bash
 docker compose --profile full up --build
-\`\`\`
+```
 
 ## Important API entry points
 
 Base path:
 
-\`\`\`text
+```text
 /api/v1
-\`\`\`
+```
 
 Key routes include:
 
-- \`GET /api/v1/health\`
-- \`POST /api/v1/mission\`
-- \`POST /api/v1/agentic/mission\`
-- \`POST /api/v1/policy/evaluate\`
-- \`GET /api/v1/evidence/{missionId}\`
-- \`POST /api/v1/evidence/export\`
-- \`GET /api/v1/sources/registry\`
-- \`POST /api/v1/sources/probe\`
-- \`GET /api/v1/osint/catalog\`
-- \`POST /api/v1/osint/run\`
-- \`GET /api/v1/osint/watches\`
-- \`POST /api/v1/osint/watches\`
-- \`POST /api/v1/osint/watch-bundles\`
-- \`GET /api/v1/extensions\`
-- \`GET /api/v1/production/readiness\`
-- \`GET /api/dashboard/command\`
+- `GET /api/v1/health`
+- `POST /api/v1/mission`
+- `POST /api/v1/agentic/mission`
+- `POST /api/v1/policy/evaluate`
+- `GET /api/v1/evidence/{missionId}`
+- `POST /api/v1/evidence/export`
+- `GET /api/v1/sources/registry`
+- `POST /api/v1/sources/probe`
+- `GET /api/v1/osint/catalog`
+- `POST /api/v1/osint/run`
+- `GET /api/v1/osint/watches`
+- `POST /api/v1/osint/watches`
+- `POST /api/v1/osint/watch-bundles`
+- `GET /api/v1/extensions`
+- `GET /api/v1/production/readiness`
+- `GET /api/dashboard/command`
 
-See [API_REFERENCE.md](docs/internal/api/API_REFERENCE.md) and the route source under \`web/app/api/v1/\`.
+See [API_REFERENCE.md](docs/internal/api/API_REFERENCE.md) and the route source under `web/app/api/v1/`.
 
 ## Technology stack
 
@@ -350,17 +350,17 @@ See [API_REFERENCE.md](docs/internal/api/API_REFERENCE.md) and the route source 
 
 | Path | Responsibility |
 | --- | --- |
-| \`web/app/\` | Product surfaces and API routes |
-| \`web/lib/unified/\` | Core contracts, orchestration, policy, evidence, sources, OSINT and workflows |
-| \`web/lib/extensions/\` | Governed advanced-capability adapters |
-| \`web/components/geospatial/\` | Operational geospatial UI |
-| \`web/database/\` | Product database migrations and durable state |
-| \`disha/brain/\` | Bounded Python intelligence/research runtime |
-| \`skills/vyuha-defense-engine/\` | Defensive proposal source |
-| \`docs/osint/\` | Governed OSINT design and integration registry |
-| \`docs/internal/\` | Product, architecture, readiness and maintainer documentation |
-| \`docs/archive/\` | Historical material that is not automatically production code |
-| \`web/tests/\` | Product-spine regression tests |
+| `web/app/` | Product surfaces and API routes |
+| `web/lib/unified/` | Core contracts, orchestration, policy, evidence, sources, OSINT and workflows |
+| `web/lib/extensions/` | Governed advanced-capability adapters |
+| `web/components/geospatial/` | Operational geospatial UI |
+| `web/database/` | Product database migrations and durable state |
+| `disha/brain/` | Bounded Python intelligence/research runtime |
+| `skills/vyuha-defense-engine/` | Defensive proposal source |
+| `docs/osint/` | Governed OSINT design and integration registry |
+| `docs/internal/` | Product, architecture, readiness and maintainer documentation |
+| `docs/archive/` | Historical material that is not automatically production code |
+| `web/tests/` | Product-spine regression tests |
 
 ## Production model
 
