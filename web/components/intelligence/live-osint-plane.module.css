@@ -45,3 +45,7 @@
 .spin{animation:spin .9s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}
 @media(max-width:980px){.grid{grid-template-columns:1fr}.statusCluster{justify-content:flex-start}.header{display:grid}.newsList{grid-template-columns:1fr}.searchBar{grid-template-columns:auto minmax(0,1fr);}.searchBar button{grid-column:auto}.refreshButton{grid-column:auto}}
 @media(max-width:640px){.header{padding:14px}.grid{padding:8px}.searchBar{padding:10px 12px;grid-template-columns:auto 1fr}.searchBar button{grid-column:1/-1}.metaLine{padding:8px 12px}.statusBox{min-width:92px}}
+
+.investigation{
+  padding:12px 12px 0;
+}
