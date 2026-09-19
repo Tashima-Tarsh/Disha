@@ -55,6 +55,12 @@ export type CelestrakOutput = {
   }>;
 };
 
+export type ReliefWebInput = { query: string; limit?: number };
+export type ReliefWebOutput = {
+  query: string;
+  reports: Array<{ id?: string; href?: string; title?: string; created?: string; sources: string[] }>;
+};
+
 export type NoaaSpaceWeatherInput = { limit?: number };
 export type NoaaSpaceWeatherOutput = {
   alerts: Array<{
@@ -363,6 +369,78 @@ export function createCelestrakGpAdapter(fetcher: CrossDomainFetchLike = safePub
           summary: `CelesTrak returned ${objects.length} current GP object record(s) for catalog number ${catalogNumber}.`,
         })],
         warnings: objects.length ? [] : ["No CelesTrak GP record returned"],
+      };
+    },
+  };
+}
+
+export function createReliefWebAdapter(
+  fetcher: CrossDomainFetchLike = safePublicFetch,
+  appName = process.env.RELIEFWEB_APPNAME?.trim(),
+): GovernedOsintAdapter<ReliefWebInput, ReliefWebOutput> {
+  return {
+    metadata: {
+      id: "public-reliefweb",
+      name: "ReliefWeb API v2",
+      version: "1.0.0",
+      capability: "humanitarian_public_report_search",
+      auth: "api_key",
+      legalUse: ["Humanitarian situational awareness", "Disaster-response report discovery", "Public report aggregation"],
+      blockedUse: ["Bypassing source copyright or access terms", "Private data acquisition"],
+      rateLimitPerMinute: 20,
+      timeoutMs: 8000,
+      maxRetries: 1,
+      executionClass: "credentialed_public_api",
+    },
+    async health() {
+      return appName
+        ? { status: "healthy" as const, detail: "ReliefWeb approved appname configured" }
+        : { status: "not_configured" as const, detail: "RELIEFWEB_APPNAME is required and must be pre-approved by ReliefWeb" };
+    },
+    async execute(input, context) {
+      ensurePurpose(context);
+      if (!appName) throw new Error("reliefweb_appname_not_configured");
+      const query = input.query.trim().replace(/\s+/g, " ").slice(0, 180);
+      if (!query) throw new Error("invalid_reliefweb_query");
+      const limit = Math.max(1, Math.min(25, Math.trunc(input.limit ?? 10)));
+      const params = new URLSearchParams({
+        appname: appName,
+        "query[value]": query,
+        limit: String(limit),
+        profile: "list",
+        preset: "latest",
+      });
+      const url = `https://api.reliefweb.int/v2/reports?${params.toString()}`;
+      const response = await fetcher(url, { headers: { accept: "application/json" }, signal: context.signal });
+      if (!response.ok) throw new Error(`reliefweb_http_${response.status}`);
+      const body = asRecord(await response.json());
+      const rows = Array.isArray(body.data) ? body.data.slice(0, limit) : [];
+      const reports = rows.map(asRecord).map((row) => {
+        const fields = asRecord(row.fields);
+        const date = asRecord(fields.date);
+        const sourcesValue = Array.isArray(fields.source) ? fields.source : [];
+        const sources = sourcesValue
+          .map(asRecord)
+          .map((source) => text(source.name) ?? text(source.shortname))
+          .filter((item): item is string => Boolean(item))
+          .slice(0, 10);
+        return {
+          id: row.id !== undefined ? String(row.id) : undefined,
+          href: text(row.href),
+          title: text(fields.title),
+          created: text(date.created),
+          sources,
+        };
+      });
+      return {
+        data: { query, reports },
+        evidence: [buildAdapterEvidence({
+          sourceId: "reliefweb-api",
+          sourceName: "ReliefWeb",
+          sourceUrl: url,
+          summary: `ReliefWeb returned ${reports.length} public humanitarian report record(s) for ${query}.`,
+        })],
+        warnings: reports.length ? [] : ["No ReliefWeb reports returned"],
       };
     },
   };
