@@ -3,6 +3,7 @@
 import { AlertTriangle, ExternalLink, RefreshCw, Search, ShieldCheck, Signal, WifiOff } from "lucide-react";
 import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
 
+import { LiveInvestigationGraph } from "./LiveInvestigationGraph";
 import styles from "./live-osint-plane.module.css";
 
 type Brief = {
@@ -102,11 +103,16 @@ export function LiveOsintPlane() {
     };
   }, [state]);
 
+  const pivot = useCallback((value: string) => {
+    const clean = value.trim().replace(/\s+/g, " ").slice(0, 180);
+    if (!clean) return;
+    setQuery(clean);
+    setSubmittedQuery(clean);
+  }, []);
+
   function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const clean = query.trim().replace(/\s+/g, " ").slice(0, 180);
-    if (!clean) return;
-    setSubmittedQuery(clean);
+    pivot(query);
   }
 
   if (state.status === "loading") {
@@ -178,6 +184,16 @@ export function LiveOsintPlane() {
         <span>Query: <strong>{data.query}</strong></span>
         <span>Updated {formatTime(data.generatedAt)}</span>
         <span>{data.notice}</span>
+      </div>
+
+      <div className={styles.investigation}>
+        <LiveInvestigationGraph
+          query={data.query}
+          articles={data.news.articles}
+          vulnerabilities={data.vulnerabilities.items}
+          sources={data.officialSources}
+          onPivot={pivot}
+        />
       </div>
 
       <div className={styles.grid}>
