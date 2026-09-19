@@ -58,6 +58,7 @@ export type ContinuousOsintRun = {
 export type ContinuousOsintBundleInput =
   | { kind: "domain"; domain: string }
   | { kind: "topic"; query: string }
+  | { kind: "humanitarian"; query: string }
   | { kind: "company"; cik: string; query: string }
   | { kind: "repository"; repository: string }
   | { kind: "vulnerability"; cve?: string; vendor?: string; product?: string }
@@ -140,6 +141,7 @@ const watchSchemas: Record<string, z.ZodType> = {
   }).strict(),
   "public-celestrak-gp": z.object({ catalogNumber: z.string().trim().regex(/^\d{1,9}$/) }).strict(),
   "public-noaa-space-weather": z.object({ limit: limitedInt(50, 12).optional() }).strict(),
+  "public-reliefweb": z.object({ query: querySchema, limit: limitedInt(25, 10).optional() }).strict(),
   "dynamic-public-source": z.object({
     sourceId: z.string().trim().min(3).max(80).regex(/^[a-z0-9][a-z0-9._-]+$/),
     path: z.string().trim().startsWith("/").max(300).optional(),
@@ -166,6 +168,7 @@ const defaultIntervals: Record<string, number> = {
   "public-ripestat-whois": 21_600,
   "public-celestrak-gp": 7_200,
   "public-noaa-space-weather": 900,
+  "public-reliefweb": 900,
   "dynamic-public-source": 3_600,
 };
 
@@ -188,6 +191,7 @@ const inputShapes: Record<string, string> = {
   "public-ripestat-whois": "{ resource: IP|ASN }",
   "public-celestrak-gp": "{ catalogNumber }",
   "public-noaa-space-weather": "{ limit? }",
+  "public-reliefweb": "{ query, limit? }",
   "dynamic-public-source": "{ sourceId, path?, query? }",
 };
 
@@ -217,6 +221,7 @@ export function listContinuousOsintBundleTemplates() {
   return [
     { kind: "domain", label: "Domain intelligence", adapters: ["public-dns-google","public-certificate-transparency","public-rdap","public-wayback-cdx","public-common-crawl"], inputShape: "{ domain }" },
     { kind: "topic", label: "Topic intelligence", adapters: ["public-gdelt-news","public-openalex","public-wikidata-search"], inputShape: "{ query }" },
+    { kind: "humanitarian", label: "Humanitarian / disaster intelligence", adapters: ["public-reliefweb","public-gdelt-news"], inputShape: "{ query }" },
     { kind: "company", label: "Company intelligence", adapters: ["public-sec-edgar","public-gdelt-news","public-wikidata-search"], inputShape: "{ cik, query }" },
     { kind: "repository", label: "Repository intelligence", adapters: ["public-github-repository"], inputShape: "{ repository }" },
     { kind: "vulnerability", label: "Defensive vulnerability intelligence", adapters: ["public-cisa-kev","public-nvd-cve","public-epss"], inputShape: "{ cve?, vendor?, product? }" },
@@ -253,6 +258,12 @@ export async function createContinuousOsintWatchBundle(input: {
         { adapterId:"public-gdelt-news", input:{query:input.bundle.query}, intervalSeconds:900 },
         { adapterId:"public-openalex", input:{query:input.bundle.query} },
         { adapterId:"public-wikidata-search", input:{query:input.bundle.query} },
+      );
+      break;
+    case "humanitarian":
+      specs.push(
+        { adapterId:"public-reliefweb", input:{query:input.bundle.query}, intervalSeconds:900 },
+        { adapterId:"public-gdelt-news", input:{query:input.bundle.query}, intervalSeconds:900 },
       );
       break;
     case "company":
