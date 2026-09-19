@@ -92,9 +92,6 @@ jobs:
     name: Supabase Postgres 17 + PostGIS compatibility
     runs-on: ubuntu-latest
     timeout-minutes: 20
-    env:
-      DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:54322/postgres
-
     steps:
       - uses: actions/checkout@v5
 
@@ -111,6 +108,48 @@ jobs:
       - name: Install dependencies
         working-directory: web
         run: npm ci
+
+      - name: Select isolated Supabase database port
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import os
+          import socket
+          from pathlib import Path
+
+          sock = socket.socket()
+          sock.bind(("127.0.0.1", 0))
+          port = sock.getsockname()[1]
+          sock.close()
+
+          config_path = Path("supabase/config.toml")
+          lines = config_path.read_text().splitlines()
+          in_db = False
+          changed = False
+
+          for index, line in enumerate(lines):
+              stripped = line.strip()
+              if stripped.startswith("[") and stripped.endswith("]"):
+                  in_db = stripped == "[db]"
+                  continue
+              if in_db and stripped.startswith("port") and "=" in line:
+                  indent = line[: len(line) - len(line.lstrip())]
+                  lines[index] = f"{indent}port = {port}"
+                  changed = True
+                  break
+
+          if not changed:
+              raise SystemExit("Could not find [db] port in supabase/config.toml")
+
+          config_path.write_text("\n".join(lines) + "\n")
+
+          with open(os.environ["GITHUB_ENV"], "a", encoding="utf-8") as env:
+              env.write(f"SUPABASE_DB_PORT={port}\n")
+              env.write(f"DATABASE_URL=postgresql://postgres:postgres@127.0.0.1:{port}/postgres\n")
+
+          print(f"Selected isolated Supabase DB port {port}")
+          PY
 
       - name: Start Supabase Postgres
         env:
