@@ -47,6 +47,8 @@ The authenticated Intelligence workspace uses the same planner, so the visual qu
 
 - `GET /api/v1/osint/catalog` lists production adapters, adapter health, and reviewed GitHub upstream projects.
 - `GET /api/v1/osint/search?q=<target>` performs governed universal public-source search.
+- `GET /api/v1/osint/sources` searches the OSINT/CTI/SPACEINT source universe.
+- `GET /api/v1/osint/restricted-sources` shows restricted-source governance posture and configuration status without ingesting restricted content.
 - `POST /api/v1/osint/run` executes one governed adapter for a mission and writes the result into Evidence Ledger v2.
 - `GET /api/v1/osint/watches` and `POST /api/v1/osint/watches` manage continuous governed watches.
 - `POST /api/v1/osint/watch-bundles` creates approved multi-source watch bundles.
@@ -109,3 +111,18 @@ The registry includes:
 Every entry is labeled as one of `builtin`, `connector_ready`, `requires_configuration`, `reference_only`, or `blocked_by_default`. Catalog presence never implies that DISHA can call the source without credentials, licensing review, or policy approval.
 
 Credential/breach repositories, leaked-data archives, active-reconnaissance frameworks, and other restricted sources remain non-executable by Universal Search unless a separately reviewed lawful workflow is added.
+
+## Restricted-source governance
+
+`GET /api/v1/osint/restricted-sources` exists for governance and configuration status only. It covers restricted sources such as Distributed Denial of Secrets, WikiLeaks, Intelligence X, and DeHashed without fetching, storing, mirroring, searching, or returning leaked datasets, breach rows, credentials, passwords, tokens, secrets, or private records.
+
+The restricted-source posture records:
+
+- whether an operator approval flag is present,
+- the source's `blocked_by_default` mode and `restricted` risk,
+- permitted governance-only uses,
+- prohibited ingestion/search uses,
+- required legal, mission, audit, retention, and redaction controls,
+- output rules that allow only non-sensitive metadata and references.
+
+Approval flags such as `DISHA_RESTRICTED_SOURCE_DEHASHED_APPROVED=true` are audit metadata only. They do not create an executable adapter and do not allow Universal Search to query restricted sources. A separate, reviewed workflow is required for any lawful, redacted metadata-only use case.
