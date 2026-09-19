@@ -49,6 +49,7 @@ describe("OSINT CTI SPACEINT source universe", () => {
     expect(entries.find((entry) => entry.id === "ripe-stat")?.adapterId).toBe("public-ripestat-whois");
     expect(entries.find((entry) => entry.id === "celestrak")?.adapterId).toBe("public-celestrak-gp");
     expect(entries.find((entry) => entry.id === "noaa-swpc")?.adapterId).toBe("public-noaa-space-weather");
+    expect(entries.find((entry) => entry.id === "reliefweb")?.adapterId).toBe("public-reliefweb");
   });
 
   it("does not normalize sensitive leak and breach sources into ordinary executable connectors", () => {
