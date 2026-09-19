@@ -28,11 +28,22 @@ describe("universal OSINT search planner", () => {
     expect(plan.runs.some((run) => run.adapterId === "public-github-repository")).toBe(true);
   });
 
-  it("recognizes CVEs and uses the defensive CISA catalog", () => {
+  it("recognizes CVEs and fans out across CISA, NVD and EPSS", () => {
     const plan = buildUniversalOsintPlan("cve-2026-12345");
     expect(plan.kind).toBe("cve");
     expect(plan.normalizedTarget).toBe("CVE-2026-12345");
-    expect(plan.runs[0].adapterId).toBe("public-cisa-kev");
+    expect(plan.runs.map((run) => run.adapterId)).toEqual([
+      "public-cisa-kev",
+      "public-nvd-cve",
+      "public-epss",
+      "public-gdelt-news",
+    ]);
+  });
+
+  it("routes humanitarian topics through ReliefWeb and public reporting", () => {
+    const plan = buildUniversalOsintPlan("India flood response");
+    expect(plan.kind).toBe("humanitarian_topic");
+    expect(plan.runs.map((run) => run.adapterId)).toEqual(["public-reliefweb", "public-gdelt-news"]);
   });
 
   it("routes general entities through public graph and reporting sources", () => {
@@ -55,7 +66,28 @@ describe("universal OSINT search planner", () => {
 
   it("classifies valid IPv4 input without accepting impossible octets", () => {
     expect(classifyUniversalOsintQuery("8.8.8.8").kind).toBe("ip");
+    expect(buildUniversalOsintPlan("8.8.8.8").runs.some((run) => run.adapterId === "public-ripestat-whois")).toBe(true);
     expect(classifyUniversalOsintQuery("999.8.8.8").kind).not.toBe("ip");
+  });
+
+  it("routes ASNs into RIPEstat enrichment", () => {
+    const plan = buildUniversalOsintPlan("AS13335");
+    expect(plan.kind).toBe("asn");
+    expect(plan.normalizedTarget).toBe("AS13335");
+    expect(plan.runs[0].adapterId).toBe("public-ripestat-whois");
+  });
+
+  it("routes NORAD catalog identifiers into CelesTrak", () => {
+    const plan = buildUniversalOsintPlan("NORAD 25544");
+    expect(plan.kind).toBe("norad_id");
+    expect(plan.normalizedTarget).toBe("25544");
+    expect(plan.runs[0].adapterId).toBe("public-celestrak-gp");
+  });
+
+  it("routes explicit space-weather queries into NOAA SWPC", () => {
+    const plan = buildUniversalOsintPlan("space weather");
+    expect(plan.kind).toBe("space_weather");
+    expect(plan.runs[0].adapterId).toBe("public-noaa-space-weather");
   });
 
   it("recognizes explicit SEC CIK searches", () => {

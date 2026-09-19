@@ -1,3 +1,11 @@
+import {
+  createCelestrakGpAdapter,
+  createEpssAdapter,
+  createNoaaSpaceWeatherAdapter,
+  createNvdCveAdapter,
+  createRipeStatWhoisAdapter,
+  createReliefWebAdapter,
+} from "./cross-domain-public-adapters";
 import { OsintAdapterBus, type AdapterBusOptions } from "./osint-adapter-bus";
 import { createDynamicPublicSourceAdapter } from "./dynamic-public-source";
 import {
@@ -32,5 +40,11 @@ export function createDefaultOsintBus(options: AdapterBusOptions = {}): OsintAda
   bus.register(createWorldBankAdapter());
   bus.register(createWikidataSearchAdapter());
   bus.register(createDynamicPublicSourceAdapter());
+  bus.register(createNvdCveAdapter());
+  bus.register(createEpssAdapter());
+  bus.register(createRipeStatWhoisAdapter());
+  bus.register(createCelestrakGpAdapter());
+  bus.register(createNoaaSpaceWeatherAdapter());
+  bus.register(createReliefWebAdapter());
   return bus;
 }

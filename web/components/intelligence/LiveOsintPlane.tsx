@@ -47,7 +47,7 @@ type Brief = {
   universal: {
     query: string;
     normalizedTarget: string;
-    kind: "domain" | "ip" | "cve" | "github_repository" | "sec_cik" | "email" | "phone" | "username" | "entity";
+    kind: "domain" | "ip" | "cve" | "asn" | "norad_id" | "space_weather" | "humanitarian_topic" | "github_repository" | "sec_cik" | "email" | "phone" | "username" | "entity";
     executedAdapters: string[];
     blockedCapabilities: string[];
     runs: UniversalRun[];
@@ -222,7 +222,7 @@ export function LiveOsintPlane() {
           value={query}
           onChange={(event) => setQuery(event.target.value)}
           aria-label="Universal public intelligence query"
-          placeholder="Domain, IP, CVE, GitHub repo, CIK, person, company or topic"
+          placeholder="Domain, IP, ASN, CVE, NORAD ID, space weather, GitHub repo, CIK, entity or topic"
         />
         <button type="submit">Run universal search</button>
         <button className={styles.refreshButton} type="button" onClick={() => void load(submittedQuery, true)} disabled={refreshing}>

@@ -20,6 +20,12 @@ The default production bus currently registers:
 - Wikidata Search (public knowledge-graph entity discovery)
 - DISHA Official Public Source Probe (allowlisted government/public sources)
 - DISHA Dynamic Public Source adapter (allowlisted source-registry endpoints)
+- NIST NVD CVE API (official CVE/CVSS enrichment)
+- FIRST EPSS (defensive exploitation-probability scoring)
+- RIPEstat Whois (public IP/ASN registry and routing-registry context)
+- CelesTrak GP (bounded public orbital-element lookup by catalog number)
+- NOAA SWPC alerts (official machine-readable space-weather alerts)
+- ReliefWeb API v2 (humanitarian reports when `RELIEFWEB_APPNAME` is configured)
 
 Every adapter declares purpose, authentication type, legal/blocked uses, timeouts, retry limits, and an execution class. The default bus fails closed for active reconnaissance, identity enumeration, and prohibited execution classes.
 
@@ -32,8 +38,12 @@ The planner classifies the target and chooses only relevant passive/public adapt
 | Target | Default routing |
 | --- | --- |
 | Domain / website | DNS, certificate transparency, RDAP, Wayback, Common Crawl, GDELT |
-| IP address | RDAP, GDELT |
-| CVE | CISA KEV, GDELT |
+| IP address | RDAP, RIPEstat Whois, GDELT |
+| ASN such as `AS13335` | RIPEstat Whois, GDELT |
+| CVE | CISA KEV, NVD, EPSS, GDELT |
+| NORAD/CATNR identifier | CelesTrak GP, GDELT |
+| Space-weather query | NOAA SWPC, GDELT |
+| Humanitarian/disaster topic | ReliefWeb (when configured), GDELT |
 | GitHub repository | GitHub public repository metadata, GDELT |
 | `CIK <number>` | SEC EDGAR, GDELT |
 | Person, company, organisation or topic | Wikidata, OpenAlex, GDELT |
@@ -51,7 +61,7 @@ The authenticated Intelligence workspace uses the same planner, so the visual qu
 - `GET /api/v1/osint/restricted-sources` shows restricted-source governance posture and configuration status without ingesting restricted content.
 - `POST /api/v1/osint/run` executes one governed adapter for a mission and writes the result into Evidence Ledger v2.
 - `GET /api/v1/osint/watches` and `POST /api/v1/osint/watches` manage continuous governed watches.
-- `POST /api/v1/osint/watch-bundles` creates approved multi-source watch bundles.
+- `POST /api/v1/osint/watch-bundles` creates approved multi-source watch bundles, including vulnerability, network-resource, humanitarian, orbital-object, and space-weather watches.
 
 Example single-adapter request body:
 
