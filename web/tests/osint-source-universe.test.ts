@@ -1,0 +1,86 @@
+import { describe, expect, it } from "vitest";
+
+import {
+  getOsintSourceUniverseSummary,
+  listOsintSourceUniverse,
+  searchOsintSourceUniverse,
+} from "../lib/unified/osint-source-universe";
+
+describe("OSINT CTI SPACEINT source universe", () => {
+  it("contains the requested broad source universe", () => {
+    const entries = listOsintSourceUniverse();
+    expect(entries.length).toBeGreaterThanOrEqual(120);
+
+    for (const id of [
+      "osint-framework",
+      "bellingcat-toolkit",
+      "inteltechniques",
+      "wayback",
+      "gdelt",
+      "acled",
+      "opensanctions",
+      "shodan",
+      "virustotal",
+      "nvd",
+      "mitre-attack",
+      "opencti",
+      "space-track",
+      "celestrak",
+      "satnogs",
+      "copernicus-browser",
+      "nasa-firms",
+      "planet",
+      "unoosa-register",
+      "noaa-swpc",
+    ]) {
+      expect(entries.some((entry) => entry.id === id), id).toBe(true);
+    }
+  });
+
+  it("marks existing governed adapters as built in", () => {
+    const entries = listOsintSourceUniverse();
+    expect(entries.find((entry) => entry.id === "wayback")?.adapterId).toBe("public-wayback-cdx");
+    expect(entries.find((entry) => entry.id === "gdelt")?.adapterId).toBe("public-gdelt-news");
+    expect(entries.find((entry) => entry.id === "sec-edgar")?.adapterId).toBe("public-sec-edgar");
+    expect(entries.find((entry) => entry.id === "crtsh")?.adapterId).toBe("public-certificate-transparency");
+    expect(entries.find((entry) => entry.id === "cisa-kev")?.adapterId).toBe("public-cisa-kev");
+  });
+
+  it("does not normalize sensitive leak and breach sources into ordinary executable connectors", () => {
+    const entries = listOsintSourceUniverse();
+    for (const id of ["ddosecrets", "wikileaks", "intelligence-x", "dehashed"]) {
+      const entry = entries.find((item) => item.id === id);
+      expect(entry?.risk).toBe("restricted");
+      expect(entry?.mode).toBe("blocked_by_default");
+    }
+  });
+
+  it("tracks credentialed providers separately from live adapters", () => {
+    const entries = listOsintSourceUniverse();
+    for (const id of ["opensanctions", "shodan", "space-track", "nasa-firms", "opencti"]) {
+      expect(entries.find((entry) => entry.id === id)?.mode).toBe("requires_configuration");
+    }
+  });
+
+  it("supports category and text search for operator discovery", () => {
+    const space = searchOsintSourceUniverse("", "orbital_tracking");
+    expect(space.some((entry) => entry.id === "celestrak")).toBe(true);
+    expect(space.every((entry) => entry.category === "orbital_tracking")).toBe(true);
+
+    const sanctions = searchOsintSourceUniverse("sanctions");
+    expect(sanctions.some((entry) => entry.id === "opensanctions")).toBe(true);
+    expect(sanctions.some((entry) => entry.id === "ofac-sanctions")).toBe(true);
+  });
+
+  it("publishes useful coverage totals", () => {
+    const summary = getOsintSourceUniverseSummary();
+    expect(summary.total).toBeGreaterThanOrEqual(120);
+    expect(summary.builtin).toBeGreaterThanOrEqual(5);
+    expect(summary.connectorReady).toBeGreaterThan(0);
+    expect(summary.requiresConfiguration).toBeGreaterThan(0);
+    expect(summary.blockedByDefault).toBeGreaterThan(0);
+    expect(summary.byCategory.space_weather).toBeGreaterThan(0);
+    expect(summary.byCategory.malware_ioc).toBeGreaterThan(0);
+    expect(summary.byCategory.corporate_financial).toBeGreaterThan(0);
+  });
+});

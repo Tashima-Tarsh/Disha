@@ -34,6 +34,16 @@ type Brief = {
   mode: "evidence-backed" | "live-unpersisted";
   persistenceAvailable: boolean;
   adapterSummary: { total: number; healthy: number; degraded: number; unavailable: number };
+  sourceUniverseSummary: {
+    total: number;
+    builtin: number;
+    connectorReady: number;
+    requiresConfiguration: number;
+    referenceOnly: number;
+    blockedByDefault: number;
+    restricted: number;
+    byCategory: Record<string, number>;
+  };
   universal: {
     query: string;
     normalizedTarget: string;
@@ -195,6 +205,10 @@ export function LiveOsintPlane() {
             <strong>{sourceHealth.online}/{sourceHealth.total}</strong>
             <span>official sources reachable</span>
           </div>
+          <div className={styles.statusBox}>
+            <strong>{data.sourceUniverseSummary.total}</strong>
+            <span>OSINT / CTI / SPACEINT sources</span>
+          </div>
           <div className={data.persistenceAvailable ? styles.persistOn : styles.persistOff}>
             {data.persistenceAvailable ? <ShieldCheck size={14} /> : <AlertTriangle size={14} />}
             {data.persistenceAvailable ? "Evidence persistence on" : "Live / unpersisted"}
@@ -262,6 +276,28 @@ export function LiveOsintPlane() {
           <summary>Execution boundary</summary>
           <div>{data.universal.blockedCapabilities.map((item) => <span key={item}>{item}</span>)}</div>
         </details>
+      </section>
+
+      <section className={styles.sourceUniversePanel} aria-label="OSINT CTI and SPACEINT source universe">
+        <div className={styles.panelHead}>
+          <div><span>SOURCE UNIVERSE</span><strong>OSINT · CTI · SPACEINT coverage registry</strong></div>
+          <small>{data.sourceUniverseSummary.total} cataloged · {data.sourceUniverseSummary.builtin} built in · {data.sourceUniverseSummary.connectorReady} connector-ready</small>
+        </div>
+        <div className={styles.sourceUniverseStats}>
+          {Object.entries(data.sourceUniverseSummary.byCategory).map(([category, count]) => (
+            <div className={styles.sourceUniverseStat} key={category}>
+              <strong>{count}</strong>
+              <span>{category.replace(/_/g, " ")}</span>
+            </div>
+          ))}
+        </div>
+        <div className={styles.sourceUniverseFoot}>
+          <span>{data.sourceUniverseSummary.requiresConfiguration} require credentials/configuration</span>
+          <span>{data.sourceUniverseSummary.referenceOnly} reference-only</span>
+          <span>{data.sourceUniverseSummary.blockedByDefault} blocked by default</span>
+          <span>{data.sourceUniverseSummary.restricted} restricted-risk sources</span>
+          <a href="/api/v1/osint/sources" target="_blank" rel="noreferrer">Open full registry <ExternalLink size={11} /></a>
+        </div>
       </section>
 
       <div className={styles.investigation}>
