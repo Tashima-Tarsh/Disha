@@ -49,3 +49,77 @@
 .investigation{
   padding:12px 12px 0;
 }
+
+.universalPanel{
+  margin:12px 12px 0;
+  border:1px solid rgba(112,193,174,.14);
+  border-radius:15px;
+  background:linear-gradient(180deg,rgba(15,38,45,.72),rgba(8,23,29,.72));
+  overflow:hidden;
+}
+.adapterRail{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+  gap:7px;
+  padding:10px 12px;
+  border-bottom:1px solid rgba(145,181,178,.08);
+}
+.adapterChip{
+  display:grid;
+  grid-template-columns:auto minmax(0,1fr);
+  gap:8px;
+  align-items:center;
+  min-width:0;
+  padding:8px 9px;
+  border:1px solid rgba(145,181,178,.08);
+  border-radius:10px;
+  background:rgba(255,255,255,.018);
+}
+.adapterChip>div{display:grid;gap:2px;min-width:0}
+.adapterChip strong{font-size:.62rem;color:#e5efeb;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.adapterChip small{font-size:.54rem;color:rgba(220,234,231,.40);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.evidenceGrid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(235px,1fr));
+  gap:1px;
+  background:rgba(145,181,178,.07);
+}
+.evidenceCard{
+  min-height:124px;
+  padding:11px 12px;
+  display:grid;
+  align-content:start;
+  gap:8px;
+  background:rgba(7,18,23,.96);
+}
+.evidenceMeta,.evidenceFoot{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  font-size:.55rem;
+}
+.evidenceMeta span:first-child{
+  text-transform:uppercase;
+  letter-spacing:.08em;
+  color:#75c3af;
+  font-weight:800;
+}
+.evidenceMeta span:last-child{color:rgba(220,234,231,.42);text-align:right}
+.evidenceCard p{margin:0;color:rgba(232,242,238,.74);font-size:.64rem;line-height:1.45}
+.evidenceFoot{margin-top:auto;color:rgba(220,234,231,.34)}
+.evidenceFoot code{font:500 .52rem/1.2 ui-monospace,SFMono-Regular,Menlo,monospace;color:rgba(220,234,231,.34)}
+.evidenceFoot a{display:inline-flex;align-items:center;gap:4px;color:#d9bc79;text-decoration:none;white-space:nowrap}
+.guardrails{
+  padding:9px 12px;
+  border-top:1px solid rgba(145,181,178,.08);
+  color:rgba(220,234,231,.46);
+  font-size:.59rem;
+}
+.guardrails summary{cursor:pointer;color:#d6bd7e;font-weight:800}
+.guardrails>div{display:grid;gap:4px;margin-top:7px}
+@media(max-width:640px){
+  .universalPanel{margin:8px 8px 0}
+  .adapterRail{grid-template-columns:1fr}
+  .evidenceGrid{grid-template-columns:1fr}
+}
