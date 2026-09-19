@@ -1,6 +1,6 @@
-# Security Policy
+# disha6.6 Security Policy
 
-DISHA is an evidence-first governance and intelligence project. Security reports should be handled privately, carefully, and without publishing exploit details in public issues.
+disha6.6 is an evidence-first governance and intelligence project. Security reports should be handled privately, carefully, and without publishing exploit details in public issues.
 
 ## Supported Version
 
@@ -13,11 +13,13 @@ DISHA is an evidence-first governance and intelligence project. Security reports
 
 Do not open a public issue for security vulnerabilities.
 
-Use GitHub Security Advisories:
+Use GitHub Security Advisories after the repository rename is completed:
 
 ```text
-https://github.com/Tashima-Tarsh/Disha/security/advisories
+https://github.com/Tashima-Tarsh/disha6.6/security/advisories
 ```
+
+Until GitHub repository settings are renamed, the current repository URL may still redirect from the previous name.
 
 Please include:
 
