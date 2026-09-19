@@ -142,7 +142,7 @@ export function getEnv(): RuntimeEnv {
     throw new Error("DISHA_JWT_SECRET is required in production");
   }
   if (env.NODE_ENV === "production" && !env.DATABASE_URL) {
-    throw new Error("DATABASE_URL is required in production for the persistent Evidence Ledger");
+    console.warn("[env] DATABASE_URL is unavailable; starting the web/auth surface in degraded stateless mode until the persistent database connection is restored.");
   }
   if (env.NODE_ENV === "production" && env.DISHA_AUTH_MODE === "dev-jwt") {
     throw new Error("DISHA_AUTH_MODE=dev-jwt is not allowed in production");
