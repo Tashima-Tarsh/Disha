@@ -6,12 +6,44 @@ import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
 import { LiveInvestigationGraph } from "./LiveInvestigationGraph";
 import styles from "./live-osint-plane.module.css";
 
+type UniversalEvidence = {
+  id: string;
+  adapterId: string;
+  sourceId: string;
+  sourceName: string;
+  sourceUrl?: string;
+  summary: string;
+  retrievedAt: string;
+  provenanceHash: string;
+  evidenceClass: "official" | "registry" | "public_archive" | "public_reporting" | "discovery";
+};
+
+type UniversalRun = {
+  adapterId: string;
+  status: string;
+  durationMs: number;
+  attempts: number;
+  warnings: string[];
+  error?: string;
+  evidence: UniversalEvidence[];
+};
+
 type Brief = {
   generatedAt: string;
   query: string;
   mode: "evidence-backed" | "live-unpersisted";
   persistenceAvailable: boolean;
   adapterSummary: { total: number; healthy: number; degraded: number; unavailable: number };
+  universal: {
+    query: string;
+    normalizedTarget: string;
+    kind: "domain" | "ip" | "cve" | "github_repository" | "sec_cik" | "email" | "phone" | "username" | "entity";
+    executedAdapters: string[];
+    blockedCapabilities: string[];
+    runs: UniversalRun[];
+    evidence: UniversalEvidence[];
+    warnings: string[];
+  };
   news: {
     status: string;
     durationMs: number;
@@ -139,20 +171,25 @@ export function LiveOsintPlane() {
   }
 
   const data = state.data;
+  const successfulRuns = data.universal.runs.filter((run) => run.status === "completed" || run.status === "partial").length;
 
   return (
     <section className={styles.shell} aria-labelledby="live-osint-heading">
       <header className={styles.header}>
         <div>
           <div className={styles.eyebrow}><span /> LIVE PUBLIC INTELLIGENCE</div>
-          <h2 id="live-osint-heading">OSINT operations plane</h2>
-          <p>Real public-source observations from governed adapters. No synthetic incidents or decorative activity.</p>
+          <h2 id="live-osint-heading">DISHA Universal OSINT Search</h2>
+          <p>One query routes through approved public/passive sources, keeps provenance, and exposes exactly which adapters ran.</p>
         </div>
 
         <div className={styles.statusCluster}>
           <div className={styles.statusBox}>
             <strong>{data.adapterSummary.healthy}/{data.adapterSummary.total}</strong>
             <span>adapters healthy</span>
+          </div>
+          <div className={styles.statusBox}>
+            <strong>{successfulRuns}/{data.universal.runs.length}</strong>
+            <span>query adapters returned</span>
           </div>
           <div className={styles.statusBox}>
             <strong>{sourceHealth.online}/{sourceHealth.total}</strong>
@@ -170,10 +207,10 @@ export function LiveOsintPlane() {
         <input
           value={query}
           onChange={(event) => setQuery(event.target.value)}
-          aria-label="Public intelligence query"
-          placeholder="Search live public intelligence"
+          aria-label="Universal public intelligence query"
+          placeholder="Domain, IP, CVE, GitHub repo, CIK, person, company or topic"
         />
-        <button type="submit">Run public query</button>
+        <button type="submit">Run universal search</button>
         <button className={styles.refreshButton} type="button" onClick={() => void load(submittedQuery, true)} disabled={refreshing}>
           <RefreshCw className={refreshing ? styles.spin : undefined} size={15} />
           Refresh
@@ -181,10 +218,51 @@ export function LiveOsintPlane() {
       </form>
 
       <div className={styles.metaLine}>
-        <span>Query: <strong>{data.query}</strong></span>
+        <span>Target: <strong>{data.universal.normalizedTarget}</strong></span>
+        <span>Detected: <strong>{formatKind(data.universal.kind)}</strong></span>
         <span>Updated {formatTime(data.generatedAt)}</span>
         <span>{data.notice}</span>
       </div>
+
+      <section className={styles.universalPanel} aria-label="Universal OSINT query execution">
+        <div className={styles.panelHead}>
+          <div><span>UNIVERSAL QUERY MATRIX</span><strong>Source-by-source execution with provenance</strong></div>
+          <small>{data.universal.evidence.length} evidence record{data.universal.evidence.length === 1 ? "" : "s"}</small>
+        </div>
+
+        <div className={styles.adapterRail}>
+          {data.universal.runs.map((run) => (
+            <div className={styles.adapterChip} key={run.adapterId} title={run.error ?? run.warnings.join(" · ")}>
+              <span className={run.status === "completed" || run.status === "partial" ? styles.dotOn : styles.dotOff} />
+              <div>
+                <strong>{friendlyAdapter(run.adapterId)}</strong>
+                <small>{run.status} · {run.durationMs} ms · {run.evidence.length} evidence</small>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div className={styles.evidenceGrid}>
+          {data.universal.evidence.length ? data.universal.evidence.slice(0, 10).map((item) => (
+            <article className={styles.evidenceCard} key={item.id}>
+              <div className={styles.evidenceMeta}>
+                <span>{item.evidenceClass.replace(/_/g, " ")}</span>
+                <span>{item.sourceName}</span>
+              </div>
+              <p>{item.summary}</p>
+              <div className={styles.evidenceFoot}>
+                <code>{item.provenanceHash.slice(0, 14)}…</code>
+                {item.sourceUrl ? <a href={item.sourceUrl} target="_blank" rel="noreferrer">Open source <ExternalLink size={11} /></a> : null}
+              </div>
+            </article>
+          )) : <Empty text="The governed adapters returned no source-linked evidence for this target." />}
+        </div>
+
+        <details className={styles.guardrails}>
+          <summary>Execution boundary</summary>
+          <div>{data.universal.blockedCapabilities.map((item) => <span key={item}>{item}</span>)}</div>
+        </details>
+      </section>
 
       <div className={styles.investigation}>
         <LiveInvestigationGraph
@@ -268,6 +346,17 @@ export function LiveOsintPlane() {
 
 function Empty({ text }: { text: string }) {
   return <div className={styles.empty}>{text}</div>;
+}
+
+function formatKind(value: Brief["universal"]["kind"]): string {
+  return value.replace(/_/g, " ");
+}
+
+function friendlyAdapter(value: string): string {
+  return value
+    .replace(/^public-/, "")
+    .replace(/-/g, " ")
+    .replace(/\b\w/g, (letter) => letter.toUpperCase());
 }
 
 function formatTime(value: string): string {
