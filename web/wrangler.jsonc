@@ -4,6 +4,13 @@
   "main": "cloudflare-proxy.ts",
   "compatibility_date": "2026-09-12",
   "compatibility_flags": ["nodejs_compat"],
+  "workers_dev": false,
+  "routes": [
+    {
+      "pattern": "disha6.6.thenitishkr.in/*",
+      "zone_name": "thenitishkr.in"
+    }
+  ],
   "observability": {
     "enabled": true
   }
