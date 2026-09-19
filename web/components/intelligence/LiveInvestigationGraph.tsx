@@ -359,7 +359,7 @@ export function LiveInvestigationGraph({
     cy.on("tap", "node", (event) => {
       const node = event.target;
       const now = Date.now();
-      const isDouble = lastTap?.id === node.id() && now - lastTap.at < 420;
+      const isDouble = Boolean(lastTap && lastTap.id === node.id() && now - lastTap.at < 420);
       lastTap = isDouble ? null : { id: node.id(), at: now };
       selectNode(event);
 
