@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getDbPool } from "@/lib/server/db";
 import { withContext } from "@/lib/unified/api";
 import { createDefaultOsintBus } from "@/lib/unified/osint-default-bus";
+import { runUniversalOsintSearch } from "@/lib/unified/universal-osint-search";
 
 export const dynamic = "force-dynamic";
 
@@ -66,16 +67,17 @@ export async function GET(req: NextRequest) {
       signal: req.signal,
     };
 
-    const [health, newsResult, kevResult, ...sourceResults] = await Promise.all([
+    const [health, universal, kevResult, ...sourceResults] = await Promise.all([
       bus.health(),
-      bus.run("public-gdelt-news", { query, maxRecords: 20 }, context),
+      runUniversalOsintSearch(bus, query, context),
       bus.run("public-cisa-kev", { limit: 12 }, context),
       ...OFFICIAL_SOURCES.map((sourceId) =>
         bus.run("official-public-source-probe", { sourceId }, context),
       ),
     ]);
 
-    const newsData = asRecord(newsResult.data);
+    const newsResult = universal.runs.find((run) => run.adapterId === "public-gdelt-news");
+    const newsData = asRecord(newsResult?.data);
     const kevData = asRecord(kevResult.data);
     const articles = Array.isArray(newsData.articles) ? newsData.articles as NewsArticle[] : [];
     const vulnerabilities = Array.isArray(kevData.matched) ? kevData.matched as Vulnerability[] : [];
@@ -90,8 +92,7 @@ export async function GET(req: NextRequest) {
     });
 
     const warnings = [
-      ...newsResult.warnings,
-      ...(newsResult.error ? [newsResult.error] : []),
+      ...universal.warnings,
       ...kevResult.warnings,
       ...(kevResult.error ? [kevResult.error] : []),
       ...sourceResults.flatMap((result) => [
@@ -112,10 +113,11 @@ export async function GET(req: NextRequest) {
         unavailable: health.filter((item) => item.status === "unavailable" || item.status === "not_configured").length,
       },
       health,
+      universal,
       news: {
-        status: newsResult.status,
-        durationMs: newsResult.durationMs,
-        evidence: newsResult.evidence,
+        status: newsResult?.status ?? "failed",
+        durationMs: newsResult?.durationMs ?? 0,
+        evidence: newsResult?.evidence ?? [],
         articles,
       },
       vulnerabilities: {
