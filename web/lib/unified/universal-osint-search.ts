@@ -12,6 +12,7 @@ export type UniversalOsintQueryKind =
   | "asn"
   | "norad_id"
   | "space_weather"
+  | "humanitarian_topic"
   | "github_repository"
   | "sec_cik"
   | "email"
@@ -84,6 +85,10 @@ export function classifyUniversalOsintQuery(value: string): {
 
   if (/^(?:space weather|geomagnetic storm|solar storm|solar flare|aurora forecast|noaa swpc)$/i.test(query)) {
     return { kind: "space_weather", normalizedTarget: query };
+  }
+
+  if (/\b(?:earthquake|flood|cyclone|hurricane|wildfire|disaster|humanitarian|refugee|drought|landslide)\b/i.test(query)) {
+    return { kind: "humanitarian_topic", normalizedTarget: query };
   }
 
   if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(query)) {
@@ -160,6 +165,12 @@ export function buildUniversalOsintPlan(value: string): UniversalOsintPlan {
       runs = [
         { adapterId: "public-noaa-space-weather", input: { limit: 12 }, reason: "Retrieve official NOAA SWPC public alerts." },
         { adapterId: "public-gdelt-news", input: { query: classified.normalizedTarget, maxRecords: 20 }, reason: "Find public reporting about the space-weather event." },
+      ];
+      break;
+    case "humanitarian_topic":
+      runs = [
+        { adapterId: "public-reliefweb", input: { query: classified.normalizedTarget, limit: 10 }, reason: "Search configured ReliefWeb public humanitarian reports." },
+        { adapterId: "public-gdelt-news", input: { query: classified.normalizedTarget, maxRecords: 20 }, reason: "Find current public reporting about the humanitarian topic." },
       ];
       break;
     case "github_repository":
@@ -262,7 +273,7 @@ function evidenceClassForAdapter(adapterId: string): UniversalOsintEvidenceHit["
   if (["public-cisa-kev", "public-sec-edgar", "public-nvd-cve", "public-noaa-space-weather"].includes(adapterId)) return "official";
   if (["public-dns-google", "public-certificate-transparency", "public-rdap", "public-ripestat-whois", "public-github-repository", "public-celestrak-gp"].includes(adapterId)) return "registry";
   if (["public-wayback-cdx", "public-common-crawl"].includes(adapterId)) return "public_archive";
-  if (adapterId === "public-gdelt-news") return "public_reporting";
+  if (["public-gdelt-news", "public-reliefweb"].includes(adapterId)) return "public_reporting";
   return "discovery";
 }
 
