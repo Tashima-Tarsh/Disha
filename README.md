@@ -2,239 +2,278 @@
 
 # DISHA 6.6
 
-### Evidence-first intelligence infrastructure for decisions that must survive scrutiny.
+### Constitutional Evidence Operating System for governed intelligence, OSINT, geospatial command, and reviewable AI.
 
-**Governed OSINT · Policy gates · Tamper-evident provenance · Geospatial intelligence · Human-reviewable AI**
+**Evidence-first intelligence · Governed OSINT · CTI and SPACEINT source universe · Policy gates · Tamper-evident provenance · Human-reviewable automation**
 
 [![Product CI](https://github.com/Tashima-Tarsh/Disha/actions/workflows/ci.yml/badge.svg)](https://github.com/Tashima-Tarsh/Disha/actions/workflows/ci.yml)
 [![CodeQL](https://github.com/Tashima-Tarsh/Disha/actions/workflows/codeql.yml/badge.svg)](https://github.com/Tashima-Tarsh/Disha/actions/workflows/codeql.yml)
+[![Custom Domain Smoke](https://github.com/Tashima-Tarsh/Disha/actions/workflows/edge-smoke.yml/badge.svg)](https://github.com/Tashima-Tarsh/Disha/actions/workflows/edge-smoke.yml)
 ![Version](https://img.shields.io/badge/DISHA-6.6-111827?style=flat-square)
 ![Evidence](https://img.shields.io/badge/evidence-hash--chained-1e6b4a?style=flat-square)
 ![Policy](https://img.shields.io/badge/policy-deny--by--default-d39b1e?style=flat-square)
 ![OSINT](https://img.shields.io/badge/OSINT-passive%20%26%20governed-2563eb?style=flat-square)
 
-[Project site](https://thenitishkr.in/disha/) · [Why DISHA](docs/internal/product/WHY_DISHA.md) · [Architecture](ARCHITECTURE.md) · [API](docs/internal/api/API_REFERENCE.md) · [Roadmap](docs/internal/ROADMAP.md)
-
-![DISHA 6.6 social preview](docs/public/assets/social-preview.svg)
+[Project Site](https://thenitishkr.in/disha/) · [Architecture](ARCHITECTURE.md) · [API Reference](docs/internal/api/API_REFERENCE.md) · [Technical Wiki](docs/wiki/Home.md) · [OSINT Governance](docs/osint/GOVERNED_OSINT_EXPANSION.md)
 
 </div>
 
 ---
 
-> **Most AI systems optimize for producing an answer. DISHA optimizes for producing an answer that can be inspected, challenged, traced to sources, policy-checked, and reviewed by a human.**
+## Executive summary
 
-## What is DISHA?
+DISHA is an evidence-first intelligence platform for teams that need more than a chatbot, dashboard, scraper, or collection script.
 
-DISHA is a **Constitutional Evidence Operating System**: an evidence-first intelligence platform for public-source research, governed OSINT, geospatial analysis, defensive cyber intelligence, public-interest data, and accountable AI-assisted decision support.
+It is designed for situations where a decision must be explainable after the fact:
 
-The product thesis is simple:
+- what was asked;
+- which public or configured sources were used;
+- what the system observed;
+- what a model inferred;
+- what policy allowed, restricted, or blocked;
+- what evidence was written;
+- what still requires human review.
 
-```text
-public sources -> signal -> analysis -> policy -> evidence -> reviewable decision
-```
-
-A model can help. A data feed can help. An analyst can help. But none of them are allowed to become invisible authority.
-
-DISHA keeps the source, the policy decision, the uncertainty, the evidence chain, and the human-review boundary visible.
-
-## Why this matters
-
-Founders and operators already have access to powerful models, APIs, dashboards, search engines, OSINT tools, and data vendors. The harder problem is **trust infrastructure around intelligence**.
-
-When a decision matters, teams eventually have to answer:
-
-- Where did this claim come from?
-- Is the source public, authorized, and still current?
-- What changed since the last observation?
-- Which part came from a model versus a source?
-- What did policy allow, restrict, or deny?
-- Can another reviewer reconstruct the reasoning?
-- Can the system prove that its evidence trail was not silently rewritten?
-
-DISHA is built around those questions.
-
-It is useful where a normal chatbot, dashboard, or collection script is not enough: due diligence, public-record research, defensive cyber operations, regulatory monitoring, policy analysis, audit, civic technology, infrastructure intelligence, investigative research, and AI products that need verifiable provenance.
-
-## Where an entrepreneur can use it
-
-| Business problem | What DISHA provides |
-| --- | --- |
-| **Due diligence & market intelligence** | Governed watches for companies, domains, topics, public news, public web history, registration data, certificates, and repository metadata. |
-| **Regulatory / policy monitoring** | Public-source registry, scheduled source workflows, evidence chains, claim provenance, and explicit verification states. |
-| **Cyber defense** | Passive DNS, certificate transparency, RDAP, CISA KEV, defensive source admission, policy-gated actions, and evidence-backed review. |
-| **Audit & compliance** | Tamper-evident evidence events, policy decisions, source hashes, exportable mission records, and human-review checkpoints. |
-| **Geospatial intelligence** | MapLibre operational map, persisted geospatial layers, PostGIS-oriented data paths, source movement, and geography-linked evidence. |
-| **AI products in high-trust environments** | Governed model adapter where model output remains advisory, logged, and separated from source-backed fact. |
-| **Research / journalism / civic technology** | Traceable public-source missions with uncertainty, source boundaries, claim review, and inspectable evidence. |
-
-DISHA is not limited to one industry. The reusable asset is the **governed intelligence spine** underneath the vertical.
-
-## What makes DISHA different?
-
-| Typical AI / OSINT product | DISHA |
-| --- | --- |
-| Answer first | Evidence first |
-| Model output can look like fact | Model output is advisory and logged |
-| Data appears on a dashboard | Claims retain source and provenance paths |
-| Integrations are connected directly | Integrations enter through governed adapters |
-| Automation executes when technically possible | Policy can allow, restrict, sandbox, escalate, or deny |
-| Monitoring produces alerts | Continuous watches produce evidence-bearing observations and change state |
-| Map layers are presentation | Geography is linked to evidence, source state, and review |
-| Audit is added later | Evidence and policy are part of the runtime contract |
-| More capability is automatically better | Unsupported or unsafe capability remains partial, research-only, or blocked |
-
-The product rule is:
+The product principle is:
 
 ```text
-contract -> policy -> evidence -> test
+source -> observation -> policy -> evidence -> review -> decision
 ```
 
-If a capability cannot pass that path, it is not promoted as production behavior.
+DISHA does not treat model output as evidence. It treats evidence, policy, source provenance, and human review as first-class runtime objects.
 
-## What is actually built today?
+## What DISHA is
 
-DISHA intentionally separates **working product**, **partial capability**, and **research material**.
+DISHA is a **Constitutional Evidence Operating System**. The term means that the product is organized around a small set of enforceable operating rules:
 
-| Area | Status | What exists now |
-| --- | --- | --- |
-| Governed web product and API | ✅ Working | Next.js product, authenticated surfaces, versioned APIs, validation, rate limits, policy gateway, dashboard and workbench. |
-| Evidence Ledger v2 | ✅ Working | Ordered evidence events, payload hashes, previous hashes, event hashes, chain verification, PostgreSQL persistence paths, and export. |
-| Policy Gate | ✅ Working | Deny-by-default decisions for unsafe actions, controlled data, unsupported claims, and prohibited cyber behavior. |
-| Mission orchestration | ✅ Working | Signal normalization, lens routing, fusion, policy evaluation, evidence writing, unified results, and agentic mission flow. |
-| Governed OSINT adapter bus | ✅ Working | Passive/public adapters with declared purpose, execution class, retry/timeout boundaries, policy checks, and evidence output. |
-| Continuous OSINT watches | ✅ Working | Database-backed watches and runs, worker scheduling, change detection, governed watch bundles, and evidence emission. |
-| Public-source adapters | ✅ Working | Google Public DNS, Certificate Transparency, RDAP, Wayback, GDELT, CISA KEV, GitHub public repository metadata, official-source probes, plus governed dynamic public-source paths. |
-| Intelligence surface | ✅ Working | `/intelligence` continuous-source mesh, watch creation, run history, and governed public observation promotion. |
-| Geospatial command map | ✅ Working / data-dependent | Real MapLibre runtime and persisted overlays. PostGIS/geospatial import paths exist; authoritative coverage depends on reviewed datasets loaded into the deployment. |
-| Source registry & scheduled ingestion | 🟡 Partial | Registry, source admission, probes, scheduling, persistence and evidence exist; source-specific production parsers and claim publication coverage are still expanding. |
-| Durable mission history | 🟡 Partial | Final mission-result persistence exists; full lifecycle durability, approvals, snapshots, model-call history, and richer case state still need hardening. |
-| Governed extensions | 🟡 Working / partial | Vyuha Defense, DISHA Brain, Cognitive Engine, Memory/Graph, honeypot evidence, and bounded simulation have governed adapters; some advanced behavior depends on optional research runtimes. |
-| Production identity | 🟡 Partial | Authenticated surfaces and fail-closed production behavior exist; full OIDC/MFA/WebAuthn production validation is not claimed complete. |
-| Investigation / case management | 🚧 Not complete | A full durable case lifecycle is not yet a production feature. |
-| Broad identity/social OSINT | 🔬 Research-gated | Not treated as a production capability until public/authorized source, privacy, licensing, policy, and evidence requirements are met. |
-| DFIR / reverse engineering / high-risk tooling | 🔬 Research-gated | Not a default product capability; requires authorization, isolation, chain-of-custody controls, and explicit promotion. |
-| Disaster recovery, full observability, tenant governance | 🚧 Not complete | Important production-hardening work remains and is tracked as readiness/debt rather than hidden. |
+1. Every material claim should have a source, evidence event, or review state.
+2. Public-source collection must pass through governed adapters.
+3. Unsafe, unlicensed, private, leaked, active, or identity-enumeration sources stay blocked by default.
+4. AI output is advisory unless backed by traceable evidence.
+5. Automation should create reviewable records, not invisible authority.
+6. Production capability must be separated from catalog, research, and future integrations.
 
-### DISHA does **not** claim
+DISHA is built for public-source intelligence, defensive cyber intelligence, policy and regulatory monitoring, geospatial analysis, source watching, evidence packaging, and accountable AI-assisted workflows.
 
-- government affiliation, approval, authority, or legal certification;
-- omniscient or autonomous "super-intelligence";
-- access to private accounts, leaked credentials, hacked datasets, or controlled data;
-- universal live intelligence across every public source;
-- that a model response is evidence;
-- that every directory or research module in this repository is production-ready;
-- that probe-only data is a publishable factual claim.
+## What DISHA is not
 
-That distinction is deliberate. **What is not verified stays visibly unverified.**
+DISHA does **not** claim to be:
 
-## A concrete example: continuous company or domain intelligence
+- a government system, law-enforcement system, or official authority;
+- an autonomous surveillance platform;
+- a leaked-data ingestion product;
+- a credential-harvesting or account-enumeration tool;
+- a system that can legally or technically access every public and private dataset;
+- a product where every cataloged source is automatically executable;
+- a replacement for analyst judgment, legal review, or source verification.
 
-An operator can create a governed watch for a company, topic, or domain.
+This distinction is intentional. DISHA is designed to show what is real, what is configured, what is blocked, and what still needs review.
 
-For a domain watch, DISHA can route the request through passive/public sources such as DNS, certificate transparency, RDAP, web history, and other approved public adapters.
+## Live deployment model
 
-```mermaid
-flowchart LR
-    A[Watch target] --> B[Governed adapter bus]
-    B --> C[Passive / public sources]
-    C --> D[Normalized observation]
-    D --> E{Policy gate}
-    E --> F[Evidence Ledger v2]
-    F --> G[Change detection]
-    G --> H[Intelligence graph / review]
+The current hosted architecture separates the public domain, frontend service, and backend intelligence service.
+
+```text
+Public URL
+  https://disha6.6.thenitishkr.in
+        |
+        v
+Cloudflare Worker edge proxy
+  web/cloudflare-proxy.ts
+        |
+        v
+Render web service
+  https://disha-v6-web.onrender.com
+        |
+        v
+Optional backend / brain service
+  https://disha-v6-brain.onrender.com
 ```
 
-Each run can preserve:
+The Cloudflare Worker route is declared in `web/wrangler.jsonc`. The Worker forwards requests to the Render web origin and adds the `x-disha-edge: cloudflare-render-proxy` header used by the custom-domain smoke workflow.
 
-- the watch and adapter identity;
-- the purpose of collection;
-- input and output hashes;
-- source/evidence metadata;
-- previous and current observation state;
-- whether something materially changed;
-- warnings or collection failure;
-- the evidence event written for the mission.
+Render currently hosts:
 
-That makes monitoring useful for more than alerting: it creates a reviewable record of **what the system knew, from where, and when**.
+| Service | Purpose |
+| --- | --- |
+| `disha-v6-web` | Next.js product, dashboard, workbench, intelligence UI, versioned API routes. |
+| `disha-v6-brain` | Python intelligence/research runtime for bounded backend analysis. |
 
 ## Product surfaces
 
 | Surface | Purpose |
 | --- | --- |
-| `/dashboard` | Command view for system posture, source state, evidence, geography, governance and review. |
-| `/workbench` | Run a governed mission from question to lenses, policy decision, evidence chain and export. |
-| `/intelligence` | Continuous public-source intelligence mesh, governed watches and observation review. |
-| `/api/v1` | Versioned API for missions, policy, evidence, sources, extensions, OSINT, readiness and related services. |
+| `/dashboard` | System posture, evidence, geospatial state, source state, readiness, and command overview. |
+| `/workbench` | Mission-oriented analyst workflow from question to source routing, policy, evidence, and result. |
+| `/intelligence` | Continuous OSINT and public-source watch surface with run history and observations. |
+| `/login` | Authenticated entry point. |
+| `/api/v1/*` | Versioned product API for missions, evidence, policy, OSINT, source registry, readiness, and extensions. |
 
 ## Core architecture
 
-DISHA presents as one product but keeps strict runtime boundaries.
-
 ```mermaid
 flowchart TD
-    U[User / API / Workbench] --> S[Typed signal]
-    S --> L[Evidence-aware lenses]
-    P[Registered public sources] --> L
-    O[Governed OSINT + watches] --> L
-    L --> F[Fusion + uncertainty]
-    F --> G{Policy Gate}
-    G -->|allow / read-only / sandbox| E[Evidence Ledger v2]
-    G -->|confirm / deny| R[Human review]
-    X[Governed extensions] --> G
-    E --> M[Mission result + provenance]
-    M --> R
+    U[User / API / Workbench] --> Q[Typed signal]
+    Q --> R[Mission router]
+    R --> L[Evidence-aware lenses]
+    S[Source registry] --> L
+    O[Governed OSINT adapter bus] --> L
+    W[Continuous watches] --> O
+    L --> F[Fusion and uncertainty]
+    F --> P{Policy Gate}
+    P -->|allow / read-only / sandbox| E[Evidence Ledger v2]
+    P -->|restrict / deny / review| H[Human review boundary]
+    X[Governed extensions] --> P
+    E --> V[Verifiable result]
+    V --> H
 ```
 
 ### Runtime ownership
 
-- **TypeScript / Next.js** owns the browser product, API contracts, sessions, policy decisions, evidence presentation, OSINT control plane, and user-visible mission flow.
-- **PostgreSQL / PostGIS** owns durable structured product data and geospatial persistence paths where configured.
-- **Redis / Key Value** supports runtime workflow infrastructure where configured.
-- **Python** owns bounded intelligence/research services such as Brain and governed advanced analysis.
-- **Extensions** cannot bypass the policy gate or Evidence Ledger.
+| Runtime | Responsibility |
+| --- | --- |
+| Next.js / TypeScript | Product UI, API routes, policy gateway, evidence views, source registry, OSINT control plane, workflows. |
+| PostgreSQL / PostGIS paths | Durable missions, evidence, source state, watch records, geospatial persistence where configured. |
+| Redis / KV paths | Runtime workflow infrastructure where configured. |
+| Python Brain | Bounded intelligence and research services behind governed interfaces. |
+| Cloudflare Worker | Public custom-domain edge proxy to the Render web service. |
+| Render | Hosted web and backend services. |
 
-Read [ARCHITECTURE.md](ARCHITECTURE.md) before changing the core.
+## What is built now
 
-## Evidence is the product primitive
+DISHA separates production capability, configured capability, cataloged sources, and blocked research areas.
 
-A DISHA result is designed to answer more than "what did the system conclude?"
+| Area | Status | Current implementation |
+| --- | --- | --- |
+| Product shell | Working | Next.js product with dashboard, workbench, intelligence surface, API routes, authentication path, and command UI. |
+| Evidence Ledger v2 | Working | Hash-linked events, previous hash, event hash, payload hash, export path, and verification-oriented records. |
+| Policy Gate | Working | Deny-by-default policy decisions for unsafe, unsupported, controlled, or prohibited behavior. |
+| Mission orchestration | Working | Signal normalization, lens routing, policy evaluation, evidence writing, and result packaging. |
+| Governed OSINT bus | Working | Passive/public-source adapters with declared execution class, purpose, retry/timeout, and evidence output. |
+| Universal OSINT Search | Working | Classifies domains, IPs, CVEs, GitHub repositories, SEC CIKs, emails, phones, usernames, and entities; routes only to allowed adapters. |
+| Continuous OSINT watches | Working | Watch records, run records, change detection, source bundles, and evidence-bearing observations. |
+| OSINT / CTI / SPACEINT source universe | Working catalog | 120+ master directories, public sources, CTI sources, SPACEINT sources, and discovery overlays with access and risk metadata. |
+| Restricted-source governance | Working governance surface | DDoSecrets, WikiLeaks, Intelligence X, and DeHashed are visible for governance but non-executable and blocked from ingestion. |
+| Service connector posture | Working control plane | OpenCTI and IntelOwl are live-configurable service connectors; SpiderFoot, Sherlock, and Maigret are registered but policy-blocked by default. |
+| Geospatial command map | Working / data-dependent | MapLibre-oriented UI and persistence paths; authoritative boundary quality depends on reviewed datasets loaded into deployment. |
+| Cloudflare custom domain | Working in smoke CI | Custom-domain smoke verifies public edge and login behavior. DNS propagation remains an operator/domain concern. |
+| Full case management | In progress | Durable case lifecycle, approvals, evidence packages, and richer analyst workflows still need hardening. |
+| Full production identity | In progress | Authenticated product exists; full OIDC/MFA/WebAuthn production posture is not claimed complete. |
+| Disaster recovery and observability | In progress | CI and readiness checks exist; complete DR/SLO/tenant governance are future hardening items. |
 
-It should also answer:
+## OSINT, CTI, and SPACEINT model
+
+DISHA has two separate layers:
+
+1. **Source universe** — a searchable catalog of sources, directories, datasets, platforms, and discovery locations.
+2. **Execution adapters** — reviewed runtime adapters that DISHA is allowed to call.
+
+A source can be cataloged without being executable. This prevents the product from pretending that a linked tool, leak site, paid API, identity-enumeration tool, or active-recon framework is automatically safe to run.
+
+### Source universe examples
+
+The source universe includes:
+
+- OSINT Framework, Bellingcat Toolkit, Start.me pages, IntelTechniques, Awesome OSINT lists, OSINT Map, and GitHub topic discovery;
+- search and archives such as Wayback, archive.today, GHDB, reverse-image workflows;
+- media verification, geolocation, conflict and humanitarian event sources;
+- corporate, financial, sanctions, public-record, and transparency sources;
+- CTI sources such as Shodan, Censys, VirusTotal, abuse.ch, OTX, URLScan, MISP, NVD, CVE, CISA KEV, EPSS, MITRE ATT&CK, Malpedia, ransomware trackers;
+- SPACEINT sources such as Space-Track, CelesTrak, SatNOGS, UCS, McDowell catalog, Copernicus/Sentinel, Landsat, NASA Worldview, FIRMS, Planet, Maxar, UNOOSA, ITU, NOAA SWPC, and launch warning sources.
+
+### Execution modes
+
+Every source is classified as one of:
+
+| Mode | Meaning |
+| --- | --- |
+| `builtin` | DISHA has a governed production adapter. |
+| `connector_ready` | Safe candidate for a bounded adapter. |
+| `requires_configuration` | Requires API keys, credentials, license review, or service deployment. |
+| `reference_only` | Analyst discovery/reference only. |
+| `blocked_by_default` | Not executable by Universal Search or default runtime. |
+
+### Built-in public-source adapters
+
+Current governed adapters include:
+
+- Google Public DNS-over-HTTPS;
+- crt.sh Certificate Transparency;
+- RDAP.org;
+- Internet Archive Wayback CDX;
+- Common Crawl;
+- GDELT DOC;
+- CISA Known Exploited Vulnerabilities;
+- GitHub public repository metadata;
+- SEC EDGAR submissions;
+- OpenAlex;
+- World Bank;
+- Wikidata search;
+- official public-source probes;
+- dynamic public-source adapter for allowlisted registries.
+
+### Service connectors
+
+`GET /api/v1/osint/service-connectors` reports connector posture for:
+
+| Connector | Runtime status |
+| --- | --- |
+| OpenCTI | Live only when `OPENCTI_BASE_URL` and `OPENCTI_TOKEN` are configured. |
+| IntelOwl | Live only when `INTELOWL_BASE_URL` and `INTELOWL_API_KEY` are configured. |
+| SpiderFoot | Registered but not executable until a reviewed passive-only module profile exists. |
+| Sherlock | Registered but blocked by identity-enumeration policy. |
+| Maigret | Registered but blocked by identity-enumeration policy. |
+
+### Restricted-source governance
+
+`GET /api/v1/osint/restricted-sources` exists for governance status only. It does not fetch, store, mirror, search, or return leaked datasets, breach rows, passwords, tokens, secrets, private records, or credential material.
+
+Restricted sources remain visible so an operator can document risk, legal review, and approval state without turning them into executable ingestion adapters.
+
+## API map
+
+Base path:
 
 ```text
-What was asked?
- -> which sources were used?
- -> which lenses ran?
- -> what did the model contribute?
- -> what policy decision was made?
- -> which claims are verified?
- -> what remains uncertain?
- -> can the evidence chain still be verified?
+/api/v1
 ```
 
-Evidence Ledger v2 records ordered events with hash-linked integrity fields. Unsupported factual claims are expected to remain marked **[VERIFY REQUIRED]** rather than being upgraded by model confidence or visual polish.
+Important routes:
 
-## Safety and source boundary
-
-DISHA's OSINT design is intentionally **passive/public by default**.
-
-Allowed production patterns include public records, official feeds, public DNS and registration metadata, public certificate data, public web archives, public news discovery, defensive vulnerability information, and other explicitly admitted sources.
-
-The default product does not turn public-source tooling into credential harvesting, authentication bypass, exploit delivery, private-account access, covert tracking, or leaked-data ingestion.
-
-This is not a limitation hidden from the architecture. It is part of the architecture.
+| Route | Purpose |
+| --- | --- |
+| `GET /api/v1/health` | Service health. |
+| `POST /api/v1/mission` | Run a governed mission. |
+| `POST /api/v1/agentic/mission` | Agentic mission flow through policy and evidence. |
+| `POST /api/v1/policy/evaluate` | Evaluate a policy decision. |
+| `GET /api/v1/evidence/{missionId}` | Read evidence for a mission. |
+| `POST /api/v1/evidence/export` | Export evidence. |
+| `GET /api/v1/sources/registry` | Source registry. |
+| `POST /api/v1/sources/probe` | Probe admitted public sources. |
+| `GET /api/v1/osint/catalog` | Adapter catalog, GitHub tool catalog, source universe, and continuous capabilities. |
+| `GET /api/v1/osint/search?q=<target>` | Governed universal OSINT search. |
+| `GET /api/v1/osint/sources` | Search OSINT / CTI / SPACEINT source universe. |
+| `GET /api/v1/osint/service-connectors` | OpenCTI, IntelOwl, SpiderFoot, Sherlock, Maigret connector posture. |
+| `GET /api/v1/osint/restricted-sources` | Restricted-source governance posture only. |
+| `POST /api/v1/osint/run` | Run one governed OSINT adapter for a mission. |
+| `GET /api/v1/osint/watches` | List continuous OSINT watches. |
+| `POST /api/v1/osint/watches` | Create a watch. |
+| `POST /api/v1/osint/watch-bundles` | Create multi-source watch bundles. |
+| `GET /api/v1/extensions` | Governed extension registry. |
+| `GET /api/v1/production/readiness` | Production readiness posture. |
 
 ## Quick start
 
-Requirements:
+### Requirements
 
 - Node.js 22.x
 - npm
-- PostgreSQL for durable production data
-- optional Redis/Key Value for workflow infrastructure
-- optional Python runtime for governed research extensions
+- PostgreSQL for durable production state
+- optional PostGIS for geospatial persistence
+- optional Redis / KV for workflow infrastructure
+- optional Python runtime for Brain and research extensions
 
-Install and run:
+### Run the web product locally
 
 ```bash
 npm install --prefix web
@@ -244,14 +283,13 @@ npm --prefix web run dev
 Open:
 
 ```text
-http://127.0.0.1:3000/workbench
+http://127.0.0.1:3000/login
 http://127.0.0.1:3000/dashboard
+http://127.0.0.1:3000/workbench
 http://127.0.0.1:3000/intelligence
 ```
 
-For local password authentication, configure a strong `DISHA_JWT_SECRET` and `DISHA_DEV_PASSWORD` as described in `.env.example`.
-
-Verify the product:
+### Verify the product
 
 ```bash
 npm --prefix web run type-check:full
@@ -259,14 +297,14 @@ npm --prefix web test
 npm --prefix web run build
 ```
 
-Python core verification:
+### Verify Python components
 
 ```bash
 python -m pip install -r disha/brain/requirements.txt pytest
 python -m pytest tests/test_disha_brain_graph.py skills/vyuha-defense-engine/tests
 ```
 
-Docker development:
+### Docker development
 
 ```bash
 docker compose up --build web
@@ -278,162 +316,99 @@ Full research profile:
 docker compose --profile full up --build
 ```
 
-## Important API entry points
+## Environment configuration
 
-Base path:
+Common variables include:
 
-```text
-/api/v1
-```
+| Variable | Purpose |
+| --- | --- |
+| `DISHA_JWT_SECRET` | Signs application sessions. Required for production. |
+| `DISHA_DEV_PASSWORD` | Local/dev password path. Use a strong value. |
+| `DATABASE_URL` | PostgreSQL connection string. |
+| `REDIS_URL` | Optional Redis/workflow infrastructure. |
+| `DISHA_INTERNAL_WEB_URL` | Internal URL used by dynamic worker/runtime paths. |
+| `OPENCTI_BASE_URL` / `OPENCTI_TOKEN` | Optional OpenCTI service connector. |
+| `INTELOWL_BASE_URL` / `INTELOWL_API_KEY` | Optional IntelOwl service connector. |
+| `CLOUDFLARE_API_TOKEN` / `CLOUDFLARE_ACCOUNT_ID` | Optional GitHub Actions deployment of Cloudflare Worker. |
 
-Key routes include:
-
-- `GET /api/v1/health`
-- `POST /api/v1/mission`
-- `POST /api/v1/agentic/mission`
-- `POST /api/v1/policy/evaluate`
-- `GET /api/v1/evidence/{missionId}`
-- `POST /api/v1/evidence/export`
-- `GET /api/v1/sources/registry`
-- `POST /api/v1/sources/probe`
-- `GET /api/v1/osint/catalog`
-- `POST /api/v1/osint/run`
-- `GET /api/v1/osint/watches`
-- `POST /api/v1/osint/watches`
-- `POST /api/v1/osint/watch-bundles`
-- `GET /api/v1/extensions`
-- `GET /api/v1/production/readiness`
-- `GET /api/dashboard/command`
-
-See [API_REFERENCE.md](docs/internal/api/API_REFERENCE.md) and the route source under `web/app/api/v1/`.
-
-## Technology stack
-
-**Frontend / product runtime**
-
-- Next.js 16
-- React 19
-- TypeScript 6
-- MapLibre GL + react-map-gl
-- deck.gl
-- Cytoscape
-- Framer Motion
-- Zustand / SWR
-- Zod
-
-**Data / runtime**
-
-- PostgreSQL
-- PostGIS-oriented geospatial schema and imports
-- Redis / Key Value
-- durable workflow worker
-- hashed evidence and provenance records
-
-**Research / intelligence**
-
-- Python DISHA Brain
-- governed extension contracts
-- graph and memory source material
-- defensive Vyuha adapter
-- bounded simulation adapters
-
-**Quality / security**
-
-- Vitest
-- TypeScript full checks
-- Product CI
-- CodeQL
-- database migration verification
-- policy and evidence regression tests
+Do not commit secrets. Configure deployment secrets through the hosting provider and GitHub Actions secrets.
 
 ## Repository map
 
 | Path | Responsibility |
 | --- | --- |
-| `web/app/` | Product surfaces and API routes |
-| `web/lib/unified/` | Core contracts, orchestration, policy, evidence, sources, OSINT and workflows |
-| `web/lib/extensions/` | Governed advanced-capability adapters |
-| `web/components/geospatial/` | Operational geospatial UI |
-| `web/database/` | Product database migrations and durable state |
-| `disha/brain/` | Bounded Python intelligence/research runtime |
-| `skills/vyuha-defense-engine/` | Defensive proposal source |
-| `docs/osint/` | Governed OSINT design and integration registry |
-| `docs/internal/` | Product, architecture, readiness and maintainer documentation |
-| `docs/archive/` | Historical material that is not automatically production code |
-| `web/tests/` | Product-spine regression tests |
+| `web/app/` | Product pages and API routes. |
+| `web/lib/unified/` | Core contracts, orchestration, policy, evidence, source registry, OSINT, watches, service connectors. |
+| `web/lib/extensions/` | Governed extension adapters. |
+| `web/components/` | Product UI components including intelligence and geospatial surfaces. |
+| `web/database/` | Database migrations and persistence schemas. |
+| `web/tests/` | TypeScript/Vitest regression tests. |
+| `disha/brain/` | Python Brain service. |
+| `skills/vyuha-defense-engine/` | Defensive-intelligence source package and tests. |
+| `docs/osint/` | Governed OSINT design and integration guidance. |
+| `docs/wiki/` | In-repository technical wiki. |
+| `docs/internal/` | Product, architecture, roadmap, API, and readiness docs. |
+| `.github/workflows/` | CI, CodeQL, DB migration verification, Cloudflare edge deploy, custom-domain smoke. |
 
-## Production model
+## Engineering rule for new capability
 
-The active deployment path is designed for:
+A new capability is not production-ready because it exists in a repo, appears in a list, or can be called from code.
 
-- Next.js web application;
-- PostgreSQL with pgvector / geospatial capability where configured;
-- Redis / Key Value;
-- durable workflow execution;
-- governed DISHA Brain service;
-- server-side secrets;
-- fail-closed production authentication and configuration.
+To promote a capability into DISHA production, it must satisfy:
 
-See [GitHub + Render Production](docs/production/GITHUB_RENDER_DEPLOYMENT.md).
+```text
+contract -> policy -> evidence -> test -> documentation
+```
 
-## Roadmap: what would make DISHA materially stronger
+The minimum review checklist is:
 
-The highest-value next steps are not "add more AI."
+1. Define the capability and allowed purpose.
+2. Declare source, license, terms, and access requirements.
+3. Classify execution behavior: passive, credentialed API, active recon, identity enumeration, restricted, or prohibited.
+4. Add policy handling before runtime execution.
+5. Add timeouts, retries, input validation, and result limits.
+6. Convert outputs into evidence/provenance records.
+7. Add tests proving both allowed and blocked behavior.
+8. Update API/docs/readiness status.
 
-They are:
+## Current production posture
 
-1. complete parser-backed ingestion and claim-level provenance for more registered public sources;
-2. finish durable mission/case lifecycle persistence;
-3. harden production OIDC/MFA/WebAuthn identity;
-4. deepen entity resolution, timeline and graph workflows with human verification;
-5. improve observability, tenant isolation, retention controls and disaster recovery;
-6. publish a safe, source-verified public demo;
-7. standardize the repository license for broad open-source adoption.
-
-The project keeps these gaps visible because credibility is more valuable than a larger feature count.
-
-## Why star DISHA?
-
-Star this repository if you are interested in any of these problems:
-
-- accountable AI;
-- governed agents;
-- explainable intelligence workflows;
-- evidence-first OSINT;
-- public-interest technology;
-- geospatial evidence;
-- auditability and provenance;
-- safer model/tool orchestration;
-- digital public infrastructure;
-- research systems where "show me the source" is a product requirement.
-
-A star is useful, but contributions that improve **contracts, policy, evidence, testing, public-source adapters, provenance, and production hardening** are even more valuable.
-
-Read [CONTRIBUTING.md](CONTRIBUTING.md) before opening a pull request.
+| System | Status |
+| --- | --- |
+| Product CI | Active. |
+| CodeQL | Active. |
+| Database migration verification | Active. |
+| Cloudflare custom-domain smoke | Active. |
+| Render web service | Active deployment target. |
+| Render brain service | Active deployment target. |
+| Cloudflare Worker proxy | Configured in repo; deploy depends on Cloudflare credentials or external integration. |
+| Source universe | Active catalog. |
+| Live OSINT execution | Passive/public by default. |
+| Restricted sources | Governance-only, non-executable. |
+| Identity enumeration | Blocked by default. |
+| Active reconnaissance | Blocked by default unless separately reviewed and sandboxed. |
 
 ## Documentation
 
+Start here:
+
+- [Technical Wiki](docs/wiki/Home.md)
 - [Architecture](ARCHITECTURE.md)
-- [Why DISHA](docs/internal/product/WHY_DISHA.md)
-- [Governed OSINT Expansion](docs/osint/GOVERNED_OSINT_EXPANSION.md)
-- [Evidence Chain Explorer](docs/internal/product/EVIDENCE_CHAIN_EXPLORER.md)
-- [Implementation Gap Matrix](docs/implementation-gap-matrix.md)
 - [API Reference](docs/internal/api/API_REFERENCE.md)
+- [Governed OSINT Expansion](docs/osint/GOVERNED_OSINT_EXPANSION.md)
 - [Roadmap](docs/internal/ROADMAP.md)
-- [Security](SECURITY.md)
-- [Contributing](CONTRIBUTING.md)
-- [Changelog](CHANGELOG.md)
 
-## License
+## Operating philosophy
 
-The repository currently uses a placeholder / non-standard license and GitHub detects it as **Other**.
+DISHA is built for responsible intelligence work.
 
-Until the owner selects and commits a standard license, do not assume broad reuse rights. For an open-source growth phase, choosing an explicit license such as Apache-2.0 or MIT is an important release decision.
+The product is strongest when it keeps uncomfortable distinctions visible:
 
----
+- known versus inferred;
+- sourced versus unsourced;
+- public versus restricted;
+- configured versus cataloged;
+- automated versus human-reviewed;
+- evidence versus model output.
 
-<div align="center">
-
-**DISHA is not trying to make intelligence look certain. It is trying to make intelligence accountable.**
-
-</div>
+The goal is not to make an intelligence system look powerful. The goal is to make it **auditable, governable, and useful when the answer matters**.
