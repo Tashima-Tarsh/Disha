@@ -4,6 +4,7 @@ import {
   createNoaaSpaceWeatherAdapter,
   createNvdCveAdapter,
   createRipeStatWhoisAdapter,
+  createReliefWebAdapter,
 } from "./cross-domain-public-adapters";
 import { OsintAdapterBus, type AdapterBusOptions } from "./osint-adapter-bus";
 import { createDynamicPublicSourceAdapter } from "./dynamic-public-source";
@@ -44,5 +45,6 @@ export function createDefaultOsintBus(options: AdapterBusOptions = {}): OsintAda
   bus.register(createRipeStatWhoisAdapter());
   bus.register(createCelestrakGpAdapter());
   bus.register(createNoaaSpaceWeatherAdapter());
+  bus.register(createReliefWebAdapter());
   return bus;
 }
