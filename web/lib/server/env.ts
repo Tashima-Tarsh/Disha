@@ -26,6 +26,7 @@ const envSchema = z.object({
   NEXT_PUBLIC_APP_URL: z.string().url().optional(),
   DISHA_WEB_RATE_LIMIT: z.coerce.number().int().positive().default(120),
   DISHA_EVIDENCE_LEDGER_MODE: z.enum(["postgres", "memory-dev"]).optional(),
+  DISHA_ALLOW_STATELESS_AUTH: z.enum(["true", "false"]).default("false"),
   DISHA_AGENT_MODE: z.enum(["eco", "balanced", "deep"]).default("balanced"),
   DISHA_AGENT_INPUT_BUDGET_TOKENS: z.coerce.number().int().positive().default(8_000),
   DISHA_AGENT_CACHE_TTL_SECONDS: z.coerce.number().int().positive().default(3600),
@@ -93,6 +94,7 @@ export function getEnv(): RuntimeEnv {
       NEXT_PUBLIC_APP_URL: "https://disha.your-production-domain.com",
       DISHA_WEB_RATE_LIMIT: 120,
       DISHA_EVIDENCE_LEDGER_MODE: "memory-dev",
+      DISHA_ALLOW_STATELESS_AUTH: "false",
       DISHA_AGENT_MODE: "balanced",
       DISHA_AGENT_INPUT_BUDGET_TOKENS: 8000,
       DISHA_AGENT_CACHE_TTL_SECONDS: 3600,
@@ -142,7 +144,10 @@ export function getEnv(): RuntimeEnv {
     throw new Error("DISHA_JWT_SECRET is required in production");
   }
   if (env.NODE_ENV === "production" && !env.DATABASE_URL) {
-    console.warn("[env] DATABASE_URL is unavailable; starting the web/auth surface in degraded stateless mode until the persistent database connection is restored.");
+    if (env.DISHA_ALLOW_STATELESS_AUTH !== "true") {
+      throw new Error("DATABASE_URL is required in production for the persistent Evidence Ledger");
+    }
+    console.warn("[env] DATABASE_URL is unavailable; explicit DISHA_ALLOW_STATELESS_AUTH=true keeps only the web/auth surface available in degraded stateless mode.");
   }
   if (env.NODE_ENV === "production" && env.DISHA_AUTH_MODE === "dev-jwt") {
     throw new Error("DISHA_AUTH_MODE=dev-jwt is not allowed in production");
