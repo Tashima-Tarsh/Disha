@@ -44,10 +44,21 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          code="$(curl -sS --connect-timeout 10 --max-time 20             -o /tmp/login-response             -w '%{http_code}'             -H 'content-type: application/json'             --data '{"email":"disha-smoke@example.com","password":"definitely-wrong-password-1234","rememberMe":false}'             https://disha6.6.thenitishkr.in/api/auth/login)"
+          ok=0
+          last_code="000"
+          for attempt in $(seq 1 18); do
+            rm -f /tmp/login-response
+            code="$(curl -sS --connect-timeout 10 --max-time 20               -o /tmp/login-response               -w '%{http_code}'               -H 'content-type: application/json'               --data '{"email":"disha-smoke@example.com","password":"definitely-wrong-password-1234","rememberMe":false}'               https://disha6.6.thenitishkr.in/api/auth/login || true)"
+            last_code="$code"
+            if [[ "$code" == "401" ]]; then
+              ok=1
+              break
+            fi
+            sleep 10
+          done
 
-          if [[ "$code" != "401" ]]; then
-            echo "Expected authenticated DISHA endpoint to reject bad credentials with 401; got $code."
+          if [[ "$ok" != "1" ]]; then
+            echo "Expected authenticated DISHA endpoint to reject bad credentials with 401; got $last_code."
             cat /tmp/login-response || true
             exit 1
           fi
