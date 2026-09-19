@@ -3,8 +3,8 @@ import type { Metadata } from "next";
 import { LoginClient } from "./login-client";
 
 export const metadata: Metadata = {
-  title: "Secure Access | DISHA 6.6",
-  description: "DISHA 6.6 secure identity and administrator access gateway.",
+  title: "Secure Access | disha6.6",
+  description: "disha6.6 secure identity and administrator access gateway.",
 };
 
 type LoginPageProps = {
