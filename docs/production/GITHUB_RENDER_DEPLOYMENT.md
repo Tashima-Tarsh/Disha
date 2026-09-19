@@ -1,21 +1,30 @@
-# GitHub + Render Production
+# disha6.6 GitHub + Render Production
 
-The active source of truth is `Tashima-Tarsh/Disha` on GitHub. Render auto-deploys the `main` branch.
+The active source repository is being branded as `Tashima-Tarsh/disha6.6`. Render auto-deploys the `main` branch from the connected GitHub repository.
 
 ## Runtime
 
-- Next.js web application
-- Durable scheduler/workflow worker (started with the web service)
-- Render PostgreSQL with `pgvector`
-- Render Key Value / Redis
-- Governed DISHA Brain service
+- Next.js web application: `https://disha-v6-web.onrender.com`
+- Public custom domain: `https://disha6.6.thenitishkr.in`
+- Durable scheduler/workflow worker started with the web service
+- Render PostgreSQL with `pgvector` where configured
+- Render Key Value / Redis where configured
+- Governed disha6.6 Brain service: `https://disha-v6-brain.onrender.com`
 - Hybrid retrieval defaults to the deterministic local-hash embedding provider; the standalone embedding service remains available for larger deployments.
 
 ## Web build/start
 
-Build: `cd web && npm ci && npm run build`
+Build:
 
-Start: `./scripts/render-start-web.sh`
+```bash
+cd web && npm ci && npm run build
+```
+
+Start:
+
+```bash
+./scripts/render-start-web.sh
+```
 
 The start wrapper applies database migrations before serving traffic.
 
@@ -36,3 +45,7 @@ The start wrapper applies database migrations before serving traffic.
 - `NEXT_PUBLIC_APP_URL`
 
 Secrets belong in Render environment variables, not in git.
+
+## Repository rename note
+
+The repository contents now refer to the public product as `disha6.6`. The actual GitHub repository settings must still be renamed in GitHub repository settings if the canonical browser URL should become `Tashima-Tarsh/disha6.6`.
