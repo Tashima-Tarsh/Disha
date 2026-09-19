@@ -9,6 +9,9 @@ export type UniversalOsintQueryKind =
   | "domain"
   | "ip"
   | "cve"
+  | "asn"
+  | "norad_id"
+  | "space_weather"
   | "github_repository"
   | "sec_cik"
   | "email"
@@ -73,6 +76,16 @@ export function classifyUniversalOsintQuery(value: string): {
   const cik = query.match(/^cik\s*[:#-]?\s*(\d{1,10})$/i);
   if (cik) return { kind: "sec_cik", normalizedTarget: cik[1] };
 
+  const asn = query.match(/^as\s*[:#-]?\s*(\d{1,10})$/i);
+  if (asn) return { kind: "asn", normalizedTarget: `AS${asn[1]}` };
+
+  const norad = query.match(/^(?:norad|catnr|catalog)\s*[:#-]?\s*(\d{1,9})$/i);
+  if (norad) return { kind: "norad_id", normalizedTarget: norad[1] };
+
+  if (/^(?:space weather|geomagnetic storm|solar storm|solar flare|aurora forecast|noaa swpc)$/i.test(query)) {
+    return { kind: "space_weather", normalizedTarget: query };
+  }
+
   if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(query)) {
     return { kind: "email", normalizedTarget: lower };
   }
@@ -119,13 +132,34 @@ export function buildUniversalOsintPlan(value: string): UniversalOsintPlan {
     case "ip":
       runs = [
         { adapterId: "public-rdap", input: { query: classified.normalizedTarget, kind: "ip" }, reason: "Retrieve public IP registration metadata." },
+        { adapterId: "public-ripestat-whois", input: { resource: classified.normalizedTarget }, reason: "Retrieve RIR and routing-registry context from RIPEstat." },
         { adapterId: "public-gdelt-news", input: { query: classified.normalizedTarget, maxRecords: 20 }, reason: "Find public reporting mentioning the IP." },
       ];
       break;
     case "cve":
       runs = [
         { adapterId: "public-cisa-kev", input: { cve: classified.normalizedTarget, limit: 50 }, reason: "Check the official CISA Known Exploited Vulnerabilities catalog." },
+        { adapterId: "public-nvd-cve", input: { cve: classified.normalizedTarget }, reason: "Retrieve official NVD CVE metadata and CVSS context." },
+        { adapterId: "public-epss", input: { cve: classified.normalizedTarget }, reason: "Retrieve FIRST EPSS exploitation-probability context." },
         { adapterId: "public-gdelt-news", input: { query: classified.normalizedTarget, maxRecords: 20 }, reason: "Find public reporting mentioning the vulnerability." },
+      ];
+      break;
+    case "asn":
+      runs = [
+        { adapterId: "public-ripestat-whois", input: { resource: classified.normalizedTarget }, reason: "Retrieve public ASN registry and routing-registry context." },
+        { adapterId: "public-gdelt-news", input: { query: classified.normalizedTarget, maxRecords: 20 }, reason: "Find public reporting mentioning the ASN." },
+      ];
+      break;
+    case "norad_id":
+      runs = [
+        { adapterId: "public-celestrak-gp", input: { catalogNumber: classified.normalizedTarget }, reason: "Retrieve current public orbital elements from CelesTrak." },
+        { adapterId: "public-gdelt-news", input: { query: `NORAD ${classified.normalizedTarget}`, maxRecords: 20 }, reason: "Find public reporting mentioning the catalog object." },
+      ];
+      break;
+    case "space_weather":
+      runs = [
+        { adapterId: "public-noaa-space-weather", input: { limit: 12 }, reason: "Retrieve official NOAA SWPC public alerts." },
+        { adapterId: "public-gdelt-news", input: { query: classified.normalizedTarget, maxRecords: 20 }, reason: "Find public reporting about the space-weather event." },
       ];
       break;
     case "github_repository":
@@ -225,8 +259,8 @@ export function sanitizeUniversalQuery(value: string): string {
 }
 
 function evidenceClassForAdapter(adapterId: string): UniversalOsintEvidenceHit["evidenceClass"] {
-  if (["public-cisa-kev", "public-sec-edgar"].includes(adapterId)) return "official";
-  if (["public-dns-google", "public-certificate-transparency", "public-rdap", "public-github-repository"].includes(adapterId)) return "registry";
+  if (["public-cisa-kev", "public-sec-edgar", "public-nvd-cve", "public-noaa-space-weather"].includes(adapterId)) return "official";
+  if (["public-dns-google", "public-certificate-transparency", "public-rdap", "public-ripestat-whois", "public-github-repository", "public-celestrak-gp"].includes(adapterId)) return "registry";
   if (["public-wayback-cdx", "public-common-crawl"].includes(adapterId)) return "public_archive";
   if (adapterId === "public-gdelt-news") return "public_reporting";
   return "discovery";
