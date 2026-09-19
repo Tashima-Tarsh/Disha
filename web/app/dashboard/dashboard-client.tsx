@@ -24,6 +24,7 @@ import type {
   WorkspaceTimelineItem,
 } from "@/lib/intelligence/workspace-contract";
 import type { OperationalGeoFeature } from "@/lib/geospatial/contracts";
+import { LiveOsintPlane } from "@/components/intelligence/LiveOsintPlane";
 import { CommandPalette } from "./command-palette";
 import styles from "./analyst-workspace.module.css";
 
@@ -225,6 +226,8 @@ export function DashboardClient({ principal }: { principal: PrincipalView }) {
             <Metric label="Relationships" value={data.counts.edges} />
             <Metric label="Claims" value={data.counts.claims} />
           </section>
+
+          <LiveOsintPlane />
 
           <section className={styles.graphPanel} id="graph">
             <header className={styles.sectionHead}>
