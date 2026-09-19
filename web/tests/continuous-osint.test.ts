@@ -39,6 +39,11 @@ describe("continuous governed OSINT", () => {
       "public-openalex",
       "public-world-bank",
       "public-wikidata-search",
+      "public-nvd-cve",
+      "public-epss",
+      "public-ripestat-whois",
+      "public-celestrak-gp",
+      "public-noaa-space-weather",
       "dynamic-public-source",
     ]) {
       expect(ids.has(id)).toBe(true);
@@ -103,6 +108,8 @@ describe("continuous governed OSINT", () => {
       "public-common-crawl",
     ]);
     expect(listContinuousOsintBundleTemplates().some((template)=>template.kind==="company")).toBe(true);
+    expect(listContinuousOsintBundleTemplates().some((template)=>template.kind==="space_weather")).toBe(true);
+    expect(listContinuousOsintBundleTemplates().some((template)=>template.kind==="space_object")).toBe(true);
     const overview = await getContinuousOsintOverview("user-a");
     expect(overview.activeWatches).toBe(5);
     expect(overview.failedWatches).toBe(0);
