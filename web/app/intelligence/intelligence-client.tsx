@@ -266,6 +266,9 @@ function BundleFields({ kind, values, onChange }: { kind: string; values: Record
   if (kind === "company") return <>{input("cik", "SEC CIK")}{input("query", "Company name / topic")}</>;
   if (kind === "repository") return input("repository", "owner/repository");
   if (kind === "vulnerability") return <>{input("cve", "CVE (optional)")}{input("vendor", "Vendor (optional)")}{input("product", "Product (optional)")}</>;
+  if (kind === "network_resource") return input("resource", "IP address or AS13335");
+  if (kind === "space_object") return input("catalogNumber", "NORAD catalog number, e.g. 25544");
+  if (kind === "space_weather") return <span>NOAA SWPC public alerts · 15 minute watch cadence</span>;
   if (kind === "macro") return <>{input("country", "Country code, e.g. IND")}{input("indicator", "World Bank indicator")}</>;
   if (kind === "official_source") return input("sourceId", "DISHA source ID");
   return <>{input("sourceId", "Registered source ID")}{input("path", "Optional /path")}</>;
