@@ -10,8 +10,32 @@ if (cliPort) runtimeEnv.PORT = cliPort;
 runtimeEnv.PORT ||= "3000";
 runtimeEnv.HOSTNAME = process.env.DISHA_BIND_HOST?.trim() || "0.0.0.0";
 
-const resolvedDatabase = await resolveProductionDatabaseUrl(runtimeEnv);
-runtimeEnv.DATABASE_URL = resolvedDatabase.databaseUrl;
+const hasSupabaseRuntimeConfig = [
+  "DISHA_SUPABASE_PROJECT_REF",
+  "DISHA_SUPABASE_REGION",
+  "DISHA_SUPABASE_DB_USER",
+  "DISHA_SUPABASE_DB_PASSWORD",
+].every((key) => runtimeEnv[key]?.trim());
+
+if (runtimeEnv.DATABASE_URL?.trim() || hasSupabaseRuntimeConfig) {
+  try {
+    const resolvedDatabase = await resolveProductionDatabaseUrl(runtimeEnv);
+    runtimeEnv.DATABASE_URL = resolvedDatabase.databaseUrl;
+  } catch (error) {
+    delete runtimeEnv.DATABASE_URL;
+    process.stderr.write(JSON.stringify({
+      type: "production_database_resolution",
+      status: "degraded",
+      message: error instanceof Error ? error.message : String(error),
+    }) + "\n");
+  }
+} else {
+  process.stderr.write(JSON.stringify({
+    type: "production_database_resolution",
+    status: "degraded",
+    message: "Persistent database credentials are not configured; web authentication remains available in stateless mode.",
+  }) + "\n");
+}
 
 const applyMigrationsOnStart = runtimeEnv.DISHA_APPLY_MIGRATIONS_ON_START === "true";
 if (applyMigrationsOnStart) {
