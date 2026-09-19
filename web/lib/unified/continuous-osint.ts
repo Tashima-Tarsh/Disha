@@ -133,12 +133,12 @@ const watchSchemas: Record<string, z.ZodType> = {
     language: z.string().trim().min(2).max(12).optional(),
     limit: limitedInt(50, 10).optional(),
   }).strict(),
-  "public-nvd-cve": z.object({ cve: z.string().trim().regex(/^CVE-\\d{4}-\\d{4,}$/i) }).strict(),
-  "public-epss": z.object({ cve: z.string().trim().regex(/^CVE-\\d{4}-\\d{4,}$/i) }).strict(),
+  "public-nvd-cve": z.object({ cve: z.string().trim().regex(/^CVE-\d{4}-\d{4,}$/i) }).strict(),
+  "public-epss": z.object({ cve: z.string().trim().regex(/^CVE-\d{4}-\d{4,}$/i) }).strict(),
   "public-ripestat-whois": z.object({
-    resource: z.string().trim().min(2).max(80).regex(/^(?:AS\\d{1,10}|(?:\\d{1,3}\\.){3}\\d{1,3}|[0-9a-f:]{2,45})$/i),
+    resource: z.string().trim().min(2).max(80).regex(/^(?:AS\d{1,10}|(?:\d{1,3}\.){3}\d{1,3}|[0-9a-f:]{2,45})$/i),
   }).strict(),
-  "public-celestrak-gp": z.object({ catalogNumber: z.string().trim().regex(/^\\d{1,9}$/) }).strict(),
+  "public-celestrak-gp": z.object({ catalogNumber: z.string().trim().regex(/^\d{1,9}$/) }).strict(),
   "public-noaa-space-weather": z.object({ limit: limitedInt(50, 12).optional() }).strict(),
   "dynamic-public-source": z.object({
     sourceId: z.string().trim().min(3).max(80).regex(/^[a-z0-9][a-z0-9._-]+$/),
