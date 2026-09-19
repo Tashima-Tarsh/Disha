@@ -96,7 +96,7 @@ describe("cross-domain governed public adapters", () => {
 
   it("keeps ReliefWeb fail-closed until a pre-approved appname is configured", async () => {
     const bus = new OsintAdapterBus();
-    bus.register(createReliefWebAdapter(async () => new Response("{}", { status: 200 }), undefined));
+    bus.register(createReliefWebAdapter(async () => new Response("{}", { status: 200 }), ""));
     const result = await bus.run("public-reliefweb", { query: "earthquake response" }, context);
     expect(result.status).toBe("failed");
     expect(result.error).toBe("not_configured");
