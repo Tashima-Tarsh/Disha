@@ -47,7 +47,7 @@ type Brief = {
   universal: {
     query: string;
     normalizedTarget: string;
-    kind: "domain" | "ip" | "cve" | "asn" | "norad_id" | "space_weather" | "github_repository" | "sec_cik" | "email" | "phone" | "username" | "entity";
+    kind: "domain" | "ip" | "cve" | "asn" | "norad_id" | "space_weather" | "humanitarian_topic" | "github_repository" | "sec_cik" | "email" | "phone" | "username" | "entity";
     executedAdapters: string[];
     blockedCapabilities: string[];
     runs: UniversalRun[];
