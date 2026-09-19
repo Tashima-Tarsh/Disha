@@ -1,6 +1,6 @@
 <div align="center">
 
-# disha6.6
+# Disha6.6
 
 ### Constitutional Evidence Operating System for governed intelligence, OSINT, geospatial command, and reviewable AI.
 
