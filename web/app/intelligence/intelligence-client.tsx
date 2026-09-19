@@ -263,6 +263,7 @@ function BundleFields({ kind, values, onChange }: { kind: string; values: Record
   const input = (key: string, placeholder: string) => <input value={values[key] ?? ""} onChange={(event) => onChange(key, event.target.value)} placeholder={placeholder} aria-label={placeholder} />;
   if (kind === "domain") return input("domain", "example.org");
   if (kind === "topic") return input("query", "Public-interest topic");
+  if (kind === "humanitarian") return input("query", "Earthquake, flood, disaster or humanitarian topic");
   if (kind === "company") return <>{input("cik", "SEC CIK")}{input("query", "Company name / topic")}</>;
   if (kind === "repository") return input("repository", "owner/repository");
   if (kind === "vulnerability") return <>{input("cve", "CVE (optional)")}{input("vendor", "Vendor (optional)")}{input("product", "Product (optional)")}</>;
