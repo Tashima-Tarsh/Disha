@@ -109,4 +109,3 @@ The registry includes:
 Every entry is labeled as one of `builtin`, `connector_ready`, `requires_configuration`, `reference_only`, or `blocked_by_default`. Catalog presence never implies that DISHA can call the source without credentials, licensing review, or policy approval.
 
 Credential/breach repositories, leaked-data archives, active-reconnaissance frameworks, and other restricted sources remain non-executable by Universal Search unless a separately reviewed lawful workflow is added.
-
