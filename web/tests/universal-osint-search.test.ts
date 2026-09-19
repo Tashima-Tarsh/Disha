@@ -40,6 +40,12 @@ describe("universal OSINT search planner", () => {
     ]);
   });
 
+  it("routes humanitarian topics through ReliefWeb and public reporting", () => {
+    const plan = buildUniversalOsintPlan("India flood response");
+    expect(plan.kind).toBe("humanitarian_topic");
+    expect(plan.runs.map((run) => run.adapterId)).toEqual(["public-reliefweb", "public-gdelt-news"]);
+  });
+
   it("routes general entities through public graph and reporting sources", () => {
     const plan = buildUniversalOsintPlan("OpenAI");
     expect(plan.kind).toBe("entity");
