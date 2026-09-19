@@ -25,6 +25,7 @@ import type {
 } from "@/lib/intelligence/workspace-contract";
 import type { OperationalGeoFeature } from "@/lib/geospatial/contracts";
 import { LiveOsintPlane } from "@/components/intelligence/LiveOsintPlane";
+import { DishaMotionField } from "@/components/visual/DishaMotionField";
 import { CommandPalette } from "./command-palette";
 import styles from "./analyst-workspace.module.css";
 
@@ -136,6 +137,7 @@ export function DashboardClient({ principal }: { principal: PrincipalView }) {
 
   return (
     <div className={styles.shell}>
+      <DishaMotionField />
       <aside className={styles.rail}>
         <Link className={styles.brand} href="/dashboard" aria-label="DISHA intelligence workspace">
           <span>D</span>
