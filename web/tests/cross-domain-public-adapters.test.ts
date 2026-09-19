@@ -6,6 +6,7 @@ import {
   createNoaaSpaceWeatherAdapter,
   createNvdCveAdapter,
   createRipeStatWhoisAdapter,
+  createReliefWebAdapter,
 } from "../lib/unified/cross-domain-public-adapters";
 import { OsintAdapterBus } from "../lib/unified/osint-adapter-bus";
 
@@ -91,6 +92,33 @@ describe("cross-domain governed public adapters", () => {
     const result = await bus.run("public-celestrak-gp", { catalogNumber: "25544" }, context);
     expect(result.status).toBe("completed");
     expect(result.data?.objects[0]).toMatchObject({ objectName: "ISS (ZARYA)", noradCatId: "25544" });
+  });
+
+  it("keeps ReliefWeb fail-closed until a pre-approved appname is configured", async () => {
+    const bus = new OsintAdapterBus();
+    bus.register(createReliefWebAdapter(async () => new Response("{}", { status: 200 }), undefined));
+    const result = await bus.run("public-reliefweb", { query: "earthquake response" }, context);
+    expect(result.status).toBe("failed");
+    expect(result.error).toBe("not_configured");
+  });
+
+  it("normalizes configured ReliefWeb public report search", async () => {
+    const fetcher = async () => new Response(JSON.stringify({
+      data: [{
+        id: 123,
+        href: "https://api.reliefweb.int/v2/reports/123",
+        fields: {
+          title: "Earthquake Situation Report",
+          date: { created: "2026-09-19T00:00:00+00:00" },
+          source: [{ name: "Example Humanitarian Agency" }],
+        },
+      }],
+    }), { status: 200 });
+    const bus = new OsintAdapterBus();
+    bus.register(createReliefWebAdapter(fetcher, "disha-test-approved"));
+    const result = await bus.run("public-reliefweb", { query: "earthquake response", limit: 5 }, context);
+    expect(result.status).toBe("completed");
+    expect(result.data?.reports[0]).toMatchObject({ title: "Earthquake Situation Report" });
   });
 
   it("retrieves bounded NOAA SWPC alert records", async () => {
